@@ -2,17 +2,17 @@
 <ruleset name="Custom ruleset"
          xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd"
-         xsi:noNamespaceSchemaLocation="http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+
     <!-- 制作ruleset -->
-    <!-- see: http://pmd.sourceforge.net/pmd-5.0.0/howtomakearuleset.html -->
+    <!-- see: https://pmd.github.io/pmd-6.3.0/pmd_userdocs_making_rulesets.html -->
 
     <!-- maven插件 -->
-    <!-- see: http://pmd.sourceforge.net/pmd-5.0.0/maven-plugin.html -->
+    <!-- see: https://pmd.github.io/pmd-6.3.0/pmd_userdocs_tools_maven.html -->
     <!-- see: https://maven.apache.org/plugins/maven-pmd-plugin/examples/usingRuleSets.html -->
 
     <!--  -->
-    <!-- see: http://pmd.sourceforge.net/pmd-5.3.5/pmd-java/rules/index.html -->
+    <!-- see: https://pmd.github.io/pmd-6.3.0/pmd_rules_java.html -->
     <!-- see: https://github.com/pmd/pmd -->
     <!-- see: https://github.com/pmd/pmd/tree/master/pmd-java/src/main/resources/rulesets/java -->
 
