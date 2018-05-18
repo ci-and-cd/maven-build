@@ -1,0 +1,11 @@
+# git config --local include.path ../.gitconfig
+# or
+# edit .git/config
+# [include]
+#     path = ../.gitconfig
+[core]
+    autocrlf = false
+	filemode = true
+	ignorecase = false
+	quotepath = false
+	safecrlf = true
