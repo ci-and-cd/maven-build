@@ -28,28 +28,28 @@
                 <plugin>
                     <groupId>org.asciidoctor</groupId>
                     <artifactId>asciidoctor-maven-plugin</artifactId>
-                    <version>1.5.3</version>
+                    <version>1.5.6</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.2</version>
+                    <version>2.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
-                    <version>1.3.6</version>
+                    <version>3.1.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>animal-sniffer-maven-plugin</artifactId>
-                    <version>1.15</version>
+                    <version>1.16</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>3.0.4</version>
+                    <version>3.0.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -63,29 +63,30 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>2.17</version>
+                    <version>3.0.0</version>
                     <dependencies>
+                        <!--<dependency>-->
+                            <!--<groupId>com.puppycrawl.tools</groupId>-->
+                            <!--<artifactId>checkstyle</artifactId>-->
+                            <!--<version>6.19</version>-->
+                        <!--</dependency>-->
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>6.19</version>
+                            <version>8.10</version>
                         </dependency>
-                        <!--dependency>
-                            <groupId>com.puppycrawl.tools</groupId>
-                            <artifactId>checkstyle</artifactId>
-                            <version>8.1</version>
-                        </dependency-->
                     </dependencies>
                 </plugin>
                 <plugin>
                     <artifactId>maven-jxr-plugin</artifactId>
                     <version>2.5</version>
                 </plugin>
-                <!-- maven-pmd-plugin:3.6 depends on net.sourceforge.pmd:pmd:5.3.5 -->
-                <!-- maven-pmd-plugin:3.7 depends on net.sourceforge.pmd:pmd:5.5.1 -->
+                <!-- maven-pmd-plugin:3.6   depends on net.sourceforge.pmd:pmd:5.3.5 -->
+                <!-- maven-pmd-plugin:3.7   depends on net.sourceforge.pmd:pmd:5.5.1 -->
+                <!-- maven-pmd-plugin:3.9.0 depends on net.sourceforge.pmd:pmd:6.0.1 -->
                 <plugin>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.6</version>
+                    <version>3.9.0</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
@@ -93,7 +94,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-report-plugin</artifactId>
-                    <version>2.19.1</version>
+                    <version>2.21.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -195,30 +196,30 @@
             <id>default-checkstyle-config</id>
             <activation>
                 <!--file>
-                    <exists>${maven.multiModuleProjectDirectory}/src/main/checkstyle/google_checks_6.19.xml</exists>
+                    <exists>${maven.multiModuleProjectDirectory}/src/main/checkstyle/google_checks_8.10.xml</exists>
                 </file-->
                 <property>
                     <name>!checkstyle.config.location</name>
                 </property>
             </activation>
             <properties>
-                <!--checkstyle.config.location>${maven.multiModuleProjectDirectory}/src/main/checkstyle/google_checks_6.19.xml</checkstyle.config.location-->
-                <checkstyle.config.location>https://raw.githubusercontent.com/home1-oss/maven-build/master/src/main/checkstyle/google_checks_6.19.xml</checkstyle.config.location>
+                <!--checkstyle.config.location>${maven.multiModuleProjectDirectory}/src/main/checkstyle/google_checks_8.10.xml</checkstyle.config.location-->
+                <checkstyle.config.location>https://raw.githubusercontent.com/home1-oss/maven-build/master/src/main/checkstyle/google_checks_8.10.xml</checkstyle.config.location>
             </properties>
         </profile>
         <profile>
             <id>default-pmd-ruleset</id>
             <activation>
                 <!--file>
-                    <exists>${maven.multiModuleProjectDirectory}/src/main/pmd/pmd-ruleset-5.3.5.xml</exists>
+                    <exists>${maven.multiModuleProjectDirectory}/src/main/pmd/pmd-ruleset-6.0.1.xml</exists>
                 </file-->
                 <property>
                     <name>!pmd.ruleset.location</name>
                 </property>
             </activation>
             <properties>
-                <!--pmd.ruleset.location>${maven.multiModuleProjectDirectory}/src/main/pmd/pmd-ruleset-5.3.5.xml</pmd.ruleset.location-->
-                <pmd.ruleset.location>https://raw.githubusercontent.com/home1-oss/maven-build/master/src/main/pmd/pmd-ruleset-5.3.5.xml</pmd.ruleset.location>
+                <!--pmd.ruleset.location>${maven.multiModuleProjectDirectory}/src/main/pmd/pmd-ruleset-6.0.1.xml</pmd.ruleset.location-->
+                <pmd.ruleset.location>https://raw.githubusercontent.com/home1-oss/maven-build/master/src/main/pmd/pmd-ruleset-6.0.1.xml</pmd.ruleset.location>
             </properties>
         </profile>
 
@@ -447,7 +448,6 @@
                             <linkXRef>true</linkXRef>
                             <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
                             <minimumTokens>100</minimumTokens>
-                            <targetJdk>${java.version}</targetJdk>
                             <rulesets>
                                 <ruleset>${pmd.ruleset.location}</ruleset>
                             </rulesets>
@@ -630,7 +630,7 @@
                 <sonar.jacoco.reportPath>${project.build.directory}/jacoco.exec</sonar.jacoco.reportPath>
                 <sonar.jacoco.itReportPath>${jacoco.itReportPath}</sonar.jacoco.itReportPath>
                 <!-- should match version of sonar-java-plugin -->
-                <sonar-jacoco-listeners.version>4.4.0.8066</sonar-jacoco-listeners.version>
+                <sonar-jacoco-listeners.version>5.3.0.13828</sonar-jacoco-listeners.version>
             </properties>
             <build>
                 <pluginManagement>
@@ -639,7 +639,7 @@
                         <plugin>
                             <groupId>org.sonarsource.scanner.maven</groupId>
                             <artifactId>sonar-maven-plugin</artifactId>
-                            <version>3.3.0.603</version>
+                            <version>3.4.0.905</version>
                         </plugin>
                     </plugins>
                 </pluginManagement>
