@@ -123,7 +123,7 @@
         </profile>
 
         <profile>
-            <id>skip-docker-plugin-lifecycle-binding-when-publish-deploy-segregation</id>
+            <id>docker-maven-plugin-lifecycle-binding-when-not-publish-deploy-segregation</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>

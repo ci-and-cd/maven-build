@@ -232,6 +232,18 @@
 
     <profiles>
         <profile>
+            <id>default-build-publish-channel</id>
+            <activation>
+                <property>
+                    <name>!build.publish.channel</name>
+                </property>
+            </activation>
+            <properties>
+                <build.publish.channel>snapshot</build.publish.channel>
+            </properties>
+        </profile>
+
+        <profile>
             <id>default-site-path</id>
             <activation>
                 <property>

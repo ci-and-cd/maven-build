@@ -50,7 +50,7 @@
     <repositories>
         <repository>
             <id>central</id>
-            <url>http://central</url>
+            <url>http://repo1.maven.org/maven2</url>
             <releases>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
@@ -86,7 +86,7 @@
     <pluginRepositories>
         <pluginRepository>
             <id>central</id>
-            <url>http://central</url>
+            <url>http://repo1.maven.org/maven2</url>
             <releases>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
@@ -225,7 +225,6 @@
                     <version>3.0.1</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-toolchains-plugin</artifactId>
                     <version>1.1</version>
                 </plugin>
@@ -233,6 +232,11 @@
                     <groupId>pl.project13.maven</groupId>
                     <artifactId>git-commit-id-plugin</artifactId>
                     <version>2.2.4</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-project-info-reports-plugin</artifactId>
+                    <version>2.9</version>
                 </plugin>
             </plugins>
         </pluginManagement>
