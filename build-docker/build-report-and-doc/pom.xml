@@ -376,7 +376,7 @@
                                 <artifactId>umlgraph</artifactId>
                                 <version>${umlgraph.version}</version>
                             </docletArtifact>
-                            <additionalparam>-views -all</additionalparam>
+                            <additionalOptions>-views -all</additionalOptions>
                             <!-- UML Graph需要通过匹配标签插入javadoc生成的html -->
                             <additionalJOption>-J-Duser.language=en</additionalJOption>
                             <useStandardDocletOptions>true</useStandardDocletOptions>
