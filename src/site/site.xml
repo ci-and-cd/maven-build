@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/DECORATION/1.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+
+    <bannerLeft>
+        <name>${project.name}</name>
+    </bannerLeft>
+
+    <!--
+    https://maven.apache.org/plugins/maven-site-plugin/examples/sitedescriptor.html
+    https://maven.apache.org/skins/index.html
+    http://maven.apache.org/skins/maven-fluido-skin/
+    https://github.com/apache/maven-skins/blob/trunk/maven-fluido-skin/src/site/site.xml
+    -->
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-fluido-skin</artifactId>
+        <version>1.5</version>
+    </skin>
+
+    <custom>
+        <fluidoSkin>
+            <topBarEnabled>true</topBarEnabled>
+            <sideBarEnabled>true</sideBarEnabled>
+            <sourceLineNumbersEnabled>true</sourceLineNumbersEnabled>
+        </fluidoSkin>
+    </custom>
+    <body>
+        <menu ref="parent" />
+        <menu name="DOCUMENTATION">
+            <item href="README.html" name="README" />
+            <item href="INTRODUCTION.html" name="INTRODUCTION" />
+            <item href="CONTRIBUTION.html" name="CONTRIBUTION" />
+        </menu>
+        <!--<menu name="Projects">-->
+            <!--&lt;!&ndash;<item href="project_name/index.html" name="project_name" />&ndash;&gt;-->
+            <!--<item href="#" name="-&#45;&#45;&#45;&#45;" />-->
+            <!--&lt;!&ndash;<item href="project_name/index.html" name="project_name" />&ndash;&gt;-->
+        <!--</menu>-->
+        <menu ref="modules" />
+        <!--<menu ref="reports" />-->
+        <menu ref="reports" inherit="bottom" />
+    </body>
+</project>

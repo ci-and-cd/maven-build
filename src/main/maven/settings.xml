@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                        http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+    <interactiveMode/>
+    <localRepository>${user.home}/.m2/repository</localRepository>
+
+    <mirrors>
+        <!-- Do not use variable substitution in mirrors when using an IDE, it does not works. -->
+        <!-- mirrorOf: pom.xml repositories repository id -->
+        <mirror>
+            <id>mirror</id>
+            <name>mirror</name>
+            <url>http://nexus3.local:28081/nexus/repository/maven-public/</url>
+            <mirrorOf>*</mirrorOf>
+            <!--<mirrorOf>central</mirrorOf>-->
+            <!--<mirrorOf>central,spring-libs-release,spring-milestone,spring-libs-snapshot</mirrorOf>-->
+            <!--<mirrorOf>external:*,!github-chshawkn-wagon-maven-plugin</mirrorOf>-->
+        </mirror>
+    </mirrors>
+
+    <offline/>
+
+    <pluginGroups>
+        <pluginGroup>org.apache.maven.plugins</pluginGroup>
+        <pluginGroup>org.apache.tomcat.maven</pluginGroup>
+        <pluginGroup>org.codehaus.mojo</pluginGroup>
+        <pluginGroup>org.sonarsource.scanner.maven</pluginGroup>
+    </pluginGroups>
+
+    <proxies>
+        <!--<proxy><id>http-proxy</id><active>true</active><protocol>http</protocol><host>127.0.0.1</host><port>8080</port><nonProxyHosts>127.0.0.1</nonProxyHosts></proxy>-->
+        <!--<proxy><id>http-proxy</id><active>true</active><protocol>socks5</protocol><host>127.0.0.1</host><port>1080</port><nonProxyHosts>127.0.0.1</nonProxyHosts></proxy>-->
+    </proxies>
+
+    <servers>
+        <!-- @formatter:off -->
+        <server><id>gpg.passphrase</id><passphrase>${env.GPG_PASSPHRASE}</passphrase></server>
+        <server><id>github</id><password>${env.GITHUB_SITE_AUTH_TOKEN}</password></server>
+        <server><id>OSSRH-releases</id><username>${env.MAVEN_CENTRAL_USER}</username><password>${env.MAVEN_CENTRAL_PASS}</password></server>
+        <server><id>OSSRH-snapshots</id><username>${env.MAVEN_CENTRAL_USER}</username><password>${env.MAVEN_CENTRAL_PASS}</password></server>
+        <server>
+            <id>docker-hub</id>
+            <username>${env.DOCKERHUB_USER}</username><password>${env.DOCKERHUB_PASS}</password>
+            <configuration><email>${env.DOCKERHUB_MAIL}</email></configuration>
+        </server>
+
+        <server><id>internal-nexus3-releases</id><username>deployment</username><password>{W4hzroIAQKoHOtCYkQror16gbyrd9/KMO2v4QiyJYho=}</password></server>
+        <server><id>internal-nexus3-snapshots</id><username>deployment</username><password>{W4hzroIAQKoHOtCYkQror16gbyrd9/KMO2v4QiyJYho=}</password></server>
+        <server><id>internal-nexus3-thirdparty</id><username>deployment</username><password>{W4hzroIAQKoHOtCYkQror16gbyrd9/KMO2v4QiyJYho=}</password></server>
+        <server>
+            <id>internal-mvnsite</id>
+            <username>root</username>
+            <privateKey>${user.home}/.ssh/mvnsite.internal</privateKey>
+        </server>
+
+        <!-- see: http://maven.apache.org/guides/mini/guide-encryption.html -->
+        <!-- mvn &#x002d;&#x002d;encrypt-password ${password} -->
+        <!-- accept RSA key fingerprint -->
+        <!-- ssh -o UserKnownHostsFile=~/.ssh/known_hosts root@mvnsite.local -p 10022 -->
+        <server><id>local-nexus3-releases</id><username>deployment</username><password>deployment</password></server>
+        <server><id>local-nexus3-snapshots</id><username>deployment</username><password>deployment</password></server>
+        <server><id>local-nexus3-thirdparty</id><username>deployment</username><password>deployment</password></server>
+        <server>
+            <id>local-mvnsite</id>
+            <!--<username>root</username><passphrase>if required</passphrase><privateKey>${user.home}/.ssh/mvnsite.local</privateKey>-->
+            <username>deployment</username><password>deployment</password>
+            <configuration>
+                <!-- see: https://maven.apache.org/wagon/apidocs/index.html -->
+                <!-- java.lang.ClassNotFoundException: org.apache.maven.wagon.providers.ssh.knownhost.NullKnownHostProvider -->
+                <!--knownHostsProvider implementation="org.apache.maven.wagon.providers.ssh.knownhost.NullKnownHostProvider">
+                    <hostKeyChecking>no</hostKeyChecking>
+                </knownHostsProvider-->
+            </configuration>
+        </server>
+        <!-- @formatter:on -->
+    </servers>
+
+    <profiles>
+    </profiles>
+
+    <usePluginRegistry/>
+</settings>

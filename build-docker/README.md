@@ -6,7 +6,7 @@ Parent pom for docker projects
 io.fabric8:docker-maven-plugin
 
 com.spotify:docker-maven-plugin
-> clean, build, deploy docker images
+> clean, build, push docker images
 
 maven-antrun-plugin
 > clean filtered '${project.basedir}/src/main/docker/Dockerfile'
@@ -29,3 +29,16 @@ maven-compiler-plugin and maven-javadoc-plugin
 
 - docker.registry
 > registry.docker.local
+
+## Example ~/.docker/daemon.json of Docker for Mac
+```json
+{
+  "debug" : true,
+  "experimental" : true,
+  "registry-mirrors" : [
+    "https://docker.mirrors.ustc.edu.cn",
+    "http://hub-mirror.c.163.com",
+    "http://mirror.gcr.io"
+  ]
+}
+```

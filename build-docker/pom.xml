@@ -14,10 +14,6 @@
     <name>build-docker</name>
     <packaging>pom</packaging>
 
-    <modules>
-        <module>build-report-and-doc</module>
-    </modules>
-
     <build>
         <pluginManagement>
             <plugins>

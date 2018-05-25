@@ -15,11 +15,6 @@
         <module>build-docker</module>
     </modules>
 
-    <ciManagement>
-        <system>Travis CI</system>
-        <url>https://travis-ci.org/home1-oss/maven-build</url>
-    </ciManagement>
-
     <developers>
         <developer>
             <name>Haolun Zhang</name>
@@ -27,102 +22,88 @@
         </developer>
     </developers>
 
-    <issueManagement>
-        <system>GitHub Issues</system>
-        <url>https://github.com/home1-oss/maven-build/issues</url>
-    </issueManagement>
-
-    <licenses>
-        <license>
-            <name>MIT License</name>
-            <url>http://www.opensource.org/licenses/mit-license.php</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
+    <!-- For this to work, you must go to: Preferences->Editor->Code Style->Formatter Control and check Enable formatter markers in comments -->
+    <!-- @formatter:off -->
+    <ciManagement><system>Travis CI</system><url>https://travis-ci.org/home1-oss/maven-build</url></ciManagement>
+    <issueManagement><system>GitHub Issues</system><url>https://github.com/home1-oss/maven-build/issues</url></issueManagement>
+    <licenses><license><name>MIT License</name><url>http://www.opensource.org/licenses/mit-license.php</url><distribution>repo</distribution></license></licenses>
     <scm>
         <url>https://github.com/home1-oss/maven-build</url>
         <connection>scm:git:https://github.com/home1-oss/maven-build.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/home1-oss/maven-build.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
+    <!-- @formatter:on -->
 
     <repositories>
+        <!-- @formatter:off -->
         <repository>
-            <id>central</id>
-            <url>http://repo1.maven.org/maven2</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
+            <id>central</id><url>http://repo1.maven.org/maven2</url>
+            <releases><enabled>true</enabled><updatePolicy>always</updatePolicy></releases>
+            <snapshots><enabled>true</enabled><updatePolicy>always</updatePolicy></snapshots>
         </repository>
         <repository>
             <id>spring-libs-release</id>
             <url>http://repo.spring.io/libs-release</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <snapshots><enabled>false</enabled></snapshots>
         </repository>
         <repository>
             <id>spring-milestone</id>
             <url>http://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <snapshots><enabled>false</enabled></snapshots>
         </repository>
         <repository>
             <id>spring-libs-snapshot</id>
             <url>http://repo.spring.io/libs-snapshot</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
+            <snapshots><enabled>true</enabled></snapshots>
         </repository>
+        <!-- @formatter:on -->
     </repositories>
 
     <pluginRepositories>
+        <!-- @formatter:off -->
         <pluginRepository>
             <id>central</id>
             <url>http://repo1.maven.org/maven2</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
+            <releases><enabled>true</enabled><updatePolicy>always</updatePolicy></releases>
+            <snapshots><enabled>true</enabled><updatePolicy>always</updatePolicy></snapshots>
         </pluginRepository>
         <pluginRepository>
             <id>spring-libs-release</id>
             <url>http://repo.spring.io/libs-release</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
         <pluginRepository>
             <id>spring-milestone</id>
             <url>http://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
         <pluginRepository>
             <id>spring-libs-snapshot</id>
             <url>http://repo.spring.io/libs-snapshot</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
+            <snapshots><enabled>true</enabled></snapshots>
         </pluginRepository>
+        <pluginRepository>
+            <id>oss-github-maven-plugins</id>
+            <url>https://raw.github.com/home1-oss/maven-plugins/mvn-repo</url>
+            <name>Forked github-maven-plugins that upload faster</name>
+            <layout>default</layout>
+            <snapshots><enabled>true</enabled></snapshots>
+            <releases><enabled>true</enabled></releases>
+        </pluginRepository>
+        <!-- @formatter:on -->
     </pluginRepositories>
 
     <properties>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <downloadSources>true</downloadSources>
+
+        <!-- for site on github, id (github.global.server) must match the config in your settings.xml -->
+        <github.global.server>github</github.global.server>
+        <github.global.oauth2Token>${env.GITHUB_SITE_AUTH_TOKEN}</github.global.oauth2Token>
+
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
     <build>
@@ -140,104 +121,111 @@
                         <npmDownloadRoot>${frontend.npmDownloadRoot}</npmDownloadRoot>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <groupId>com.amashchenko.maven.plugin</groupId>
-                    <artifactId>gitflow-maven-plugin</artifactId>
-                    <version>1.9.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.mysema.maven</groupId>
-                    <artifactId>apt-maven-plugin</artifactId>
-                    <version>1.1.3</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.soebes.maven.plugins</groupId>
-                    <artifactId>echo-maven-plugin</artifactId>
-                    <version>0.3.0</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.21.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.0.0</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>2.21.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>properties-maven-plugin</artifactId>
-                    <version>1.0.0</version>
-                </plugin>
+                <!-- @formatter:off -->
+                <plugin><groupId>com.amashchenko.maven.plugin</groupId><artifactId>gitflow-maven-plugin</artifactId><version>1.9.0</version></plugin>
+                <plugin><groupId>com.mysema.maven</groupId><artifactId>apt-maven-plugin</artifactId><version>1.1.3</version></plugin>
+                <plugin><groupId>com.soebes.maven.plugins</groupId><artifactId>echo-maven-plugin</artifactId><version>0.3.0</version></plugin>
+                <!-- TODO find a newer plugin for groovy scripts to replace gmaven-plugin -->
+                <plugin><groupId>org.codehaus.groovy.maven</groupId><artifactId>gmaven-plugin</artifactId><version>1.0</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.0.0</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>properties-maven-plugin</artifactId><version>1.0.0</version></plugin>
                 <plugin>
                     <artifactId>maven-antrun-plugin</artifactId>
                     <version>1.8</version>
                     <dependencies>
-                        <dependency>
-                            <groupId>ant-contrib</groupId>
-                            <artifactId>ant-contrib</artifactId>
-                            <version>20020829</version>
-                        </dependency>
+                        <dependency><groupId>ant-contrib</groupId><artifactId>ant-contrib</artifactId><version>20020829</version></dependency>
                     </dependencies>
                 </plugin>
+                <plugin><artifactId>maven-clean-plugin</artifactId><version>3.1.0</version></plugin>
+                <plugin><artifactId>maven-compiler-plugin</artifactId><version>3.7.0</version></plugin>
+                <plugin><artifactId>maven-dependency-plugin</artifactId><version>3.1.0</version></plugin>
+                <plugin><artifactId>maven-deploy-plugin</artifactId><version>2.8.2</version></plugin>
+                <plugin><artifactId>maven-enforcer-plugin</artifactId><version>3.0.0-M1</version></plugin>
+                <plugin><artifactId>maven-failsafe-plugin</artifactId><version>2.21.0</version></plugin>
+                <plugin><artifactId>maven-install-plugin</artifactId><version>2.5.2</version></plugin>
+                <plugin><artifactId>maven-jar-plugin</artifactId><version>3.1.0</version></plugin>
+                <plugin><artifactId>maven-javadoc-plugin</artifactId><version>3.0.0</version></plugin>
+                <plugin><artifactId>maven-source-plugin</artifactId><version>3.0.1</version></plugin>
+                <plugin><artifactId>maven-resources-plugin</artifactId><version>3.0.1</version></plugin>
+                <plugin><artifactId>maven-surefire-plugin</artifactId><version>2.21.0</version></plugin>
+                <plugin><artifactId>maven-toolchains-plugin</artifactId><version>1.1</version></plugin>
+                <plugin><groupId>pl.project13.maven</groupId><artifactId>git-commit-id-plugin</artifactId><version>2.2.4</version></plugin>
+
+                <plugin><artifactId>maven-project-info-reports-plugin</artifactId><version>2.9</version></plugin>
+                <!-- @formatter:on -->
+
+                <!-- @formatter:off -->
                 <plugin>
-                    <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.1.0</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.7.0</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.1.0</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.2</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.0.0-M1</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-install-plugin</artifactId>
-                    <version>2.5.2</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.1.0</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.0.0</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>3.0.1</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.0.1</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-toolchains-plugin</artifactId>
-                    <version>1.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>pl.project13.maven</groupId>
-                    <artifactId>git-commit-id-plugin</artifactId>
-                    <version>2.2.4</version>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.7.1</version>
+                    <dependencies>
+                        <dependency><groupId>org.apache.maven.doxia</groupId><artifactId>doxia-module-markdown</artifactId><version>1.8</version></dependency>
+                        <dependency><groupId>org.pegdown</groupId><artifactId>pegdown</artifactId><version>1.6.0</version></dependency>
+                        <dependency><groupId>org.apache.maven.wagon</groupId><artifactId>wagon-webdav-jackrabbit</artifactId><version>3.0.0</version></dependency>
+                        <!-- org.apache.maven.wagon:wagon-ssh support ssh/scp and password only -->
+                        <dependency>
+                            <groupId>org.apache.maven.wagon</groupId>
+                            <artifactId>wagon-ssh</artifactId>
+                            <version>3.0.0</version>
+                            <exclusions>
+                                <exclusion><groupId>com.jcraft</groupId><artifactId>jsch</artifactId></exclusion>
+                            </exclusions>
+                        </dependency>
+                        <dependency><groupId>com.jcraft</groupId><artifactId>jsch</artifactId><version>0.1.54</version></dependency>
+                        <!-- support for sshexe/scpexe and privateKey -->
+                        <dependency><groupId>org.apache.maven.wagon</groupId><artifactId>wagon-ssh-external</artifactId><version>3.0.0</version></dependency>
+                        <!-- provide org.apache.maven.wagon.providers.ssh.knownhost.NullKnownHostProvider -->
+                        <dependency>
+                            <groupId>org.apache.maven.wagon</groupId>
+                            <artifactId>wagon-ssh-common</artifactId>
+                            <version>3.0.0</version>
+                            <exclusions>
+                                <exclusion><groupId>org.codehaus.plexus</groupId><artifactId>plexus-utils</artifactId></exclusion>
+                            </exclusions>
+                        </dependency>
+                    </dependencies>
+                    <!-- see: http://maven.apache.org/plugins/maven-site-plugin/maven-3.html#Site_descriptor_attachment -->
+                    <executions>
+                        <execution><id>attach-descriptor</id><goals><goal>attach-descriptor</goal></goals></execution>
+                    </executions>
                 </plugin>
 
                 <plugin>
-                    <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>2.9</version>
+                    <groupId>com.github.github</groupId>
+                    <artifactId>site-maven-plugin</artifactId>
+                    <version>0.13.0.OSS-M1</version>
+                    <configuration>
+                        <message>Creating site for ${project.artifactId}-${project.version}</message>
+                        <merge>true</merge>
+                        <noJekyll>true</noJekyll>
+                        <repositoryOwner>${env.GITHUB_SITE_REPO_OWNER}</repositoryOwner>
+                    </configuration>
                 </plugin>
+                <!-- @formatter:on -->
+
+                <!-- @formatter:off -->
+                <plugin><groupId>org.asciidoctor</groupId><artifactId>asciidoctor-maven-plugin</artifactId><version>1.5.6</version></plugin>
+                <plugin><groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId><version>3.1.2</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>animal-sniffer-maven-plugin</artifactId><version>1.16</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId><version>3.0.5</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>jdepend-maven-plugin</artifactId><version>2.0</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>taglist-maven-plugin</artifactId><version>2.4</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>versions-maven-plugin</artifactId><version>2.5</version></plugin>
+                <plugin>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.0.0</version>
+                    <dependencies>
+                        <!--<dependency><groupId>com.puppycrawl.tools</groupId><artifactId>checkstyle</artifactId><version>6.19</version></dependency>-->
+                        <dependency><groupId>com.puppycrawl.tools</groupId><artifactId>checkstyle</artifactId><version>8.10</version></dependency>
+                    </dependencies>
+                </plugin>
+                <plugin><artifactId>maven-jxr-plugin</artifactId><version>2.5</version></plugin>
+                <!-- maven-pmd-plugin:3.6   depends on net.sourceforge.pmd:pmd:5.3.5 -->
+                <!-- maven-pmd-plugin:3.7   depends on net.sourceforge.pmd:pmd:5.5.1 -->
+                <!-- maven-pmd-plugin:3.9.0 depends on net.sourceforge.pmd:pmd:6.0.1 -->
+                <plugin><artifactId>maven-pmd-plugin</artifactId><version>3.9.0</version></plugin>
+                <plugin><artifactId>maven-surefire-report-plugin</artifactId><version>2.21.0</version></plugin>
+                <!-- @formatter:on -->
             </plugins>
         </pluginManagement>
         <plugins>
@@ -276,25 +264,146 @@
                     </commitMessages>
                 </configuration>
             </plugin>
+            <!-- @formatter:off -->
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>auto-clean-git-properties</id>
                         <phase>clean</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
+                        <goals><goal>run</goal></goals>
+                        <configuration>
+                            <target>
+                                <delete failonerror="false"><fileset dir="${project.basedir}/src/main/resources" includes="git.properties"/></delete>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>auto-clean-readme</id>
+                        <phase>clean</phase>
+                        <goals><goal>run</goal></goals>
                         <configuration>
                             <target>
                                 <delete failonerror="false">
-                                    <fileset dir="${project.basedir}/src/main/resources" includes="git.properties"/>
+                                    <fileset dir="${project.basedir}/src/site/markdown" includes="README.md"/>
+                                    <fileset dir="${project.basedir}/src/site/markdown/src/readme" includes="**/*"/>
+                                    <fileset dir="${project.basedir}/src/site/resources" includes="**/*"/>
                                 </delete>
                             </target>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>ensure-dot-gitkeep</id>
+                        <phase>initialize</phase>
+                        <goals><goal>run</goal></goals>
+                        <configuration>
+                            <tasks>
+                                <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath"/>
+                                <if>
+                                    <available file="${project.basedir}/src/readme" type="dir"/>
+                                    <then>
+                                        <echo>${project.basedir}/src/readme exists</echo>
+                                        <if>
+                                            <available file="${project.basedir}/src/readme/.gitkeep"/>
+                                            <else>
+                                                <echo>touch ${project.basedir}/src/readme/.gitkeep</echo>
+                                                <touch file="${project.basedir}/src/readme/.gitkeep"/>
+                                            </else>
+                                        </if>
+                                    </then>
+                                    <else>
+                                        <echo>${project.basedir}/src/readme does not exist</echo>
+                                    </else>
+                                </if>
+                                <if>
+                                    <available file="${project.basedir}/src/main/asciidoc" type="dir"/>
+                                    <then>
+                                        <echo>${project.basedir}/src/main/asciidoc exists</echo>
+                                        <if>
+                                            <available file="${project.basedir}/src/main/asciidoc/.gitkeep"/>
+                                            <else>
+                                                <echo>touch ${project.basedir}/src/main/asciidoc/.gitkeep</echo>
+                                                <touch file="${project.basedir}/src/main/asciidoc/.gitkeep"/>
+                                            </else>
+                                        </if>
+                                    </then>
+                                    <else>
+                                        <echo>${project.basedir}/src/main/asciidoc does not exist</echo>
+                                    </else>
+                                </if>
+                            </tasks>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>auto-copy-readme-to-site-markdown</id>
+                        <phase>pre-site</phase>
+                        <goals><goal>copy-resources</goal></goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/src/site/markdown</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}</directory>
+                                    <includes><include>README.md</include></includes>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>auto-copy-readme-assets-to-site-markdown</id>
+                        <phase>pre-site</phase>
+                        <goals><goal>copy-resources</goal></goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/src/site/markdown/src/readme</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/src/readme</directory>
+                                    <filtering>false</filtering>
+                                    <excludes><exclude>**/.gitkeep</exclude></excludes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>auto-copy-readme-assets-to-site-resources</id>
+                        <phase>pre-site</phase>
+                        <goals><goal>copy-resources</goal></goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/src/site/resources/src/readme</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/src/readme</directory>
+                                    <filtering>false</filtering>
+                                    <excludes><exclude>**/.gitkeep</exclude></excludes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>auto-copy-markdown-assets-to-site-resources</id>
+                        <phase>pre-site</phase>
+                        <goals><goal>copy-resources</goal></goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/src/site/resources/images</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/src/site/markdown/images</directory>
+                                    <filtering>false</filtering>
+                                    <excludes><exclude>**/.gitkeep</exclude></excludes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- see: https://github.com/google/error-prone -->
+            <!-- override plexus-compiler-javac-errorprone's dependency on Error Prone with the latest version -->
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -302,22 +411,12 @@
                     <showDeprecation>true</showDeprecation>
                     <showWarnings>true</showWarnings>
                     <!-- javac-with-errorprone not working on Eclipse m2e -->
-                    <!--compilerId>javac-with-errorprone</compilerId>
-                    <forceJavacCompilerUse>true</forceJavacCompilerUse-->
+                    <!--<compilerId>javac-with-errorprone</compilerId>-->
+                    <!--<forceJavacCompilerUse>true</forceJavacCompilerUse>-->
                 </configuration>
-                <!-- see: https://github.com/google/error-prone -->
-                <!-- override plexus-compiler-javac-errorprone's dependency on Error Prone with the latest version -->
                 <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.plexus</groupId>
-                        <artifactId>plexus-compiler-javac-errorprone</artifactId>
-                        <version>2.8.4</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.google.errorprone</groupId>
-                        <artifactId>error_prone_core</artifactId>
-                        <version>2.3.1</version>
-                    </dependency>
+                    <dependency><groupId>org.codehaus.plexus</groupId><artifactId>plexus-compiler-javac-errorprone</artifactId><version>2.8.4</version></dependency>
+                    <dependency><groupId>com.google.errorprone</groupId><artifactId>error_prone_core</artifactId><version>2.3.1</version></dependency>
                 </dependencies>
             </plugin>
             <plugin>
@@ -342,12 +441,8 @@
                 <executions>
                     <execution>
                         <id>default-test</id>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${maven.test.skip}</skip>
-                        </configuration>
+                        <goals><goal>test</goal></goals>
+                        <configuration><skip>${maven.test.skip}</skip></configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -374,16 +469,12 @@
                     <execution>
                         <id>failsafe-integration-test</id>
                         <phase>integration-test</phase>
-                        <goals>
-                            <goal>integration-test</goal>
-                        </goals>
+                        <goals><goal>integration-test</goal></goals>
                     </execution>
                     <execution>
                         <id>failsafe-verify</id>
                         <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>verify</goal>
-                        </goals>
+                        <goals><goal>verify</goal></goals>
                     </execution>
                 </executions>
             </plugin>
@@ -391,14 +482,10 @@
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <configuration>
                     <rules>
-                        <requireMavenVersion>
-                            <!-- Note: travis-ci uses old maven version  -->
-                            <version>[3.5.0,)</version>
-                        </requireMavenVersion>
+                        <!-- Note: travis-ci uses old maven version  -->
+                        <requireMavenVersion><version>[3.5.0,)</version></requireMavenVersion>
                         <!--requireUpperBoundDeps-->
-                        <dependencyConvergence>
-                            <uniqueVersions>false</uniqueVersions>
-                        </dependencyConvergence>
+                        <dependencyConvergence><uniqueVersions>false</uniqueVersions></dependencyConvergence>
                         <banTransitiveDependencies>
                             <excludes>
                                 <exclude>*</exclude>
@@ -419,9 +506,7 @@
                     <execution>
                         <id>enforce-banned-dependencies</id>
                         <phase>validate</phase>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
+                        <goals><goal>enforce</goal></goals>
                     </execution>
                 </executions>
             </plugin>
@@ -433,27 +518,67 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
                 <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
+                    <execution><id>attach-javadocs</id><goals><goal>jar</goal></goals></execution>
+                    <execution><id>aggregate</id><goals><goal>aggregate</goal></goals><phase>site</phase></execution>
                 </executions>
             </plugin>
+            <!-- https://maven.apache.org/plugins/maven-source-plugin/test-jar-no-fork-mojo.html -->
+            <!-- Use 'jar-no-fork' not 'jar' to avoid trigger default lifecycle binding of @Execute( phase = LifecyclePhase.GENERATE_SOURCES ) -->
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
                 <executions>
+                    <execution><id>attach-sources</id><goals><goal>jar-no-fork</goal></goals></execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.groovy.maven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <executions>
                     <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <!-- https://maven.apache.org/plugins/maven-source-plugin/test-jar-no-fork-mojo.html -->
-                            <!-- Use 'jar-no-fork' not 'jar' to avoid trigger default lifecycle binding of @Execute( phase = LifecyclePhase.GENERATE_SOURCES ) -->
-                            <goal>jar-no-fork</goal>
-                        </goals>
+                        <goals><goal>execute</goal></goals>
+                        <phase>initialize</phase>
+                        <configuration><source>System.setProperty("local.deploy.model.path", "${project.groupId}".replace('.', '/')+"/${project.artifactId}")</source></configuration>
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-site-plugin</artifactId>
+                <configuration><attach>true</attach></configuration>
+            </plugin>
+            <!-- @formatter:on -->
+
+            <!-- @formatter:off -->
+            <plugin>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <configLocation>${checkstyle.config.location}</configLocation>
+                    <encoding>${project.reporting.outputEncoding}</encoding>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>false</failsOnError>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals><goal>check</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- see: http://maven.apache.org/plugins/maven-pmd-plugin/examples/multi-module-config.html -->
+            <plugin>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <configuration>
+                    <failOnViolation>false</failOnViolation>
+                    <printFailingErrors>true</printFailingErrors>
+                    <rulesets><ruleset>${pmd.ruleset.location}</ruleset></rulesets>
+                </configuration>
+                <executions>
+                    <execution><goals><goal>check</goal><goal>cpd-check</goal></goals></execution>
+                </executions>
+            </plugin>
+            <!-- @formatter:on -->
         </plugins>
 
         <!--extensions>
@@ -461,71 +586,226 @@
     </build>
 
     <profiles>
+        <!-- @formatter:off -->
         <profile>
-            <id>default-maven-test-failure-ignore</id>
-            <activation>
-                <property>
-                    <name>!maven.test.failure.ignore</name>
-                </property>
-            </activation>
+            <id>gpg-for-travis-and-maven-central</id>
+            <activation><activeByDefault>true</activeByDefault></activation>
             <properties>
-                <maven.test.failure.ignore>false</maven.test.failure.ignore>
-            </properties>
-        </profile>
-        <profile>
-            <id>default-maven-test-skip</id>
-            <activation>
-                <property>
-                    <name>!maven.test.skip</name>
-                </property>
-            </activation>
-            <properties>
-                <maven.test.skip>false</maven.test.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>default-maven-integration-test-skip</id>
-            <activation>
-                <property>
-                    <name>!maven.integration-test.skip</name>
-                </property>
-            </activation>
-            <properties>
-                <maven.integration-test.skip>false</maven.integration-test.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>default-frontend-nodeDownloadRoot</id>
-            <activation>
-                <property>
-                    <name>!frontend.nodeDownloadRoot</name>
-                </property>
-            </activation>
-            <properties>
-                <!--frontend.nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</frontend.nodeDownloadRoot-->
-                <frontend.nodeDownloadRoot>https://nodejs.org/dist/</frontend.nodeDownloadRoot>
-            </properties>
-        </profile>
-        <profile>
-            <id>default-frontend-npmDownloadRoot</id>
-            <activation>
-                <property>
-                    <name>!frontend.npmDownloadRoot</name>
-                </property>
-            </activation>
-            <properties>
-                <!--frontend.npmDownloadRoot>http://registry.npm.taobao.org/npm/-/</frontend.npmDownloadRoot-->
-                <frontend.npmDownloadRoot>https://registry.npmjs.org/npm/-/</frontend.npmDownloadRoot>
+                <gpg.executable>gpg</gpg.executable>
+                <gpg.keyname>${env.GPG_KEYNAME}</gpg.keyname>
+                <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
             </properties>
         </profile>
 
         <profile>
+            <id>infrastructure-github</id>
+            <activation><property><name>infrastructure</name><value>github</value></property></activation>
+            <properties>
+                <sonar.host.url>https://sonarqube.com</sonar.host.url>
+            </properties>
+            <repositories>
+                <repository>
+                    <id>OSSRH-releases</id>
+                    <name>central releases</name>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </repository>
+                <repository>
+                    <id>OSSRH-snapshots</id>
+                    <name>central snapshots</name>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>OSSRH-snapshots</id>
+                    <name>central snapshots</name>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>OSSRH-thirdparty</id>
+                    <name>central thirdparty</name>
+                    <url>https://oss.sonatype.org/content/repositories/third-party-releases/</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>oss-github-maven-plugins</id>
+                    <url>https://raw.github.com/home1-oss/maven-plugins/mvn-repo</url>
+                    <name>Forked github-maven-plugins that upload faster</name>
+                    <layout>default</layout>
+                    <snapshots><enabled>true</enabled></snapshots>
+                    <releases><enabled>true</enabled></releases>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+
+        <profile>
+            <id>default-internal-nexus3.repository</id>
+            <activation><property><name>!internal-nexus3.repository</name></property></activation>
+            <properties><internal-nexus3.repository>http://nexus3.internal:28081/nexus/repository</internal-nexus3.repository></properties>
+        </profile>
+        <profile>
+            <id>default-internal-sonar-host-url</id>
+            <activation><property><name>!internal-sonar.host.url</name></property></activation>
+            <properties><internal-sonar.host.url>http://sonarqube.internal:9000</internal-sonar.host.url></properties>
+        </profile>
+        <profile>
+            <id>infrastructure-internal</id>
+            <activation><property><name>infrastructure</name><value>internal</value></property></activation>
+            <properties><sonar.host.url>${internal-sonar.host.url}</sonar.host.url></properties>
+            <repositories>
+                <repository>
+                    <id>internal-nexus3-releases</id>
+                    <name>internal nexus3 releases</name>
+                    <url>${internal-nexus3.repository}/maven-releases/</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </repository>
+                <repository>
+                    <id>internal-nexus3-snapshots</id>
+                    <name>internal nexus3 snapshots</name>
+                    <url>${internal-nexus3.repository}/maven-snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </repository>
+                <repository>
+                    <id>internal-nexus3-thirdparty</id>
+                    <name>internal nexus3 thirdparty</name>
+                    <url>${internal-nexus3.repository}/maven-thirdparty/</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>internal-nexus3-releases</id>
+                    <name>internal nexus3 releases</name>
+                    <url>${internal-nexus3.repository}/maven-releases/</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>internal-nexus3-snapshots</id>
+                    <name>internal nexus3 snapshots</name>
+                    <url>${internal-nexus3.repository}/maven-snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>internal-nexus3-thirdparty</id>
+                    <name>internal nexus3 thirdparty</name>
+                    <url>${internal-nexus3.repository}/maven-thirdparty/</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+
+        <profile>
+            <id>default-local-nexus3.repository</id>
+            <activation><property><name>!local-nexus3.repository</name></property></activation>
+            <properties><local-nexus3.repository>http://nexus3.local:28081/nexus/repository</local-nexus3.repository></properties>
+        </profile>
+        <profile>
+            <id>default-local-sonar-host-url</id>
+            <activation><property><name>!local-sonar.host.url</name></property></activation>
+            <properties><local-sonar.host.url>http://sonarqube.local:9000</local-sonar.host.url></properties>
+        </profile>
+        <profile>
+            <id>infrastructure-local</id>
+            <activation><property><name>infrastructure</name><value>local</value></property></activation>
+            <properties>
+                <!-- default values -->
+                <sonar.host.url>${local-sonar.host.url}</sonar.host.url>
+                <!--sonar.jdbc.url>jdbc:h2:tcp://sonarqube.local/sonar</sonar.jdbc.url>
+                <sonar.jdbc.url>jdbc:postgresql://postgresql.local:5432/sonar</sonar.jdbc.url-->
+            </properties>
+            <repositories>
+                <repository>
+                    <id>local-nexus3-releases</id>
+                    <name>local nexus3 releases</name>
+                    <url>${local-nexus3.repository}/maven-releases/</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </repository>
+                <repository>
+                    <id>local-nexus3-snapshots</id>
+                    <name>local nexus3 snapshots</name>
+                    <url>${local-nexus3.repository}/maven-snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </repository>
+                <repository>
+                    <id>local-nexus3-thirdparty</id>
+                    <name>local nexus3 thirdparty</name>
+                    <url>${local-nexus3.repository}/maven-thirdparty/</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>local-nexus3-releases</id>
+                    <name>local nexus3 releases</name>
+                    <url>${local-nexus3.repository}/maven-releases/</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>local-nexus3-snapshots</id>
+                    <name>local nexus3 snapshots</name>
+                    <url>${local-nexus3.repository}/maven-snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>local-nexus3-thirdparty</id>
+                    <name>local nexus3 thirdparty</name>
+                    <url>${local-nexus3.repository}/maven-thirdparty/</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+        <!-- @formatter:on -->
+
+        <!-- @formatter:off -->
+        <profile>
+            <id>default-maven-test-failure-ignore</id>
+            <activation><property><name>!maven.test.failure.ignore</name></property></activation>
+            <properties><maven.test.failure.ignore>false</maven.test.failure.ignore></properties></profile>
+        <profile>
+            <id>default-maven-test-skip</id>
+            <activation><property><name>!maven.test.skip</name></property></activation>
+            <properties><maven.test.skip>false</maven.test.skip></properties>
+        </profile>
+        <profile>
+            <id>default-maven-integration-test-skip</id>
+            <activation><property><name>!maven.integration-test.skip</name></property></activation>
+            <properties><maven.integration-test.skip>false</maven.integration-test.skip></properties>
+        </profile>
+        <!--frontend.nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</frontend.nodeDownloadRoot-->
+        <profile>
+            <id>default-frontend-nodeDownloadRoot</id>
+            <activation><property><name>!frontend.nodeDownloadRoot</name></property></activation>
+            <properties><frontend.nodeDownloadRoot>https://nodejs.org/dist/</frontend.nodeDownloadRoot></properties>
+        </profile>
+        <!--frontend.npmDownloadRoot>http://registry.npm.taobao.org/npm/-/</frontend.npmDownloadRoot-->
+        <profile>
+            <id>default-frontend-npmDownloadRoot</id>
+            <activation><property><name>!frontend.npmDownloadRoot</name></property></activation>
+            <properties><frontend.npmDownloadRoot>https://registry.npmjs.org/npm/-/</frontend.npmDownloadRoot></properties>
+        </profile>
+
+        <profile>
             <id>git-commit-id</id>
-            <activation>
-                <file>
-                    <exists>${maven.multiModuleProjectDirectory}/.git/HEAD</exists>
-                </file>
-            </activation>
+            <activation><file><exists>${maven.multiModuleProjectDirectory}/.git/HEAD</exists></file></activation>
             <build>
                 <plugins>
                     <plugin>
@@ -534,9 +814,8 @@
                         <executions>
                             <execution>
                                 <id>get-the-git-infos</id>
-                                <goals>
-                                    <goal>revision</goal>
-                                </goals>
+                                <phase>initialize</phase>
+                                <goals><goal>revision</goal></goals>
                             </execution>
                         </executions>
                         <configuration>
@@ -545,8 +824,8 @@
                             <failOnNoGitDirectory>false</failOnNoGitDirectory>
                             <generateGitPropertiesFile>true</generateGitPropertiesFile>
                             <!--generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename-->
-                            <generateGitPropertiesFilename>src/main/resources/git.properties
-                            </generateGitPropertiesFilename>
+                            <generateGitPropertiesFilename>src/main/resources/git.properties</generateGitPropertiesFilename>
+                            <injectAllReactorProjects>true</injectAllReactorProjects>
                             <prefix>git</prefix>
                             <skipPoms>false</skipPoms>
                             <verbose>false</verbose>
@@ -556,97 +835,274 @@
             </build>
         </profile>
 
+        <!-- http://www.eclemma.org/jacoco/trunk/doc/maven.html -->
+        <!-- see: https://github.com/timp/juice -->
+        <!-- see: https://github.com/jacoco/jacoco/issues/409 -->
+        <!-- https://www.petrikainulainen.net/programming/maven/creating-code-coverage-reports-for-unit-and-integration-tests-with-the-jacoco-maven-plugin/ -->
+        <profile>
+            <id>jacoco-build</id>
+            <activation><property><name>!jacoco</name></property></activation>
+            <properties>
+                <jacoco-ut.skip>${maven.test.skip}</jacoco-ut.skip>
+                <jacoco-it.skip>${maven.integration-test.skip}</jacoco-it.skip>
+                <jacoco.version>0.8.1</jacoco.version>
+                <jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</jacoco.itReportPath>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin><groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId><version>${jacoco.version}</version></plugin>
+                    </plugins>
+                </pluginManagement>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>default-prepare-agent</id>
+                                <goals><goal>prepare-agent</goal></goals>
+                                <phase>test-compile</phase>
+                                <configuration><propertyName>surefireArgLine</propertyName><skip>${jacoco-ut.skip}</skip><!--<destFile>${project.build.directory}/jacoco.exec</destFile>--></configuration>
+                            </execution>
+                            <execution>
+                                <id>default-prepare-agent-integration</id>
+                                <goals><goal>prepare-agent-integration</goal></goals>
+                                <phase>pre-integration-test</phase>
+                                <configuration><append>true</append><propertyName>failsafeArgLine</propertyName><skip>${jacoco-it.skip}</skip><!--<destFile>${project.build.directory}/jacoco-it.exec</destFile>--></configuration>
+                            </execution>
+                            <!--<execution><id>default-report</id><goals><goal>report</goal></goals><phase>test</phase></execution>-->
+                            <!--<execution><id>default-report-integration</id><goals><goal>report-integration</goal></goals><phase>post-integration-test</phase></execution>-->
+                            <execution>
+                                <id>merge</id>
+                                <phase>pre-site</phase>
+                                <goals><goal>merge</goal></goals>
+                                <configuration>
+                                    <destFile>${project.build.directory}/jacoco-combined.exec</destFile>
+                                    <fileSets>
+                                        <fileSet>
+                                            <directory>${project.build.directory}</directory>
+                                            <includes><include>jacoco.exec</include><include>jacoco-it.exec</include></includes>
+                                        </fileSet>
+                                    </fileSets>
+                                    <skip>${jacoco-it.skip}</skip>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>composite</id>
+                                <phase>pre-site</phase>
+                                <goals><goal>report</goal></goals>
+                                <configuration>
+                                    <dataFile>${project.build.directory}/jacoco-combined.exec</dataFile>
+                                    <outputDirectory>${project.reporting.outputDirectory}/jacoco-combined</outputDirectory>
+                                    <skip>${jacoco-it.skip}</skip>
+                                    <title>Combined</title>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>default-check</id>
+                                <goals><goal>check</goal></goals>
+                                <configuration>
+                                    <haltOnFailure>false</haltOnFailure>
+                                    <rules>
+                                        <rule implementation="org.jacoco.maven.RuleConfiguration">
+                                            <element>BUNDLE</element>
+                                            <limits>
+                                                <limit implementation="org.jacoco.report.check.Limit"><counter>COMPLEXITY</counter><value>COVEREDRATIO</value><minimum>0.60</minimum></limit>
+                                            </limits>
+                                        </rule>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- net.sourceforge.cobertura:cobertura is for cobertura-maven-plugin and qualinsight-mojo-cobertura -->
+        <!-- force junit:junit version resolve cobertura transitive depends on old version, and SpringJUnit4ClassRunner requires JUnit 4.12 or higher -->
+        <!-- cobertura-maven-plugin is deprecated, see: https://github.com/QualInsight/qualinsight-mojo-cobertura -->
+        <!-- qualinsight-mojo-cobertura-core conflict with jacoco-maven-plugin
+            [WARNING] Classes in bundle 'x' do no match with execution data.
+            For report generation the same class files must be used as at runtime -->
+        <profile>
+            <id>cobertura</id>
+            <activation><property><name>jacoco</name><value>false</value></property></activation>
+            <properties>
+                <jacoco-ut.skip>true</jacoco-ut.skip>
+                <jacoco-it.skip>true</jacoco-it.skip>
+            </properties>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.sourceforge.cobertura</groupId><artifactId>cobertura</artifactId><version>2.1.1</version>
+                        <exclusions><exclusion><groupId>ch.qos.logback</groupId><artifactId>logback-classic</artifactId></exclusion></exclusions>
+                    </dependency>
+                    <dependency>
+                        <groupId>junit</groupId><artifactId>junit</artifactId><version>4.12</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+            <dependencies>
+                <dependency><groupId>net.sourceforge.cobertura</groupId><artifactId>cobertura</artifactId><scope>test</scope></dependency>
+                <dependency><groupId>junit</groupId><artifactId>junit</artifactId><scope>test</scope></dependency>
+            </dependencies>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin><groupId>com.qualinsight.mojo.cobertura</groupId><artifactId>qualinsight-mojo-cobertura-core</artifactId><version>2.0.0</version></plugin>
+                        <!--<plugin><groupId>org.codehaus.mojo</groupId><artifactId>cobertura-maven-plugin</artifactId><version>2.7</version></plugin>-->
+                    </plugins>
+                </pluginManagement>
+                <plugins>
+                    <plugin>
+                        <groupId>com.qualinsight.mojo.cobertura</groupId>
+                        <artifactId>qualinsight-mojo-cobertura-core</artifactId>
+                        <executions>
+                            <execution><id>instrument-ut</id><goals><goal>instrument-ut</goal></goals></execution>
+                            <execution><id>instrument-it</id><goals><goal>instrument-it</goal></goals></execution>
+                            <execution><id>report-ut-coverage</id><goals><goal>report-ut-coverage</goal></goals></execution>
+                            <execution><id>report-it-coverage</id><goals><goal>report-it-coverage</goal></goals></execution>
+                            <execution><id>report-overall-coverage</id><goals><goal>report-overall-coverage</goal></goals></execution>
+                        </executions>
+                    </plugin>
+                    <!--<plugin>-->
+                        <!--<groupId>org.codehaus.mojo</groupId>-->
+                        <!--<artifactId>cobertura-maven-plugin</artifactId>-->
+                        <!--<reportSets><reportSet><reports><report>cobertura</report></reports></reportSet></reportSets>-->
+                    <!--</plugin>-->
+                </plugins>
+            </build>
+        </profile>
+        <!-- @formatter:on -->
+
+        <!-- @formatter:off -->
+        <profile>
+            <id>default-build-publish-channel</id>
+            <activation><property><name>!build.publish.channel</name></property></activation>
+            <properties><build.publish.channel>snapshot</build.publish.channel></properties>
+        </profile>
+
+        <profile>
+            <id>infrastructure_github</id>
+            <activation><property><name>infrastructure</name><value>github</value></property><activeByDefault>false</activeByDefault></activation>
+            <properties>
+                <wagon.merge-maven-repos.targetId>OSSRH-${build.publish.channel}s</wagon.merge-maven-repos.targetId>
+            </properties>
+            <distributionManagement>
+                <repository><id>OSSRH-releases</id><url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url></repository>
+                <snapshotRepository><id>OSSRH-snapshots</id><url>https://oss.sonatype.org/content/repositories/snapshots</url></snapshotRepository>
+            </distributionManagement>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution><id>sign-artifacts</id><phase>verify</phase><goals><goal>sign</goal></goals></execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.8</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>OSSRH-snapshots</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>infrastructure_internal</id>
+            <activation><property><name>infrastructure</name><value>internal</value></property><activeByDefault>false</activeByDefault></activation>
+            <properties>
+                <wagon.merge-maven-repos.target>${internal-nexus3.repository}/maven-${build.publish.channel}s</wagon.merge-maven-repos.target>
+                <wagon.merge-maven-repos.targetId>internal-nexus3-${build.publish.channel}s</wagon.merge-maven-repos.targetId>
+            </properties>
+            <distributionManagement>
+                <repository><id>internal-nexus3-releases</id><url>${internal-nexus3.repository}/maven-releases</url></repository>
+                <snapshotRepository><id>internal-nexus3-snapshots</id><url>${internal-nexus3.repository}/maven-snapshots</url></snapshotRepository>
+            </distributionManagement>
+        </profile>
+
+        <profile>
+            <id>infrastructure_local</id>
+            <activation><property><name>infrastructure</name><value>local</value></property><activeByDefault>false</activeByDefault></activation>
+            <properties>
+                <wagon.merge-maven-repos.target>${local-nexus3.repository}/maven-${build.publish.channel}s</wagon.merge-maven-repos.target>
+                <wagon.merge-maven-repos.targetId>local-nexus3-${build.publish.channel}s</wagon.merge-maven-repos.targetId>
+            </properties>
+            <distributionManagement>
+                <repository><id>local-nexus3-releases</id><url>${local-nexus3.repository}/maven-releases/</url></repository>
+                <snapshotRepository><id>local-nexus3-snapshots</id><url>${local-nexus3.repository}/maven-snapshots/</url></snapshotRepository>
+            </distributionManagement>
+        </profile>
+
+        <profile>
+            <id>default-publish_deploy_segregation-properties</id>
+            <activation><property><name>!publish_deploy_segregation</name></property><activeByDefault>false</activeByDefault></activation>
+            <properties>
+                <wagon.source.filepath>${user.home}/.oss/local-deploy/${git.commit.id}</wagon.source.filepath>
+                <wagon.merge-maven-repos.target>${local-nexus3.repository}/maven-${build.publish.channel}s</wagon.merge-maven-repos.target>
+                <wagon.merge-maven-repos.targetId>local-nexus3-${build.publish.channel}s</wagon.merge-maven-repos.targetId>
+            </properties>
+        </profile>
+        <!-- Why org.codehaus.mojo:wagon-maven-plugin:1.1-snapshot-chshawkn-1.4?
+            see: https://www.mail-archive.com/users@maven.apache.org/msg129243.html -->
+        <!--http://www.mojohaus.org/wagon-maven-plugin/usage.html-->
+        <!--http://www.mojohaus.org/wagon-maven-plugin/-->
         <profile>
             <id>publish-deploy-segregation-with-wagon</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>publish_deploy_segregation</name>
-                    <value>true</value>
-                </property>
-            </activation>
+            <activation><property><name>publish_deploy_segregation</name><value>true</value></property><activeByDefault>false</activeByDefault></activation>
             <pluginRepositories>
                 <pluginRepository>
                     <id>github-chshawkn-wagon-maven-plugin</id>
                     <url>https://raw.github.com/chshawkn/wagon-maven-plugin/mvn-repo</url>
                     <name>Forked wagon-maven-plugin that can merge snapshots metadata correctly</name>
                     <layout>default</layout>
-                    <snapshots>
-                        <enabled>true</enabled>
-                    </snapshots>
-                    <releases>
-                        <enabled>true</enabled>
-                    </releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                    <releases><enabled>true</enabled></releases>
                 </pluginRepository>
             </pluginRepositories>
             <build>
                 <pluginManagement>
                     <plugins>
-                        <!-- TODO find a newer plugin to run groovy scripts -->
-                        <plugin>
-                            <groupId>org.codehaus.groovy.maven</groupId>
-                            <artifactId>gmaven-plugin</artifactId>
-                            <version>1.0</version>
-                        </plugin>
-                        <!--https://www.mail-archive.com/users@maven.apache.org/msg129243.html-->
-                        <plugin>
-                            <groupId>org.codehaus.mojo</groupId>
-                            <artifactId>wagon-maven-plugin</artifactId>
-                            <version>1.1-snapshot-chshawkn-1.4</version>
-                        </plugin>
+                        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>wagon-maven-plugin</artifactId><version>1.1-snapshot-chshawkn-1.4</version></plugin>
                     </plugins>
                 </pluginManagement>
                 <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.groovy.maven</groupId>
-                        <artifactId>gmaven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>pre-clean</phase>
-                                <goals>
-                                    <goal>execute</goal>
-                                </goals>
-                                <configuration>
-                                    <source>
-                                        System.setProperty("local.deploy.model.path", "${project.groupId}".replace('.', '/')+"/${project.artifactId}")
-                                    </source>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
+                    <!-- clean files deployed to local directory -->
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
-                            <!--对deploy到本地的文件进行清理-->
                             <execution>
                                 <id>clean-local-deploy-dir</id>
                                 <phase>none</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
+                                <goals><goal>run</goal></goals>
                                 <configuration>
                                     <target>
-                                        <echo message="${local.deploy.model.path}"/>
-                                        <delete failonerror="false" includeemptydirs="true" verbose="true">
-                                            <fileset dir="${wagon.source.filepath}/${local.deploy.model.path}" includes="**/*"/>
-                                        </delete>
+                                        <echo message="local.deploy.model.path: ${local.deploy.model.path}"/>
+                                        <delete failonerror="false" includeemptydirs="true" verbose="true"><fileset dir="${wagon.source.filepath}/${local.deploy.model.path}" includes="**/*"/></delete>
                                     </target>
                                 </configuration>
                             </execution>
                         </executions>
                     </plugin>
                     <plugin>
-                        <!--http://www.mojohaus.org/wagon-maven-plugin/usage.html-->
-                        <!--http://www.mojohaus.org/wagon-maven-plugin/-->
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>wagon-maven-plugin</artifactId>
                         <executions>
                             <execution>
                                 <id>deploy-merge-maven-repos</id>
                                 <phase>none</phase>
-                                <goals>
-                                    <goal>merge-maven-repos</goal>
-                                </goals>
+                                <goals><goal>merge-maven-repos</goal></goals>
                                 <configuration>
                                     <source>file://${wagon.source.filepath}</source>
                                     <target>${wagon.merge-maven-repos.target}</target>
@@ -660,129 +1116,149 @@
         </profile>
 
         <profile>
-            <id>jacoco-build</id>
-            <activation>
-                <property>
-                    <name>!jacoco</name>
-                </property>
-            </activation>
+            <id>infrastructure_github_site</id>
+            <activation><property><name>infrastructure</name><value>github</value></property><activeByDefault>false</activeByDefault></activation>
             <properties>
-                <jacoco-ut.skip>${maven.test.skip}</jacoco-ut.skip>
-                <jacoco-it.skip>${maven.integration-test.skip}</jacoco-it.skip>
+                <!-- In child projects, do not add url. Let it inherit from parent.-->
+                <!--<github.site.path>${project.version}/${project.artifactId}</github.site.path>-->
+                <!--<github.site.path>${project.version}</github.site.path>-->
+                <maven.site.deploy.skip>true</maven.site.deploy.skip>
+            </properties>
+            <distributionManagement>
+                <!-- Do mvn site site:stage -DstagingDirectory=/tmp/path first,
+                then manually add/push to the gh-pages branch on GitHub -->
+                <site>
+                    <id>github-site</id>
+                    <name>Deployment through GitHub's site deployment plugin</name>
+                    <!--If sub projects/module inherit the site URL from a parent POM,they will automatically append their <artifactId>
+                    to their effective deployment location. More info in http://maven.apache.org/guides/mini/guide-site.html-->
+                    <url>${build.publish.channel}</url>
+                </site>
+            </distributionManagement>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.github</groupId>
+                        <artifactId>site-maven-plugin</artifactId>
+                        <configuration>
+                            <path>${project.distributionManagement.site.url}</path>
+                            <repositoryName>${env.GITHUB_SITE_REPO_NAME}</repositoryName>
+                        </configuration>
+                        <executions>
+                            <execution><goals><goal>site</goal></goals><phase>site-deploy</phase><!--<phase>site</phase>--></execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
-                <jacoco.version>0.8.1</jacoco.version>
-                <jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</jacoco.itReportPath>
+        <profile>
+            <id>infrastructure_github_site_publish</id>
+            <activation><property><name>github-publish</name></property></activation>
+            <properties>
+                <!-- In child projects Do not add url. Let it inherit from parent. -->
+                <!--<github.site.path>${project.version}/${project.artifactId}</github.site.path>-->
+                <github.site.path>${project.version}</github.site.path>
+                <!--<maven.site.deploy.skip>true</maven.site.deploy.skip>-->
             </properties>
             <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.jacoco</groupId>
-                            <artifactId>jacoco-maven-plugin</artifactId>
-                            <version>${jacoco.version}</version>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
                 <plugins>
-                    <!-- http://www.eclemma.org/jacoco/trunk/doc/maven.html -->
-                    <!-- see: https://github.com/timp/juice -->
-                    <!-- see: https://github.com/jacoco/jacoco/issues/409 -->
-                    <!-- https://www.petrikainulainen.net/programming/maven/creating-code-coverage-reports-for-unit-and-integration-tests-with-the-jacoco-maven-plugin/ -->
                     <plugin>
-                        <groupId>org.jacoco</groupId>
-                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <groupId>com.github.github</groupId>
+                        <artifactId>site-maven-plugin</artifactId>
+                        <configuration>
+                            <path>${github.site.path}</path>
+                            <!--<repositoryName>${env.GITHUB_SITE_REPO_NAME}</repositoryName>-->
+                        </configuration>
+                        <executions>
+                            <execution><goals><goal>site</goal></goals><phase>site</phase></execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>default-site-path</id>
+            <activation><property><name>!site.path</name></property></activation>
+            <properties><site.path>${project.artifactId}-${build.publish.channel}</site.path></properties>
+        </profile>
+
+        <profile>
+            <id>infrastructure_internal_site</id>
+            <activation><property><name>infrastructure</name><value>internal</value></property><activeByDefault>false</activeByDefault></activation>
+            <distributionManagement>
+                <!-- scpexe uses privateKey, scp uses password -->
+                <!-- scpexe://${domain_or_ip}:22/path/to/sites -->
+                <site><id>internal-mvnsite</id><url>dav:${internal-nexus3.repository}/mvnsite/${site.path}</url></site>
+            </distributionManagement>
+        </profile>
+
+        <profile>
+            <id>infrastructure_local_site</id>
+            <activation><property><name>infrastructure</name><value>local</value></property><activeByDefault>false</activeByDefault></activation>
+            <distributionManagement>
+                <site><id>local-mvnsite</id><url>dav:${local-nexus3.repository}/mvnsite/${site.path}</url></site>
+            </distributionManagement>
+        </profile>
+        <!-- @formatter:on -->
+
+        <!-- @formatter:off -->
+        <!-- set property checkstyle.config.location in MAVEN_OPTS, pom.xml or settings.xml. -->
+        <!--<file><exists>${maven.multiModuleProjectDirectory}/src/main/checkstyle/google_checks_8.10.xml</exists></file>-->
+        <!--checkstyle.config.location>${maven.multiModuleProjectDirectory}/src/main/checkstyle/google_checks_8.10.xml</checkstyle.config.location-->
+        <profile>
+            <id>default-checkstyle-config</id>
+            <activation><property><name>!checkstyle.config.location</name></property></activation>
+            <properties><checkstyle.config.location>https://raw.githubusercontent.com/home1-oss/maven-build/master/src/main/checkstyle/google_checks_8.10.xml</checkstyle.config.location></properties>
+        </profile>
+        <!--<file><exists>${maven.multiModuleProjectDirectory}/src/main/pmd/pmd-ruleset-6.0.1.xml</exists></file>-->
+        <!--pmd.ruleset.location>${maven.multiModuleProjectDirectory}/src/main/pmd/pmd-ruleset-6.0.1.xml</pmd.ruleset.location-->
+        <profile>
+            <id>default-pmd-ruleset</id>
+            <activation><property><name>!pmd.ruleset.location</name></property></activation>
+            <properties><pmd.ruleset.location>https://raw.githubusercontent.com/home1-oss/maven-build/master/src/main/pmd/pmd-ruleset-6.0.1.xml</pmd.ruleset.location></properties>
+        </profile>
+
+        <profile>
+            <id>spring-restdocs</id>
+            <activation>
+                <property><name>spring-restdocs</name><value>true</value></property>
+                <file><exists>${basedir}/src/main/asciidoc/.gitkeep</exists></file>
+            </activation>
+            <properties>
+                <snippetsDirectory>${project.build.directory}/generated-snippets</snippetsDirectory>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.asciidoctor</groupId>
+                        <artifactId>asciidoctor-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>default-prepare-agent</id>
-                                <goals>
-                                    <goal>prepare-agent</goal>
-                                </goals>
-                                <phase>test-compile</phase>
+                                <id>generate-docs</id>
+                                <phase>prepare-package</phase>
+                                <goals><goal>process-asciidoc</goal></goals>
                                 <configuration>
-                                    <!--destFile>${project.build.directory}/jacoco.exec</destFile-->
-                                    <propertyName>surefireArgLine</propertyName>
-                                    <skip>${jacoco-ut.skip}</skip>
+                                    <backend>html</backend>
+                                    <doctype>book</doctype>
+                                    <attributes><snippets>${snippetsDirectory}</snippets></attributes>
                                 </configuration>
                             </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
                             <execution>
-                                <id>default-prepare-agent-integration</id>
-                                <goals>
-                                    <goal>prepare-agent-integration</goal>
-                                </goals>
-                                <phase>pre-integration-test</phase>
+                                <id>package-spring-restdocs</id>
+                                <phase>prepare-package</phase>
+                                <goals><goal>copy-resources</goal></goals>
                                 <configuration>
-                                    <append>true</append>
-                                    <!--destFile>${project.build.directory}/jacoco-it.exec</destFile-->
-                                    <propertyName>failsafeArgLine</propertyName>
-                                    <skip>${jacoco-it.skip}</skip>
-                                </configuration>
-                            </execution>
-                            <!--execution>
-                                <id>default-report</id>
-                                <goals>
-                                    <goal>report</goal>
-                                </goals>
-                                <phase>test</phase>
-                            </execution>
-                            <execution>
-                                <id>default-report-integration</id>
-                                <goals>
-                                    <goal>report-integration</goal>
-                                </goals>
-                                <phase>post-integration-test</phase>
-                            </execution-->
-                            <execution>
-                                <id>merge</id>
-                                <phase>pre-site</phase>
-                                <goals>
-                                    <goal>merge</goal>
-                                </goals>
-                                <configuration>
-                                    <destFile>${project.build.directory}/jacoco-combined.exec</destFile>
-                                    <fileSets>
-                                        <fileSet>
-                                            <directory>${project.build.directory}</directory>
-                                            <includes>
-                                                <include>jacoco.exec</include>
-                                                <include>jacoco-it.exec</include>
-                                            </includes>
-                                        </fileSet>
-                                    </fileSets>
-                                    <skip>${jacoco-it.skip}</skip>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>composite</id>
-                                <phase>pre-site</phase>
-                                <goals>
-                                    <goal>report</goal>
-                                </goals>
-                                <configuration>
-                                    <dataFile>${project.build.directory}/jacoco-combined.exec</dataFile>
-                                    <outputDirectory>${project.reporting.outputDirectory}/jacoco-combined</outputDirectory>
-                                    <skip>${jacoco-it.skip}</skip>
-                                    <title>Combined</title>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>default-check</id>
-                                <goals>
-                                    <goal>check</goal>
-                                </goals>
-                                <configuration>
-                                    <haltOnFailure>false</haltOnFailure>
-                                    <rules>
-                                        <rule implementation="org.jacoco.maven.RuleConfiguration">
-                                            <element>BUNDLE</element>
-                                            <limits>
-                                                <limit implementation="org.jacoco.report.check.Limit">
-                                                    <counter>COMPLEXITY</counter>
-                                                    <value>COVEREDRATIO</value>
-                                                    <minimum>0.60</minimum>
-                                                </limit>
-                                            </limits>
-                                        </rule>
-                                    </rules>
+                                    <outputDirectory>${project.build.outputDirectory}/static/docs</outputDirectory>
+                                    <resources>
+                                        <resource><directory>${project.build.directory}/generated-docs</directory></resource>
+                                    </resources>
                                 </configuration>
                             </execution>
                         </executions>
@@ -792,123 +1268,351 @@
         </profile>
 
         <profile>
-            <id>cobertura</id>
-            <activation>
-                <property>
-                    <name>jacoco</name>
-                    <value>false</value>
-                </property>
-            </activation>
+            <id>reports-for-site</id>
+            <activation><property><name>site</name><value>true</value></property></activation>
             <properties>
-                <jacoco-ut.skip>true</jacoco-ut.skip>
-                <jacoco-it.skip>true</jacoco-it.skip>
+                <umlgraph.version>5.6.6</umlgraph.version>
             </properties>
-            <dependencyManagement>
-                <dependencies>
-                    <!-- for cobertura-maven-plugin and qualinsight-mojo-cobertura -->
-                    <dependency>
-                        <groupId>net.sourceforge.cobertura</groupId>
-                        <artifactId>cobertura</artifactId>
-                        <version>2.1.1</version>
-                        <exclusions>
-                            <exclusion>
-                                <groupId>ch.qos.logback</groupId>
-                                <artifactId>logback-classic</artifactId>
-                            </exclusion>
-                        </exclusions>
-                    </dependency>
-                    <!-- resolve cobertura transitive junit version, and SpringJUnit4ClassRunner requires JUnit 4.12 or higher -->
-                    <dependency>
-                        <groupId>junit</groupId>
-                        <artifactId>junit</artifactId>
-                        <version>4.12</version>
-                    </dependency>
-                </dependencies>
-            </dependencyManagement>
-            <dependencies>
-                <dependency>
-                    <groupId>net.sourceforge.cobertura</groupId>
-                    <artifactId>cobertura</artifactId>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
             <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.qualinsight.mojo.cobertura</groupId>
-                            <artifactId>qualinsight-mojo-cobertura-core</artifactId>
-                            <version>2.0.0</version>
-                        </plugin>
-                        <!-- cobertura-maven-plugin is deprecated, see: https://github.com/QualInsight/qualinsight-mojo-cobertura -->
-                        <!--<plugin>-->
-                            <!--<groupId>org.codehaus.mojo</groupId>-->
-                            <!--<artifactId>cobertura-maven-plugin</artifactId>-->
-                            <!--<version>2.7</version>-->
-                        <!--</plugin>-->
-                    </plugins>
-                </pluginManagement>
                 <plugins>
-                    <!--
-                    qualinsight-mojo-cobertura-core conflict with jacoco-maven-plugin
-                    [WARNING] Classes in bundle 'x' do no match with execution data.
-                    For report generation the same class files must be used as at runtime
-                    -->
                     <plugin>
-                        <groupId>com.qualinsight.mojo.cobertura</groupId>
-                        <artifactId>qualinsight-mojo-cobertura-core</artifactId>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>animal-sniffer-maven-plugin</artifactId>
+                        <configuration>
+                            <signature><groupId>org.codehaus.mojo.signature</groupId><artifactId>java18</artifactId><version>1.0</version></signature>
+                        </configuration>
+                    </plugin>
+                    <!--plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>instrument-ut</id>
+                                <id>analyze</id>
                                 <goals>
-                                    <goal>instrument-ut</goal>
+                                    <goal>analyze-only</goal>
                                 </goals>
-                            </execution>
-                            <execution>
-                                <id>instrument-it</id>
-                                <goals>
-                                    <goal>instrument-it</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>report-ut-coverage</id>
-                                <goals>
-                                    <goal>report-ut-coverage</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>report-it-coverage</id>
-                                <goals>
-                                    <goal>report-it-coverage</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>report-overall-coverage</id>
-                                <goals>
-                                    <goal>report-overall-coverage</goal>
-                                </goals>
+                                <configuration>
+                                    <failOnWarning>false</failOnWarning>
+                                    <ignoreNonCompile>true</ignoreNonCompile>
+                                    <outputXML>true</outputXML>
+                                </configuration>
                             </execution>
                         </executions>
-                    </plugin>
-                    <!-- cobertura-maven-plugin is deprecated, see: https://github.com/QualInsight/qualinsight-mojo-cobertura -->
-                    <!--plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>cobertura-maven-plugin</artifactId>
-                        <reportSets>
-                            <reportSet>
-                                <reports>
-                                    <report>cobertura</report>
-                                </reports>
-                            </reportSet>
-                        </reportSets>
                     </plugin-->
                 </plugins>
             </build>
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-report-plugin</artifactId>
+                        <reportSets>
+                            <reportSet>
+                                <id>unit-tests</id>
+                                <reports><report>report-only</report></reports>
+                            </reportSet>
+                            <reportSet>
+                                <id>integration-tests</id>
+                                <reports><report>failsafe-report-only</report></reports>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+                    <plugin><groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId></plugin>
+                    <plugin><groupId>org.codehaus.mojo</groupId><artifactId>jdepend-maven-plugin</artifactId></plugin>
+                    <plugin>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <reportSets>
+                            <reportSet>
+                                <configuration>
+                                    <configLocation>${checkstyle.config.location}</configLocation>
+                                    <encoding>${project.reporting.outputEncoding}</encoding>
+                                    <consoleOutput>false</consoleOutput>
+                                    <failsOnError>false</failsOnError>
+                                    <linkXRef>true</linkXRef>
+                                </configuration>
+                                <reports><report>checkstyle</report></reports>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <failOnError>false</failOnError>
+                            <charset>${project.build.sourceEncoding}</charset>
+                            <encoding>${project.build.sourceEncoding}</encoding>
+                            <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
+                            <docletArtifact>
+                                <groupId>org.umlgraph</groupId>
+                                <artifactId>umlgraph</artifactId>
+                                <version>${umlgraph.version}</version>
+                            </docletArtifact>
+                            <additionalOptions>-views -all</additionalOptions>
+                            <!-- UML Graph需要通过匹配标签插入javadoc生成的html -->
+                            <additionalJOption>-J-Duser.language=en</additionalJOption>
+                            <useStandardDocletOptions>true</useStandardDocletOptions>
+                        </configuration>
+                        <reportSets>
+                            <reportSet>
+                                <id>non-aggregate</id>
+                                <reports>
+                                    <report>javadoc</report>
+                                    <!--report>it-javadoc</report-->
+                                </reports>
+                            </reportSet>
+                            <!-- aggregate reportSet, to define in poms having modules -->
+                            <!-- don't run aggregate in child modules -->
+                            <!-- TODO inherited false bug? -->
+                            <!--reportSet>
+                                <id>aggregate</id>
+                                <inherited>false</inherited>
+                                <reports>
+                                    <report>aggregate</report>
+                                </reports>
+                            </reportSet-->
+                        </reportSets>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-jxr-plugin</artifactId>
+                        <reportSets>
+                            <reportSet>
+                                <id>aggregate</id>
+                                <inherited>false</inherited>
+                                <reports><report>aggregate</report></reports>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+                    <!-- Taglist plugin MUST be executed after the JXR plugin. -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>taglist-maven-plugin</artifactId>
+                        <configuration>
+                            <tagListOptions>
+                                <tagClasses>
+                                    <tagClass>
+                                        <displayName>Todo Work</displayName>
+                                        <tags>
+                                            <tag><matchString>todo</matchString><matchType>ignoreCase</matchType></tag>
+                                            <tag><matchString>FIXME</matchString><matchType>exact</matchType></tag>
+                                        </tags>
+                                    </tagClass>
+                                </tagClasses>
+                            </tagListOptions>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                        <configuration>
+                            <linkXRef>true</linkXRef>
+                            <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
+                            <minimumTokens>100</minimumTokens>
+                            <rulesets><ruleset>${pmd.ruleset.location}</ruleset></rulesets>
+                        </configuration>
+                    </plugin>
+                    <!-- see: https://maven.apache.org/plugins/maven-dependency-plugin/analyze-mojo.html -->
+                    <!--
+                    dependency:analyze goal is intended to be used standalone,
+                    thus it always executes the test-compile phase.
+                    use the dependency:analyze-only goal instead when participating in the build lifecycle.
+                    -->
+                    <!--<plugin>-->
+                    <!--<artifactId>maven-dependency-plugin</artifactId>-->
+                    <!--<reportSets><reportSet><reports><report>analyze-report</report></reports></reportSet></reportSets>-->
+                    <!--</plugin>-->
+                    <plugin>
+                        <artifactId>maven-project-info-reports-plugin</artifactId>
+                        <!--inherited>true</inherited-->
+                        <configuration>
+                            <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                        </configuration>
+                        <reportSets>
+                            <reportSet>
+                                <reports>
+                                    <report>cim</report>
+                                    <report>dependencies</report>
+                                    <!--
+                                    <report>dependency-convergence</report>
+                                    <report>dependency-info</report>
+                                    <report>dependency-management</report>
+                                    <report>distribution-management</report>
+                                    -->
+                                    <report>index</report>
+                                    <report>summary</report>
+                                    <report>mailing-list</report>
+                                    <report>issue-tracking</report>
+                                    <report>modules</report>
+                                    <report>project-team</report>
+                                    <report>scm</report>
+                                    <report>license</report>
+                                </reports>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+                </plugins>
+            </reporting>
         </profile>
+
+        <profile>
+            <id>jacoco-report</id>
+            <activation><property><name>!jacoco</name></property></activation>
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <reportSets>
+                            <reportSet>
+                                <reports>
+                                    <report>report</report>
+                                    <report>report-integration</report>
+                                    <!--report>report-aggregate</report-->
+                                </reports>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+                </plugins>
+            </reporting>
+        </profile>
+
+        <profile>
+            <id>dependency-check</id>
+            <activation><property><name>dependency-check</name><value>true</value></property></activation>
+            <build>
+                <plugins>
+                    <plugin><groupId>org.codehaus.mojo</groupId><artifactId>versions-maven-plugin</artifactId></plugin>
+                </plugins>
+            </build>
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>versions-maven-plugin</artifactId>
+                        <reportSets>
+                            <reportSet>
+                                <reports>
+                                    <report>dependency-updates-report</report>
+                                    <report>plugin-updates-report</report>
+                                </reports>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                        <reportSets>
+                            <reportSet><reports><report>aggregate</report></reports></reportSet>
+                        </reportSets>
+                    </plugin>
+                </plugins>
+            </reporting>
+        </profile>
+
+        <!-- this plugin has error sometimes, you can disable it by mvn -Dclirr=false -->
+        <profile>
+            <id>clirr</id>
+            <activation>
+                <property><name>site</name><value>true</value></property>
+                <!--<property><name>!clirr</name></property>-->
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>clirr-maven-plugin</artifactId><version>2.8</version></plugin>
+                    </plugins>
+                </pluginManagement>
+                <plugins>
+                    <plugin><groupId>org.codehaus.mojo</groupId><artifactId>clirr-maven-plugin</artifactId></plugin>
+                </plugins>
+            </build>
+            <reporting>
+                <plugins>
+                    <plugin><groupId>org.codehaus.mojo</groupId><artifactId>clirr-maven-plugin</artifactId></plugin>
+                </plugins>
+            </reporting>
+        </profile>
+
+        <profile>
+            <id>sonar</id>
+            <activation>
+                <property>
+                    <name>sonar</name>
+                </property>
+            </activation>
+            <properties>
+                <!-- sonar.java.binaries issue when force language java  -->
+                <!--sonar.language>java</sonar.language-->
+                <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
+
+                <!--sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin-->
+                <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+                <sonar.jacoco.reportPath>${project.build.directory}/jacoco.exec</sonar.jacoco.reportPath>
+                <sonar.jacoco.itReportPath>${jacoco.itReportPath}</sonar.jacoco.itReportPath>
+                <!-- should match version of sonar-java-plugin -->
+                <sonar-jacoco-listeners.version>5.3.0.13828</sonar-jacoco-listeners.version>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <!-- see: https://github.com/SonarSource/sonar-scanner-maven -->
+                        <plugin><groupId>org.sonarsource.scanner.maven</groupId><artifactId>sonar-maven-plugin</artifactId><version>3.4.0.905</version></plugin>
+                    </plugins>
+                </pluginManagement>
+                <plugins>
+                    <!-- see: https://dzone.com/articles/integration-jenkins-jacoco-and-sonarqube -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <!-- Specific to generate mapping between tests and covered code -->
+                            <properties>
+                                <property><name>listener</name><value>org.sonar.java.jacoco.JUnitListener</value></property>
+                            </properties>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <skip>${maven.integration-test.skip}</skip>
+                            <properties>
+                                <property><name>listener</name><value>org.sonar.java.jacoco.JUnitListener</value></property>
+                            </properties>
+                        </configuration>
+                        <dependencies>
+                            <dependency><artifactId>sonar-jacoco-listeners</artifactId><groupId>org.sonarsource.java</groupId><version>${sonar-jacoco-listeners.version}</version><scope>test</scope></dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>jira_project</id>
+            <activation>
+                <property>
+                    <name>jira.projectKey</name>
+                </property>
+            </activation>
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-changes-plugin</artifactId>
+                        <version>2.12.1</version>
+                        <!-- if jira version > 5.1, use this flag -->
+                        <configuration>
+                            <useJql>true</useJql>
+                            <jiraUser>${jira.user}</jiraUser>
+                            <jiraPassword>${jira.password}</jiraPassword>
+                            <!--<onlyCurrentVersion>true</onlyCurrentVersion>-->
+                            <!-- http://jira7.internal/rest/api/2/resolution/ -->
+                            <!-- http://jira7.internal/rest/api/2/status/ -->
+                            <resolutionIds>完成</resolutionIds>
+                            <statusIds>关闭</statusIds>
+                        </configuration>
+                        <reportSets>
+                            <reportSet><reports><report>jira-report</report><!--<report>changes-report</report>--></reports></reportSet>
+                        </reportSets>
+                    </plugin>
+                </plugins>
+            </reporting>
+        </profile>
+        <!-- @formatter:on -->
     </profiles>
 </project>
