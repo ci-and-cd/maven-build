@@ -16,7 +16,7 @@
     <skin>
         <groupId>org.apache.maven.skins</groupId>
         <artifactId>maven-fluido-skin</artifactId>
-        <version>1.5</version>
+        <version>1.7</version>
     </skin>
 
     <custom>
@@ -30,14 +30,13 @@
         <menu ref="parent" />
         <menu name="DOCUMENTATION">
             <item href="README.html" name="README" />
-            <item href="INTRODUCTION.html" name="INTRODUCTION" />
-            <item href="CONTRIBUTION.html" name="CONTRIBUTION" />
+            <item href="TRAVISCI.html" name="travis-ci build" />
         </menu>
-        <!--<menu name="Projects">-->
-            <!--&lt;!&ndash;<item href="project_name/index.html" name="project_name" />&ndash;&gt;-->
-            <!--<item href="#" name="-&#45;&#45;&#45;&#45;" />-->
-            <!--&lt;!&ndash;<item href="project_name/index.html" name="project_name" />&ndash;&gt;-->
-        <!--</menu>-->
+        <menu name="Projects">
+            <item href="maven-build-java8/index.html" name="maven-build-java8" />
+            <item href="#" name="-----" />
+            <item href="maven-build-java9/index.html" name="maven-build-java9" />
+        </menu>
         <menu ref="modules" />
         <!--<menu ref="reports" />-->
         <menu ref="reports" inherit="bottom" />

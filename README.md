@@ -260,3 +260,15 @@ And add this to ~/.gnupg/gpg-agent.conf, creating the file if it doesn't already
 ```
 allow-loopback-pinentry
 ```
+
+## Contribution to maven-build
+
+### local install/deploy maven-build
+
+    mvn -e -U clean install
+    
+    mvn -e -U -Dinfrastructure=local -Dsite=true -Dsite.path=oss clean install deploy site site:stage site:stage-deploy
+
+### Pull request
+
+Please open PR on develop branch.
