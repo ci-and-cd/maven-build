@@ -195,10 +195,9 @@
                     <artifactId>site-maven-plugin</artifactId>
                     <version>0.13.0.OSS-M1</version>
                     <configuration>
-                        <message>Creating site for ${project.artifactId}-${project.version}</message>
                         <merge>true</merge>
                         <noJekyll>true</noJekyll>
-                        <repositoryOwner>${env.GITHUB_SITE_REPO_OWNER}</repositoryOwner>
+                        <repositoryOwner>${env.BUILD_OPT_GITHUB_SITE_REPO_OWNER}</repositoryOwner>
                     </configuration>
                 </plugin>
                 <!-- @formatter:on -->
@@ -592,8 +591,8 @@
             <activation><activeByDefault>true</activeByDefault></activation>
             <properties>
                 <gpg.executable>gpg</gpg.executable>
-                <gpg.keyname>${env.GPG_KEYNAME}</gpg.keyname>
-                <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
+                <gpg.keyname>${env.BUILD_OPT_GPG_KEYNAME}</gpg.keyname>
+                <gpg.passphrase>${env.BUILD_OPT_GPG_PASSPHRASE}</gpg.passphrase>
             </properties>
         </profile>
 
@@ -841,7 +840,7 @@
         <!-- https://www.petrikainulainen.net/programming/maven/creating-code-coverage-reports-for-unit-and-integration-tests-with-the-jacoco-maven-plugin/ -->
         <profile>
             <id>jacoco-build</id>
-            <activation><property><name>!jacoco</name></property></activation>
+            <activation><property><name>jacoco</name><value>true</value></property></activation>
             <properties>
                 <jacoco-ut.skip>${maven.test.skip}</jacoco-ut.skip>
                 <jacoco-it.skip>${maven.integration-test.skip}</jacoco-it.skip>
@@ -988,6 +987,8 @@
             <id>infrastructure_github</id>
             <activation><property><name>infrastructure</name><value>github</value></property><activeByDefault>false</activeByDefault></activation>
             <properties>
+                <!--<wagon.merge-maven-repos.target>https://oss.sonatype.org/content/repositories/snapshots</wagon.merge-maven-repos.target>-->
+                <wagon.merge-maven-repos.target>https://oss.sonatype.org/service/local/staging/deploy/maven2</wagon.merge-maven-repos.target>
                 <wagon.merge-maven-repos.targetId>OSSRH-${build.publish.channel}s</wagon.merge-maven-repos.targetId>
             </properties>
             <distributionManagement>
@@ -1046,21 +1047,27 @@
         </profile>
 
         <profile>
-            <id>default-publish_deploy_segregation-properties</id>
-            <activation><property><name>!publish_deploy_segregation</name></property><activeByDefault>false</activeByDefault></activation>
-            <properties>
-                <wagon.source.filepath>${user.home}/.oss/local-deploy/${git.commit.id}</wagon.source.filepath>
-                <wagon.merge-maven-repos.target>${local-nexus3.repository}/maven-${build.publish.channel}s</wagon.merge-maven-repos.target>
-                <wagon.merge-maven-repos.targetId>local-nexus3-${build.publish.channel}s</wagon.merge-maven-repos.targetId>
-            </properties>
+            <id>default-wagon-source-filepath</id>
+            <activation><property><name>!wagon.source.filepath</name></property><activeByDefault>false</activeByDefault></activation>
+            <properties><wagon.source.filepath>${user.home}/.oss/local-deploy/${git.commit.id}</wagon.source.filepath></properties>
+        </profile>
+        <profile>
+            <id>default-wagon-merge-maven-repos-target</id>
+            <activation><property><name>!wagon.merge-maven-repos.target</name></property><activeByDefault>false</activeByDefault></activation>
+            <properties><wagon.merge-maven-repos.target>${local-nexus3.repository}/maven-${build.publish.channel}s</wagon.merge-maven-repos.target></properties>
+        </profile>
+        <profile>
+            <id>default-wagon-merge-maven-repos-targetId</id>
+            <activation><property><name>!wagon.merge-maven-repos.targetId</name></property><activeByDefault>false</activeByDefault></activation>
+            <properties><wagon.merge-maven-repos.targetId>local-nexus3-${build.publish.channel}s</wagon.merge-maven-repos.targetId></properties>
         </profile>
         <!-- Why org.codehaus.mojo:wagon-maven-plugin:1.1-snapshot-chshawkn-1.4?
             see: https://www.mail-archive.com/users@maven.apache.org/msg129243.html -->
         <!--http://www.mojohaus.org/wagon-maven-plugin/usage.html-->
         <!--http://www.mojohaus.org/wagon-maven-plugin/-->
         <profile>
-            <id>publish-deploy-segregation-with-wagon</id>
-            <activation><property><name>publish_deploy_segregation</name><value>true</value></property><activeByDefault>false</activeByDefault></activation>
+            <id>mvn-deploy-publish-segregation-by-wagon</id>
+            <activation><property><name>mvn_deploy_publish_segregation</name><value>true</value></property><activeByDefault>false</activeByDefault></activation>
             <pluginRepositories>
                 <pluginRepository>
                     <id>github-chshawkn-wagon-maven-plugin</id>
@@ -1083,7 +1090,7 @@
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>clean-local-deploy-dir</id>
+                                <id>clean-local-deploy-model-path</id>
                                 <phase>none</phase>
                                 <goals><goal>run</goal></goals>
                                 <configuration>
@@ -1100,7 +1107,7 @@
                         <artifactId>wagon-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>deploy-merge-maven-repos</id>
+                                <id>merge-maven-repos-deploy</id>
                                 <phase>none</phase>
                                 <goals><goal>merge-maven-repos</goal></goals>
                                 <configuration>
@@ -1141,8 +1148,9 @@
                         <groupId>com.github.github</groupId>
                         <artifactId>site-maven-plugin</artifactId>
                         <configuration>
+                            <message>Creating site for ${project.artifactId}-${project.version}</message>
                             <path>${project.distributionManagement.site.url}</path>
-                            <repositoryName>${env.GITHUB_SITE_REPO_NAME}</repositoryName>
+                            <repositoryName>${env.BUILD_OPT_GITHUB_SITE_REPO_NAME}</repositoryName>
                         </configuration>
                         <executions>
                             <execution><goals><goal>site</goal></goals><phase>site-deploy</phase><!--<phase>site</phase>--></execution>
@@ -1167,8 +1175,9 @@
                         <groupId>com.github.github</groupId>
                         <artifactId>site-maven-plugin</artifactId>
                         <configuration>
+                            <message>Creating site for ${project.artifactId}-${project.version}</message>
                             <path>${github.site.path}</path>
-                            <!--<repositoryName>${env.GITHUB_SITE_REPO_NAME}</repositoryName>-->
+                            <!--<repositoryName>${env.BUILD_OPT_GITHUB_SITE_REPO_NAME}</repositoryName>-->
                         </configuration>
                         <executions>
                             <execution><goals><goal>site</goal></goals><phase>site</phase></execution>
@@ -1451,7 +1460,7 @@
 
         <profile>
             <id>jacoco-report</id>
-            <activation><property><name>!jacoco</name></property></activation>
+            <activation><property><name>jacoco</name><value>true</value></property></activation>
             <reporting>
                 <plugins>
                     <plugin>
@@ -1530,11 +1539,7 @@
 
         <profile>
             <id>sonar</id>
-            <activation>
-                <property>
-                    <name>sonar</name>
-                </property>
-            </activation>
+            <activation><property><name>sonar</name><value>true</value></property></activation>
             <properties>
                 <!-- sonar.java.binaries issue when force language java  -->
                 <!--sonar.language>java</sonar.language-->

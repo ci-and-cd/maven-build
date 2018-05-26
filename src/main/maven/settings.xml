@@ -16,7 +16,6 @@
             <url>http://nexus3.local:28081/nexus/repository/maven-public/</url>
             <mirrorOf>*</mirrorOf>
             <!--<mirrorOf>central</mirrorOf>-->
-            <!--<mirrorOf>central,spring-libs-release,spring-milestone,spring-libs-snapshot</mirrorOf>-->
             <!--<mirrorOf>external:*,!github-chshawkn-wagon-maven-plugin</mirrorOf>-->
         </mirror>
     </mirrors>
@@ -37,7 +36,7 @@
 
     <servers>
         <!-- @formatter:off -->
-        <server><id>gpg.passphrase</id><passphrase>${env.GPG_PASSPHRASE}</passphrase></server>
+        <server><id>gpg.passphrase</id><passphrase>${env.BUILD_OPT_GPG_PASSPHRASE}</passphrase></server>
         <server><id>github</id><password>${env.GITHUB_SITE_AUTH_TOKEN}</password></server>
         <server><id>OSSRH-releases</id><username>${env.MAVEN_CENTRAL_USER}</username><password>${env.MAVEN_CENTRAL_PASS}</password></server>
         <server><id>OSSRH-snapshots</id><username>${env.MAVEN_CENTRAL_USER}</username><password>${env.MAVEN_CENTRAL_PASS}</password></server>
@@ -52,8 +51,7 @@
         <server><id>internal-nexus3-thirdparty</id><username>deployment</username><password>{W4hzroIAQKoHOtCYkQror16gbyrd9/KMO2v4QiyJYho=}</password></server>
         <server>
             <id>internal-mvnsite</id>
-            <username>root</username>
-            <privateKey>${user.home}/.ssh/mvnsite.internal</privateKey>
+            <username>root</username><password>{W4hzroIAQKoHOtCYkQror16gbyrd9/KMO2v4QiyJYho=}</password>
         </server>
 
         <!-- see: http://maven.apache.org/guides/mini/guide-encryption.html -->

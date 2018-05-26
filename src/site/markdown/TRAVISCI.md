@@ -32,7 +32,7 @@ Variables in travis repo settings:
 
 |name                                | usage                                          | note                           |
 |------------------------------------|:----------------------------------------------:|:------------------------------:|
-|GITHUB_SITE_REPO_OWNER              | for github maven site                          | Display value in build log     |
+|BUILD_OPT_GITHUB_SITE_REPO_OWNER              | for github maven site                          | Display value in build log     |
 |GITHUB_SITE_AUTH_TOKEN              | for github maven site and config fetch         | Not display value in build log |
 |                                    |                                                |                                |
 |MAVEN_CENTRAL_USER                  | for deploy artifact | Do not set on forked repo, Not display value in build log |

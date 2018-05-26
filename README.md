@@ -1,11 +1,3 @@
-[![Build Status](https://travis-ci.org/home1-oss/maven-build.svg?branch=master)](https://travis-ci.org/home1-oss/maven-build)
-
------
-There are link issues on git service generated pages, see gitbook or maven site.
-+ [gitbook](https://home1-oss.github.io/home1-oss-gitbook/release/)
-+ [maven site](https://home1-oss.github.io/home1-oss/release/)
------
-
 # maven-build
 Parent pom for maven based projects
 
@@ -93,22 +85,30 @@ use same value on relative projects.
 
 - GITHUB_SITE_AUTH_TOKEN
 > default: N/A (blank)
-- GITHUB_SITE_REPO_OWNER
+- BUILD_OPT_GITHUB_SITE_REPO_OWNER
 > default: N/A (blank)
-- GITHUB_SITE_REPO_NAME
+- BUILD_OPT_GITHUB_SITE_REPO_NAME
 > default: N/A (blank)
 
 Need these properties only when deploy site to github.com.
 
 ### 6. GPG
-- GPG_KEYNAME
+- BUILD_OPT_GPG_KEYNAME
 > default: N/A (blank)
-- GPG_PASSPHRASE
+- BUILD_OPT_GPG_PASSPHRASE
 > default: N/A (blank)
- 
-Need these properties only when deploy artifacts to maven central repository.
 
-### 7. maven-compiler-plugin and maven-javadoc-plugin
+Need these properties only when deploy artifacts into maven central repository.
+
+### 7. maven central
+- MAVEN_CENTRAL_USER
+> Maven central's username
+- MAVEN_CENTRAL_PASS
+> Maven central's password
+
+Need these properties only when deploy artifacts into maven central repository.
+
+### 8. maven-compiler-plugin and maven-javadoc-plugin
 - project.build.sourceEncoding
 > default: UTF-8
 
@@ -185,8 +185,8 @@ git-commit-id
 > Generate src/main/resources/git.properties.
 activate automatically if '${maven.multiModuleProjectDirectory}/.git/HEAD' exists
 
-publish-deploy-segregation-with-wagon
-> activate by set 'publish_deploy_segregation' to 'true'
+mvn-deploy-publish-segregation-by-wagon
+> activate by set 'mvn_deploy_publish_segregation' to 'true'
 
 jacoco-build
 > Test coverage report.
@@ -203,7 +203,7 @@ reports-for-site
 > activate by set property 'site' to 'true'
 
 jacoco-report
-> activate by property 'jacoco' absent
+> activate by set property 'jacoco' to 'true'
 
 dependency-check
 > Generate a detailed dependency report, This takes a long time, disabled by default.
@@ -214,7 +214,7 @@ clirr
 > activate by set property 'site' to 'true'
 
 sonar
-> activate by property 'sonar' present
+> activate by set property 'sonar' to 'true'
 
 ### 3. site
 site
@@ -227,7 +227,7 @@ infrastructure_github_site_publish
 activate on property 'github-publish' present  
 needs:  
 env.GITHUB_SITE_AUTH_TOKEN  
-env.GITHUB_SITE_REPO_OWNER
+env.BUILD_OPT_GITHUB_SITE_REPO_OWNER
 
 
 ## V. Repositories
@@ -244,7 +244,21 @@ Add args on `maven site`
     jira.password           # jira password
 
 
-## GPG issue
+## VII. Appendices
+
+### A. Contribution to maven-build
+
+#### A.1. local install/deploy maven-build
+
+    mvn -e -U clean install
+    
+    mvn -e -U -Dinfrastructure=local -Dsite=true -Dsite.path=oss clean install deploy site site:stage site:stage-deploy
+
+#### A.2 Pull request
+
+Please open PR on develop branch.
+
+### B. GPG issue
 ```
 gpg: signing failed: Inappropriate ioctl for device
 ```
@@ -260,15 +274,3 @@ And add this to ~/.gnupg/gpg-agent.conf, creating the file if it doesn't already
 ```
 allow-loopback-pinentry
 ```
-
-## Contribution to maven-build
-
-### local install/deploy maven-build
-
-    mvn -e -U clean install
-    
-    mvn -e -U -Dinfrastructure=local -Dsite=true -Dsite.path=oss clean install deploy site site:stage site:stage-deploy
-
-### Pull request
-
-Please open PR on develop branch.

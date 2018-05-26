@@ -51,17 +51,12 @@ else
     done
 fi
 
-if [ "local" == "${INFRASTRUCTURE}" ]; then
-    NEXUS_REPO_RELEASES="${LOCAL_NEXUS3}/nexus/repository/maven-releases";
-    NEXUS_REPO_SNAPSHOTS="${LOCAL_NEXUS3}/nexus/repository/maven-snapshots";
-    NEXUS_REPO_THIRDPARTY="${LOCAL_NEXUS3}/nexus/repository/maven-thirdparty";
-    NEXUS_REPO_ID="local-nexus3-thirdparty";
-else
-    NEXUS_REPO_RELEASES="${INTERNAL_NEXUS3}/nexus/repository/maven-releases";
-    NEXUS_REPO_SNAPSHOTS="${INTERNAL_NEXUS3}/nexus/repository/maven-snapshots";
-    NEXUS_REPO_THIRDPARTY="${INTERNAL_NEXUS3}/nexus/repository/maven-thirdparty";
-    NEXUS_REPO_ID="internal-nexus3-thirdparty";
-fi
+
+NEXUS_REPO_RELEASES="${INFRASTRUCTURE_OPT_NEXUS3}/nexus/repository/maven-releases";
+NEXUS_REPO_SNAPSHOTS="${INFRASTRUCTURE_OPT_NEXUS3}/nexus/repository/maven-snapshots";
+NEXUS_REPO_THIRDPARTY="${INFRASTRUCTURE_OPT_NEXUS3}/nexus/repository/maven-thirdparty";
+NEXUS_REPO_ID="${INFRASTRUCTURE}-nexus3-thirdparty";
+
 
 # ${GROUP_ID//.//} replace all dots with slashs
 ARTIFACT_PATH="${GROUP_ID//.//}/${ARTIFACT_ID}/${ARTIFACT_VERSION}";

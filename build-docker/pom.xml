@@ -123,7 +123,7 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>!publish_deploy_segregation</name>
+                    <name>!mvn_deploy_publish_segregation</name>
                 </property>
             </activation>
             <build>

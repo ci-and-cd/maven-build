@@ -1,7 +1,18 @@
 # maven-docker
 Parent pom for docker projects
 
-## Plugins
+## I. Usage
+
+
+## II. Properties and default values
+
+com.spotify:docker-maven-plugin
+
+- docker.registry
+> default: registry.docker.local
+
+
+## III. Plugins
 
 io.fabric8:docker-maven-plugin
 
@@ -17,20 +28,16 @@ maven-resources-plugin
 maven-deploy-plugin
 > must run after docker-maven-plugin
 
-## Profiles
+
+## IV. Profiles
 
 docker-maven-plugin-lifecycle-binding-when-not-publish-deploy-segregation
-> activate by property 'publish_deploy_segregation' absent
+> activate by property 'mvn_deploy_publish_segregation' absent
 build and push docker image automatically
 
-## Properties and default values
+## VI. Appendices
 
-maven-compiler-plugin and maven-javadoc-plugin
-
-- docker.registry
-> registry.docker.local
-
-## Example ~/.docker/daemon.json of Docker for Mac
+## A. Example ~/.docker/daemon.json of Docker for Mac
 ```json
 {
   "debug" : true,

@@ -30,12 +30,14 @@
         <menu ref="parent" />
         <menu name="DOCUMENTATION">
             <item href="README.html" name="README" />
+            <item href="MVN_DEPLOY_PUBLISH_SEGREGATION.html" name="mvn deploy and artifacts publish segregation" />
             <item href="TRAVISCI.html" name="travis-ci build" />
         </menu>
         <menu name="Projects">
-            <item href="maven-build-java8/index.html" name="maven-build-java8" />
+            <item href="build-docker/index.html" name="build-docker" />
             <item href="#" name="-----" />
-            <item href="maven-build-java9/index.html" name="maven-build-java9" />
+            <item href="build-docker/maven-build-java8/index.html" name="maven-build-java8" />
+            <item href="build-docker/maven-build-java9/index.html" name="maven-build-java9" />
         </menu>
         <menu ref="modules" />
         <!--<menu ref="reports" />-->
