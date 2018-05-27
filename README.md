@@ -85,17 +85,17 @@ use same value on relative projects.
 
 - GITHUB_SITE_AUTH_TOKEN
 > default: N/A (blank)
-- BUILD_OPT_GITHUB_SITE_REPO_OWNER
+- CI_OPT_GITHUB_SITE_REPO_OWNER
 > default: N/A (blank)
-- BUILD_OPT_GITHUB_SITE_REPO_NAME
+- CI_OPT_GITHUB_SITE_REPO_NAME
 > default: N/A (blank)
 
 Need these properties only when deploy site to github.com.
 
 ### 6. GPG
-- BUILD_OPT_GPG_KEYNAME
+- CI_OPT_GPG_KEYNAME
 > default: N/A (blank)
-- BUILD_OPT_GPG_PASSPHRASE
+- CI_OPT_GPG_PASSPHRASE
 > default: N/A (blank)
 
 Need these properties only when deploy artifacts into maven central repository.
@@ -169,7 +169,7 @@ maven-resources-plugin
 ## IV. Profiles
 
 ### 1. build
-infrastructure_github
+infrastructure_opensource
 > Use maven central service.
 Deploy maven site to github.
 
@@ -222,12 +222,12 @@ site
 run `mvn -Dsite=true site site:stage site:stage-deploy` to active this profile and build site, 
 set `-Dsite.path=maven-build-snapshot` to specify upload directory.
 
-infrastructure_github_site_publish
+infrastructure_opensource_site_publish
 > publish project site to github  
-activate on property 'github-publish' present  
+activate on property 'github-site-publish' present  
 needs:  
 env.GITHUB_SITE_AUTH_TOKEN  
-env.BUILD_OPT_GITHUB_SITE_REPO_OWNER
+env.CI_OPT_GITHUB_SITE_REPO_OWNER
 
 
 ## V. Repositories

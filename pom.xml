@@ -197,7 +197,7 @@
                     <configuration>
                         <merge>true</merge>
                         <noJekyll>true</noJekyll>
-                        <repositoryOwner>${env.BUILD_OPT_GITHUB_SITE_REPO_OWNER}</repositoryOwner>
+                        <repositoryOwner>${env.CI_OPT_GITHUB_SITE_REPO_OWNER}</repositoryOwner>
                     </configuration>
                 </plugin>
                 <!-- @formatter:on -->
@@ -591,14 +591,14 @@
             <activation><activeByDefault>true</activeByDefault></activation>
             <properties>
                 <gpg.executable>gpg</gpg.executable>
-                <gpg.keyname>${env.BUILD_OPT_GPG_KEYNAME}</gpg.keyname>
-                <gpg.passphrase>${env.BUILD_OPT_GPG_PASSPHRASE}</gpg.passphrase>
+                <gpg.keyname>${env.CI_OPT_GPG_KEYNAME}</gpg.keyname>
+                <gpg.passphrase>${env.CI_OPT_GPG_PASSPHRASE}</gpg.passphrase>
             </properties>
         </profile>
 
         <profile>
-            <id>infrastructure-github</id>
-            <activation><property><name>infrastructure</name><value>github</value></property></activation>
+            <id>infrastructure-opensource</id>
+            <activation><property><name>infrastructure</name><value>opensource</value></property></activation>
             <properties>
                 <sonar.host.url>https://sonarqube.com</sonar.host.url>
             </properties>
@@ -984,8 +984,8 @@
         </profile>
 
         <profile>
-            <id>infrastructure_github</id>
-            <activation><property><name>infrastructure</name><value>github</value></property><activeByDefault>false</activeByDefault></activation>
+            <id>infrastructure_opensource</id>
+            <activation><property><name>infrastructure</name><value>opensource</value></property><activeByDefault>false</activeByDefault></activation>
             <properties>
                 <!--<wagon.merge-maven-repos.target>https://oss.sonatype.org/content/repositories/snapshots</wagon.merge-maven-repos.target>-->
                 <wagon.merge-maven-repos.target>https://oss.sonatype.org/service/local/staging/deploy/maven2</wagon.merge-maven-repos.target>
@@ -1123,8 +1123,8 @@
         </profile>
 
         <profile>
-            <id>infrastructure_github_site</id>
-            <activation><property><name>infrastructure</name><value>github</value></property><activeByDefault>false</activeByDefault></activation>
+            <id>infrastructure_opensource_site</id>
+            <activation><property><name>infrastructure</name><value>opensource</value></property><activeByDefault>false</activeByDefault></activation>
             <properties>
                 <!-- In child projects, do not add url. Let it inherit from parent.-->
                 <!--<github.site.path>${project.version}/${project.artifactId}</github.site.path>-->
@@ -1150,7 +1150,7 @@
                         <configuration>
                             <message>Creating site for ${project.artifactId}-${project.version}</message>
                             <path>${project.distributionManagement.site.url}</path>
-                            <repositoryName>${env.BUILD_OPT_GITHUB_SITE_REPO_NAME}</repositoryName>
+                            <repositoryName>${env.CI_OPT_GITHUB_SITE_REPO_NAME}</repositoryName>
                         </configuration>
                         <executions>
                             <execution><goals><goal>site</goal></goals><phase>site-deploy</phase><!--<phase>site</phase>--></execution>
@@ -1161,8 +1161,8 @@
         </profile>
 
         <profile>
-            <id>infrastructure_github_site_publish</id>
-            <activation><property><name>github-publish</name></property></activation>
+            <id>infrastructure_opensource_site_publish</id>
+            <activation><property><name>github-site-publish</name></property></activation>
             <properties>
                 <!-- In child projects Do not add url. Let it inherit from parent. -->
                 <!--<github.site.path>${project.version}/${project.artifactId}</github.site.path>-->
@@ -1177,7 +1177,7 @@
                         <configuration>
                             <message>Creating site for ${project.artifactId}-${project.version}</message>
                             <path>${github.site.path}</path>
-                            <!--<repositoryName>${env.BUILD_OPT_GITHUB_SITE_REPO_NAME}</repositoryName>-->
+                            <!--<repositoryName>${env.CI_OPT_GITHUB_SITE_REPO_NAME}</repositoryName>-->
                         </configuration>
                         <executions>
                             <execution><goals><goal>site</goal></goals><phase>site</phase></execution>

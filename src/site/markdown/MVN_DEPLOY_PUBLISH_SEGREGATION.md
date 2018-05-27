@@ -9,7 +9,7 @@ then run another command to publish them and their docker image into a remote re
 This make build process more flexible for most CI systems.
 
 
-- BUILD_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION
+- CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION
 > default: not equals to 'true'
 
 

@@ -32,7 +32,7 @@ Variables in travis repo settings:
 
 |name                                | usage                                          | note                           |
 |------------------------------------|:----------------------------------------------:|:------------------------------:|
-|BUILD_OPT_GITHUB_SITE_REPO_OWNER              | for github maven site                          | Display value in build log     |
+|CI_OPT_GITHUB_SITE_REPO_OWNER              | for github maven site                          | Display value in build log     |
 |GITHUB_SITE_AUTH_TOKEN              | for github maven site and config fetch         | Not display value in build log |
 |                                    |                                                |                                |
 |MAVEN_CENTRAL_USER                  | for deploy artifact | Do not set on forked repo, Not display value in build log |
@@ -43,7 +43,7 @@ Variables in travis repo settings:
     env:
       global:
       # ci-script and infrastructure config ref, ex master/develop/v1.0.8
-      - LIB_CI_SCRIPT=https://github.com/home1-oss/maven-build/raw/master/src/main/ci-script/lib_ci.sh
+      - CI_OPT_CI_SCRIPT=https://github.com/home1-oss/maven-build/raw/master/src/main/ci-script/lib_ci.sh
       # or delete /etc/mavenrc
       - MAVEN_SKIP_RC=true
     # Skipping the Installation Step

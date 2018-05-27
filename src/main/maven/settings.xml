@@ -36,7 +36,7 @@
 
     <servers>
         <!-- @formatter:off -->
-        <server><id>gpg.passphrase</id><passphrase>${env.BUILD_OPT_GPG_PASSPHRASE}</passphrase></server>
+        <server><id>gpg.passphrase</id><passphrase>${env.CI_OPT_GPG_PASSPHRASE}</passphrase></server>
         <server><id>github</id><password>${env.GITHUB_SITE_AUTH_TOKEN}</password></server>
         <server><id>OSSRH-releases</id><username>${env.MAVEN_CENTRAL_USER}</username><password>${env.MAVEN_CENTRAL_PASS}</password></server>
         <server><id>OSSRH-snapshots</id><username>${env.MAVEN_CENTRAL_USER}</username><password>${env.MAVEN_CENTRAL_PASS}</password></server>

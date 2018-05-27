@@ -65,38 +65,67 @@ function git_repo_slug() {
 
 # >>>>>>>>>> ---------- CI option functions ---------- >>>>>>>>>>
 # returns: git commit id
-function build_opt_git_commit_id() {
-    if [ -n "${BUILD_OPT_GIT_COMMIT_ID}" ]; then
-        echo "${BUILD_OPT_GIT_COMMIT_ID}"
+function ci_opt_git_commit_id() {
+    if [ -n "${CI_OPT_GIT_COMMIT_ID}" ]; then
+        echo "${CI_OPT_GIT_COMMIT_ID}"
     else
         echo "$(git rev-parse HEAD)"
     fi
 }
 
-function build_opt_cache_directory() {
+function ci_opt_cache_directory() {
     local cache_directory=""
-    if [ -n "${BUILD_OPT_CACHE_DIRECTORY}" ]; then
-        cache_directory="${BUILD_OPT_CACHE_DIRECTORY}"
+    if [ -n "${CI_OPT_CACHE_DIRECTORY}" ]; then
+        cache_directory="${CI_OPT_CACHE_DIRECTORY}"
     else
-        cache_directory="${HOME}/.oss/tmp/$(build_opt_git_commit_id)"
+        cache_directory="${HOME}/.oss/tmp/$(ci_opt_git_commit_id)"
     fi
     mkdir -p ${cache_directory} 2>/dev/null
     echo "${cache_directory}"
 }
 
+# determine current is origin (original) or forked
+function ci_opt_ci_opt_is_origin_repo() {
+    if [ -n "${CI_OPT_IS_ORIGIN_REPO}" ]; then
+        echo "${CI_OPT_IS_ORIGIN_REPO}"
+    else
+        if [ -z "${CI_OPT_ORIGIN_REPO_SLUG}" ]; then CI_OPT_ORIGIN_REPO_SLUG="unknown/unknown"; fi
+        if ([ "${CI_OPT_ORIGIN_REPO_SLUG}" == "$(git_repo_slug)" ] && [ "${TRAVIS_EVENT_TYPE}" != "pull_request" ]); then
+            echo "true";
+        else
+            eco "false";
+        fi
+    fi
+}
+
+# auto detect infrastructure using for this build.
+# example of gitlab-ci's CI_PROJECT_URL: "https://example.com/gitlab-org/gitlab-ce"
+# returns: opensource, internal or local
+function ci_opt_infrastructure() {
+    if [ -n "${CI_OPT_INFRASTRUCTURE}" ]; then
+        echo ${CI_OPT_INFRASTRUCTURE}
+    elif [ -n "${TRAVIS_REPO_SLUG}" ]; then
+        echo "opensource"
+    elif [ -n "${CI_PROJECT_URL}" ] && [[ "${CI_PROJECT_URL}" == ${CI_INFRA_OPT_INTERNAL_GIT_PREFIX}* ]]; then
+        echo "internal"
+    else
+        echo "local"
+    fi
+}
+
 # auto detect current build ref name by CI environment variables or local git info
-# ${CI_BUILD_REF_NAME} show branch or tag since GitLab-CI 5.2
-# CI_BUILD_REF_NAME for gitlab 8.x, see: https://gitlab.com/help/ci/variables/README.md
+# ${CI_CI_OPT_REF_NAME} show branch or tag since GitLab-CI 5.2
+# CI_CI_OPT_REF_NAME for gitlab 8.x, see: https://gitlab.com/help/ci/variables/README.md
 # CI_COMMIT_REF_NAME for gitlab 9.x, see: https://gitlab.com/help/ci/variables/README.md
 # TRAVIS_BRANCH for travis-ci, see: https://docs.travis-ci.com/user/environment-variables/
 # returns: current build ref name, i.e. develop, release ...
-function build_opt_ref_name() {
-    if [ -n "${BUILD_REF_NAME}" ]; then
-        echo "${BUILD_REF_NAME}"
+function ci_opt_ref_name() {
+    if [ -n "${CI_OPT_REF_NAME}" ]; then
+        echo "${CI_OPT_REF_NAME}"
     elif [ -n "${TRAVIS_BRANCH}" ]; then
         echo "${TRAVIS_BRANCH}"
-    elif [ -n "${CI_BUILD_REF_NAME}" ]; then
-        echo "${CI_BUILD_REF_NAME}"
+    elif [ -n "${CI_CI_OPT_REF_NAME}" ]; then
+        echo "${CI_CI_OPT_REF_NAME}"
     elif [ -n "${CI_COMMIT_REF_NAME}" ]; then
         echo "${CI_COMMIT_REF_NAME}"
     else
@@ -105,12 +134,12 @@ function build_opt_ref_name() {
 }
 
 # auto determine current build publish channel by current build ref name
-# arguments: build_opt_ref_name
-function build_opt_publish_channel() {
-    if [ -n "${BUILD_OPT_PUBLISH_CHANNEL}" ]; then
-        echo "${BUILD_OPT_PUBLISH_CHANNEL}"
+# arguments: ci_opt_ref_name
+function ci_opt_publish_channel() {
+    if [ -n "${CI_OPT_PUBLISH_CHANNEL}" ]; then
+        echo "${CI_OPT_PUBLISH_CHANNEL}"
     else
-        case "$(build_opt_ref_name)" in
+        case "$(ci_opt_ref_name)" in
         "develop")
             echo "snapshot"
             ;;
@@ -127,17 +156,17 @@ function build_opt_publish_channel() {
     fi
 }
 
-function build_opt_site() {
-    if [ -n "${BUILD_OPT_SITE}" ]; then
-        echo "${BUILD_OPT_SITE}"
+function ci_opt_site() {
+    if [ -n "${CI_OPT_SITE}" ]; then
+        echo "${CI_OPT_SITE}"
     else
         echo "false"
     fi
 }
 
-function build_opt_site_path_prefix() {
-    if [ -n "${BUILD_OPT_SITE_PATH_PREFIX}" ]; then
-        echo "${BUILD_OPT_SITE_PATH_PREFIX}"
+function ci_opt_site_path_prefix() {
+    if [ -n "${CI_OPT_SITE_PATH_PREFIX}" ]; then
+        echo "${CI_OPT_SITE_PATH_PREFIX}"
     else
         echo $(echo $(git_repo_slug) | cut -d '/' -f2-)
     fi
@@ -146,45 +175,31 @@ function build_opt_site_path_prefix() {
 
 
 # >>>>>>>>>> ---------- CI option functions about infrastructures ---------- >>>>>>>>>>
-# auto detect infrastructure using for this build.
-# example of gitlab-ci's CI_PROJECT_URL: "https://example.com/gitlab-org/gitlab-ce"
-# returns: github, internal or local
-function infrastructure() {
-    if [ -n "${INFRASTRUCTURE}" ]; then
-        echo ${INFRASTRUCTURE}
-    elif [ -n "${TRAVIS_REPO_SLUG}" ]; then
-        echo "github"
-    elif [ -n "${CI_PROJECT_URL}" ] && [[ "${CI_PROJECT_URL}" == ${INFRASTRUCTURE_INTERNAL_GIT_PREFIX}* ]]; then
-        echo "internal"
-    else
-        echo "local"
-    fi
-}
 
-# auto determine INFRASTRUCTURE_OPT_GIT_PREFIX by infrastructure for further download.
+# auto determine CI_INFRA_OPT_GIT_PREFIX by infrastructure for further download.
 # returns: prefix of git service url (infrastructure specific), i.e. https://github.com
-function infrastructure_opt_git_prefix() {
-    local infrastructure="$(infrastructure)"
-    if [ -n "${INFRASTRUCTURE_OPT_GIT_PREFIX}" ]; then
-        echo "${INFRASTRUCTURE_OPT_GIT_PREFIX}"
-    elif [ "github" == "${infrastructure}" ]; then
-        if [ -n "${INFRASTRUCTURE_GITHUB_GIT_PREFIX}" ]; then echo "${INFRASTRUCTURE_GITHUB_GIT_PREFIX}"; else echo "https://github.com"; fi
+function ci_infra_opt_git_prefix() {
+    local infrastructure="$(ci_opt_infrastructure)"
+    if [ -n "${CI_INFRA_OPT_GIT_PREFIX}" ]; then
+        echo "${CI_INFRA_OPT_GIT_PREFIX}"
+    elif [ "opensource" == "${infrastructure}" ]; then
+        if [ -n "${CI_INFRA_OPT_OPENSOURCE_GIT_PREFIX}" ]; then echo "${CI_INFRA_OPT_OPENSOURCE_GIT_PREFIX}"; else echo "https://github.com"; fi
     elif [ "internal" == "${infrastructure}" ]; then
         if [ -n "${CI_PROJECT_URL}" ]; then
             echo $(echo "${CI_PROJECT_URL}" | sed 's,/*[^/]\+/*$,,' | sed 's,/*[^/]\+/*$,,')
         else
-            if [ -n "${INFRASTRUCTURE_INTERNAL_GIT_PREFIX}" ]; then echo "${INFRASTRUCTURE_INTERNAL_GIT_PREFIX}"; else echo "http://gitlab.internal"; fi
+            if [ -n "${CI_INFRA_OPT_INTERNAL_GIT_PREFIX}" ]; then echo "${CI_INFRA_OPT_INTERNAL_GIT_PREFIX}"; else echo "http://gitlab.internal"; fi
         fi
     else
-        if [ -n "${INFRASTRUCTURE_LOCAL_GIT_PREFIX}" ]; then echo "${INFRASTRUCTURE_LOCAL_GIT_PREFIX}"; else echo "http://gitlab.local:10080"; fi
+        if [ -n "${CI_INFRA_OPT_LOCAL_GIT_PREFIX}" ]; then echo "${CI_INFRA_OPT_LOCAL_GIT_PREFIX}"; else echo "http://gitlab.local:10080"; fi
     fi
 }
 
-function infrastructure_opt_git_auth_token() {
-    if [ -n "${INFRASTRUCTURE_OPT_GIT_AUTH_TOKEN}" ]; then
-        echo "${INFRASTRUCTURE_OPT_GIT_AUTH_TOKEN}"
+function ci_infra_opt_git_auth_token() {
+    if [ -n "${CI_INFRA_OPT_GIT_AUTH_TOKEN}" ]; then
+        echo "${CI_INFRA_OPT_GIT_AUTH_TOKEN}"
     else
-        local var_name="INFRASTRUCTURE_$(echo $(infrastructure) | tr '[:lower:]' '[:upper:]')_GIT_AUTH_TOKEN"
+        local var_name="CI_INFRA_OPT_$(echo $(ci_opt_infrastructure) | tr '[:lower:]' '[:upper:]')_GIT_AUTH_TOKEN"
         if [ -n "${BASH_VERSION}" ]; then
             echo "${!var_name}"
         elif [ -n "${ZSH_VERSION}" ]; then
@@ -198,39 +213,142 @@ function infrastructure_opt_git_auth_token() {
 # <<<<<<<<<< ---------- CI option functions about infrastructures ---------- <<<<<<<<<<
 
 
-# Build MAVEN_OPTS by EXTRA_MAVEN_OPTS from BUILD_OPT_CI_OPTS_SCRIPT and BUILD_OPT_*
-function build_mvn_opts() {
-    local opts="${EXTRA_MAVEN_OPTS} -Dbuild.publish.channel=$(build_opt_publish_channel)"
-    if [ -n "${BUILD_OPT_CHECKSTYLE_CONFIG_LOCATION}" ]; then opts="${opts} -Dcheckstyle.config.location=${BUILD_OPT_CHECKSTYLE_CONFIG_LOCATION}"; fi
-    if [ "${BUILD_OPT_DEPENDENCY_CHECK}" == "true" ]; then opts="${opts} -Ddependency-check=true"; fi
-    if [ -n "${INFRASTRUCTURE_OPT_DOCKER_REGISTRY}" ]; then opts="${opts} -Ddocker.registry=${INFRASTRUCTURE_OPT_DOCKER_REGISTRY}"; fi
-    opts="${opts} -Dfile.encoding=UTF-8"
-    if [ -n "${BUILD_OPT_FRONTEND_NODEDOWNLOADROOT}" ]; then opts="${opts} -Dfrontend.nodeDownloadRoot=${BUILD_OPT_FRONTEND_NODEDOWNLOADROOT}"; fi
-    if [ -n "${BUILD_OPT_FRONTEND_NPMDOWNLOADROOT}" ]; then opts="${opts} -Dfrontend.npmDownloadRoot=${BUILD_OPT_FRONTEND_NPMDOWNLOADROOT}"; fi
-    opts="${opts} -Dinfrastructure=$(infrastructure)"
-    if [ "${BUILD_OPT_INTEGRATION_TEST_SKIP}" == "true" ]; then opts="${opts} -Dmaven.integration-test.skip=true"; fi
-    if [ "${BUILD_OPT_TEST_FAILURE_IGNORE}" == "true" ]; then opts="${opts} -Dmaven.test.failure.ignore=true"; fi
-    if [ "${BUILD_OPT_TEST_SKIP}" == "true" ]; then opts="${opts} -Dmaven.test.skip=true"; fi
-    if [ "${BUILD_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]; then opts="${opts} -Dmvn_deploy_publish_segregation=true"; fi
-    if [ -n "${BUILD_OPT_PMD_RULESET_LOCATION}" ]; then opts="${opts} -Dpmd.ruleset.location=${BUILD_OPT_PMD_RULESET_LOCATION}"; fi
-    opts="${opts} -Dsite=$(build_opt_site)"
-    opts="${opts} -Dsite.path=$(build_opt_site_path_prefix)-$(build_opt_publish_channel)"
-    if [ "${BUILD_OPT_SONAR}" == "true" ]; then opts="${opts} -Dsonar=true"; fi
-    opts="${opts} -Duser.language=zh -Duser.region=CN -Duser.timezone=Asia/Shanghai"
-    if [ -n "${BUILD_OPT_WAGON_SOURCE_FILEPATH}" ]; then opts="${opts} -Dwagon.source.filepath=${BUILD_OPT_WAGON_SOURCE_FILEPATH} -DaltDeploymentRepository=repo::default::file://${BUILD_OPT_WAGON_SOURCE_FILEPATH}"; fi
+# Build MAVEN_OPTS by variables from CI_OPT_CI_OPTS_SCRIPT and CI_OPT_*
+function ci_opt_maven_opts() {
+    if [ -n "${CI_OPT_MAVEN_OPTS}" ]; then
+        echo "${CI_OPT_MAVEN_OPTS}"
+    else
+        local opts="${MAVEN_OPTS}"
+        if [ -n "${CI_OPT_EXTRA_MAVEN_OPTS}" ]; then opts="${opts} ${CI_OPT_EXTRA_MAVEN_OPTS}"; fi
 
-    if [ -n "${INFRASTRUCTURE_OPT_SONAR_HOST_URL}" ]; then opts="${opts} -D$(infrastructure)-sonar.host.url=${INFRASTRUCTURE_OPT_SONAR_HOST_URL}"; fi
-    if [ -n "${INFRASTRUCTURE_OPT_NEXUS3}" ]; then opts="${opts} -D$(infrastructure)-nexus3.repository=${INFRASTRUCTURE_OPT_NEXUS3}/nexus/repository"; fi
+        opts="${opts} -Dbuild.publish.channel=$(ci_opt_publish_channel)"
+        if [ -n "${CI_OPT_CHECKSTYLE_CONFIG_LOCATION}" ]; then opts="${opts} -Dcheckstyle.config.location=${CI_OPT_CHECKSTYLE_CONFIG_LOCATION}"; fi
+        if [ "${CI_OPT_DEPENDENCY_CHECK}" == "true" ]; then opts="${opts} -Ddependency-check=true"; fi
+        if [ -n "${CI_INFRA_OPT_DOCKER_REGISTRY}" ]; then opts="${opts} -Ddocker.registry=${CI_INFRA_OPT_DOCKER_REGISTRY}"; fi
+        opts="${opts} -Dfile.encoding=UTF-8"
+        if [ -n "${CI_OPT_FRONTEND_NODEDOWNLOADROOT}" ]; then opts="${opts} -Dfrontend.nodeDownloadRoot=${CI_OPT_FRONTEND_NODEDOWNLOADROOT}"; fi
+        if [ -n "${CI_OPT_FRONTEND_NPMDOWNLOADROOT}" ]; then opts="${opts} -Dfrontend.npmDownloadRoot=${CI_OPT_FRONTEND_NPMDOWNLOADROOT}"; fi
+        opts="${opts} -Dinfrastructure=$(ci_opt_infrastructure)"
+        if [ "${CI_OPT_INTEGRATION_TEST_SKIP}" == "true" ]; then opts="${opts} -Dmaven.integration-test.skip=true"; fi
+        if [ "${CI_OPT_TEST_FAILURE_IGNORE}" == "true" ]; then opts="${opts} -Dmaven.test.failure.ignore=true"; fi
+        if [ "${CI_OPT_TEST_SKIP}" == "true" ]; then opts="${opts} -Dmaven.test.skip=true"; fi
+        if [ "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]; then opts="${opts} -Dmvn_deploy_publish_segregation=true"; fi
+        if [ -n "${CI_OPT_PMD_RULESET_LOCATION}" ]; then opts="${opts} -Dpmd.ruleset.location=${CI_OPT_PMD_RULESET_LOCATION}"; fi
+        opts="${opts} -Dsite=$(ci_opt_site)"
+        opts="${opts} -Dsite.path=$(ci_opt_site_path_prefix)-$(ci_opt_publish_channel)"
+        if [ "${CI_OPT_SONAR}" == "true" ]; then opts="${opts} -Dsonar=true"; fi
+        opts="${opts} -Duser.language=zh -Duser.region=CN -Duser.timezone=Asia/Shanghai"
+        if [ -n "${CI_OPT_WAGON_SOURCE_FILEPATH}" ]; then opts="${opts} -Dwagon.source.filepath=${CI_OPT_WAGON_SOURCE_FILEPATH} -DaltDeploymentRepository=repo::default::file://${CI_OPT_WAGON_SOURCE_FILEPATH}"; fi
 
-    # MAVEN_OPTS that need to kept secret
-    if [ -n "${BUILD_OPT_JIRA_PROJECTKEY}" ]; then opts="${opts} -Djira.projectKey=${BUILD_OPT_JIRA_PROJECTKEY} -Djira.user=${BUILD_OPT_JIRA_USER} -Djira.password=${BUILD_OPT_JIRA_PASSWORD}"; fi
-    # public sonarqube config, see: https://sonarcloud.io
-    if [ "github" == "$(infrastructure)" ]; then opts="${opts} -Dsonar.organization=${BUILD_OPT_SONAR_ORGANIZATION} -Dsonar.login=${BUILD_OPT_SONAR_LOGIN_TOKEN}"; fi
-    if [ -n "${BUILD_OPT_MAVEN_SETTINGS_SECURITY_FILE}" ] && [ -f "${BUILD_OPT_MAVEN_SETTINGS_SECURITY_FILE}" ]; then opts="${opts} -Dsettings.security=${BUILD_OPT_MAVEN_SETTINGS_SECURITY_FILE}"; fi
+        if [ -n "${CI_INFRA_OPT_SONAR_HOST_URL}" ]; then opts="${opts} -D$(ci_opt_infrastructure)-sonar.host.url=${CI_INFRA_OPT_SONAR_HOST_URL}"; fi
+        if [ -n "${CI_INFRA_OPT_NEXUS3}" ]; then opts="${opts} -D$(ci_opt_infrastructure)-nexus3.repository=${CI_INFRA_OPT_NEXUS3}/nexus/repository"; fi
 
-    echo "${opts}"
+        # MAVEN_OPTS that need to kept secret
+        if [ -n "${CI_OPT_JIRA_PROJECTKEY}" ]; then opts="${opts} -Djira.projectKey=${CI_OPT_JIRA_PROJECTKEY} -Djira.user=${CI_OPT_JIRA_USER} -Djira.password=${CI_OPT_JIRA_PASSWORD}"; fi
+        # public sonarqube config, see: https://sonarcloud.io
+        if [ "opensource" == "$(ci_opt_infrastructure)" ]; then opts="${opts} -Dsonar.organization=${CI_OPT_SONAR_ORGANIZATION} -Dsonar.login=${CI_OPT_SONAR_LOGIN_TOKEN}"; fi
+        if [ -n "${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE}" ] && [ -f "${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE}" ]; then opts="${opts} -Dsettings.security=${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE}"; fi
+
+        echo "${opts}"
+    fi
 }
 
+# Build GRADLE_PROPERTIES by variables from CI_OPT_CI_OPTS_SCRIPT and CI_OPT_*
+function ci_opt_gradle_properties() {
+    if [ -n "${CI_OPT_GRADLE_PROPERTIES}" ]; then
+        echo "${CI_OPT_GRADLE_PROPERTIES}"
+    else
+        local properties="";
+        if [ -n "${CI_OPT_GRADLE_INIT_SCRIPT}" ]; then properties="${properties} --init-script ${CI_OPT_GRADLE_INIT_SCRIPT}"; fi
+        properties="${properties} -Pinfrastructure=$(ci_opt_infrastructure)"
+        properties="${properties} -PtestFailureIgnore=${CI_OPT_TEST_FAILURE_IGNORE}"
+        properties="${properties} -Psettings=${CI_OPT_MAVEN_SETTINGS_FILE}"
+        if [ -n "${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE}" ]; then properties="${properties} -Psettings.security=${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE}"; fi
+        echo "${properties}"
+    fi
+}
+
+function init_docker_config() {
+    if [ ! -d "${HOME}/.docker/" ]; then echo "mkdir ${HOME}/.docker/ "; mkdir -p "${HOME}/.docker/"; fi
+    # Download docker's config.json if current infrastructure has this file
+    download_if_exists "${CI_INFRA_OPT_CONF_LOC}/src/main/docker/config.json" "${HOME}/.docker/config.json" "-H \"PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)\""
+    # TODO NEXUS3_DEPLOYMENT_PASSWORD for docker login when using internal infrastructure
+    if [ -n "${CI_OPT_DOCKERHUB_PASS}" ] && [ -n "${CI_OPT_DOCKERHUB_USER}" ]; then
+        docker login -p="${CI_OPT_DOCKERHUB_PASS}" -u="${CI_OPT_DOCKERHUB_USER}" https://registry-1.docker.io/v1/
+        docker login -p="${CI_OPT_DOCKERHUB_PASS}" -u="${CI_OPT_DOCKERHUB_USER}" https://registry-1.docker.io/v2/
+    fi
+}
+
+function run_mvn() {
+    # >>>>>>>>>> ---------- maven settings.xml and settings-security.xml ---------- >>>>>>>>>>
+    # Maven settings.xml
+    if [ -z "${CI_OPT_MAVEN_SETTINGS}" ]; then
+        if [ -z "${CI_OPT_MAVEN_SETTINGS_FILE}" ]; then CI_OPT_MAVEN_SETTINGS_FILE="$(pwd)/src/main/maven/settings-$(ci_opt_infrastructure).xml"; fi
+        if [ ! -f "${CI_OPT_MAVEN_SETTINGS_FILE}" ]; then
+            CI_OPT_MAVEN_SETTINGS_FILE="$(ci_opt_cache_directory)/settings-$(ci_opt_infrastructure)-$(ci_opt_git_commit_id).xml"
+            download "${CI_INFRA_OPT_CONF_LOC}/src/main/maven/settings.xml" "${CI_OPT_MAVEN_SETTINGS_FILE}" "-H \"PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)\""
+        fi
+        export CI_OPT_MAVEN_SETTINGS="-s ${CI_OPT_MAVEN_SETTINGS_FILE}"
+    fi
+    echo "CI_OPT_MAVEN_SETTINGS: ${CI_OPT_MAVEN_SETTINGS}"
+
+    # Download maven's settings-security.xml if current infrastructure has this file
+    download_if_exists "${CI_INFRA_OPT_CONF_LOC}/src/main/maven/settings-security.xml" "${HOME}/.m2/settings-security.xml" "-H \"PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)\""
+    # <<<<<<<<<< ---------- maven settings.xml and settings-security.xml ---------- <<<<<<<<<<
+
+
+    # >>>>>>>>>> ---------- maven properties and environment variables ---------- >>>>>>>>>>
+    # Load infrastructure specific ci options (CI_OPT_CI_OPTS_SCRIPT)
+    if [ ! -f "${CI_OPT_CI_OPTS_SCRIPT}" ]; then
+        CI_OPT_CI_OPTS_SCRIPT="${CI_INFRA_OPT_CONF_LOC}/src/main/ci-script/ci_opts.sh"
+        echo "eval \$(curl -H 'Cache-Control: no-cache' -H \"PRIVATE-TOKEN: <secret>\" -s -L ${CI_OPT_CI_OPTS_SCRIPT})"
+        eval "$(curl -H 'Cache-Control: no-cache' -H "PRIVATE-TOKEN: ${CI_INFRA_OPT_GIT_AUTH_TOKEN}" -s -L ${CI_OPT_CI_OPTS_SCRIPT})"
+    else
+        . ${CI_OPT_CI_OPTS_SCRIPT}
+    fi
+
+    export MAVEN_OPTS="$(ci_opt_maven_opts)"
+
+    if [ "opensource" == "$(ci_opt_infrastructure)" ]; then
+        if [ -z "${CI_OPT_GITHUB_SITE_REPO_NAME}" ]; then export CI_OPT_GITHUB_SITE_REPO_NAME="$(ci_opt_site_path_prefix)"; fi
+        if [ -z "${CI_OPT_GITHUB_SITE_REPO_OWNER}" ]; then export CI_OPT_GITHUB_SITE_REPO_OWNER="$(echo $(git_repo_slug) | cut -d '/' -f1-)"; fi
+    fi
+    # <<<<<<<<<< ---------- maven properties and environment variables ---------- <<<<<<<<<<
+
+
+    # >>>>>>>>>> ---------- maven project info ---------- >>>>>>>>>>
+    mvn ${CI_OPT_MAVEN_SETTINGS} -version
+
+    # Maven effective pom
+    # output some log to avoid travis timeout
+    if [ -z "${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}" ]; then CI_OPT_MAVEN_EFFECTIVE_POM_FILE="$(ci_opt_cache_directory)/effective-pom-$(ci_opt_git_commit_id).xml"; fi
+    echo "CI_OPT_MAVEN_EFFECTIVE_POM_FILE: ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}"
+    set +e
+    mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | grep 'Downloading:' | awk '!(NR%10)'
+    mvn ${CI_OPT_MAVEN_SETTINGS} help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
+    if [ $? -ne 0 ]; then
+        echo "error on generate effective-pom"
+        cat ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
+        exit 1
+    fi
+    set -e && set -o pipefail
+    # <<<<<<<<<< ---------- maven project info ---------- <<<<<<<<<<
+}
+
+function run_gradle() {
+    if [[ "${CI_OPT_GRADLE_INIT_SCRIPT}" == http* ]]; then
+        download "${CI_OPT_GRADLE_INIT_SCRIPT}" "$(ci_opt_cache_directory)/$(basename $(echo ${CI_OPT_GRADLE_INIT_SCRIPT}))" ""
+        CI_OPT_GRADLE_INIT_SCRIPT="$(ci_opt_cache_directory)/$(basename $(echo ${CI_OPT_GRADLE_INIT_SCRIPT}))"
+    fi
+
+    # >>>>>>>>>> ---------- gradle properties and environment variables ---------- >>>>>>>>>>
+    export GRADLE_PROPERTIES="$(ci_opt_gradle_properties)"
+    # <<<<<<<<<< ---------- gradle properties and environment variables ---------- <<<<<<<<<<
+
+    # >>>>>>>>>> ---------- gradle project info ---------- >>>>>>>>>>
+    gradle --stacktrace ${GRADLE_PROPERTIES} -version
+    # <<<<<<<<<< ---------- gradle project info ---------- <<<<<<<<<<
+}
 
 # check if current repository is a spring-cloud-configserver's config repository
 function is_config_repository() {
@@ -242,12 +360,20 @@ function is_config_repository() {
 
 
 # key line to make whole build process file when command using pipelines fails
-set -e && set -o pipefail
+#set -e && set -o pipefail
 
 
 # >>>>>>>>>> ---------- build context info ---------- >>>>>>>>>>
-echo "gitlab-ci variables: CI_BUILD_REF_NAME: ${CI_BUILD_REF_NAME}, CI_COMMIT_REF_NAME: ${CI_COMMIT_REF_NAME}, CI_PROJECT_URL: ${CI_PROJECT_URL}"
-echo "travis-ci variables: TRAVIS_BRANCH: ${TRAVIS_BRANCH}, TRAVIS_EVENT_TYPE: ${TRAVIS_EVENT_TYPE}, TRAVIS_REPO_SLUG: ${TRAVIS_REPO_SLUG}"
+echo "gitlab-ci variables: CI_CI_OPT_REF_NAME: ${CI_CI_OPT_REF_NAME}, CI_COMMIT_REF_NAME: ${CI_COMMIT_REF_NAME}, CI_PROJECT_URL: ${CI_PROJECT_URL}"
+echo "travis-ci variables: TRAVIS_BRANCH: ${TRAVIS_BRANCH}, TRAVIS_EVENT_TYPE: ${TRAVIS_EVENT_TYPE}, TRAVIS_REPO_SLUG: ${TRAVIS_REPO_SLUG}, TRAVIS_PULL_REQUEST: ${TRAVIS_PULL_REQUEST}"
+
+# >>>>>>>>>> ---------- decrypt files and handle keys ---------- >>>>>>>>>>
+if [ -f codesigning.asc ]; then
+    gpg --fast-import codesigning.asc
+    # for gradle build
+    if [ -n "${CI_OPT_GPG_KEYID}" ]; then gpg --keyring secring.gpg --export-secret-key ${CI_OPT_GPG_KEYID} > secring.gpg; fi
+fi
+# <<<<<<<<<< ---------- decrypt files and handle keys ---------- <<<<<<<<<<
 
 if [ -f "${HOME}/.bashrc" ]; then source "${HOME}/.bashrc"; fi
 echo "PWD: $(pwd)"
@@ -256,12 +382,12 @@ echo "USER: $(whoami)"
 
 
 # >>>>>>>>>> ---------- must have variables ---------- >>>>>>>>>>
-if [ -z "${BUILD_OPT_CI_OPTS_SCRIPT}" ]; then BUILD_OPT_CI_OPTS_SCRIPT="src/main/ci-script/ci_opts_$(infrastructure).sh"; fi
-echo "BUILD_OPT_CI_OPTS_SCRIPT: ${BUILD_OPT_CI_OPTS_SCRIPT}"
-INFRASTRUCTURE_OPT_CONF_LOC="$(infrastructure_opt_git_prefix)/maven-build/maven-build-$(infrastructure)/raw/master"
-echo "INFRASTRUCTURE_OPT_CONF_LOC: ${INFRASTRUCTURE_OPT_CONF_LOC}"
-#if [ -z "$(infrastructure_opt_git_auth_token)" ]; then echo "INFRASTRUCTURE_OPT_GIT_AUTH_TOKEN not set, exit."; exit 1; else echo "INFRASTRUCTURE_OPT_GIT_AUTH_TOKEN: <secret>"; fi
-#if [ -z "${BUILD_OPT_MAVEN_BUILD_REPOSITORY}" ]; then echo "BUILD_OPT_MAVEN_BUILD_REPOSITORY not set, exit."; exit 1; fi
+if [ -z "${CI_OPT_CI_OPTS_SCRIPT}" ]; then CI_OPT_CI_OPTS_SCRIPT="src/main/ci-script/ci_opts_$(ci_opt_infrastructure).sh"; fi
+echo "CI_OPT_CI_OPTS_SCRIPT: ${CI_OPT_CI_OPTS_SCRIPT}"
+CI_INFRA_OPT_CONF_LOC="$(ci_infra_opt_git_prefix)/maven-build/maven-build-$(ci_opt_infrastructure)/raw/master"
+echo "CI_INFRA_OPT_CONF_LOC: ${CI_INFRA_OPT_CONF_LOC}"
+#if [ -z "$(ci_infra_opt_git_auth_token)" ]; then echo "CI_INFRA_OPT_GIT_AUTH_TOKEN not set, exit."; exit 1; else echo "CI_INFRA_OPT_GIT_AUTH_TOKEN: <secret>"; fi
+#if [ -z "${CI_OPT_MAVEN_BUILD_REPOSITORY}" ]; then echo "CI_OPT_MAVEN_BUILD_REPOSITORY not set, exit."; exit 1; fi
 # <<<<<<<<<< ---------- must have variables ---------- <<<<<<<<<<
 
 
@@ -270,93 +396,13 @@ echo "INFRASTRUCTURE_OPT_CONF_LOC: ${INFRASTRUCTURE_OPT_CONF_LOC}"
 
 # TODO find *Dockerfile* or *docker-compose*.yml
 if [ -f Dockerfile ] || [ -f src/main/resources/docker/Dockerfile ] || [ -f src/main/docker/Dockerfile ]; then
-    # >>>>>>>>>> ---------- init docker config and docker login ---------- >>>>>>>>>>
-    if [ ! -d "${HOME}/.docker/" ]; then echo "mkdir ${HOME}/.docker/ "; mkdir -p "${HOME}/.docker/"; fi
-    # Download docker's config.json if current infrastructure has this file
-    download_if_exists "${INFRASTRUCTURE_OPT_CONF_LOC}/src/main/docker/config.json" "${HOME}/.docker/config.json" "-H \"PRIVATE-TOKEN: $(infrastructure_opt_git_auth_token)\""
-    # TODO NEXUS3_DEPLOYMENT_PASSWORD for docker login when using internal infrastructure
-    if [ -n "${BUILD_OPT_DOCKERHUB_PASS}" ] && [ -n "${BUILD_OPT_DOCKERHUB_USER}" ]; then
-        docker login -p="${BUILD_OPT_DOCKERHUB_PASS}" -u="${BUILD_OPT_DOCKERHUB_USER}" https://registry-1.docker.io/v1/
-        docker login -p="${BUILD_OPT_DOCKERHUB_PASS}" -u="${BUILD_OPT_DOCKERHUB_USER}" https://registry-1.docker.io/v2/
-    fi
-    # <<<<<<<<<< ---------- init docker config and docker login ---------- <<<<<<<<<<
+    init_docker_config
 fi
-
 
 if [ -f pom.xml ]; then
-# >>>>>>>>>> ---------- maven settings.xml and settings-security.xml ---------- >>>>>>>>>>
-    # Maven settings.xml
-    if [ -z "${BUILD_OPT_MAVEN_SETTINGS}" ]; then
-        if [ -z "${BUILD_OPT_MAVEN_SETTINGS_FILE}" ]; then BUILD_OPT_MAVEN_SETTINGS_FILE="$(pwd)/src/main/maven/settings-$(infrastructure).xml"; fi
-        if [ ! -f "${BUILD_OPT_MAVEN_SETTINGS_FILE}" ]; then
-            BUILD_OPT_MAVEN_SETTINGS_FILE="$(build_opt_cache_directory)/settings-$(infrastructure)-$(build_opt_git_commit_id).xml"
-            download "${INFRASTRUCTURE_OPT_CONF_LOC}/src/main/maven/settings.xml" "${BUILD_OPT_MAVEN_SETTINGS_FILE}" "-H \"PRIVATE-TOKEN: $(infrastructure_opt_git_auth_token)\""
-        fi
-        export BUILD_OPT_MAVEN_SETTINGS="-s ${BUILD_OPT_MAVEN_SETTINGS_FILE}"
-    fi
-    echo "BUILD_OPT_MAVEN_SETTINGS: ${BUILD_OPT_MAVEN_SETTINGS}"
-
-    # Download maven's settings-security.xml if current infrastructure has this file
-    download_if_exists "${INFRASTRUCTURE_OPT_CONF_LOC}/src/main/maven/settings-security.xml" "${HOME}/.m2/settings-security.xml" "-H \"PRIVATE-TOKEN: $(infrastructure_opt_git_auth_token)\""
-    # <<<<<<<<<< ---------- maven settings.xml and settings-security.xml ---------- <<<<<<<<<<
-
-
-    # >>>>>>>>>> ---------- maven properties and environment variables ---------- >>>>>>>>>>
-    # Load infrastructure specific ci options (BUILD_OPT_CI_OPTS_SCRIPT)
-    if [ ! -f "${BUILD_OPT_CI_OPTS_SCRIPT}" ]; then
-        BUILD_OPT_CI_OPTS_SCRIPT="${INFRASTRUCTURE_OPT_CONF_LOC}/src/main/ci-script/ci_opts.sh"
-        echo "eval \$(curl -H 'Cache-Control: no-cache' -H \"PRIVATE-TOKEN: <secret>\" -s -L ${BUILD_OPT_CI_OPTS_SCRIPT})"
-        eval "$(curl -H 'Cache-Control: no-cache' -H "PRIVATE-TOKEN: ${INFRASTRUCTURE_OPT_GIT_AUTH_TOKEN}" -s -L ${BUILD_OPT_CI_OPTS_SCRIPT})"
-    else
-        . ${BUILD_OPT_CI_OPTS_SCRIPT}
-    fi
-
-    export MAVEN_OPTS="$(build_mvn_opts)"
-
-    if [ "github" == "$(infrastructure)" ]; then
-        if [ -z "${BUILD_OPT_GITHUB_SITE_REPO_NAME}" ]; then export BUILD_OPT_GITHUB_SITE_REPO_NAME="$(build_opt_site_path_prefix)"; fi
-        if [ -z "${BUILD_OPT_GITHUB_SITE_REPO_OWNER}" ]; then export BUILD_OPT_GITHUB_SITE_REPO_OWNER="$(echo $(git_repo_slug) | cut -d '/' -f1-)"; fi
-    fi
-    # <<<<<<<<<< ---------- maven properties and environment variables ---------- <<<<<<<<<<
-
-
-    # >>>>>>>>>> ---------- maven and project info ---------- >>>>>>>>>>
-    mvn ${BUILD_OPT_MAVEN_SETTINGS} -version
-
-    # Maven effective pom
-    # output some log to avoid travis timeout
-    if [ -z "${MAVEN_EFFECTIVE_POM_FILE}" ]; then MAVEN_EFFECTIVE_POM_FILE="$(build_opt_cache_directory)/effective-pom-$(build_opt_git_commit_id).xml"; fi
-    echo "MAVEN_EFFECTIVE_POM_FILE: ${MAVEN_EFFECTIVE_POM_FILE}"
-    set +e
-    mvn ${BUILD_OPT_MAVEN_SETTINGS} -U help:effective-pom | grep 'Downloading:' | awk '!(NR%10)'
-    mvn ${BUILD_OPT_MAVEN_SETTINGS} help:effective-pom > ${MAVEN_EFFECTIVE_POM_FILE}
-    if [ $? -ne 0 ]; then
-        echo "error on generate effective-pom"
-        cat ${MAVEN_EFFECTIVE_POM_FILE}
-        exit 1
-    fi
-    set -e && set -o pipefail
-    # <<<<<<<<<< ---------- maven and project info ---------- <<<<<<<<<<
+    run_mvn
 fi
 
-
-if [ -n "${GRADLE_INIT_SCRIPT}" ]; then
-    if [[ "${GRADLE_INIT_SCRIPT}" == http* ]]; then
-        GRADLE_INIT_SCRIPT_FILE="$(build_opt_cache_directory)/$(basename $(echo ${GRADLE_INIT_SCRIPT}))"
-        curl -H 'Cache-Control: no-cache' -t utf-8 -s -L -o ${GRADLE_INIT_SCRIPT_FILE} ${GRADLE_INIT_SCRIPT}
-        echo "curl -H 'Cache-Control: no-cache' -t utf-8 -s -L -o ${GRADLE_INIT_SCRIPT_FILE} ${GRADLE_INIT_SCRIPT}"
-        export GRADLE_PROPERTIES="${GRADLE_PROPERTIES} --init-script ${GRADLE_INIT_SCRIPT_FILE}"
-    else
-        export GRADLE_PROPERTIES="${GRADLE_PROPERTIES} --init-script ${GRADLE_INIT_SCRIPT}"
-    fi
+if [ -f build.gradle ]; then
+    run_gradle
 fi
-
-export GRADLE_PROPERTIES="${GRADLE_PROPERTIES} -Pinfrastructure=$(infrastructure)"
-export GRADLE_PROPERTIES="${GRADLE_PROPERTIES} -PtestFailureIgnore=${BUILD_OPT_TEST_FAILURE_IGNORE}"
-export GRADLE_PROPERTIES="${GRADLE_PROPERTIES} -Psettings=${BUILD_OPT_MAVEN_SETTINGS_FILE}"
-if [ -n "${BUILD_OPT_MAVEN_SETTINGS_SECURITY_FILE}" ]; then
-  export GRADLE_PROPERTIES="${GRADLE_PROPERTIES} -Psettings.security=${BUILD_OPT_MAVEN_SETTINGS_SECURITY_FILE}"
-fi
-echo "GRADLE_PROPERTIES: ${GRADLE_PROPERTIES}"
-
-gradle --stacktrace ${GRADLE_PROPERTIES} -version

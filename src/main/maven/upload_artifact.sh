@@ -11,7 +11,7 @@ if [ $# -eq 4 ]; then
     ARTIFACT_ID="$1"
     GROUP_ID="$2"
     ARTIFACT_VERSION="$3"
-    INFRASTRUCTURE="$4"
+    CI_OPT_INFRASTRUCTURE="$4"
 else
     read -p "search artifactId to upload, input: " search
     while true; do
@@ -35,27 +35,27 @@ else
         fi
     done
 
-    echo "select INFRASTRUCTURE to use."
+    echo "select CI_OPT_INFRASTRUCTURE to use."
     infrastructures=("internal" "local")
     while true; do
         select inf in "${infrastructures[@]}"; do
             echo "selected ${inf}"
             if [ ! -z "${inf}" ]; then
-                INFRASTRUCTURE="${inf}"
+                CI_OPT_INFRASTRUCTURE="${inf}"
                 break
             fi
         done
-        if [ ! -z "${INFRASTRUCTURE}" ]; then
+        if [ ! -z "${CI_OPT_INFRASTRUCTURE}" ]; then
             break
         fi
     done
 fi
 
 
-NEXUS_REPO_RELEASES="${INFRASTRUCTURE_OPT_NEXUS3}/nexus/repository/maven-releases";
-NEXUS_REPO_SNAPSHOTS="${INFRASTRUCTURE_OPT_NEXUS3}/nexus/repository/maven-snapshots";
-NEXUS_REPO_THIRDPARTY="${INFRASTRUCTURE_OPT_NEXUS3}/nexus/repository/maven-thirdparty";
-NEXUS_REPO_ID="${INFRASTRUCTURE}-nexus3-thirdparty";
+NEXUS_REPO_RELEASES="${CI_INFRA_OPT_NEXUS3}/nexus/repository/maven-releases";
+NEXUS_REPO_SNAPSHOTS="${CI_INFRA_OPT_NEXUS3}/nexus/repository/maven-snapshots";
+NEXUS_REPO_THIRDPARTY="${CI_INFRA_OPT_NEXUS3}/nexus/repository/maven-thirdparty";
+NEXUS_REPO_ID="${CI_OPT_INFRASTRUCTURE}-nexus3-thirdparty";
 
 
 # ${GROUP_ID//.//} replace all dots with slashs
