@@ -8,7 +8,7 @@
     <groupId>cn.home1</groupId>
     <name>maven-build</name>
     <packaging>pom</packaging>
-    <url>https://github.com/home1-oss/maven-build</url>
+    <url>https://github.com/ci-and-cd/maven-build</url>
     <version>0.0.1.OSS-SNAPSHOT</version>
 
     <modules>
@@ -24,13 +24,13 @@
 
     <!-- For this to work, you must go to: Preferences->Editor->Code Style->Formatter Control and check Enable formatter markers in comments -->
     <!-- @formatter:off -->
-    <ciManagement><system>Travis CI</system><url>https://travis-ci.org/home1-oss/maven-build</url></ciManagement>
-    <issueManagement><system>GitHub Issues</system><url>https://github.com/home1-oss/maven-build/issues</url></issueManagement>
+    <ciManagement><system>Travis CI</system><url>https://travis-ci.org/ci-and-cd/maven-build</url></ciManagement>
+    <issueManagement><system>GitHub Issues</system><url>https://github.com/ci-and-cd/maven-build/issues</url></issueManagement>
     <licenses><license><name>MIT License</name><url>http://www.opensource.org/licenses/mit-license.php</url><distribution>repo</distribution></license></licenses>
     <scm>
-        <url>https://github.com/home1-oss/maven-build</url>
-        <connection>scm:git:https://github.com/home1-oss/maven-build.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/home1-oss/maven-build.git</developerConnection>
+        <url>https://github.com/ci-and-cd/maven-build</url>
+        <connection>scm:git:https://github.com/ci-and-cd/maven-build.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/ci-and-cd/maven-build.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
     <!-- @formatter:on -->
@@ -1227,14 +1227,14 @@
         <profile>
             <id>default-checkstyle-config</id>
             <activation><property><name>!checkstyle.config.location</name></property></activation>
-            <properties><checkstyle.config.location>https://raw.githubusercontent.com/home1-oss/maven-build/master/src/main/checkstyle/google_checks_8.10.xml</checkstyle.config.location></properties>
+            <properties><checkstyle.config.location>https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/checkstyle/google_checks_8.10.xml</checkstyle.config.location></properties>
         </profile>
         <!--<file><exists>${maven.multiModuleProjectDirectory}/src/main/pmd/pmd-ruleset-6.0.1.xml</exists></file>-->
         <!--pmd.ruleset.location>${maven.multiModuleProjectDirectory}/src/main/pmd/pmd-ruleset-6.0.1.xml</pmd.ruleset.location-->
         <profile>
             <id>default-pmd-ruleset</id>
             <activation><property><name>!pmd.ruleset.location</name></property></activation>
-            <properties><pmd.ruleset.location>https://raw.githubusercontent.com/home1-oss/maven-build/master/src/main/pmd/pmd-ruleset-6.0.1.xml</pmd.ruleset.location></properties>
+            <properties><pmd.ruleset.location>https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/pmd/pmd-ruleset-6.0.1.xml</pmd.ruleset.location></properties>
         </profile>
 
         <profile>

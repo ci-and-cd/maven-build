@@ -67,11 +67,11 @@ Need these properties only when profile 'sonar' is activated.
 #### 4.2 maven-checkstyle-plugin and maven-pmd-plugin
 
 - checkstyle.config.location
-> default: https://raw.githubusercontent.com/home1-oss/maven-build/master/src/main/checkstyle/google_checks_8.10.xml
+> default: https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/checkstyle/google_checks_8.10.xml
 Need to customize when github.com is not reachable.
 
 - pmd.ruleset.location
-> default: https://raw.githubusercontent.com/home1-oss/maven-build/master/src/main/pmd/pmd-ruleset-6.0.1.xml
+> default: https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/pmd/pmd-ruleset-6.0.1.xml
 Need to customize when github.com is not reachable.
 
 - project.reporting.outputEncoding
