@@ -84,9 +84,17 @@
             <snapshots><enabled>true</enabled></snapshots>
         </pluginRepository>
         <pluginRepository>
-            <id>oss-github-maven-plugins</id>
-            <url>https://raw.github.com/home1-oss/maven-plugins/mvn-repo</url>
+            <id>github-mvn-repo-github-maven-plugins</id>
+            <url>https://raw.github.com/ci-and-cd/maven-plugins/mvn-repo</url>
             <name>Forked github-maven-plugins that upload faster</name>
+            <layout>default</layout>
+            <snapshots><enabled>true</enabled></snapshots>
+            <releases><enabled>true</enabled></releases>
+        </pluginRepository>
+        <pluginRepository>
+            <id>github-mvn-repo-wagon-maven-plugin</id>
+            <url>https://raw.github.com/ci-and-cd/wagon-maven-plugin/mvn-repo/</url>
+            <name>Fixed issue of merge snapshotVersion</name>
             <layout>default</layout>
             <snapshots><enabled>true</enabled></snapshots>
             <releases><enabled>true</enabled></releases>
@@ -634,8 +642,8 @@
                     <snapshots><enabled>false</enabled></snapshots>
                 </pluginRepository>
                 <pluginRepository>
-                    <id>oss-github-maven-plugins</id>
-                    <url>https://raw.github.com/home1-oss/maven-plugins/mvn-repo</url>
+                    <id>github-mvn-repo-github-maven-plugins</id>
+                    <url>https://raw.github.com/ci-and-cd/maven-plugins/mvn-repo</url>
                     <name>Forked github-maven-plugins that upload faster</name>
                     <layout>default</layout>
                     <snapshots><enabled>true</enabled></snapshots>
@@ -1061,7 +1069,7 @@
             <activation><property><name>!wagon.merge-maven-repos.targetId</name></property><activeByDefault>false</activeByDefault></activation>
             <properties><wagon.merge-maven-repos.targetId>local-nexus3-${build.publish.channel}s</wagon.merge-maven-repos.targetId></properties>
         </profile>
-        <!-- Why org.codehaus.mojo:wagon-maven-plugin:1.1-snapshot-chshawkn-1.4?
+        <!-- Why org.codehaus.mojo:wagon-maven-plugin:wagon-maven-plugin-2.0.1-snapshot-chshawkn-1.6?
             see: https://www.mail-archive.com/users@maven.apache.org/msg129243.html -->
         <!--http://www.mojohaus.org/wagon-maven-plugin/usage.html-->
         <!--http://www.mojohaus.org/wagon-maven-plugin/-->
@@ -1071,7 +1079,7 @@
             <pluginRepositories>
                 <pluginRepository>
                     <id>github-chshawkn-wagon-maven-plugin</id>
-                    <url>https://raw.github.com/chshawkn/wagon-maven-plugin/mvn-repo</url>
+                    <url>https://raw.github.com/ci-and-cd/wagon-maven-plugin/mvn-repo</url>
                     <name>Forked wagon-maven-plugin that can merge snapshots metadata correctly</name>
                     <layout>default</layout>
                     <snapshots><enabled>true</enabled></snapshots>
@@ -1081,7 +1089,7 @@
             <build>
                 <pluginManagement>
                     <plugins>
-                        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>wagon-maven-plugin</artifactId><version>1.1-snapshot-chshawkn-1.4</version></plugin>
+                        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>wagon-maven-plugin</artifactId><version>wagon-maven-plugin-2.0.1-snapshot-chshawkn-1.6</version></plugin>
                     </plugins>
                 </pluginManagement>
                 <plugins>

@@ -36,14 +36,26 @@
 
     <servers>
         <!-- @formatter:off -->
+        <!--
+        To fix issue: gpg: signing failed: Inappropriate ioctl for device
+        1.
+        ~/.gnupg/gpg.conf:
+        use-agent
+        pinentry-mode loopback
+        2.
+        ~/.gnupg/gpg-agent.conf:
+        allow-loopback-pinentry
+        3.
+        echo RELOADAGENT | gpg-connect-agent
+        -->
         <server><id>gpg.passphrase</id><passphrase>${env.CI_OPT_GPG_PASSPHRASE}</passphrase></server>
         <server><id>github</id><password>${env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</password></server>
         <server><id>OSSRH-releases</id><username>${env.CI_OPT_MAVEN_CENTRAL_USER}</username><password>${env.CI_OPT_MAVEN_CENTRAL_PASS}</password></server>
         <server><id>OSSRH-snapshots</id><username>${env.CI_OPT_MAVEN_CENTRAL_USER}</username><password>${env.CI_OPT_MAVEN_CENTRAL_PASS}</password></server>
         <server>
             <id>docker-hub</id>
-            <username>${env.DOCKERHUB_USER}</username><password>${env.DOCKERHUB_PASS}</password>
-            <configuration><email>${env.DOCKERHUB_MAIL}</email></configuration>
+            <username>${env.CI_OPT_DOCKERHUB_USER}</username><password>${env.CI_OPT_DOCKERHUB_PASS}</password>
+            <configuration><email>${env.CI_OPT_DOCKERHUB_MAIL}</email></configuration>
         </server>
 
         <server><id>internal-nexus3-releases</id><username>deployment</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
