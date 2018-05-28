@@ -5,28 +5,41 @@
 function download() {
     local curl_source="$1"
     local curl_target="$2"
-    local curl_default_options="-H 'Cache-Control: no-cache' -L -s -t utf-8"
+    local curl_default_options="-H \"Cache-Control: no-cache\" -L -S -s -t utf-8"
     local curl_option="$3 ${curl_default_options}"
-    local curl_secret="$(echo $3 | sed -E 's#: [^ ]+#: <secret>#g') ${curl_default_options}"
-    echo "curl ${curl_secret} -o ${curl_target} ${curl_source}"
-    curl ${curl_option} -o ${curl_target} ${curl_source}
+    local curl_secret="$(echo $3 | sed -E "s#: [^ ]+#: <secret>'#g") ${curl_default_options}"
+    if [ -f ${curl_target} ] && [ -z "$(diff ${curl_target} <sh -c "curl ${curl_option} ${curl_source} 2>/dev/null")" ]; then
+        (>&2 echo "contents identical, skip download")
+    else
+        echo "curl ${curl_secret} -o ${curl_target} ${curl_source} 2>/dev/null"
+        sh -c "curl ${curl_option} -o ${curl_target} ${curl_source} 2>/dev/null"
+    fi
 }
 
 # download a file by curl only when file exists
 # arguments: curl_source, curl_target, curl_option
 function download_if_exists() {
-    local curl_source="$1"
-    local curl_target="$2"
-    local curl_default_options="-H 'Cache-Control: no-cache' -L -s -t utf-8"
-    local curl_option="$3 ${curl_default_options}"
-    local curl_secret="$(echo $3 | sed -E 's#: [^ ]+#: <secret>#g') ${curl_default_options}"
-    echo "Test whether remote file exists: curl -I -o /dev/null -s -w \"%{http_code}\" ${curl_secret} ${curl_source} | tail -n1"
-    curl_status=$(curl -I -o /dev/null -s -w "%{http_code}" ${curl_option} ${curl_source} | tail -n1) || echo "error reading remote file."
-    echo "curl_status: ${curl_status}"
-    if [ "200" == "${curl_status}" ]; then
-        echo "Download file: curl -o ${curl_target} ${curl_secret} ${curl_source} > /dev/null"
-        curl -o ${curl_target} ${curl_option} ${curl_source} > /dev/null
+    if [ "$(is_remote_resource_exists "$1" "$3")" == "true" ]; then
+        download "$1" "$2" "$3"
     fi
+}
+
+function filter_secret_variables() {
+    while read line; do
+      printf "%s" "$line" | sed -E 's#TOKEN=.+#TOKEN=<secret>#g' | sed -E 's#PASS=.+#PASS=<secret>#g' | sed -E 's#PASSWORD=.+#PASSWORD=<secret>#g'
+    done
+}
+
+# arguments: curl_source, curl_option
+function is_remote_resource_exists() {
+    local curl_source="$1"
+    local curl_default_options="-H \"Cache-Control: no-cache\" -L -s -t utf-8"
+    local curl_option="$2 ${curl_default_options}"
+    local curl_secret="$(echo $2 | sed -E "s#: [^ ]+#: <secret>'#g") ${curl_default_options}"
+    (>&2 echo "Test whether remote file exists: curl -I -o /dev/null -w \"%{http_code}\" ${curl_secret} ${curl_source} | tail -n1")
+    local status_code=$(sh -c "curl -I -o /dev/null -w \"%{http_code}\" ${curl_option} ${curl_source} | tail -n1 || echo -n 500")
+    (>&2 echo "status_code: ${status_code}")
+    if [ "200" == "${status_code}" ]; then echo "true"; else echo "false"; fi
 }
 
 # build a filter_script file
@@ -57,13 +70,28 @@ EOL
 function git_repo_slug() {
     # test cases
     # echo "Fetch URL: http://user@pass:gitservice.org:20080/owner/repo.git" | ruby -ne 'puts /^\s*Fetch.*(:|\/){1}([^\/]+\/[^\/]+).git/.match($_)[2] rescue nil'
-    # echo "Fetch URL: Fetch URL: git@github.com:home1-oss/oss-build.git" | ruby -ne 'puts /^\s*Fetch.*(:|\/){1}([^\/]+\/[^\/]+).git/.match($_)[2] rescue nil'
+    # echo "Fetch URL: Fetch URL: git@github.com:ci-and-cd/maven-build.git" | ruby -ne 'puts /^\s*Fetch.*(:|\/){1}([^\/]+\/[^\/]+).git/.match($_)[2] rescue nil'
     # echo "Fetch URL: https://github.com/owner/repo.git" | ruby -ne 'puts /^\s*Fetch.*(:|\/){1}([^\/]+\/[^\/]+).git/.match($_)[2] rescue nil'
     echo $(git remote show origin -n | ruby -ne 'puts /^\s*Fetch.*(:|\/){1}([^\/]+\/[^\/]+).git/.match($_)[2] rescue nil')
 }
 
 
 # >>>>>>>>>> ---------- CI option functions ---------- >>>>>>>>>>
+
+# returns: true or false
+function ci_opt_user_docker() {
+    if [ -n "${CI_OPT_USE_DOCKER}" ]; then
+        echo "${CI_OPT_USE_DOCKER}"
+    else
+    # TODO find *Dockerfile* or *docker-compose*.yml
+        if [ -f Dockerfile ] || [ -f src/main/resources/docker/Dockerfile ] || [ -f src/main/docker/Dockerfile ]; then
+            echo "true"
+        else
+            echo "false"
+        fi
+    fi
+}
+
 # returns: git commit id
 function ci_opt_git_commit_id() {
     if [ -n "${CI_OPT_GIT_COMMIT_ID}" ]; then
@@ -85,7 +113,7 @@ function ci_opt_cache_directory() {
 }
 
 # determine current is origin (original) or forked
-function ci_opt_ci_opt_is_origin_repo() {
+function ci_opt_is_origin_repo() {
     if [ -n "${CI_OPT_IS_ORIGIN_REPO}" ]; then
         echo "${CI_OPT_IS_ORIGIN_REPO}"
     else
@@ -93,7 +121,7 @@ function ci_opt_ci_opt_is_origin_repo() {
         if ([ "${CI_OPT_ORIGIN_REPO_SLUG}" == "$(git_repo_slug)" ] && [ "${TRAVIS_EVENT_TYPE}" != "pull_request" ]); then
             echo "true";
         else
-            eco "false";
+            echo "false";
         fi
     fi
 }
@@ -175,23 +203,42 @@ function ci_opt_site_path_prefix() {
 
 
 # >>>>>>>>>> ---------- CI option functions about infrastructures ---------- >>>>>>>>>>
+# arguments: default_value
+function find_git_prefix_from_ci_script() {
+    (>&2 echo "find CI_INFRA_OPT_GIT_PREFIX from CI_OPT_CI_SCRIPT: $CI_OPT_CI_SCRIPT, default_value: $1")
+    if [[ "${CI_OPT_CI_SCRIPT}" == http* ]]; then
+        $(echo ${CI_OPT_CI_SCRIPT} | $(dirname $(sed -E 's#/raw/master/.+##')))
+    else
+        echo "$1"
+    fi
+}
 
 # auto determine CI_INFRA_OPT_GIT_PREFIX by infrastructure for further download.
 # returns: prefix of git service url (infrastructure specific), i.e. https://github.com
 function ci_infra_opt_git_prefix() {
-    local infrastructure="$(ci_opt_infrastructure)"
+    (>&2 echo "ci_infra_opt_git_prefix infrastructure: $(ci_opt_infrastructure), CI_OPT_CI_SCRIPT: ${CI_OPT_CI_SCRIPT}")
     if [ -n "${CI_INFRA_OPT_GIT_PREFIX}" ]; then
         echo "${CI_INFRA_OPT_GIT_PREFIX}"
-    elif [ "opensource" == "${infrastructure}" ]; then
-        if [ -n "${CI_INFRA_OPT_OPENSOURCE_GIT_PREFIX}" ]; then echo "${CI_INFRA_OPT_OPENSOURCE_GIT_PREFIX}"; else echo "https://github.com"; fi
-    elif [ "internal" == "${infrastructure}" ]; then
-        if [ -n "${CI_PROJECT_URL}" ]; then
-            echo $(echo "${CI_PROJECT_URL}" | sed 's,/*[^/]\+/*$,,' | sed 's,/*[^/]\+/*$,,')
-        else
-            if [ -n "${CI_INFRA_OPT_INTERNAL_GIT_PREFIX}" ]; then echo "${CI_INFRA_OPT_INTERNAL_GIT_PREFIX}"; else echo "http://gitlab.internal"; fi
-        fi
     else
-        if [ -n "${CI_INFRA_OPT_LOCAL_GIT_PREFIX}" ]; then echo "${CI_INFRA_OPT_LOCAL_GIT_PREFIX}"; else echo "http://gitlab.local:10080"; fi
+        local infrastructure="$(ci_opt_infrastructure)"
+        local default_value=""
+        if [ "opensource" == "${infrastructure}" ]; then
+            default_value="https://github.com"
+            CI_INFRA_OPT_GIT_PREFIX="${CI_INFRA_OPT_OPENSOURCE_GIT_PREFIX}"
+        elif [ "internal" == "${infrastructure}" ]; then
+            default_value="http://gitlab.internal"
+            CI_INFRA_OPT_GIT_PREFIX="${CI_INFRA_OPT_INTERNAL_GIT_PREFIX}"
+        elif [ "local" == "${infrastructure}" ] || [ -z "${infrastructure}" ]; then
+            default_value="http://gitlab.local:10080"
+            CI_INFRA_OPT_GIT_PREFIX="${CI_INFRA_OPT_LOCAL_GIT_PREFIX}"
+        fi
+
+        if [ -z "${CI_INFRA_OPT_GIT_PREFIX}" ] && [ -n "${default_value}" ]; then
+            find_git_prefix_from_ci_script "${default_value}";
+        elif [ -n "${CI_PROJECT_URL}" ]; then
+            CI_INFRA_OPT_GIT_PREFIX=$(echo "${CI_PROJECT_URL}" | sed 's,/*[^/]\+/*$,,' | sed 's,/*[^/]\+/*$,,')
+        fi
+        echo ${CI_INFRA_OPT_GIT_PREFIX}
     fi
 }
 
@@ -223,6 +270,7 @@ function ci_opt_maven_opts() {
 
         opts="${opts} -Dbuild.publish.channel=$(ci_opt_publish_channel)"
         if [ -n "${CI_OPT_CHECKSTYLE_CONFIG_LOCATION}" ]; then opts="${opts} -Dcheckstyle.config.location=${CI_OPT_CHECKSTYLE_CONFIG_LOCATION}"; fi
+        if [ "${CI_OPT_CLEAN_SKIP}" == "true" ]; then opts="${opts} -Dmaven.clean.skip=true"; fi
         if [ "${CI_OPT_DEPENDENCY_CHECK}" == "true" ]; then opts="${opts} -Ddependency-check=true"; fi
         if [ -n "${CI_INFRA_OPT_DOCKER_REGISTRY}" ]; then opts="${opts} -Ddocker.registry=${CI_INFRA_OPT_DOCKER_REGISTRY}"; fi
         opts="${opts} -Dfile.encoding=UTF-8"
@@ -271,68 +319,175 @@ function ci_opt_gradle_properties() {
 function init_docker_config() {
     if [ ! -d "${HOME}/.docker/" ]; then echo "mkdir ${HOME}/.docker/ "; mkdir -p "${HOME}/.docker/"; fi
     # Download docker's config.json if current infrastructure has this file
-    download_if_exists "${CI_INFRA_OPT_CONF_LOC}/src/main/docker/config.json" "${HOME}/.docker/config.json" "-H \"PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)\""
-    # TODO NEXUS3_DEPLOYMENT_PASSWORD for docker login when using internal infrastructure
-    if [ -n "${CI_OPT_DOCKERHUB_PASS}" ] && [ -n "${CI_OPT_DOCKERHUB_USER}" ]; then
-        docker login -p="${CI_OPT_DOCKERHUB_PASS}" -u="${CI_OPT_DOCKERHUB_USER}" https://registry-1.docker.io/v1/
-        docker login -p="${CI_OPT_DOCKERHUB_PASS}" -u="${CI_OPT_DOCKERHUB_USER}" https://registry-1.docker.io/v2/
+    if [ "${CI_OPT_DRYRUN}" != "true" ]; then
+        download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/docker/config.json" "${HOME}/.docker/config.json" "-H 'PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)'"
+        # TODO NEXUS3_DEPLOYMENT_PASSWORD for docker login when using internal infrastructure
+        if [ -n "${CI_OPT_DOCKERHUB_PASS}" ] && [ -n "${CI_OPT_DOCKERHUB_USER}" ]; then
+            docker login -p="${CI_OPT_DOCKERHUB_PASS}" -u="${CI_OPT_DOCKERHUB_USER}" https://registry-1.docker.io/v1/
+            docker login -p="${CI_OPT_DOCKERHUB_PASS}" -u="${CI_OPT_DOCKERHUB_USER}" https://registry-1.docker.io/v2/
+        fi
     fi
 }
 
+function alter_mvn() {
+    local is_origin_repo=$(ci_opt_is_origin_repo)
+    local ref_name=$(ci_opt_ref_name)
+    (>&2 echo "alter_mvn is_origin_repo: ${is_origin_repo}, ref_name: ${ref_name}")
+
+    result=()
+
+    for element in $@; do
+        if [ "${element}" == "mvn" ]; then
+            #(>&2 echo "alter_mvn command '${element}' found")
+            continue
+        elif [[ "${element}" == -* ]]; then
+            (>&2 echo "alter_mvn property '${element}' found")
+            result+=("${element}")
+        else
+            (>&2 echo "alter_mvn goal '${element}' found")
+
+            if [[ "${element}" == *site* ]] && [ "$(ci_opt_site)" == true ]; then
+            # if ci_opt_site=false, do not build site
+                result+=("${element}")
+            elif ([[ "${element}" == *clean ]] || [[ "${element}" == *install ]] || [[ "${element}" == *deploy ]]); then
+            # goals need to alter
+                if [ "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]; then
+                # mvn deploy and publish segregation
+                    if [[ "${element}" == *clean ]]; then
+                        result+=("clean")
+                        result+=("org.apache.maven.plugins:maven-antrun-plugin:run@local-deploy-model-path-clean")
+                    elif [[ "${element}" == *install ]]; then
+                        result+=("deploy")
+                    elif [[ "${element}" == *deploy ]]; then
+                        CI_OPT_CLEAN_SKIP="true"
+                        result+=("org.codehaus.mojo:wagon-maven-plugin:merge-maven-repos@merge-maven-repos-deploy")
+                        if [ "$(ci_opt_user_docker)" == "true" ]; then
+                            result+=("docker:build")
+                            result+=("docker:push")
+                        fi
+                    fi
+                else
+                    result+=("${element}")
+                fi
+            elif [ "true" == "${is_origin_repo}" ]; then
+            # if is origin repo
+                case "${ref_name}" in
+                release*)
+                    # if release (origin repo), skip sonar
+                    if [[ "${element}" != *sonar ]]; then
+                        result+=("${element}")
+                    fi
+                    ;;
+                *)
+                    # if not release (origin repo)
+                    result+=("${element}")
+                    #(>&2 echo "alter_mvn (origin repo) drop '${element}'")
+                esac
+            else
+                # if not origin repo (forked)
+                result+=("${element}")
+                #(>&2 echo "alter_mvn (forked repo) drop '${element}'")
+            fi
+        fi
+    done
+
+    echo "${result[*]}"
+}
+
 function run_mvn() {
-    # >>>>>>>>>> ---------- maven settings.xml and settings-security.xml ---------- >>>>>>>>>>
+    local curl_options="-H \"PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)\""
+
+    echo -e "\n>>>>>>>>>> ---------- run_mvn settings.xml and settings-security.xml ---------- >>>>>>>>>>"
     # Maven settings.xml
     if [ -z "${CI_OPT_MAVEN_SETTINGS}" ]; then
-        if [ -z "${CI_OPT_MAVEN_SETTINGS_FILE}" ]; then CI_OPT_MAVEN_SETTINGS_FILE="$(pwd)/src/main/maven/settings-$(ci_opt_infrastructure).xml"; fi
-        if [ ! -f "${CI_OPT_MAVEN_SETTINGS_FILE}" ]; then
+        if [ -z "${CI_OPT_MAVEN_SETTINGS_FILE}" ]; then CI_OPT_MAVEN_SETTINGS_FILE="$(pwd)/src/main/maven/settings.xml"; fi
+        if [ ! -f ${CI_OPT_MAVEN_SETTINGS_FILE} ]; then
+            if [ -z "${CI_OPT_MAVEN_SETTINGS_FILE_URL}" ]; then CI_OPT_MAVEN_SETTINGS_FILE_URL="${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/maven/settings.xml"; fi
             CI_OPT_MAVEN_SETTINGS_FILE="$(ci_opt_cache_directory)/settings-$(ci_opt_infrastructure)-$(ci_opt_git_commit_id).xml"
-            download "${CI_INFRA_OPT_CONF_LOC}/src/main/maven/settings.xml" "${CI_OPT_MAVEN_SETTINGS_FILE}" "-H \"PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)\""
+            if [ "$(is_remote_resource_exists "${CI_OPT_MAVEN_SETTINGS_FILE_URL}" "${curl_options}")" == "true" ]; then
+                download "${CI_OPT_MAVEN_SETTINGS_FILE_URL}" "${CI_OPT_MAVEN_SETTINGS_FILE}" "${curl_options}"
+                CI_OPT_MAVEN_SETTINGS="-s ${CI_OPT_MAVEN_SETTINGS_FILE}"
+            else
+                echo "Error, can not download ${CI_OPT_MAVEN_SETTINGS_FILE_URL}"
+            fi
+        else
+            echo "Found ${CI_OPT_MAVEN_SETTINGS_FILE}"
+            cp -f ${CI_OPT_MAVEN_SETTINGS_FILE} $(ci_opt_cache_directory)/settings-$(ci_opt_infrastructure)-$(ci_opt_git_commit_id).xml
+            CI_OPT_MAVEN_SETTINGS="-s $(ci_opt_cache_directory)/settings-$(ci_opt_infrastructure)-$(ci_opt_git_commit_id).xml"
         fi
-        export CI_OPT_MAVEN_SETTINGS="-s ${CI_OPT_MAVEN_SETTINGS_FILE}"
     fi
     echo "CI_OPT_MAVEN_SETTINGS: ${CI_OPT_MAVEN_SETTINGS}"
 
     # Download maven's settings-security.xml if current infrastructure has this file
-    download_if_exists "${CI_INFRA_OPT_CONF_LOC}/src/main/maven/settings-security.xml" "${HOME}/.m2/settings-security.xml" "-H \"PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)\""
-    # <<<<<<<<<< ---------- maven settings.xml and settings-security.xml ---------- <<<<<<<<<<
+#    download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/maven/settings-security.xml" "${HOME}/.m2/settings-security.xml" "${curl_options}"
+    echo -e "<<<<<<<<<< ---------- run_mvn settings.xml and settings-security.xml ---------- <<<<<<<<<<\n"
 
-
-    # >>>>>>>>>> ---------- maven properties and environment variables ---------- >>>>>>>>>>
+    echo -e "\n>>>>>>>>>> ---------- run_mvn properties and environment variables ---------- >>>>>>>>>>"
     # Load infrastructure specific ci options (CI_OPT_CI_OPTS_SCRIPT)
     if [ ! -f "${CI_OPT_CI_OPTS_SCRIPT}" ]; then
-        CI_OPT_CI_OPTS_SCRIPT="${CI_INFRA_OPT_CONF_LOC}/src/main/ci-script/ci_opts.sh"
-        echo "eval \$(curl -H 'Cache-Control: no-cache' -H \"PRIVATE-TOKEN: <secret>\" -s -L ${CI_OPT_CI_OPTS_SCRIPT})"
-        eval "$(curl -H 'Cache-Control: no-cache' -H "PRIVATE-TOKEN: ${CI_INFRA_OPT_GIT_AUTH_TOKEN}" -s -L ${CI_OPT_CI_OPTS_SCRIPT})"
+        if [ -f ../maven-build-opts-$(ci_opt_infrastructure)/${CI_OPT_CI_OPTS_SCRIPT} ]; then
+            # for maven-build* developer
+            eval "$(cat ../maven-build-opts-$(ci_opt_infrastructure)/${CI_OPT_CI_OPTS_SCRIPT})"
+        else
+            # for maven-build* user
+            CI_OPT_CI_OPTS_SCRIPT="${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/${CI_OPT_CI_OPTS_SCRIPT}"
+            if [ "$(is_remote_resource_exists "${CI_OPT_CI_OPTS_SCRIPT}" "${curl_options}")" == "true" ]; then
+                echo "eval \$(curl -H \"Cache-Control: no-cache\" -H \"PRIVATE-TOKEN: <secret>\" -s -L ${CI_OPT_CI_OPTS_SCRIPT})"
+                eval "$(curl -H "Cache-Control: no-cache" -H "PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)" -s -L ${CI_OPT_CI_OPTS_SCRIPT})"
+            else
+                echo "Error, can not download ${CI_OPT_CI_OPTS_SCRIPT}"
+            fi
+        fi
     else
         . ${CI_OPT_CI_OPTS_SCRIPT}
     fi
 
-    export MAVEN_OPTS="$(ci_opt_maven_opts)"
-
     if [ "opensource" == "$(ci_opt_infrastructure)" ]; then
-        if [ -z "${CI_OPT_GITHUB_SITE_REPO_NAME}" ]; then export CI_OPT_GITHUB_SITE_REPO_NAME="$(ci_opt_site_path_prefix)"; fi
-        if [ -z "${CI_OPT_GITHUB_SITE_REPO_OWNER}" ]; then export CI_OPT_GITHUB_SITE_REPO_OWNER="$(echo $(git_repo_slug) | cut -d '/' -f1-)"; fi
+        if [ -z "${CI_OPT_GITHUB_SITE_REPO_NAME}" ]; then CI_OPT_GITHUB_SITE_REPO_NAME="$(ci_opt_site_path_prefix)"; fi
+        if [ -z "${CI_OPT_GITHUB_SITE_REPO_OWNER}" ]; then CI_OPT_GITHUB_SITE_REPO_OWNER="$(echo $(git_repo_slug) | cut -d '/' -f1-)"; fi
     fi
-    # <<<<<<<<<< ---------- maven properties and environment variables ---------- <<<<<<<<<<
 
+    if [ -z "${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}" ]; then CI_OPT_MAVEN_EFFECTIVE_POM_FILE="$(ci_opt_cache_directory)/effective-pom-$(ci_opt_git_commit_id).xml"; fi
+    echo -e "<<<<<<<<<< ---------- run_mvn properties and environment variables ---------- <<<<<<<<<<\n"
 
-    # >>>>>>>>>> ---------- maven project info ---------- >>>>>>>>>>
+    echo -e "\n>>>>>>>>>> ---------- run_mvn alter_mvn ---------- >>>>>>>>>>"
+    local altered=$(alter_mvn $@)
+    echo "alter_mvn result: mvn ${altered}"
+    echo -e "<<<<<<<<<< ---------- run_mvn alter_mvn ---------- <<<<<<<<<<\n"
+
+    echo -e "\n>>>>>>>>>> ---------- run_mvn options ---------- >>>>>>>>>>"
+    export MAVEN_OPTS="$(ci_opt_maven_opts)"
+    set | grep -E '^CI_INFRA_OPT' | filter_secret_variables
+    set | grep -E '^CI_OPT' | filter_secret_variables
+    echo MAVEN_OPTS=${MAVEN_OPTS} | filter_secret_variables
+    echo -e "<<<<<<<<<< ---------- run_mvn options ---------- <<<<<<<<<<\n"
+
+    echo -e "\n>>>>>>>>>> ---------- run_mvn project info ---------- >>>>>>>>>>"
     mvn ${CI_OPT_MAVEN_SETTINGS} -version
 
     # Maven effective pom
     # output some log to avoid travis timeout
-    if [ -z "${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}" ]; then CI_OPT_MAVEN_EFFECTIVE_POM_FILE="$(ci_opt_cache_directory)/effective-pom-$(ci_opt_git_commit_id).xml"; fi
-    echo "CI_OPT_MAVEN_EFFECTIVE_POM_FILE: ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}"
-    set +e
-    mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | grep 'Downloading:' | awk '!(NR%10)'
-    mvn ${CI_OPT_MAVEN_SETTINGS} help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
-    if [ $? -ne 0 ]; then
-        echo "error on generate effective-pom"
-        cat ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
-        exit 1
+    echo "mvn ${CI_OPT_MAVEN_SETTINGS} help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}"
+    if [ "${CI_OPT_DRYRUN}" != "true" ]; then
+        set +e
+        mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | grep 'Downloading:' | awk '!(NR%10)'
+        mvn ${CI_OPT_MAVEN_SETTINGS} help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
+        if [ $? -ne 0 ]; then
+            echo "error on generate effective-pom"
+            cat ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
+            exit 1
+        fi
+        set -e && set -o pipefail
     fi
-    set -e && set -o pipefail
-    # <<<<<<<<<< ---------- maven project info ---------- <<<<<<<<<<
+    echo -e "<<<<<<<<<< ---------- run_mvn project info ---------- <<<<<<<<<<\n"
+
+    local filter_script_file=$(filter_script "$(ci_opt_cache_directory)/filter")
+    #sh -c "echo sh -c echo MAVEN_OPTS: \${MAVEN_OPTS}"
+    #sh -c "echo sh -c echo MAVEN_OPTS: ${MAVEN_OPTS}"
+    echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U ${altered} | ${filter_script_file}"
+    if [ "${CI_OPT_DRYRUN}" != "true" ]; then
+        sh -c "mvn ${CI_OPT_MAVEN_SETTINGS} -U ${altered} | ${filter_script_file}"
+    fi
 }
 
 function run_gradle() {
@@ -360,10 +515,10 @@ function is_config_repository() {
 
 
 # key line to make whole build process file when command using pipelines fails
-#set -e && set -o pipefail
+set -e && set -o pipefail
 
 
-# >>>>>>>>>> ---------- build context info ---------- >>>>>>>>>>
+echo -e "\n>>>>>>>>>> ---------- build context info ---------- >>>>>>>>>>"
 echo "gitlab-ci variables: CI_CI_OPT_REF_NAME: ${CI_CI_OPT_REF_NAME}, CI_COMMIT_REF_NAME: ${CI_COMMIT_REF_NAME}, CI_PROJECT_URL: ${CI_PROJECT_URL}"
 echo "travis-ci variables: TRAVIS_BRANCH: ${TRAVIS_BRANCH}, TRAVIS_EVENT_TYPE: ${TRAVIS_EVENT_TYPE}, TRAVIS_REPO_SLUG: ${TRAVIS_REPO_SLUG}, TRAVIS_PULL_REQUEST: ${TRAVIS_PULL_REQUEST}"
 
@@ -378,29 +533,42 @@ fi
 if [ -f "${HOME}/.bashrc" ]; then source "${HOME}/.bashrc"; fi
 echo "PWD: $(pwd)"
 echo "USER: $(whoami)"
-# <<<<<<<<<< ---------- build context info ---------- <<<<<<<<<<
+echo -e "<<<<<<<<<< ---------- build context info ---------- <<<<<<<<<<\n"
 
 
-# >>>>>>>>>> ---------- must have variables ---------- >>>>>>>>>>
-if [ -z "${CI_OPT_CI_OPTS_SCRIPT}" ]; then CI_OPT_CI_OPTS_SCRIPT="src/main/ci-script/ci_opts_$(ci_opt_infrastructure).sh"; fi
-echo "CI_OPT_CI_OPTS_SCRIPT: ${CI_OPT_CI_OPTS_SCRIPT}"
-CI_INFRA_OPT_CONF_LOC="$(ci_infra_opt_git_prefix)/maven-build/maven-build-$(ci_opt_infrastructure)/raw/master"
-echo "CI_INFRA_OPT_CONF_LOC: ${CI_INFRA_OPT_CONF_LOC}"
-#if [ -z "$(ci_infra_opt_git_auth_token)" ]; then echo "CI_INFRA_OPT_GIT_AUTH_TOKEN not set, exit."; exit 1; else echo "CI_INFRA_OPT_GIT_AUTH_TOKEN: <secret>"; fi
-#if [ -z "${CI_OPT_MAVEN_BUILD_REPOSITORY}" ]; then echo "CI_OPT_MAVEN_BUILD_REPOSITORY not set, exit."; exit 1; fi
-# <<<<<<<<<< ---------- must have variables ---------- <<<<<<<<<<
+echo -e "\n>>>>>>>>>> ---------- important variables ---------- >>>>>>>>>>"
+if [ -z "${CI_OPT_MAVEN_BUILD_REPO}" ]; then
+    if [[ "${CI_OPT_CI_SCRIPT}" == http* ]]; then
+        CI_OPT_MAVEN_BUILD_REPO=$(echo ${CI_OPT_CI_SCRIPT} | sed -E 's#/raw/master/.+#/raw/master#')
+    elif [ -n "${CI_OPT_CI_SCRIPT}" ]; then
+        # use current directory
+        CI_OPT_MAVEN_BUILD_REPO=""
+    else
+        echo "Both CI_OPT_MAVEN_BUILD_REPO and CI_OPT_CI_SCRIPT are not set, exit."
+        exit 1
+    fi
+fi
+CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO="$(ci_infra_opt_git_prefix)/ci-and-cd/maven-build-opts-$(ci_opt_infrastructure)/raw/master"
+if [ -z "${CI_OPT_CI_OPTS_SCRIPT}" ]; then CI_OPT_CI_OPTS_SCRIPT="src/main/ci-script/ci_opts.sh"; fi
+if [ -z "$(ci_infra_opt_git_auth_token)" ]; then echo "CI_INFRA_OPT_GIT_AUTH_TOKEN not set, exit."; exit 1; fi
+echo -e "<<<<<<<<<< ---------- important variables ---------- <<<<<<<<<<\n"
+
+
+echo -e "\n>>>>>>>>>> ---------- init options ---------- >>>>>>>>>>"
+set | grep -E '^CI_INFRA_OPT' | filter_secret_variables
+set | grep -E '^CI_OPT' | filter_secret_variables
+echo -e "<<<<<<<<<< ---------- init options ---------- <<<<<<<<<<\n"
 
 
 # Load remote script library here
 
 
-# TODO find *Dockerfile* or *docker-compose*.yml
-if [ -f Dockerfile ] || [ -f src/main/resources/docker/Dockerfile ] || [ -f src/main/docker/Dockerfile ]; then
+if [ "$(ci_opt_user_docker)" == "true" ]; then
     init_docker_config
 fi
 
 if [ -f pom.xml ]; then
-    run_mvn
+    run_mvn $@
 fi
 
 if [ -f build.gradle ]; then

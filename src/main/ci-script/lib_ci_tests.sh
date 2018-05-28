@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+# usage: ./src/main/ci-script/lib_ci_tests.sh | grep ASSERT
+
+if [ -z "${CI_INFRA_OPT_LOCAL_GIT_AUTH_TOKEN}" ]; then echo "Error, please set CI_INFRA_OPT_LOCAL_GIT_AUTH_TOKEN"; exit 1; fi
+
+export CI_INFRA_OPT_GIT_AUTH_TOKEN="${CI_INFRA_OPT_LOCAL_GIT_AUTH_TOKEN}"
+export CI_OPT_CI_SCRIPT="src/main/ci-script/lib_ci.sh"
+export CI_OPT_DRYRUN="true"
+
+TEST_LOG="/tmp/lib_ci_test.log"
+
+# arguments: expected, grep_expr
+function assert_log() {
+    local actual=$(cat ${TEST_LOG} | grep "$2")
+    if [ "${actual}" == "$1" ]; then
+        echo "ASSERT OK, expected: $1"
+    else
+        echo "ASSERT FAILED, expected: $1, actual: ${actual}"
+    fi
+}
+
+
+rm -f ${TEST_LOG}
+exec 3> >(tee ${TEST_LOG})
+./src/main/ci-script/lib_ci.sh mvn -Dxxx=yyy clean compile package >&3
+assert_log "alter_mvn result: mvn -Dxxx=yyy clean compile package" "alter_mvn result: "
+
+
+rm -f ${TEST_LOG}
+exec 3> >(tee ${TEST_LOG})
+CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="true" \
+./src/main/ci-script/lib_ci.sh mvn clean install >&3
+assert_log "alter_mvn result: mvn clean org.apache.maven.plugins:maven-antrun-plugin:run@local-deploy-model-path-clean deploy" "alter_mvn result: "
+
+
+rm -f ${TEST_LOG}
+exec 3> >(tee ${TEST_LOG})
+CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="true" \
+./src/main/ci-script/lib_ci.sh mvn deploy >&3
+assert_log "alter_mvn result: mvn org.codehaus.mojo:wagon-maven-plugin:merge-maven-repos@merge-maven-repos-deploy" "alter_mvn result: "
+
+
+rm -f ${TEST_LOG}
+exec 3> >(tee ${TEST_LOG})
+CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="true" \
+CI_OPT_USE_DOCKER="true" \
+./src/main/ci-script/lib_ci.sh mvn deploy >&3
+assert_log "alter_mvn result: mvn org.codehaus.mojo:wagon-maven-plugin:merge-maven-repos@merge-maven-repos-deploy docker:build docker:push" "alter_mvn result: "

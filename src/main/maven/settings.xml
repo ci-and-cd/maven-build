@@ -46,12 +46,12 @@
             <configuration><email>${env.DOCKERHUB_MAIL}</email></configuration>
         </server>
 
-        <server><id>internal-nexus3-releases</id><username>deployment</username><password>{W4hzroIAQKoHOtCYkQror16gbyrd9/KMO2v4QiyJYho=}</password></server>
-        <server><id>internal-nexus3-snapshots</id><username>deployment</username><password>{W4hzroIAQKoHOtCYkQror16gbyrd9/KMO2v4QiyJYho=}</password></server>
-        <server><id>internal-nexus3-thirdparty</id><username>deployment</username><password>{W4hzroIAQKoHOtCYkQror16gbyrd9/KMO2v4QiyJYho=}</password></server>
+        <server><id>internal-nexus3-releases</id><username>deployment</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
+        <server><id>internal-nexus3-snapshots</id><username>deployment</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
+        <server><id>internal-nexus3-thirdparty</id><username>deployment</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
         <server>
             <id>internal-mvnsite</id>
-            <username>root</username><password>{W4hzroIAQKoHOtCYkQror16gbyrd9/KMO2v4QiyJYho=}</password>
+            <username>root</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password>
         </server>
 
         <!-- see: http://maven.apache.org/guides/mini/guide-encryption.html -->
