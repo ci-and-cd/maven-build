@@ -12,7 +12,7 @@ TEST_LOG="/tmp/lib_ci_test.log"
 
 # arguments: expected, grep_expr
 function assert_log() {
-    local actual=$(cat ${TEST_LOG} | grep "$2")
+    local actual=$(cat ${TEST_LOG} | grep -E "$2" | tail -1)
     if [ "${actual}" == "$1" ]; then
         echo "ASSERT OK, expected: $1"
     else
@@ -37,8 +37,14 @@ assert_log "alter_mvn result: mvn clean org.apache.maven.plugins:maven-antrun-pl
 rm -f ${TEST_LOG}
 exec 3> >(tee ${TEST_LOG})
 CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="true" \
+CI_OPT_CLEAN_SKIP="true" \
+CI_OPT_INTEGRATION_TEST_SKIP="true" \
+CI_OPT_TEST_SKIP="true" \
 ./src/main/ci-script/lib_ci.sh mvn deploy >&3
 assert_log "alter_mvn result: mvn org.codehaus.mojo:wagon-maven-plugin:merge-maven-repos@merge-maven-repos-deploy" "alter_mvn result: "
+assert_log "CI_OPT_CLEAN_SKIP=true" "^CI_OPT_CLEAN_SKIP="
+assert_log "CI_OPT_INTEGRATION_TEST_SKIP=true" "^CI_OPT_INTEGRATION_TEST_SKIP="
+assert_log "CI_OPT_TEST_SKIP=true" "^CI_OPT_TEST_SKIP="
 
 
 rm -f ${TEST_LOG}

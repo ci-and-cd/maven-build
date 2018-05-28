@@ -1,5 +1,6 @@
 # no shebang line here
 
+
 # download a file by curl
 # arguments: curl_source, curl_target, curl_option
 function download() {
@@ -329,6 +330,20 @@ function init_docker_config() {
     fi
 }
 
+function maven_pull_base_image() {
+    # TODO multi module project
+    if type -p docker > /dev/null; then
+        if [ -f src/main/resources/docker/Dockerfile ]; then
+            if [ ! -f src/main/docker/Dockerfile ]; then
+                mvn ${CI_OPT_MAVEN_SETTINGS} process-resources
+            fi
+            if [ -f src/main/docker/Dockerfile ]; then
+                docker pull $(cat src/main/docker/Dockerfile | grep -E '^FROM' | awk '{print $2}')
+            fi
+        fi
+    fi
+}
+
 function alter_mvn() {
     local is_origin_repo=$(ci_opt_is_origin_repo)
     local ref_name=$(ci_opt_ref_name)
@@ -359,7 +374,6 @@ function alter_mvn() {
                     elif [[ "${element}" == *install ]]; then
                         result+=("deploy")
                     elif [[ "${element}" == *deploy ]]; then
-                        CI_OPT_CLEAN_SKIP="true"
                         result+=("org.codehaus.mojo:wagon-maven-plugin:merge-maven-repos@merge-maven-repos-deploy")
                         if [ "$(ci_opt_user_docker)" == "true" ]; then
                             result+=("docker:build")
@@ -457,8 +471,8 @@ function run_mvn() {
 
     echo -e "\n>>>>>>>>>> ---------- run_mvn options ---------- >>>>>>>>>>"
     export MAVEN_OPTS="$(ci_opt_maven_opts)"
-    set | grep -E '^CI_INFRA_OPT' | filter_secret_variables
-    set | grep -E '^CI_OPT' | filter_secret_variables
+    set | grep -E '^CI_INFRA_OPT_' | filter_secret_variables
+    set | grep -E '^CI_OPT_' | filter_secret_variables
     echo MAVEN_OPTS=${MAVEN_OPTS} | filter_secret_variables
     echo -e "<<<<<<<<<< ---------- run_mvn options ---------- <<<<<<<<<<\n"
 
@@ -480,6 +494,10 @@ function run_mvn() {
         set -e && set -o pipefail
     fi
     echo -e "<<<<<<<<<< ---------- run_mvn project info ---------- <<<<<<<<<<\n"
+
+    if [ "$(ci_opt_user_docker)" == "true" ] && [ "${CI_OPT_DRYRUN}" != "true" ]; then
+        maven_pull_base_image
+    fi
 
     local filter_script_file=$(filter_script "$(ci_opt_cache_directory)/filter")
     #sh -c "echo sh -c echo MAVEN_OPTS: \${MAVEN_OPTS}"
@@ -555,8 +573,8 @@ echo -e "<<<<<<<<<< ---------- important variables ---------- <<<<<<<<<<\n"
 
 
 echo -e "\n>>>>>>>>>> ---------- init options ---------- >>>>>>>>>>"
-set | grep -E '^CI_INFRA_OPT' | filter_secret_variables
-set | grep -E '^CI_OPT' | filter_secret_variables
+set | grep -E '^CI_INFRA_OPT_' | filter_secret_variables
+set | grep -E '^CI_OPT_' | filter_secret_variables
 echo -e "<<<<<<<<<< ---------- init options ---------- <<<<<<<<<<\n"
 
 

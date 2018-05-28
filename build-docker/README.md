@@ -4,6 +4,12 @@ Parent pom for docker projects
 ## I. Usage
 
 
+if docker.registry property absent, 
+or CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION=true (use script),
+no docker image is built at package phase.
+see profile 'docker-maven-plugin-lifecycle-binding-when-not-publish-deploy-segregation' in docker-build/pom.xml.
+
+
 ## II. Properties and default values
 
 com.spotify:docker-maven-plugin
