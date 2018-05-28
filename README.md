@@ -83,7 +83,7 @@ Need to customize when github.com is not reachable.
 Customize this properties if you want to publish relative projects's site into same parent directory, 
 use same value on relative projects.
 
-- GITHUB_SITE_AUTH_TOKEN
+- CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN
 > default: N/A (blank)
 - CI_OPT_GITHUB_SITE_REPO_OWNER
 > default: N/A (blank)
@@ -101,9 +101,9 @@ Need these properties only when deploy site to github.com.
 Need these properties only when deploy artifacts into maven central repository.
 
 ### 7. maven central
-- MAVEN_CENTRAL_USER
+- CI_OPT_MAVEN_CENTRAL_USER
 > Maven central's username
-- MAVEN_CENTRAL_PASS
+- CI_OPT_MAVEN_CENTRAL_PASS
 > Maven central's password
 
 Need these properties only when deploy artifacts into maven central repository.
@@ -226,7 +226,7 @@ infrastructure_opensource_site_publish
 > publish project site to github  
 activate on property 'github-site-publish' present  
 needs:  
-env.GITHUB_SITE_AUTH_TOKEN  
+env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN  
 env.CI_OPT_GITHUB_SITE_REPO_OWNER
 
 

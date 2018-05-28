@@ -11,7 +11,7 @@
     travis version
     
 
-`travis login` or `travis login --github-token $GITHUB_SITE_AUTH_TOKEN`
+`travis login` or `travis login --github-token $CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN`
 
 ## Deploying to Maven Repositories from Tavis CI
 
@@ -22,7 +22,7 @@
 * see: [Publishing a Maven Site to GitHub Pages with Travis-CI](https://blog.lanyonm.org/articles/2015/12/19/publish-maven-site-github-pages-travis-ci.html)
 
 
-    travis encrypt GITHUB_SITE_AUTH_TOKEN="${GITHUB_SITE_AUTH_TOKEN}" --add env.global
+    travis encrypt CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN="${CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN}" --add env.global
 
 ## Environment variables
 
@@ -30,13 +30,13 @@ see: [Environment variables](https://docs.travis-ci.com/user/environment-variabl
 
 Variables in travis repo settings:
 
-|name                                | usage                                          | note                           |
-|------------------------------------|:----------------------------------------------:|:------------------------------:|
-|CI_OPT_GITHUB_SITE_REPO_OWNER              | for github maven site                          | Display value in build log     |
-|GITHUB_SITE_AUTH_TOKEN              | for github maven site and config fetch         | Not display value in build log |
-|                                    |                                                |                                |
-|MAVEN_CENTRAL_USER                  | for deploy artifact | Do not set on forked repo, Not display value in build log |
-|MAVEN_CENTRAL_PASS                  | for deploy artifact | Do not set on forked repo, Not display value in build log |
+|name                                   | usage                                          | note                           |
+|---------------------------------------|:----------------------------------------------:|:------------------------------:|
+|CI_OPT_GITHUB_SITE_REPO_OWNER          | for github maven site                          | Display value in build log     |
+|CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN | for github maven site and config fetch         | Not display value in build log |
+|                                       |                                                |                                |
+|CI_OPT_MAVEN_CENTRAL_USER              | for deploy artifact | Do not set on forked repo, Not display value in build log |
+|CI_OPT_MAVEN_CENTRAL_PASS              | for deploy artifact | Do not set on forked repo, Not display value in build log |
 
 ## Note
 
@@ -58,7 +58,7 @@ Variables in travis repo settings:
 
     deploy:
       provider: releases
-      api_key: $GITHUB_SITE_AUTH_TOKEN
+      api_key: $CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN
       file: "target/oss-keygen-${PROJECT_MAVEN_VERSION}.jar"
       skip_cleanup: true
       on:

@@ -101,7 +101,7 @@
 
         <!-- for site on github, id (github.global.server) must match the config in your settings.xml -->
         <github.global.server>github</github.global.server>
-        <github.global.oauth2Token>${env.GITHUB_SITE_AUTH_TOKEN}</github.global.oauth2Token>
+        <github.global.oauth2Token>${env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</github.global.oauth2Token>
 
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -789,13 +789,13 @@
             <activation><property><name>!maven.integration-test.skip</name></property></activation>
             <properties><maven.integration-test.skip>false</maven.integration-test.skip></properties>
         </profile>
-        <!--frontend.nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</frontend.nodeDownloadRoot-->
+        <!--<frontend.nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</frontend.nodeDownloadRoot>-->
         <profile>
             <id>default-frontend-nodeDownloadRoot</id>
             <activation><property><name>!frontend.nodeDownloadRoot</name></property></activation>
             <properties><frontend.nodeDownloadRoot>https://nodejs.org/dist/</frontend.nodeDownloadRoot></properties>
         </profile>
-        <!--frontend.npmDownloadRoot>http://registry.npm.taobao.org/npm/-/</frontend.npmDownloadRoot-->
+        <!--<frontend.npmDownloadRoot>http://registry.npm.taobao.org/npm/-/</frontend.npmDownloadRoot>-->
         <profile>
             <id>default-frontend-npmDownloadRoot</id>
             <activation><property><name>!frontend.npmDownloadRoot</name></property></activation>
