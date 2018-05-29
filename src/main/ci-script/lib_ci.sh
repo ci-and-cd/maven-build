@@ -610,7 +610,7 @@ if [ -f codesigning.asc ]; then
     # test key
     if [ -f LICENSE ]; then
         echo test private key imported
-        echo ${CI_OPT_GPG_PASSPHRASE} | gpg --passphrase-fd 0 -u ${CI_OPT_GPG_KEYNAME} --armor --detach-sig LICENSE
+        echo ${CI_OPT_GPG_PASSPHRASE} | gpg --passphrase-fd 0 --yes -u ${CI_OPT_GPG_KEYNAME} --armor --detach-sig LICENSE
     fi
     echo -e "trust\n5\ny\n" | gpg --command-fd 0 --edit-key ${CI_OPT_GPG_KEYNAME}
 
