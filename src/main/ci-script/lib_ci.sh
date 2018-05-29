@@ -480,12 +480,13 @@ function run_mvn() {
     mvn ${CI_OPT_MAVEN_SETTINGS} -version
 
     # Maven effective pom
-    # output some log to avoid travis timeout
+    exec 3> >(tee ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE})
     echo "mvn ${CI_OPT_MAVEN_SETTINGS} help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}"
     if [ "${CI_OPT_DRYRUN}" != "true" ]; then
         set +e
-        mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | grep 'Downloading:' | awk '!(NR%10)'
-        mvn ${CI_OPT_MAVEN_SETTINGS} help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
+        # output some log to avoid travis timeout
+        mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | grep -E '^Downloading' | awk '!(NR%10)'
+        mvn ${CI_OPT_MAVEN_SETTINGS} help:effective-pom >&3
         if [ $? -ne 0 ]; then
             echo "error on generate effective-pom"
             cat ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
@@ -541,7 +542,12 @@ echo "gitlab-ci variables: CI_CI_OPT_REF_NAME: ${CI_CI_OPT_REF_NAME}, CI_COMMIT_
 echo "travis-ci variables: TRAVIS_BRANCH: ${TRAVIS_BRANCH}, TRAVIS_EVENT_TYPE: ${TRAVIS_EVENT_TYPE}, TRAVIS_REPO_SLUG: ${TRAVIS_REPO_SLUG}, TRAVIS_PULL_REQUEST: ${TRAVIS_PULL_REQUEST}"
 
 # >>>>>>>>>> ---------- decrypt files and handle keys ---------- >>>>>>>>>>
-if [ -f codesigning.asc ]; then
+if [ -f codesigning.asc.gpg ] && [ -n "${CI_OPT_GPG_PASSPHRASE}" ]; then
+# general way, decrypt here
+    echo ${CI_OPT_GPG_PASSPHRASE} | gpg --passphrase-fd 0 --yes codesigning.asc.gpg
+    gpg --batch --yes --import codesigning.asc
+elif [ -f codesigning.asc ]; then
+# travis-ci way, already decrypted
     gpg --fast-import codesigning.asc
     # for gradle build
     if [ -n "${CI_OPT_GPG_KEYID}" ]; then gpg --keyring secring.gpg --export-secret-key ${CI_OPT_GPG_KEYID} > secring.gpg; fi

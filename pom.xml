@@ -1588,7 +1588,7 @@
                             </properties>
                         </configuration>
                         <dependencies>
-                            <dependency><artifactId>sonar-jacoco-listeners</artifactId><groupId>org.sonarsource.java</groupId><version>${sonar-jacoco-listeners.version}</version><scope>test</scope></dependency>
+                            <dependency><artifactId>sonar-jacoco-listeners</artifactId><groupId>org.sonarsource.java</groupId><version>${sonar-jacoco-listeners.version}</version><scope>runtime</scope></dependency>
                         </dependencies>
                     </plugin>
                 </plugins>
