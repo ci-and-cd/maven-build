@@ -9,11 +9,11 @@ function download() {
     local curl_default_options="-H \"Cache-Control: no-cache\" -L -S -s -t utf-8"
     local curl_option="$3 ${curl_default_options}"
     local curl_secret="$(echo $3 | sed -E "s#: [^ ]+#: <secret>'#g") ${curl_default_options}"
-    if [ -f ${curl_target} ] && [ -z "$(diff ${curl_target} <sh -c "curl ${curl_option} ${curl_source} 2>/dev/null")" ]; then
+    if [ -f ${curl_target} ] && [ -z "$(diff ${curl_target} <sh -c "set -e; curl ${curl_option} ${curl_source} 2>/dev/null")" ]; then
         (>&2 echo "contents identical, skip download")
     else
         echo "curl ${curl_secret} -o ${curl_target} ${curl_source} 2>/dev/null"
-        sh -c "curl ${curl_option} -o ${curl_target} ${curl_source} 2>/dev/null"
+        sh -c "set -e; curl ${curl_option} -o ${curl_target} ${curl_source} 2>/dev/null"
     fi
 }
 
@@ -27,7 +27,15 @@ function download_if_exists() {
 
 function filter_secret_variables() {
     while read line; do
-      printf "%s" "$line" | sed -E 's#TOKEN=.+#TOKEN=<secret>#g' | sed -E 's#PASS=.+#PASS=<secret>#g' | sed -E 's#PASSWORD=.+#PASSWORD=<secret>#g'
+      printf "%s\n" "$line" \
+        | sed -E 's#KEYNAME=.+#KEYNAME=<secret>#g' \
+        | sed -E 's#ORGANIZATION=.+#ORGANIZATION=<secret>#g'\
+        | sed -E 's#PASS=.+#PASS=<secret>#g' \
+        | sed -E 's#PASSWORD=.+#PASSWORD=<secret>#g' \
+        | sed -E 's#PASSPHRASE=.+#PASSPHRASE=<secret>#g' \
+        | sed -E 's#TOKEN=.+#TOKEN=<secret>#g' \
+        | sed -E 's#USER=.+#USER=<secret>#g' \
+        | sed -E 's#USERNAME=.+#USERNAME=<secret>#g'
     done
 }
 
@@ -107,7 +115,7 @@ function ci_opt_cache_directory() {
     if [ -n "${CI_OPT_CACHE_DIRECTORY}" ]; then
         cache_directory="${CI_OPT_CACHE_DIRECTORY}"
     else
-        cache_directory="${HOME}/.oss/tmp/$(ci_opt_git_commit_id)"
+        cache_directory="${HOME}/.ci-and-cd/tmp/$(ci_opt_git_commit_id)"
     fi
     mkdir -p ${cache_directory} 2>/dev/null
     echo "${cache_directory}"
@@ -208,7 +216,7 @@ function ci_opt_site_path_prefix() {
 function find_git_prefix_from_ci_script() {
     (>&2 echo "find CI_INFRA_OPT_GIT_PREFIX from CI_OPT_CI_SCRIPT: $CI_OPT_CI_SCRIPT, default_value: $1")
     if [[ "${CI_OPT_CI_SCRIPT}" == http* ]]; then
-        $(echo ${CI_OPT_CI_SCRIPT} | $(dirname $(sed -E 's#/raw/master/.+##')))
+        echo $(echo ${CI_OPT_CI_SCRIPT} | sed -E 's#/[^/]+/raw/[^/]+/.+##')
     else
         echo "$1"
     fi
@@ -248,9 +256,12 @@ function ci_infra_opt_git_auth_token() {
         echo "${CI_INFRA_OPT_GIT_AUTH_TOKEN}"
     else
         local var_name="CI_INFRA_OPT_$(echo $(ci_opt_infrastructure) | tr '[:lower:]' '[:upper:]')_GIT_AUTH_TOKEN"
+        (>&2 echo "ci_infra_opt_git_auth_token var_name: ${var_name}")
         if [ -n "${BASH_VERSION}" ]; then
+            (>&2 echo "ci_infra_opt_git_auth_token BASH_VERSION: ${BASH_VERSION}")
             echo "${!var_name}"
         elif [ -n "${ZSH_VERSION}" ]; then
+            (>&2 echo "ci_infra_opt_git_auth_token ZSH_VERSION: ${ZSH_VERSION}")
             echo "${(P)var_name}"
         else
             (>&2 echo "unsupported ${SHELL}")
@@ -417,7 +428,7 @@ function run_mvn() {
         if [ -z "${CI_OPT_MAVEN_SETTINGS_FILE}" ]; then CI_OPT_MAVEN_SETTINGS_FILE="$(pwd)/src/main/maven/settings.xml"; fi
         if [ ! -f ${CI_OPT_MAVEN_SETTINGS_FILE} ]; then
             if [ -z "${CI_OPT_MAVEN_SETTINGS_FILE_URL}" ]; then CI_OPT_MAVEN_SETTINGS_FILE_URL="${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/maven/settings.xml"; fi
-            CI_OPT_MAVEN_SETTINGS_FILE="$(ci_opt_cache_directory)/settings-$(ci_opt_infrastructure)-$(ci_opt_git_commit_id).xml"
+            CI_OPT_MAVEN_SETTINGS_FILE="$(ci_opt_cache_directory)/settings-$(ci_opt_infrastructure).xml"
             if [ "$(is_remote_resource_exists "${CI_OPT_MAVEN_SETTINGS_FILE_URL}" "${curl_options}")" == "true" ]; then
                 download "${CI_OPT_MAVEN_SETTINGS_FILE_URL}" "${CI_OPT_MAVEN_SETTINGS_FILE}" "${curl_options}"
                 CI_OPT_MAVEN_SETTINGS="-s ${CI_OPT_MAVEN_SETTINGS_FILE}"
@@ -426,8 +437,8 @@ function run_mvn() {
             fi
         else
             echo "Found ${CI_OPT_MAVEN_SETTINGS_FILE}"
-            cp -f ${CI_OPT_MAVEN_SETTINGS_FILE} $(ci_opt_cache_directory)/settings-$(ci_opt_infrastructure)-$(ci_opt_git_commit_id).xml
-            CI_OPT_MAVEN_SETTINGS="-s $(ci_opt_cache_directory)/settings-$(ci_opt_infrastructure)-$(ci_opt_git_commit_id).xml"
+            cp -f ${CI_OPT_MAVEN_SETTINGS_FILE} $(ci_opt_cache_directory)/settings-$(ci_opt_infrastructure).xml
+            CI_OPT_MAVEN_SETTINGS="-s $(ci_opt_cache_directory)/settings-$(ci_opt_infrastructure).xml"
         fi
     fi
     echo "CI_OPT_MAVEN_SETTINGS: ${CI_OPT_MAVEN_SETTINGS}"
@@ -461,7 +472,7 @@ function run_mvn() {
         if [ -z "${CI_OPT_GITHUB_SITE_REPO_OWNER}" ]; then CI_OPT_GITHUB_SITE_REPO_OWNER="$(echo $(git_repo_slug) | cut -d '/' -f1-)"; fi
     fi
 
-    if [ -z "${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}" ]; then CI_OPT_MAVEN_EFFECTIVE_POM_FILE="$(ci_opt_cache_directory)/effective-pom-$(ci_opt_git_commit_id).xml"; fi
+    if [ -z "${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}" ]; then CI_OPT_MAVEN_EFFECTIVE_POM_FILE="$(ci_opt_cache_directory)/effective-pom.xml"; fi
     echo -e "<<<<<<<<<< ---------- run_mvn properties and environment variables ---------- <<<<<<<<<<\n"
 
     echo -e "\n>>>>>>>>>> ---------- run_mvn alter_mvn ---------- >>>>>>>>>>"
@@ -480,13 +491,21 @@ function run_mvn() {
     mvn ${CI_OPT_MAVEN_SETTINGS} -version
 
     # Maven effective pom
-    exec 3> >(tee ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE})
-    echo "mvn ${CI_OPT_MAVEN_SETTINGS} help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}"
     if [ "${CI_OPT_DRYRUN}" != "true" ]; then
         set +e
-        # output some log to avoid travis timeout
-        mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | grep -E '^Downloading' | awk '!(NR%10)'
-        mvn ${CI_OPT_MAVEN_SETTINGS} help:effective-pom >&3
+        # merge every 10 lines of log into 1, avoid travis timeout and to much lines
+        echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | awk 'NR%10{printf \"%s \",\$0;next;}1'' ..."
+        mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | awk 'NR%10{printf "%s ",$0;next;}1'
+        if [ "${CI_OPT_OUTPUT_MAVEN_EFFECTIVE_POM_TO_CONSOLE}" == "true" ]; then
+        # set CI_OPT_OUTPUT_MAVEN_EFFECTIVE_POM_TO_CONSOLE to false when using travis-ci
+            echo "mvn -e ${CI_OPT_MAVEN_SETTINGS} help:effective-pom >&3 ..."
+            exec 3> >(tee ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE})
+            mvn ${CI_OPT_MAVEN_SETTINGS} help:effective-pom >&3
+        else
+            mkdir -p $(dirname ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}) && touch ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
+            echo "mvn -e ${CI_OPT_MAVEN_SETTINGS} help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE} ..."
+            mvn ${CI_OPT_MAVEN_SETTINGS} help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
+        fi
         if [ $? -ne 0 ]; then
             echo "error on generate effective-pom"
             cat ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
@@ -501,11 +520,9 @@ function run_mvn() {
     fi
 
     local filter_script_file=$(filter_script "$(ci_opt_cache_directory)/filter")
-    #sh -c "echo sh -c echo MAVEN_OPTS: \${MAVEN_OPTS}"
-    #sh -c "echo sh -c echo MAVEN_OPTS: ${MAVEN_OPTS}"
-    echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U ${altered} | ${filter_script_file}"
+    echo "mvn ${CI_OPT_MAVEN_SETTINGS} -e -U ${altered} | ${filter_script_file}"
     if [ "${CI_OPT_DRYRUN}" != "true" ]; then
-        sh -c "mvn ${CI_OPT_MAVEN_SETTINGS} -U ${altered} | ${filter_script_file}"
+        bash -c "set -e -o pipefail; mvn ${CI_OPT_MAVEN_SETTINGS} -e -U ${altered} | ${filter_script_file}"
     fi
 }
 
@@ -537,20 +554,68 @@ function is_config_repository() {
 set -e && set -o pipefail
 
 
+echo -e "\n>>>>>>>>>> ---------- init options ---------- >>>>>>>>>>"
+set | grep -E '^CI_INFRA_OPT_' | filter_secret_variables
+set | grep -E '^CI_OPT_' | filter_secret_variables
+echo -e "<<<<<<<<<< ---------- init options ---------- <<<<<<<<<<\n"
+
+
 echo -e "\n>>>>>>>>>> ---------- build context info ---------- >>>>>>>>>>"
 echo "gitlab-ci variables: CI_CI_OPT_REF_NAME: ${CI_CI_OPT_REF_NAME}, CI_COMMIT_REF_NAME: ${CI_COMMIT_REF_NAME}, CI_PROJECT_URL: ${CI_PROJECT_URL}"
 echo "travis-ci variables: TRAVIS_BRANCH: ${TRAVIS_BRANCH}, TRAVIS_EVENT_TYPE: ${TRAVIS_EVENT_TYPE}, TRAVIS_REPO_SLUG: ${TRAVIS_REPO_SLUG}, TRAVIS_PULL_REQUEST: ${TRAVIS_PULL_REQUEST}"
 
 # >>>>>>>>>> ---------- decrypt files and handle keys ---------- >>>>>>>>>>
+GPG="gpg"
+echo determine gpg or gpg2 to use
+# invalid option --pinentry-mode loopback
+if which gpg2 > /dev/null; then GPG="gpg2 --use-agent"; elif which gpg > /dev/null; then GPG="gpg"; fi
+echo "using ${GPG}"
+${GPG} --version
+echo "gpg tty $(tty)"
+GPG_TTY=$(tty)
+if [ -f codesigning.asc.enc ] && [ -n "${CI_OPT_GPG_PASSPHRASE}" ]; then
+    echo decrypt private key
+    openssl aes-256-cbc -k ${CI_OPT_GPG_PASSPHRASE} -in codesigning.asc.enc -out codesigning.asc -d
+fi
 if [ -f codesigning.asc.gpg ] && [ -n "${CI_OPT_GPG_PASSPHRASE}" ]; then
-# general way, decrypt here
-    echo ${CI_OPT_GPG_PASSPHRASE} | gpg --passphrase-fd 0 --yes codesigning.asc.gpg
-    gpg --batch --yes --import codesigning.asc
-elif [ -f codesigning.asc ]; then
-# travis-ci way, already decrypted
-    gpg --fast-import codesigning.asc
+    echo decrypt private key
+    LC_CTYPE="UTF-8" echo ${CI_OPT_GPG_PASSPHRASE} | ${GPG} --passphrase-fd 0 --yes --cipher-algo AES256 -o codesigning.asc codesigning.asc.gpg
+fi
+if [ -f codesigning.pub ]; then
+    echo import public keys
+    ${GPG} --yes --batch --import codesigning.pub
+
+    echo public keys
+    ${GPG} --list-keys
+fi
+if [ -f codesigning.asc ]; then
+    echo import private keys
+    # some versions only can import public key from a keypair file, some can import key pair
+    if [ -f codesigning.pub ]; then
+        ${GPG} --yes --batch --import codesigning.asc
+    else
+        if [ -z "$(${GPG} --list-secret-keys | grep ${CI_OPT_GPG_KEYNAME})" ]; then ${GPG} --yes --fast-import codesigning.asc; fi
+    fi
+    echo list private keys
+    ${GPG} --list-secret-keys
+
+#    # set default key
+#    echo -e "trust\n5\ny\n" | ${GPG} --command-fd 0 --edit-key ${CI_OPT_GPG_KEYNAME};
+
+    # issue: You need a passphrase to unlock the secret key
+    # no-tty cause "gpg: Sorry, no terminal at all requested - can't get input"
+    #echo 'no-tty' >> ~/.gnupg/gpg.conf
+    #echo 'default-cache-ttl 600' > ~/.gnupg/gpg-agent.conf
+
+    # test key
+    if [ -f LICENSE ]; then
+        echo test private key imported
+        echo ${CI_OPT_GPG_PASSPHRASE} | gpg --passphrase-fd 0 -u ${CI_OPT_GPG_KEYNAME} --armor --detach-sig LICENSE
+    fi
+    echo -e "trust\n5\ny\n" | gpg --command-fd 0 --edit-key ${CI_OPT_GPG_KEYNAME}
+
     # for gradle build
-    if [ -n "${CI_OPT_GPG_KEYID}" ]; then gpg --keyring secring.gpg --export-secret-key ${CI_OPT_GPG_KEYID} > secring.gpg; fi
+    if [ -n "${CI_OPT_GPG_KEYID}" ]; then ${GPG} --keyring secring.gpg --export-secret-key ${CI_OPT_GPG_KEYID} > secring.gpg; fi
 fi
 # <<<<<<<<<< ---------- decrypt files and handle keys ---------- <<<<<<<<<<
 
@@ -563,7 +628,7 @@ echo -e "<<<<<<<<<< ---------- build context info ---------- <<<<<<<<<<\n"
 echo -e "\n>>>>>>>>>> ---------- important variables ---------- >>>>>>>>>>"
 if [ -z "${CI_OPT_MAVEN_BUILD_REPO}" ]; then
     if [[ "${CI_OPT_CI_SCRIPT}" == http* ]]; then
-        CI_OPT_MAVEN_BUILD_REPO=$(echo ${CI_OPT_CI_SCRIPT} | sed -E 's#/raw/master/.+#/raw/master#')
+        CI_OPT_MAVEN_BUILD_REPO=$(echo ${CI_OPT_CI_SCRIPT} | sed -r 's#/raw/([^/]+)/.+#/raw/\1#')
     elif [ -n "${CI_OPT_CI_SCRIPT}" ]; then
         # use current directory
         CI_OPT_MAVEN_BUILD_REPO=""
@@ -578,10 +643,10 @@ if [ -z "$(ci_infra_opt_git_auth_token)" ]; then echo "CI_INFRA_OPT_GIT_AUTH_TOK
 echo -e "<<<<<<<<<< ---------- important variables ---------- <<<<<<<<<<\n"
 
 
-echo -e "\n>>>>>>>>>> ---------- init options ---------- >>>>>>>>>>"
+echo -e "\n>>>>>>>>>> ---------- options with important variables ---------- >>>>>>>>>>"
 set | grep -E '^CI_INFRA_OPT_' | filter_secret_variables
 set | grep -E '^CI_OPT_' | filter_secret_variables
-echo -e "<<<<<<<<<< ---------- init options ---------- <<<<<<<<<<\n"
+echo -e "<<<<<<<<<< ---------- options with important variables ---------- <<<<<<<<<<\n"
 
 
 # Load remote script library here

@@ -596,7 +596,7 @@
         <!-- @formatter:off -->
         <profile>
             <id>gpg-for-travis-and-maven-central</id>
-            <activation><activeByDefault>true</activeByDefault></activation>
+            <activation><file><exists>${maven.multiModuleProjectDirectory}/codesigning.asc</exists></file><activeByDefault>true</activeByDefault></activation>
             <properties>
                 <gpg.executable>gpg</gpg.executable>
                 <gpg.keyname>${env.CI_OPT_GPG_KEYNAME}</gpg.keyname>
@@ -1057,7 +1057,7 @@
         <profile>
             <id>default-wagon-source-filepath</id>
             <activation><property><name>!wagon.source.filepath</name></property><activeByDefault>false</activeByDefault></activation>
-            <properties><wagon.source.filepath>${user.home}/.oss/local-deploy/${git.commit.id}</wagon.source.filepath></properties>
+            <properties><wagon.source.filepath>${user.home}/.ci-and-cd/local-deploy/${git.commit.id}</wagon.source.filepath></properties>
         </profile>
         <profile>
             <id>default-wagon-merge-maven-repos-target</id>

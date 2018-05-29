@@ -252,7 +252,7 @@ Add args on `maven site`
 
     mvn -e -U clean install
     
-    mvn -e -U -Dinfrastructure=local -Dsite=true -Dsite.path=oss clean install deploy site site:stage site:stage-deploy
+    mvn -e -U -Dinfrastructure=local -Dsite=true -Dsite.path=ci-and-cd clean install deploy site site:stage site:stage-deploy
 
 #### A.2 Pull request
 

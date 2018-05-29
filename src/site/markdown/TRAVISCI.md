@@ -1,6 +1,16 @@
 
 # Travis-ci
 
+## java
+
+travis-ci's oraclejdk8
+java version "1.8.0_151"
+JAVA_HOME /usr/lib/jvm/java-8-oracle
+
+travis-ci's oraclejdk9
+java version "9.0.1"
+JAVA_HOME /usr/lib/jvm/java-9-oracle
+
 ## install travis cli on mac
 
 * see [travis.rb](https://github.com/travis-ci/travis.rb#installation)
