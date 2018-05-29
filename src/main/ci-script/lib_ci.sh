@@ -485,7 +485,7 @@ function run_mvn() {
     set | grep -E '^CI_INFRA_OPT_' | filter_secret_variables
     set | grep -E '^CI_OPT_' | filter_secret_variables
     echo MAVEN_OPTS=${MAVEN_OPTS} | filter_secret_variables
-    echo -e "<<<<<<<<<< ---------- run_mvn options ---------- <<<<<<<<<<\n"
+    echo -e "\n<<<<<<<<<< ---------- run_mvn options ---------- <<<<<<<<<<\n"
 
     echo -e "\n>>>>>>>>>> ---------- run_mvn project info ---------- >>>>>>>>>>"
     mvn ${CI_OPT_MAVEN_SETTINGS} -version
@@ -557,7 +557,7 @@ set -e && set -o pipefail
 echo -e "\n>>>>>>>>>> ---------- init options ---------- >>>>>>>>>>"
 set | grep -E '^CI_INFRA_OPT_' | filter_secret_variables
 set | grep -E '^CI_OPT_' | filter_secret_variables
-echo -e "<<<<<<<<<< ---------- init options ---------- <<<<<<<<<<\n"
+echo -e "\n<<<<<<<<<< ---------- init options ---------- <<<<<<<<<<\n"
 
 
 echo -e "\n>>>>>>>>>> ---------- build context info ---------- >>>>>>>>>>"
@@ -646,7 +646,7 @@ echo -e "<<<<<<<<<< ---------- important variables ---------- <<<<<<<<<<\n"
 echo -e "\n>>>>>>>>>> ---------- options with important variables ---------- >>>>>>>>>>"
 set | grep -E '^CI_INFRA_OPT_' | filter_secret_variables
 set | grep -E '^CI_OPT_' | filter_secret_variables
-echo -e "<<<<<<<<<< ---------- options with important variables ---------- <<<<<<<<<<\n"
+echo -e "\n<<<<<<<<<< ---------- options with important variables ---------- <<<<<<<<<<\n"
 
 
 # Load remote script library here
