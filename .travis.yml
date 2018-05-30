@@ -42,7 +42,7 @@ jdk:
 #- oraclejdk9
 language: java
 script:
-- bash ci.sh clean install deploy sonar:sonar site site-deploy
+- bash ci.sh clean install sonar:sonar deploy site site-deploy
 services:
 - docker
 sudo: required
