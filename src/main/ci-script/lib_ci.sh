@@ -10,7 +10,7 @@ function download() {
     local curl_option="$3 ${curl_default_options}"
     local curl_secret="$(echo $3 | sed -E "s#: [^ ]+#: <secret>'#g") ${curl_default_options}"
     (>&2 echo "test contents between ${curl_target} and ${curl_source}")
-    if [ -f ${curl_target} ] && [ -z "$(diff ${curl_target} <sh -c "set -e; curl ${curl_option} ${curl_source} 2>/dev/null")" ]; then
+    if [ -f ${curl_target} ] && [ -z "$(diff ${curl_target} <(sh -c "set -e; curl ${curl_option} ${curl_source} 2>&1"))" ]; then
         (>&2 echo "contents identical, skip download")
     else
         echo "curl ${curl_secret} -o ${curl_target} ${curl_source} 2>/dev/null"
