@@ -216,7 +216,7 @@ function ci_opt_site_path_prefix() {
 function find_git_prefix_from_ci_script() {
     (>&2 echo "find CI_INFRA_OPT_GIT_PREFIX from CI_OPT_CI_SCRIPT: $CI_OPT_CI_SCRIPT, default_value: $1")
     if [[ "${CI_OPT_CI_SCRIPT}" == http* ]]; then
-        echo $(echo ${CI_OPT_CI_SCRIPT} | sed -E 's#/[^/]+/raw/[^/]+/.+##')
+        echo $(echo ${CI_OPT_CI_SCRIPT} | sed -E 's#/[^/]+/[^/]+/raw/[^/]+/.+##')
     else
         echo "$1"
     fi
@@ -434,6 +434,7 @@ function run_mvn() {
                 CI_OPT_MAVEN_SETTINGS="-s ${CI_OPT_MAVEN_SETTINGS_FILE}"
             else
                 echo "Error, can not download ${CI_OPT_MAVEN_SETTINGS_FILE_URL}"
+                exit 1
             fi
         else
             echo "Found ${CI_OPT_MAVEN_SETTINGS_FILE}"
