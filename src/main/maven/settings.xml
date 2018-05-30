@@ -29,12 +29,26 @@
         <pluginGroup>org.sonarsource.scanner.maven</pluginGroup>
     </pluginGroups>
 
+    <profiles>
+        <profile>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <gpg.keyname>${env.CI_OPT_GPG_KEYNAME}</gpg.keyname>
+            </properties>
+        </profile>
+    </profiles>
+
     <proxies>
         <!--<proxy><id>http-proxy</id><active>true</active><protocol>http</protocol><host>127.0.0.1</host><port>8080</port><nonProxyHosts>127.0.0.1</nonProxyHosts></proxy>-->
         <!--<proxy><id>http-proxy</id><active>true</active><protocol>socks5</protocol><host>127.0.0.1</host><port>1080</port><nonProxyHosts>127.0.0.1</nonProxyHosts></proxy>-->
     </proxies>
 
     <servers>
+        <!-- custom servers -> -->
+        <!-- <- custom servers -->
+
         <!-- @formatter:off -->
         <!--
         To fix issue: gpg: signing failed: Inappropriate ioctl for device
@@ -87,9 +101,6 @@
         </server>
         <!-- @formatter:on -->
     </servers>
-
-    <profiles>
-    </profiles>
 
     <usePluginRegistry/>
 </settings>

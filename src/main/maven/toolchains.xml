@@ -9,7 +9,17 @@
             <vendor>oracle</vendor>
         </provides>
         <configuration>
-            <jdkHome>/Library/Java/JavaVirtualMachines/jdk1.8.0_171.jdk/Contents/Home</jdkHome>
+            <!-- OSX style: /Library/Java/JavaVirtualMachines/jdk1.8.0_171.jdk/Contents/Home -->
+            <!-- travis-ci style: /usr/lib/jvm/java-8-oracle -->
+            <!--
+            # Disable SIP (System Integrity Protection)
+            # see: https://apple.stackexchange.com/questions/208764/cant-write-to-usr-lib
+            # Boot by Recovery partition and run `csrutil disable` in Terminal.app
+            mkdir -p /usr/lib/jvm
+            ln -s /Library/Java/JavaVirtualMachines/jdk1.8.0_171.jdk/Contents/Home /usr/lib/jvm/java-8-oracle
+            # run `csrutil enable` in Terminal.app
+            -->
+            <jdkHome>/usr/lib/jvm/java-8-oracle</jdkHome>
         </configuration>
     </toolchain>
     <toolchain>
@@ -20,7 +30,9 @@
             <id>jdk9</id>
         </provides>
         <configuration>
-            <jdkHome>/Library/Java/JavaVirtualMachines/jdk-9.0.4.jdk/Contents/Home</jdkHome>
+            <!-- OSX style: /Library/Java/JavaVirtualMachines/jdk-9.0.4.jdk/Contents/Home -->
+            <!-- travis-ci style: /usr/lib/jvm/java-9-oracle -->
+            <jdkHome>/usr/lib/jvm/java-9-oracle</jdkHome>
         </configuration>
     </toolchain>
 </toolchains>
