@@ -39,23 +39,26 @@
         <!-- @formatter:off -->
         <repository>
             <id>central</id><url>http://repo1.maven.org/maven2</url>
-            <releases><enabled>true</enabled><updatePolicy>always</updatePolicy></releases>
-            <snapshots><enabled>true</enabled><updatePolicy>always</updatePolicy></snapshots>
+            <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
+            <snapshots><enabled>false</enabled></snapshots>
         </repository>
         <repository>
             <id>spring-libs-release</id>
             <url>http://repo.spring.io/libs-release</url>
+            <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </repository>
         <repository>
             <id>spring-milestone</id>
             <url>http://repo.spring.io/milestone</url>
+            <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </repository>
         <repository>
             <id>spring-libs-snapshot</id>
             <url>http://repo.spring.io/libs-snapshot</url>
-            <snapshots><enabled>true</enabled></snapshots>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
         </repository>
         <!-- @formatter:on -->
     </repositories>
@@ -65,23 +68,26 @@
         <pluginRepository>
             <id>central</id>
             <url>http://repo1.maven.org/maven2</url>
-            <releases><enabled>true</enabled><updatePolicy>always</updatePolicy></releases>
-            <snapshots><enabled>true</enabled><updatePolicy>always</updatePolicy></snapshots>
+            <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
+            <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
         <pluginRepository>
             <id>spring-libs-release</id>
             <url>http://repo.spring.io/libs-release</url>
+            <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
         <pluginRepository>
             <id>spring-milestone</id>
             <url>http://repo.spring.io/milestone</url>
+            <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
         <pluginRepository>
             <id>spring-libs-snapshot</id>
             <url>http://repo.spring.io/libs-snapshot</url>
-            <snapshots><enabled>true</enabled></snapshots>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
         </pluginRepository>
         <pluginRepository>
             <id>github-mvn-repo-github-maven-plugins</id>
@@ -112,6 +118,9 @@
         <github.global.oauth2Token>${env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</github.global.oauth2Token>
 
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <repositories.releases.updatePolicy>always</repositories.releases.updatePolicy>
+        <repositories.snapshots.updatePolicy>always</repositories.snapshots.updatePolicy>
     </properties>
 
     <build>
@@ -615,7 +624,7 @@
                     <id>OSSRH-releases</id>
                     <name>central releases</name>
                     <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-                    <releases><enabled>true</enabled></releases>
+                    <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </repository>
                 <repository>
@@ -623,7 +632,7 @@
                     <name>central snapshots</name>
                     <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
                     <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
+                    <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
                 </repository>
             </repositories>
             <pluginRepositories>
@@ -632,7 +641,7 @@
                     <name>central snapshots</name>
                     <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
                     <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
+                    <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
                 </pluginRepository>
                 <pluginRepository>
                     <id>OSSRH-thirdparty</id>
@@ -671,7 +680,7 @@
                     <id>internal-nexus3-releases</id>
                     <name>internal nexus3 releases</name>
                     <url>${internal-nexus3.repository}/maven-releases/</url>
-                    <releases><enabled>true</enabled></releases>
+                    <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </repository>
                 <repository>
@@ -679,7 +688,7 @@
                     <name>internal nexus3 snapshots</name>
                     <url>${internal-nexus3.repository}/maven-snapshots/</url>
                     <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
+                    <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
                 </repository>
                 <repository>
                     <id>internal-nexus3-thirdparty</id>
@@ -694,7 +703,7 @@
                     <id>internal-nexus3-releases</id>
                     <name>internal nexus3 releases</name>
                     <url>${internal-nexus3.repository}/maven-releases/</url>
-                    <releases><enabled>true</enabled></releases>
+                    <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </pluginRepository>
                 <pluginRepository>
@@ -702,7 +711,7 @@
                     <name>internal nexus3 snapshots</name>
                     <url>${internal-nexus3.repository}/maven-snapshots/</url>
                     <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
+                    <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
                 </pluginRepository>
                 <pluginRepository>
                     <id>internal-nexus3-thirdparty</id>
@@ -738,7 +747,7 @@
                     <id>local-nexus3-releases</id>
                     <name>local nexus3 releases</name>
                     <url>${local-nexus3.repository}/maven-releases/</url>
-                    <releases><enabled>true</enabled></releases>
+                    <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </repository>
                 <repository>
@@ -746,7 +755,7 @@
                     <name>local nexus3 snapshots</name>
                     <url>${local-nexus3.repository}/maven-snapshots/</url>
                     <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
+                    <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
                 </repository>
                 <repository>
                     <id>local-nexus3-thirdparty</id>
@@ -761,7 +770,7 @@
                     <id>local-nexus3-releases</id>
                     <name>local nexus3 releases</name>
                     <url>${local-nexus3.repository}/maven-releases/</url>
-                    <releases><enabled>true</enabled></releases>
+                    <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </pluginRepository>
                 <pluginRepository>
@@ -769,7 +778,7 @@
                     <name>local nexus3 snapshots</name>
                     <url>${local-nexus3.repository}/maven-snapshots/</url>
                     <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
+                    <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
                 </pluginRepository>
                 <pluginRepository>
                     <id>local-nexus3-thirdparty</id>

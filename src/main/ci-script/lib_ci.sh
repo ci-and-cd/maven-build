@@ -506,8 +506,14 @@ function run_mvn() {
     if [ "${CI_OPT_DRYRUN}" != "true" ]; then
         set +e
         # merge every 10 lines of log into 1, avoid travis timeout and to much lines
-        echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | awk 'NR%10{printf \"%s \",\$0;next;}1'' ..."
-        mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | awk 'NR%10{printf "%s ",$0;next;}1'
+        if [ -n "${TRAVIS_EVENT_TYPE}" ]; then
+            echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | awk 'NR%10{printf \"%s \",\$0;next;}1'' ..."
+            mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | awk 'NR%10{printf "%s ",$0;next;}1'
+        else
+            echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom"
+            mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom
+        fi
+
         if [ "${CI_OPT_OUTPUT_MAVEN_EFFECTIVE_POM_TO_CONSOLE}" == "true" ]; then
         # set CI_OPT_OUTPUT_MAVEN_EFFECTIVE_POM_TO_CONSOLE to false when using travis-ci
             echo "mvn -e ${CI_OPT_MAVEN_SETTINGS} help:effective-pom >&3 ..."
