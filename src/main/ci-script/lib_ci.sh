@@ -422,6 +422,15 @@ function alter_mvn() {
 function run_mvn() {
     local curl_options="-H \"PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)\""
 
+    echo -e "\n>>>>>>>>>> ---------- run_mvn toolchains.xml ---------- >>>>>>>>>>"
+    if [ -z "${CI_OPT_MAVEN_TOOLCHAINS_FILE_URL}" ]; then CI_OPT_MAVEN_TOOLCHAINS_FILE_URL="${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/maven/toolchains.xml"; fi
+    if [ ! -f "${HOME}/.m2/toolchains.xml" ]; then
+        download_if_exists "${CI_OPT_MAVEN_TOOLCHAINS_FILE_URL}" "${HOME}/.m2/toolchains.xml" "${curl_options}"
+    else
+        echo "Found ${HOME}/.m2/toolchains.xml"
+    fi
+    echo -e "<<<<<<<<<< ---------- run_mvn toolchains.xml ---------- <<<<<<<<<<\n"
+
     echo -e "\n>>>>>>>>>> ---------- run_mvn settings.xml and settings-security.xml ---------- >>>>>>>>>>"
     # Maven settings.xml
     if [ -z "${CI_OPT_MAVEN_SETTINGS}" ]; then
@@ -445,7 +454,7 @@ function run_mvn() {
     echo "CI_OPT_MAVEN_SETTINGS: ${CI_OPT_MAVEN_SETTINGS}"
 
     # Download maven's settings-security.xml if current infrastructure has this file
-#    download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/maven/settings-security.xml" "${HOME}/.m2/settings-security.xml" "${curl_options}"
+    download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/maven/settings-security.xml" "${HOME}/.m2/settings-security.xml" "${curl_options}"
     echo -e "<<<<<<<<<< ---------- run_mvn settings.xml and settings-security.xml ---------- <<<<<<<<<<\n"
 
     echo -e "\n>>>>>>>>>> ---------- run_mvn properties and environment variables ---------- >>>>>>>>>>"
