@@ -424,7 +424,8 @@ function run_mvn() {
 
     echo -e "\n>>>>>>>>>> ---------- run_mvn toolchains.xml ---------- >>>>>>>>>>"
     if [ -z "${CI_OPT_MAVEN_TOOLCHAINS_FILE_URL}" ]; then CI_OPT_MAVEN_TOOLCHAINS_FILE_URL="${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/maven/toolchains.xml"; fi
-    if [ ! -f "${HOME}/.m2/toolchains.xml" ]; then
+    # always down toolchains.xml on travis-ci build
+    if [ ! -f "${HOME}/.m2/toolchains.xml" ] || [ -n "${TRAVIS_EVENT_TYPE}" ]; then
         download_if_exists "${CI_OPT_MAVEN_TOOLCHAINS_FILE_URL}" "${HOME}/.m2/toolchains.xml" "${curl_options}"
     else
         echo "Found ${HOME}/.m2/toolchains.xml"
