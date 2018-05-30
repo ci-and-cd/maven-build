@@ -9,6 +9,7 @@ function download() {
     local curl_default_options="-H \"Cache-Control: no-cache\" -L -S -s -t utf-8"
     local curl_option="$3 ${curl_default_options}"
     local curl_secret="$(echo $3 | sed -E "s#: [^ ]+#: <secret>'#g") ${curl_default_options}"
+    (>&2 echo "test contents between ${curl_target} and ${curl_source}")
     if [ -f ${curl_target} ] && [ -z "$(diff ${curl_target} <sh -c "set -e; curl ${curl_option} ${curl_source} 2>/dev/null")" ]; then
         (>&2 echo "contents identical, skip download")
     else
