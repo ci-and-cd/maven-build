@@ -1087,7 +1087,7 @@
             <activation><property><name>mvn_deploy_publish_segregation</name><value>true</value></property><activeByDefault>false</activeByDefault></activation>
             <pluginRepositories>
                 <pluginRepository>
-                    <id>github-chshawkn-wagon-maven-plugin</id>
+                    <id>github-mvn-repo-wagon-maven-plugin</id>
                     <url>https://raw.github.com/ci-and-cd/wagon-maven-plugin/mvn-repo</url>
                     <name>Forked wagon-maven-plugin that can merge snapshots metadata correctly</name>
                     <layout>default</layout>

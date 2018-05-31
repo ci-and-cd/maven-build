@@ -11,7 +11,7 @@
         <!-- Do not use variable substitution in mirrors when using an IDE, it does not works. -->
         <!-- mirrorOf: pom.xml repositories repository id -->
         <!--<mirrorOf>central</mirrorOf>-->
-        <!--<mirrorOf>external:*,!github-chshawkn-wagon-maven-plugin</mirrorOf>-->
+        <!--<mirrorOf>external:*,!github-mvn-repo-wagon-maven-plugin</mirrorOf>-->
         <!--mirror>
             <id>mirror</id>
             <name>mirror</name>
@@ -21,7 +21,7 @@
         <!--mirror>
             <id>mirror</id>
             <name>mirror</name>
-            <url>http://192.168.1.5:28081/nexus/repository/maven-public/</url>
+            <url>http://nexus3.internal:28081/nexus/repository/maven-public/</url>
             <mirrorOf>*</mirrorOf>
         </mirror-->
     </mirrors>

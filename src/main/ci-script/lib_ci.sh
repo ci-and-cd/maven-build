@@ -515,7 +515,7 @@ function run_mvn() {
 
     # Maven effective pom
     if [ "${CI_OPT_DRYRUN}" != "true" ]; then
-        set +e
+        if [ "${CI_OPT_SHELL_EXIT_ON_ERROR}" == "true" ]; then set +e; fi
         # merge every 10 lines of log into 1, avoid travis timeout and to much lines
         if [ -n "${TRAVIS_EVENT_TYPE}" ]; then
             echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | awk 'NR%10{printf \"%s \",\$0;next;}1'' ..."
@@ -540,7 +540,7 @@ function run_mvn() {
             cat ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
             return 1
         fi
-        set -e && set -o pipefail
+        if [ "${CI_OPT_SHELL_EXIT_ON_ERROR}" == "true" ]; then set -e -o pipefail; fi
     fi
     echo -e "<<<<<<<<<< ---------- run_mvn project info ---------- <<<<<<<<<<\n"
 
@@ -579,8 +579,9 @@ function is_config_repository() {
 }
 
 
+if [ "${CI_OPT_SHELL_PRINT_EXECUTED_COMMANDS}" == "true" ]; then set -x; fi
 # key line to make whole build process file when command using pipelines fails
-set -e && set -o pipefail
+if [ "${CI_OPT_SHELL_EXIT_ON_ERROR}" == "true" ]; then set -e -o pipefail; fi
 
 
 echo -e "\n>>>>>>>>>> ---------- init options ---------- >>>>>>>>>>"
