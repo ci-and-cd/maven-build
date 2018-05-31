@@ -579,8 +579,11 @@ function is_config_repository() {
 }
 
 
+if [ -z "${CI_OPT_SHELL_PRINT_EXECUTED_COMMANDS}" ]; then CI_OPT_SHELL_PRINT_EXECUTED_COMMANDS="false"; fi
 if [ "${CI_OPT_SHELL_PRINT_EXECUTED_COMMANDS}" == "true" ]; then set -x; fi
+
 # key line to make whole build process file when command using pipelines fails
+if [ -z "${CI_OPT_SHELL_EXIT_ON_ERROR}" ]; then CI_OPT_SHELL_EXIT_ON_ERROR="true"; fi
 if [ "${CI_OPT_SHELL_EXIT_ON_ERROR}" == "true" ]; then set -e -o pipefail; fi
 
 
@@ -594,9 +597,10 @@ echo -e "\n>>>>>>>>>> ---------- build context info ---------- >>>>>>>>>>"
 echo "gitlab-ci variables: CI_REF_NAME: ${CI_REF_NAME}, CI_COMMIT_REF_NAME: ${CI_COMMIT_REF_NAME}, CI_PROJECT_URL: ${CI_PROJECT_URL}"
 echo "travis-ci variables: TRAVIS_BRANCH: ${TRAVIS_BRANCH}, TRAVIS_EVENT_TYPE: ${TRAVIS_EVENT_TYPE}, TRAVIS_REPO_SLUG: ${TRAVIS_REPO_SLUG}, TRAVIS_PULL_REQUEST: ${TRAVIS_PULL_REQUEST}"
 
-# >>>>>>>>>> ---------- decrypt files and handle keys ---------- >>>>>>>>>>
-GPG_TTY=$(tty)
-echo "gpg tty ${GPG_TTY}"
+echo -e "\n    >>>>>>>>>> ---------- decrypt files and handle keys ---------- >>>>>>>>>>"
+GPG_TTY=$(tty || echo "")
+if [ -z "${GPG_TTY}" ]; then unset GPG_TTY; fi
+echo "gpg tty '${GPG_TTY}'"
 GPG="gpg"
 echo determine gpg or gpg2 to use
 # invalid option --pinentry-mode loopback
@@ -655,7 +659,7 @@ if [ -f codesigning.asc ]; then
     # for gradle build
     if [ -n "${CI_OPT_GPG_KEYID}" ]; then ${GPG} --batch=true --keyring secring.gpg --export-secret-key ${CI_OPT_GPG_KEYID} > secring.gpg; fi
 fi
-# <<<<<<<<<< ---------- decrypt files and handle keys ---------- <<<<<<<<<<
+echo -e "    <<<<<<<<<< ---------- decrypt files and handle keys ---------- <<<<<<<<<<\n"
 
 if [ -f "${HOME}/.bashrc" ]; then source "${HOME}/.bashrc"; fi
 echo "PWD: $(pwd)"
