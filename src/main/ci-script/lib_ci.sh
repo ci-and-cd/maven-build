@@ -599,6 +599,11 @@ echo determine gpg or gpg2 to use
 if which gpg2 > /dev/null; then GPG="gpg2 --use-agent"; elif which gpg > /dev/null; then GPG="gpg"; fi
 echo "using ${GPG}"
 ${GPG} --version
+if version_gt $(gpg --version | grep -E '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 | awk '{print $NF}') "2.1"; then
+    echo "GPG version greater than 2.1"
+    export GPG_OPTS='--pinentry-mode loopback'
+    #add allow-loopback-pinentry to  .gnupg/gpg-agent.conf
+fi
 echo "gpg tty $(tty)"
 GPG_TTY=$(tty)
 if [ -f codesigning.asc.enc ] && [ -n "${CI_OPT_GPG_PASSPHRASE}" ]; then
