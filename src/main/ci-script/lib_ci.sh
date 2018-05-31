@@ -593,33 +593,36 @@ echo "gitlab-ci variables: CI_REF_NAME: ${CI_REF_NAME}, CI_COMMIT_REF_NAME: ${CI
 echo "travis-ci variables: TRAVIS_BRANCH: ${TRAVIS_BRANCH}, TRAVIS_EVENT_TYPE: ${TRAVIS_EVENT_TYPE}, TRAVIS_REPO_SLUG: ${TRAVIS_REPO_SLUG}, TRAVIS_PULL_REQUEST: ${TRAVIS_PULL_REQUEST}"
 
 # >>>>>>>>>> ---------- decrypt files and handle keys ---------- >>>>>>>>>>
+GPG_TTY=$(tty)
+echo "gpg tty ${GPG_TTY}"
 GPG="gpg"
 echo determine gpg or gpg2 to use
 # invalid option --pinentry-mode loopback
 if which gpg2 > /dev/null; then GPG="gpg2 --use-agent"; elif which gpg > /dev/null; then GPG="gpg"; fi
 echo "using ${GPG}"
-${GPG} --version
-if version_gt $(gpg --version | grep -E '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 | awk '{print $NF}') "2.1"; then
+# use --batch=true to avoid 'gpg tty not a tty' error
+${GPG} --batch=true --version
+if version_gt $(gpg --batch=true --version | grep -E '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 | awk '{print $NF}') "2.1"; then
     echo "GPG version greater than 2.1"
     export GPG_OPTS='--pinentry-mode loopback'
-    #add allow-loopback-pinentry to  .gnupg/gpg-agent.conf
+    echo GPG_OPTS: ${GPG_OPTS}
+    mkdir -p ~/.gnupg && chmod 600 ~/.gnupg && touch ~/.gnupg/gpg-agent.conf
+    #add 'allow-loopback-pinentry' to '~/.gnupg/gpg-agent.conf'
 fi
-echo "gpg tty $(tty)"
-GPG_TTY=$(tty)
 if [ -f codesigning.asc.enc ] && [ -n "${CI_OPT_GPG_PASSPHRASE}" ]; then
     echo decrypt private key
     openssl aes-256-cbc -k ${CI_OPT_GPG_PASSPHRASE} -in codesigning.asc.enc -out codesigning.asc -d
 fi
 if [ -f codesigning.asc.gpg ] && [ -n "${CI_OPT_GPG_PASSPHRASE}" ]; then
     echo decrypt private key
-    LC_CTYPE="UTF-8" echo ${CI_OPT_GPG_PASSPHRASE} | ${GPG} --passphrase-fd 0 --yes --cipher-algo AES256 -o codesigning.asc codesigning.asc.gpg
+    LC_CTYPE="UTF-8" echo ${CI_OPT_GPG_PASSPHRASE} | ${GPG} --passphrase-fd 0 --yes --batch=true --cipher-algo AES256 -o codesigning.asc codesigning.asc.gpg
 fi
 if [ -f codesigning.pub ]; then
     echo import public keys
     ${GPG} --yes --batch --import codesigning.pub
 
     echo public keys
-    ${GPG} --list-keys
+    ${GPG} --batch=true --list-keys
 fi
 if [ -f codesigning.asc ]; then
     echo import private keys
@@ -627,10 +630,10 @@ if [ -f codesigning.asc ]; then
     if [ -f codesigning.pub ]; then
         ${GPG} --yes --batch --import codesigning.asc
     else
-        if [ -z "$(${GPG} --list-secret-keys | grep ${CI_OPT_GPG_KEYNAME})" ]; then ${GPG} --yes --fast-import codesigning.asc; fi
+        if [ -z "$(${GPG} --list-secret-keys | grep ${CI_OPT_GPG_KEYNAME})" ]; then ${GPG} --yes --batch=true --fast-import codesigning.asc; fi
     fi
     echo list private keys
-    ${GPG} --list-secret-keys
+    ${GPG} --batch=true --list-secret-keys
 
 #    # set default key
 #    echo -e "trust\n5\ny\n" | ${GPG} --command-fd 0 --edit-key ${CI_OPT_GPG_KEYNAME};
@@ -643,12 +646,12 @@ if [ -f codesigning.asc ]; then
     # test key
     if [ -f LICENSE ]; then
         echo test private key imported
-        echo ${CI_OPT_GPG_PASSPHRASE} | gpg --passphrase-fd 0 --yes -u ${CI_OPT_GPG_KEYNAME} --armor --detach-sig LICENSE
+        echo ${CI_OPT_GPG_PASSPHRASE} | gpg --passphrase-fd 0 --yes --batch=true -u ${CI_OPT_GPG_KEYNAME} --armor --detach-sig LICENSE
     fi
-    echo -e "trust\n5\ny\n" | gpg --command-fd 0 --edit-key ${CI_OPT_GPG_KEYNAME}
+    echo -e "trust\n5\ny\n" | gpg --command-fd 0 --batch=true --edit-key ${CI_OPT_GPG_KEYNAME}
 
     # for gradle build
-    if [ -n "${CI_OPT_GPG_KEYID}" ]; then ${GPG} --keyring secring.gpg --export-secret-key ${CI_OPT_GPG_KEYID} > secring.gpg; fi
+    if [ -n "${CI_OPT_GPG_KEYID}" ]; then ${GPG} --batch=true --keyring secring.gpg --export-secret-key ${CI_OPT_GPG_KEYID} > secring.gpg; fi
 fi
 # <<<<<<<<<< ---------- decrypt files and handle keys ---------- <<<<<<<<<<
 
