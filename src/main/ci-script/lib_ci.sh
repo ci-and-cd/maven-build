@@ -13,6 +13,7 @@ function download() {
     if [ -f ${curl_target} ] && [ -z "$(diff ${curl_target} <(sh -c "set -e; curl ${curl_option} ${curl_source} 2>&1"))" ]; then
         (>&2 echo "contents identical, skip download")
     else
+        if [ ! -d $(dirname ${curl_target}) ]; then mkdir -p $(dirname ${curl_target}); fi
         echo "curl ${curl_secret} -o ${curl_target} ${curl_source} 2>/dev/null"
         sh -c "set -e; curl ${curl_option} -o ${curl_target} ${curl_source} 2>/dev/null"
     fi
