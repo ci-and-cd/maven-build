@@ -606,7 +606,7 @@ if version_gt $(gpg --batch=true --version | grep -E '[0-9]+\.[0-9]+\.[0-9]+' | 
     echo "GPG version greater than 2.1"
     export GPG_OPTS='--pinentry-mode loopback'
     echo GPG_OPTS: ${GPG_OPTS}
-    mkdir -p ~/.gnupg && chmod 600 ~/.gnupg && touch ~/.gnupg/gpg-agent.conf
+    mkdir -p ~/.gnupg && chmod 700 ~/.gnupg && touch ~/.gnupg/gpg-agent.conf
     #add 'allow-loopback-pinentry' to '~/.gnupg/gpg-agent.conf'
 fi
 if [ -f codesigning.asc.enc ] && [ -n "${CI_OPT_GPG_PASSPHRASE}" ]; then
