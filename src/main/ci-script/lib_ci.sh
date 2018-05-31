@@ -266,7 +266,7 @@ function ci_infra_opt_git_auth_token() {
             echo "${(P)var_name}"
         else
             (>&2 echo "unsupported ${SHELL}")
-            exit 1
+            return 1
         fi
     fi
 }
@@ -445,7 +445,7 @@ function run_mvn() {
                 CI_OPT_MAVEN_SETTINGS="-s ${CI_OPT_MAVEN_SETTINGS_FILE}"
             else
                 echo "Error, can not download ${CI_OPT_MAVEN_SETTINGS_FILE_URL}"
-                exit 1
+                return 1
             fi
         else
             echo "Found ${CI_OPT_MAVEN_SETTINGS_FILE}"
@@ -527,7 +527,7 @@ function run_mvn() {
         if [ $? -ne 0 ]; then
             echo "error on generate effective-pom"
             cat ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
-            exit 1
+            return 1
         fi
         set -e && set -o pipefail
     fi
@@ -652,12 +652,12 @@ if [ -z "${CI_OPT_MAVEN_BUILD_REPO}" ]; then
         CI_OPT_MAVEN_BUILD_REPO=""
     else
         echo "Both CI_OPT_MAVEN_BUILD_REPO and CI_OPT_CI_SCRIPT are not set, exit."
-        exit 1
+        return 1
     fi
 fi
 CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO="$(ci_infra_opt_git_prefix)/ci-and-cd/maven-build-opts-$(ci_opt_infrastructure)/raw/master"
 if [ -z "${CI_OPT_CI_OPTS_SCRIPT}" ]; then CI_OPT_CI_OPTS_SCRIPT="src/main/ci-script/ci_opts.sh"; fi
-if [ -z "$(ci_infra_opt_git_auth_token)" ]; then echo "CI_INFRA_OPT_GIT_AUTH_TOKEN not set, exit."; exit 1; fi
+if [ -z "$(ci_infra_opt_git_auth_token)" ]; then echo "CI_INFRA_OPT_GIT_AUTH_TOKEN not set, exit."; return 1; fi
 echo -e "<<<<<<<<<< ---------- important variables ---------- <<<<<<<<<<\n"
 
 
