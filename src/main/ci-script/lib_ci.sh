@@ -85,6 +85,16 @@ function git_repo_slug() {
     echo $(git remote show origin -n | ruby -ne 'puts /^\s*Fetch.*(:|\/){1}([^\/]+\/[^\/]+).git/.match($_)[2] rescue nil')
 }
 
+# see: http://stackoverflow.com/questions/16989598/bash-comparing-version-numbers
+# arguments: first_version, second_version
+# return: if first_version is greater than second_version
+function version_gt() {
+    if [ ! -z "$(sort --help | grep GNU)" ]; then
+        test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1";
+    else
+        test "$(printf '%s\n' "$@" | sort | head -n 1)" != "$1";
+    fi
+}
 
 # >>>>>>>>>> ---------- CI option functions ---------- >>>>>>>>>>
 
@@ -152,8 +162,8 @@ function ci_opt_infrastructure() {
 }
 
 # auto detect current build ref name by CI environment variables or local git info
-# ${CI_CI_OPT_REF_NAME} show branch or tag since GitLab-CI 5.2
-# CI_CI_OPT_REF_NAME for gitlab 8.x, see: https://gitlab.com/help/ci/variables/README.md
+# ${CI_REF_NAME} show branch or tag since GitLab-CI 5.2
+# CI_REF_NAME for gitlab 8.x, see: https://gitlab.com/help/ci/variables/README.md
 # CI_COMMIT_REF_NAME for gitlab 9.x, see: https://gitlab.com/help/ci/variables/README.md
 # TRAVIS_BRANCH for travis-ci, see: https://docs.travis-ci.com/user/environment-variables/
 # returns: current build ref name, i.e. develop, release ...
@@ -162,8 +172,8 @@ function ci_opt_ref_name() {
         echo "${CI_OPT_REF_NAME}"
     elif [ -n "${TRAVIS_BRANCH}" ]; then
         echo "${TRAVIS_BRANCH}"
-    elif [ -n "${CI_CI_OPT_REF_NAME}" ]; then
-        echo "${CI_CI_OPT_REF_NAME}"
+    elif [ -n "${CI_REF_NAME}" ]; then
+        echo "${CI_REF_NAME}"
     elif [ -n "${CI_COMMIT_REF_NAME}" ]; then
         echo "${CI_COMMIT_REF_NAME}"
     else
@@ -494,9 +504,9 @@ function run_mvn() {
 
     echo -e "\n>>>>>>>>>> ---------- run_mvn options ---------- >>>>>>>>>>"
     export MAVEN_OPTS="$(ci_opt_maven_opts)"
-    set | grep -E '^CI_INFRA_OPT_' | filter_secret_variables
-    set | grep -E '^CI_OPT_' | filter_secret_variables
-    echo MAVEN_OPTS=${MAVEN_OPTS} | filter_secret_variables
+    set | grep -E '^CI_INFRA_OPT_' | filter_secret_variables || echo "no any CI_INFRA_OPT_* present"
+    set | grep -E '^CI_OPT_' | filter_secret_variables || echo "no any CI_OPT_* present"
+    echo MAVEN_OPTS=${MAVEN_OPTS} | filter_secret_variables || echo "no MAVEN_OPTS present"
     echo -e "\n<<<<<<<<<< ---------- run_mvn options ---------- <<<<<<<<<<\n"
 
     echo -e "\n>>>>>>>>>> ---------- run_mvn project info ---------- >>>>>>>>>>"
@@ -573,13 +583,13 @@ set -e && set -o pipefail
 
 
 echo -e "\n>>>>>>>>>> ---------- init options ---------- >>>>>>>>>>"
-set | grep -E '^CI_INFRA_OPT_' | filter_secret_variables
-set | grep -E '^CI_OPT_' | filter_secret_variables
+set | grep -E '^CI_INFRA_OPT_' | filter_secret_variables || echo "no any CI_INFRA_OPT_* present"
+set | grep -E '^CI_OPT_' | filter_secret_variables || echo "no any CI_OPT_* present"
 echo -e "\n<<<<<<<<<< ---------- init options ---------- <<<<<<<<<<\n"
 
 
 echo -e "\n>>>>>>>>>> ---------- build context info ---------- >>>>>>>>>>"
-echo "gitlab-ci variables: CI_CI_OPT_REF_NAME: ${CI_CI_OPT_REF_NAME}, CI_COMMIT_REF_NAME: ${CI_COMMIT_REF_NAME}, CI_PROJECT_URL: ${CI_PROJECT_URL}"
+echo "gitlab-ci variables: CI_REF_NAME: ${CI_REF_NAME}, CI_COMMIT_REF_NAME: ${CI_COMMIT_REF_NAME}, CI_PROJECT_URL: ${CI_PROJECT_URL}"
 echo "travis-ci variables: TRAVIS_BRANCH: ${TRAVIS_BRANCH}, TRAVIS_EVENT_TYPE: ${TRAVIS_EVENT_TYPE}, TRAVIS_REPO_SLUG: ${TRAVIS_REPO_SLUG}, TRAVIS_PULL_REQUEST: ${TRAVIS_PULL_REQUEST}"
 
 # >>>>>>>>>> ---------- decrypt files and handle keys ---------- >>>>>>>>>>
@@ -662,8 +672,8 @@ echo -e "<<<<<<<<<< ---------- important variables ---------- <<<<<<<<<<\n"
 
 
 echo -e "\n>>>>>>>>>> ---------- options with important variables ---------- >>>>>>>>>>"
-set | grep -E '^CI_INFRA_OPT_' | filter_secret_variables
-set | grep -E '^CI_OPT_' | filter_secret_variables
+set | grep -E '^CI_INFRA_OPT_' | filter_secret_variables || echo "no any CI_INFRA_OPT_* present"
+set | grep -E '^CI_OPT_' | filter_secret_variables || echo "no any CI_OPT_* present"
 echo -e "\n<<<<<<<<<< ---------- options with important variables ---------- <<<<<<<<<<\n"
 
 
