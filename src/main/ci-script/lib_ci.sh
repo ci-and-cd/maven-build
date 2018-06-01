@@ -302,6 +302,7 @@ function ci_opt_maven_opts() {
         if [ -n "${CI_OPT_FRONTEND_NPMDOWNLOADROOT}" ]; then opts="${opts} -Dfrontend.npmDownloadRoot=${CI_OPT_FRONTEND_NPMDOWNLOADROOT}"; fi
         opts="${opts} -Dinfrastructure=$(ci_opt_infrastructure)"
         if [ "${CI_OPT_INTEGRATION_TEST_SKIP}" == "true" ]; then opts="${opts} -Dmaven.integration-test.skip=true"; fi
+        if [ "${CI_OPT_JACOCO}" == "true" ]; then opts="${opts} -Djacoco=true"; elif [ "${CI_OPT_JACOCO}" == "false" ]; then opts="${opts} -Djacoco=false"; fi
         if [ "${CI_OPT_TEST_FAILURE_IGNORE}" == "true" ]; then opts="${opts} -Dmaven.test.failure.ignore=true"; fi
         if [ "${CI_OPT_TEST_SKIP}" == "true" ]; then opts="${opts} -Dmaven.test.skip=true"; fi
         if [ "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]; then opts="${opts} -Dmvn_deploy_publish_segregation=true"; fi
@@ -514,30 +515,26 @@ function run_mvn() {
     mvn ${CI_OPT_MAVEN_SETTINGS} -version
 
     # Maven effective pom
+    mkdir -p $(dirname ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}) && touch ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
     if [ "${CI_OPT_DRYRUN}" != "true" ]; then
         if [ "${CI_OPT_SHELL_EXIT_ON_ERROR}" == "true" ]; then set +e; fi
-        if [ -n "${TRAVIS_EVENT_TYPE}" ]; then
-            echo travis-ci has log limit of 10000 lines, merge every 10 lines of log into 1, avoid travis timeout and to much lines
-            echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | awk 'NR%10{printf \"%s \",\$0;next;}1'' ..."
-            mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | awk 'NR%10{printf "%s ",$0;next;}1'
-        elif [ -n "${CI_COMMIT_REF_NAME}" ]; then
-            echo gitlab-ci has log limit of 4194304 bytes
-            echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom > /dev/null"
-            mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom > /dev/null
-        else
-            echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom"
-            mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom
-        fi
-
         if [ "${CI_OPT_OUTPUT_MAVEN_EFFECTIVE_POM_TO_CONSOLE}" == "true" ]; then
-        # set CI_OPT_OUTPUT_MAVEN_EFFECTIVE_POM_TO_CONSOLE to false when using travis-ci
-            echo "mvn -e ${CI_OPT_MAVEN_SETTINGS} help:effective-pom >&3 ..."
-            exec 3> >(tee ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE})
-            mvn ${CI_OPT_MAVEN_SETTINGS} help:effective-pom >&3
+            if [ -n "${TRAVIS_EVENT_TYPE}" ]; then
+                echo travis-ci has log limit of 10000 lines, merge every 10 lines of log into 1, avoid travis timeout and to much lines
+                echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | awk 'NR%10{printf \"%s \",\$0;next;}1'' ..."
+                mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | awk 'NR%10{printf "%s ",$0;next;}1'
+            elif [ -n "${CI_COMMIT_REF_NAME}" ]; then
+                echo gitlab-ci has log limit of 4194304 bytes
+                echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE} ..."
+                mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
+            else
+                echo "mvn -e ${CI_OPT_MAVEN_SETTINGS} help:effective-pom >&3 ..."
+                exec 3> >(tee ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE})
+                mvn ${CI_OPT_MAVEN_SETTINGS} help:effective-pom >&3
+            fi
         else
-            mkdir -p $(dirname ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}) && touch ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
-            echo "mvn -e ${CI_OPT_MAVEN_SETTINGS} help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE} ..."
-            mvn ${CI_OPT_MAVEN_SETTINGS} help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
+            echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE} ..."
+            mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
         fi
         if [ $? -ne 0 ]; then
             echo "error on generate effective-pom"

@@ -121,6 +121,10 @@
 
         <repositories.releases.updatePolicy>always</repositories.releases.updatePolicy>
         <repositories.snapshots.updatePolicy>always</repositories.snapshots.updatePolicy>
+
+        <jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</jacoco.itReportPath>
+        <jacoco.version>0.8.1</jacoco.version>
+        <sonar-jacoco-listeners.version>5.3.0.13828</sonar-jacoco-listeners.version>
     </properties>
 
     <build>
@@ -861,8 +865,6 @@
             <properties>
                 <jacoco-ut.skip>${maven.test.skip}</jacoco-ut.skip>
                 <jacoco-it.skip>${maven.integration-test.skip}</jacoco-it.skip>
-                <jacoco.version>0.8.1</jacoco.version>
-                <jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</jacoco.itReportPath>
             </properties>
             <build>
                 <pluginManagement>
@@ -1566,8 +1568,6 @@
                 <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
                 <sonar.jacoco.reportPath>${project.build.directory}/jacoco.exec</sonar.jacoco.reportPath>
                 <sonar.jacoco.itReportPath>${jacoco.itReportPath}</sonar.jacoco.itReportPath>
-                <!-- should match version of sonar-java-plugin -->
-                <sonar-jacoco-listeners.version>5.3.0.13828</sonar-jacoco-listeners.version>
             </properties>
             <build>
                 <pluginManagement>
@@ -1596,12 +1596,14 @@
                                 <property><name>listener</name><value>org.sonar.java.jacoco.JUnitListener</value></property>
                             </properties>
                         </configuration>
-                        <dependencies>
-                            <dependency><artifactId>sonar-jacoco-listeners</artifactId><groupId>org.sonarsource.java</groupId><version>${sonar-jacoco-listeners.version}</version><scope>runtime</scope></dependency>
-                        </dependencies>
                     </plugin>
                 </plugins>
             </build>
+            <dependencies>
+                <!-- sonar-jacoco-listeners's version should match version of sonar-java-plugin -->
+                <dependency><artifactId>sonar-jacoco-listeners</artifactId><groupId>org.sonarsource.java</groupId><version>${sonar-jacoco-listeners.version}</version><scope>test</scope></dependency>
+                <dependency><groupId>org.jacoco</groupId><artifactId>org.jacoco.agent</artifactId><classifier>runtime</classifier><scope>test</scope><version>${jacoco.version}</version></dependency>
+            </dependencies>
         </profile>
 
         <profile>
