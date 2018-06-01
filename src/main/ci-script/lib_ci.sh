@@ -516,10 +516,14 @@ function run_mvn() {
     # Maven effective pom
     if [ "${CI_OPT_DRYRUN}" != "true" ]; then
         if [ "${CI_OPT_SHELL_EXIT_ON_ERROR}" == "true" ]; then set +e; fi
-        # merge every 10 lines of log into 1, avoid travis timeout and to much lines
         if [ -n "${TRAVIS_EVENT_TYPE}" ]; then
+            echo travis-ci has log limit of 10000 lines, merge every 10 lines of log into 1, avoid travis timeout and to much lines
             echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | awk 'NR%10{printf \"%s \",\$0;next;}1'' ..."
             mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | awk 'NR%10{printf "%s ",$0;next;}1'
+        elif [ -n "${CI_COMMIT_REF_NAME}" ]; then
+            echo gitlab-ci has log limit of 4194304 bytes
+            echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom > /dev/null"
+            mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom > /dev/null
         else
             echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom"
             mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom
