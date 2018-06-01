@@ -301,10 +301,10 @@ function ci_opt_maven_opts() {
         if [ -n "${CI_OPT_FRONTEND_NODEDOWNLOADROOT}" ]; then opts="${opts} -Dfrontend.nodeDownloadRoot=${CI_OPT_FRONTEND_NODEDOWNLOADROOT}"; fi
         if [ -n "${CI_OPT_FRONTEND_NPMDOWNLOADROOT}" ]; then opts="${opts} -Dfrontend.npmDownloadRoot=${CI_OPT_FRONTEND_NPMDOWNLOADROOT}"; fi
         opts="${opts} -Dinfrastructure=$(ci_opt_infrastructure)"
-        if [ "${CI_OPT_INTEGRATION_TEST_SKIP}" == "true" ]; then opts="${opts} -Dmaven.integration-test.skip=true"; fi
+        if [ "${CI_OPT_INTEGRATION_TEST_SKIP}" == "true" ]; then opts="${opts} -Dmaven.integration-test.skip=true"; else opts="${opts} -Dmaven.integration-test.skip=false"; fi
         if [ "${CI_OPT_JACOCO}" == "true" ]; then opts="${opts} -Djacoco=true"; elif [ "${CI_OPT_JACOCO}" == "false" ]; then opts="${opts} -Djacoco=false"; fi
         if [ "${CI_OPT_TEST_FAILURE_IGNORE}" == "true" ]; then opts="${opts} -Dmaven.test.failure.ignore=true"; fi
-        if [ "${CI_OPT_TEST_SKIP}" == "true" ]; then opts="${opts} -Dmaven.test.skip=true"; fi
+        if [ "${CI_OPT_TEST_SKIP}" == "true" ]; then opts="${opts} -Dmaven.test.skip=true"; else opts="${opts} -Dmaven.test.skip=false"; fi
         if [ "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]; then opts="${opts} -Dmvn_deploy_publish_segregation=true"; fi
         if [ -n "${CI_OPT_PMD_RULESET_LOCATION}" ]; then opts="${opts} -Dpmd.ruleset.location=${CI_OPT_PMD_RULESET_LOCATION}"; fi
         opts="${opts} -Dsite=$(ci_opt_site)"

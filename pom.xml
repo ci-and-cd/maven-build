@@ -125,6 +125,8 @@
         <jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</jacoco.itReportPath>
         <jacoco.version>0.8.1</jacoco.version>
         <sonar-jacoco-listeners.version>5.3.0.13828</sonar-jacoco-listeners.version>
+        <!--create blank property for surefire and failsafe when not running under coverage profile-->
+        <argLine></argLine>
     </properties>
 
     <build>
@@ -862,10 +864,6 @@
         <profile>
             <id>jacoco-build</id>
             <activation><property><name>jacoco</name><value>true</value></property></activation>
-            <properties>
-                <jacoco-ut.skip>${maven.test.skip}</jacoco-ut.skip>
-                <jacoco-it.skip>${maven.integration-test.skip}</jacoco-it.skip>
-            </properties>
             <build>
                 <pluginManagement>
                     <plugins>
@@ -881,13 +879,14 @@
                                 <id>default-prepare-agent</id>
                                 <goals><goal>prepare-agent</goal></goals>
                                 <phase>test-compile</phase>
-                                <configuration><propertyName>surefireArgLine</propertyName><skip>${jacoco-ut.skip}</skip><!--<destFile>${project.build.directory}/jacoco.exec</destFile>--></configuration>
+                                <!--<phase>process-test-classes</phase>-->
+                                <configuration><propertyName>argLine</propertyName><skip>${maven.test.skip}</skip><!--<destFile>${project.build.directory}/jacoco.exec</destFile>--></configuration>
                             </execution>
                             <execution>
                                 <id>default-prepare-agent-integration</id>
                                 <goals><goal>prepare-agent-integration</goal></goals>
                                 <phase>pre-integration-test</phase>
-                                <configuration><append>true</append><propertyName>failsafeArgLine</propertyName><skip>${jacoco-it.skip}</skip><!--<destFile>${project.build.directory}/jacoco-it.exec</destFile>--></configuration>
+                                <configuration><append>true</append><propertyName>argLine</propertyName><skip>${maven.integration-test.skip}</skip><!--<destFile>${project.build.directory}/jacoco-it.exec</destFile>--></configuration>
                             </execution>
                             <!--<execution><id>default-report</id><goals><goal>report</goal></goals><phase>test</phase></execution>-->
                             <!--<execution><id>default-report-integration</id><goals><goal>report-integration</goal></goals><phase>post-integration-test</phase></execution>-->
@@ -903,7 +902,7 @@
                                             <includes><include>jacoco.exec</include><include>jacoco-it.exec</include></includes>
                                         </fileSet>
                                     </fileSets>
-                                    <skip>${jacoco-it.skip}</skip>
+                                    <skip>${maven.integration-test.skip}</skip>
                                 </configuration>
                             </execution>
                             <execution>
@@ -913,7 +912,7 @@
                                 <configuration>
                                     <dataFile>${project.build.directory}/jacoco-combined.exec</dataFile>
                                     <outputDirectory>${project.reporting.outputDirectory}/jacoco-combined</outputDirectory>
-                                    <skip>${jacoco-it.skip}</skip>
+                                    <skip>${maven.integration-test.skip}</skip>
                                     <title>Combined</title>
                                 </configuration>
                             </execution>
@@ -936,6 +935,9 @@
                     </plugin>
                 </plugins>
             </build>
+            <dependencies>
+                <dependency><groupId>org.jacoco</groupId><artifactId>org.jacoco.agent</artifactId><classifier>runtime</classifier><scope>test</scope><version>${jacoco.version}</version></dependency>
+            </dependencies>
         </profile>
 
         <!-- net.sourceforge.cobertura:cobertura is for cobertura-maven-plugin and qualinsight-mojo-cobertura -->
@@ -947,10 +949,6 @@
         <profile>
             <id>cobertura</id>
             <activation><property><name>jacoco</name><value>false</value></property></activation>
-            <properties>
-                <jacoco-ut.skip>true</jacoco-ut.skip>
-                <jacoco-it.skip>true</jacoco-it.skip>
-            </properties>
             <dependencyManagement>
                 <dependencies>
                     <dependency>
@@ -1602,7 +1600,6 @@
             <dependencies>
                 <!-- sonar-jacoco-listeners's version should match version of sonar-java-plugin -->
                 <dependency><artifactId>sonar-jacoco-listeners</artifactId><groupId>org.sonarsource.java</groupId><version>${sonar-jacoco-listeners.version}</version><scope>test</scope></dependency>
-                <dependency><groupId>org.jacoco</groupId><artifactId>org.jacoco.agent</artifactId><classifier>runtime</classifier><scope>test</scope><version>${jacoco.version}</version></dependency>
             </dependencies>
         </profile>
 
