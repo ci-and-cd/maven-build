@@ -21,6 +21,7 @@
 
         <dockerfile.build.skip>true</dockerfile.build.skip>
         <dockerfile.useMavenSettingsForAuth>false</dockerfile.useMavenSettingsForAuth>
+        <docker.registry>nexus3.local:5000</docker.registry>
     </properties>
 
     <build>
@@ -134,13 +135,11 @@
     <profiles>
         <!-- @formatter:off -->
         <profile>
-            <id>default-docker-image-prefix</id>
-            <activation><property><name>!docker.image.prefix</name></property></activation>
-            <properties><docker.image.prefix>nexus3.local:5000</docker.image.prefix></properties>
-        </profile>
-        <profile>
-            <id>docker-registry-docker-image-prefix</id>
-            <activation><property><name>docker.registry</name></property></activation>
+            <id>ues-private-docker-registry-no-docker-image-prefix</id>
+            <activation>
+                <property><name>!docker.image.prefix</name></property>
+                <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
+            </activation>
             <build>
                 <pluginManagement>
                     <plugins>
@@ -163,8 +162,11 @@
             </build>
         </profile>
         <profile>
-            <id>docker-hub-docker-image-prefix</id>
-            <activation><property><name>docker.image.prefix</name></property></activation>
+            <id>use-docker-hub-docker-image-prefix-no-docker-registry</id>
+            <activation>
+                <property><name>docker.image.prefix</name></property>
+                <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
+            </activation>
             <build>
                 <pluginManagement>
                     <plugins>
