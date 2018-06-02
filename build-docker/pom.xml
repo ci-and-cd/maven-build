@@ -51,10 +51,9 @@
                     <artifactId>docker-maven-plugin</artifactId>
                     <version>${com.spotify_docker-maven-plugin.version}</version>
                     <configuration>
-                        <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
                         <imageTags>
                             <imageTag>${project.version}</imageTag>
-                            <imageTag>latest</imageTag>
+                            <!--<imageTag>latest</imageTag>-->
                         </imageTags>
                         <resources>
                             <resource>
@@ -140,23 +139,6 @@
             <properties><docker.image.prefix>nexus3.local:5000</docker.image.prefix></properties>
         </profile>
         <profile>
-            <id>docker-hub-docker-image-prefix</id>
-            <activation><property><name>!docker.registry</name></property></activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.spotify</groupId>
-                            <artifactId>dockerfile-maven-plugin</artifactId>
-                            <configuration>
-                                <repository>${docker.image.prefix}/${project.artifactId}</repository>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-        <profile>
             <id>docker-registry-docker-image-prefix</id>
             <activation><property><name>docker.registry</name></property></activation>
             <build>
@@ -167,6 +149,37 @@
                             <artifactId>dockerfile-maven-plugin</artifactId>
                             <configuration>
                                 <repository>${docker.registry}/${project.artifactId}</repository>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>docker-maven-plugin</artifactId>
+                            <configuration>
+                                <imageName>${docker.registry}/${project.artifactId}</imageName>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <id>docker-hub-docker-image-prefix</id>
+            <activation><property><name>docker.image.prefix</name></property></activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>dockerfile-maven-plugin</artifactId>
+                            <configuration>
+                                <repository>${docker.image.prefix}/${project.artifactId}</repository>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>docker-maven-plugin</artifactId>
+                            <configuration>
+                                <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
                             </configuration>
                         </plugin>
                     </plugins>
