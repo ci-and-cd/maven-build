@@ -209,6 +209,7 @@
                                     <id>default</id>
                                     <goals>
                                         <goal>build</goal>
+                                        <goal>tag</goal>
                                         <goal>push</goal>
                                     </goals>
                                 </execution>
