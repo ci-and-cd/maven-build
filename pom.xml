@@ -125,7 +125,7 @@
         <org.codehaus.plexus_plexus-compiler-javac-errorprone>2.8.4</org.codehaus.plexus_plexus-compiler-javac-errorprone>
         <com.google.errorprone_error_prone_core.version>2.3.1</com.google.errorprone_error_prone_core.version>
 
-        <properties><org.jacoco_jacoco.version>0.8.1</org.jacoco_jacoco.version></properties>
+        <org.jacoco_jacoco.version>0.8.1</org.jacoco_jacoco.version>
         <jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</jacoco.itReportPath>
         <org.sonarsource.java_sonar-jacoco-listeners.version>5.3.0.13828</org.sonarsource.java_sonar-jacoco-listeners.version>
         <!--create blank property for surefire and failsafe when not running under coverage profile-->
