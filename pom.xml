@@ -122,9 +122,12 @@
         <repositories.releases.updatePolicy>always</repositories.releases.updatePolicy>
         <repositories.snapshots.updatePolicy>always</repositories.snapshots.updatePolicy>
 
+        <org.codehaus.plexus_plexus-compiler-javac-errorprone>2.8.4</org.codehaus.plexus_plexus-compiler-javac-errorprone>
+        <com.google.errorprone_error_prone_core.version>2.3.1</com.google.errorprone_error_prone_core.version>
+
+        <properties><org.jacoco_jacoco.version>0.8.1</org.jacoco_jacoco.version></properties>
         <jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</jacoco.itReportPath>
-        <jacoco.version>0.8.1</jacoco.version>
-        <sonar-jacoco-listeners.version>5.3.0.13828</sonar-jacoco-listeners.version>
+        <org.sonarsource.java_sonar-jacoco-listeners.version>5.3.0.13828</org.sonarsource.java_sonar-jacoco-listeners.version>
         <!--create blank property for surefire and failsafe when not running under coverage profile-->
         <argLine></argLine>
     </properties>
@@ -437,8 +440,8 @@
                     <!--<forceJavacCompilerUse>true</forceJavacCompilerUse>-->
                 </configuration>
                 <dependencies>
-                    <dependency><groupId>org.codehaus.plexus</groupId><artifactId>plexus-compiler-javac-errorprone</artifactId><version>2.8.4</version></dependency>
-                    <dependency><groupId>com.google.errorprone</groupId><artifactId>error_prone_core</artifactId><version>2.3.1</version></dependency>
+                    <dependency><groupId>org.codehaus.plexus</groupId><artifactId>plexus-compiler-javac-errorprone</artifactId><version>${org.codehaus.plexus_plexus-compiler-javac-errorprone}</version></dependency>
+                    <dependency><groupId>com.google.errorprone</groupId><artifactId>error_prone_core</artifactId><version>${com.google.errorprone_error_prone_core.version}</version></dependency>
                 </dependencies>
             </plugin>
             <plugin>
@@ -867,7 +870,7 @@
             <build>
                 <pluginManagement>
                     <plugins>
-                        <plugin><groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId><version>${jacoco.version}</version></plugin>
+                        <plugin><groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId><version>${org.jacoco_jacoco.version}</version></plugin>
                     </plugins>
                 </pluginManagement>
                 <plugins>
@@ -936,7 +939,7 @@
                 </plugins>
             </build>
             <dependencies>
-                <dependency><groupId>org.jacoco</groupId><artifactId>org.jacoco.agent</artifactId><classifier>runtime</classifier><scope>test</scope><version>${jacoco.version}</version></dependency>
+                <dependency><groupId>org.jacoco</groupId><artifactId>org.jacoco.agent</artifactId><classifier>runtime</classifier><scope>test</scope><version>${org.jacoco_jacoco.version}</version></dependency>
             </dependencies>
         </profile>
 
@@ -949,14 +952,18 @@
         <profile>
             <id>cobertura</id>
             <activation><property><name>jacoco</name><value>false</value></property></activation>
+            <properties>
+                <net.sourceforge.cobertura_cobertura.version>2.1.1</net.sourceforge.cobertura_cobertura.version>
+                <junit_junit.version>4.12</junit_junit.version>
+            </properties>
             <dependencyManagement>
                 <dependencies>
                     <dependency>
-                        <groupId>net.sourceforge.cobertura</groupId><artifactId>cobertura</artifactId><version>2.1.1</version>
+                        <groupId>net.sourceforge.cobertura</groupId><artifactId>cobertura</artifactId><version>${net.sourceforge.cobertura_cobertura.version}</version>
                         <exclusions><exclusion><groupId>ch.qos.logback</groupId><artifactId>logback-classic</artifactId></exclusion></exclusions>
                     </dependency>
                     <dependency>
-                        <groupId>junit</groupId><artifactId>junit</artifactId><version>4.12</version>
+                        <groupId>junit</groupId><artifactId>junit</artifactId><version>${junit_junit.version}</version>
                     </dependency>
                 </dependencies>
             </dependencyManagement>
@@ -1599,7 +1606,7 @@
             </build>
             <dependencies>
                 <!-- sonar-jacoco-listeners's version should match version of sonar-java-plugin -->
-                <dependency><artifactId>sonar-jacoco-listeners</artifactId><groupId>org.sonarsource.java</groupId><version>${sonar-jacoco-listeners.version}</version><scope>test</scope></dependency>
+                <dependency><artifactId>sonar-jacoco-listeners</artifactId><groupId>org.sonarsource.java</groupId><version>${org.sonarsource.java_sonar-jacoco-listeners.version}</version><scope>test</scope></dependency>
             </dependencies>
         </profile>
 

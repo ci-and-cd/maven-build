@@ -74,17 +74,15 @@
         <server><id>OSSRH-snapshots</id><username>${env.CI_OPT_MAVEN_CENTRAL_USER}</username><password>${env.CI_OPT_MAVEN_CENTRAL_PASS}</password></server>
         <server>
             <id>docker-hub</id>
-            <username>${env.CI_OPT_DOCKERHUB_USER}</username><password>${env.CI_OPT_DOCKERHUB_PASS}</password>
-            <configuration><email>${env.CI_OPT_DOCKERHUB_MAIL}</email></configuration>
+            <username>${env.CI_OPT_DOCKER_REGISTRY_USER}</username><password>${env.CI_OPT_DOCKER_REGISTRY_PASS}</password>
+            <configuration><email>${env.CI_OPT_DOCKER_DOCKERHUB_MAIL}</email></configuration>
         </server>
 
         <server><id>internal-nexus3-releases</id><username>deployment</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
         <server><id>internal-nexus3-snapshots</id><username>deployment</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
         <server><id>internal-nexus3-thirdparty</id><username>deployment</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
-        <server>
-            <id>internal-mvnsite</id>
-            <username>root</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password>
-        </server>
+        <server><id>internal-mvnsite</id><username>root</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
+        <server><id>nexus3.internal:5000</id><username>deployment</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
 
         <!-- see: http://maven.apache.org/guides/mini/guide-encryption.html -->
         <!-- mvn &#x002d;&#x002d;encrypt-password ${password} -->
@@ -105,6 +103,7 @@
                 </knownHostsProvider-->
             </configuration>
         </server>
+        <server><id>nexus3.local:5000</id><username>deployment</username><password>deployment</password></server>
         <!-- @formatter:on -->
     </servers>
 

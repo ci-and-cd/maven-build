@@ -4,25 +4,23 @@ Parent pom for docker projects
 ## I. Usage
 
 
-if docker.registry property absent, 
-or CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION=true (use script),
+if src/main/resources/Dockerfile absent or CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION=true (use script),
 no docker image is built at package phase.
 see profile 'docker-maven-plugin-lifecycle-binding-when-not-publish-deploy-segregation' in docker-build/pom.xml.
 
 
 ## II. Properties and default values
 
-com.spotify:docker-maven-plugin
+com.spotify:dockerfile-maven-plugin
 
 - docker.registry
-> default: registry.docker.local
 
 
 ## III. Plugins
 
 io.fabric8:docker-maven-plugin
 
-com.spotify:docker-maven-plugin
+com.spotify:dockerfile-maven-plugin
 > clean, build, push docker images
 
 maven-antrun-plugin

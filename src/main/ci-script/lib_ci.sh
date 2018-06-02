@@ -104,8 +104,7 @@ function ci_opt_user_docker() {
     if [ -n "${CI_OPT_USE_DOCKER}" ]; then
         echo "${CI_OPT_USE_DOCKER}"
     else
-    # TODO find *Dockerfile* or *docker-compose*.yml
-        if [ -f Dockerfile ] || [ -f src/main/resources/docker/Dockerfile ] || [ -f src/main/docker/Dockerfile ]; then
+        if [ -n $(find . -name "*Docker*") ] || [ -n $(find . -name "*docker-compose*.yml") ]; then
             echo "true"
         else
             echo "false"
@@ -296,7 +295,12 @@ function ci_opt_maven_opts() {
         if [ -n "${CI_OPT_CHECKSTYLE_CONFIG_LOCATION}" ]; then opts="${opts} -Dcheckstyle.config.location=${CI_OPT_CHECKSTYLE_CONFIG_LOCATION}"; fi
         if [ "${CI_OPT_CLEAN_SKIP}" == "true" ]; then opts="${opts} -Dmaven.clean.skip=true"; fi
         if [ "${CI_OPT_DEPENDENCY_CHECK}" == "true" ]; then opts="${opts} -Ddependency-check=true"; fi
+        if [ -n "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" ]; then
+            local docker_registry=$(echo "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" | awk -F/ '{print $3}')
+            if [[ "${docker_registry}" == *docker.io ]]; then CI_INFRA_OPT_DOCKER_REGISTRY=""; else CI_INFRA_OPT_DOCKER_REGISTRY="${docker_registry}"; fi
+        fi
         if [ -n "${CI_INFRA_OPT_DOCKER_REGISTRY}" ]; then opts="${opts} -Ddocker.registry=${CI_INFRA_OPT_DOCKER_REGISTRY}"; fi
+        if [ -n "${CI_OPT_DOCKER_IMAGE_PREFIX}" ]; then opts="${opts} -Ddocker.image.prefix=${CI_OPT_DOCKER_IMAGE_PREFIX}"; fi
         opts="${opts} -Dfile.encoding=UTF-8"
         if [ -n "${CI_OPT_FRONTEND_NODEDOWNLOADROOT}" ]; then opts="${opts} -Dfrontend.nodeDownloadRoot=${CI_OPT_FRONTEND_NODEDOWNLOADROOT}"; fi
         if [ -n "${CI_OPT_FRONTEND_NPMDOWNLOADROOT}" ]; then opts="${opts} -Dfrontend.npmDownloadRoot=${CI_OPT_FRONTEND_NPMDOWNLOADROOT}"; fi
@@ -346,24 +350,17 @@ function init_docker_config() {
     # Download docker's config.json if current infrastructure has this file
     if [ "${CI_OPT_DRYRUN}" != "true" ]; then
         download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/docker/config.json" "${HOME}/.docker/config.json" "-H 'PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)'"
-        # TODO NEXUS3_DEPLOYMENT_PASSWORD for docker login when using internal infrastructure
-        if [ -n "${CI_OPT_DOCKERHUB_PASS}" ] && [ -n "${CI_OPT_DOCKERHUB_USER}" ]; then
-            docker login -p="${CI_OPT_DOCKERHUB_PASS}" -u="${CI_OPT_DOCKERHUB_USER}" https://registry-1.docker.io/v1/
-            docker login -p="${CI_OPT_DOCKERHUB_PASS}" -u="${CI_OPT_DOCKERHUB_USER}" https://registry-1.docker.io/v2/
+        if [ -n "${CI_OPT_DOCKER_REGISTRY_PASS}" ] && [ -n "${CI_OPT_DOCKER_REGISTRY_USER}" ]; then
+            docker login -p="${CI_OPT_DOCKER_REGISTRY_PASS}" -u="${CI_OPT_DOCKER_REGISTRY_USER}" ${CI_INFRA_OPT_DOCKER_REGISTRY_URL}
         fi
     fi
 }
 
 function maven_pull_base_image() {
-    # TODO multi module project
     if type -p docker > /dev/null; then
-        if [ -f src/main/resources/docker/Dockerfile ]; then
-            if [ ! -f src/main/docker/Dockerfile ]; then
-                mvn ${CI_OPT_MAVEN_SETTINGS} process-resources
-            fi
-            if [ -f src/main/docker/Dockerfile ]; then
-                docker pull $(cat src/main/docker/Dockerfile | grep -E '^FROM' | awk '{print $2}')
-            fi
+        if [ -n $(find . -name "*Docker*") ]; then
+            mvn ${CI_OPT_MAVEN_SETTINGS} -U -e process-resources
+            find . -name "*Docker*" | xargs cat | grep -E '^FROM' | awk '{print $2}' | xargs docker pull
         fi
     fi
 }
@@ -400,8 +397,8 @@ function alter_mvn() {
                     elif [[ "${element}" == *deploy ]]; then
                         result+=("org.codehaus.mojo:wagon-maven-plugin:merge-maven-repos@merge-maven-repos-deploy")
                         if [ "$(ci_opt_user_docker)" == "true" ]; then
-                            result+=("docker:build")
-                            result+=("docker:push")
+                            result+=("dockerfile:build")
+                            result+=("dockerfile:push")
                         fi
                     fi
                 else
@@ -521,20 +518,20 @@ function run_mvn() {
         if [ "${CI_OPT_OUTPUT_MAVEN_EFFECTIVE_POM_TO_CONSOLE}" == "true" ]; then
             if [ -n "${TRAVIS_EVENT_TYPE}" ]; then
                 echo travis-ci has log limit of 10000 lines, merge every 10 lines of log into 1, avoid travis timeout and to much lines
-                echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | awk 'NR%10{printf \"%s \",\$0;next;}1'' ..."
-                mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom | awk 'NR%10{printf "%s ",$0;next;}1'
+                echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom | awk 'NR%10{printf \"%s \",\$0;next;}1'' ..."
+                mvn ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom | awk 'NR%10{printf "%s ",$0;next;}1'
             elif [ -n "${CI_COMMIT_REF_NAME}" ]; then
                 echo gitlab-ci has log limit of 4194304 bytes
-                echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE} ..."
-                mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
+                echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE} ..."
+                mvn ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
             else
-                echo "mvn -e ${CI_OPT_MAVEN_SETTINGS} help:effective-pom >&3 ..."
+                echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom >&3 ..."
                 exec 3> >(tee ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE})
-                mvn ${CI_OPT_MAVEN_SETTINGS} help:effective-pom >&3
+                mvn ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom >&3
             fi
         else
-            echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE} ..."
-            mvn ${CI_OPT_MAVEN_SETTINGS} -U help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
+            echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE} ..."
+            mvn ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
         fi
         if [ $? -ne 0 ]; then
             echo "error on generate effective-pom"
@@ -550,9 +547,9 @@ function run_mvn() {
     fi
 
     local filter_script_file=$(filter_script "$(ci_opt_cache_directory)/filter")
-    echo "mvn ${CI_OPT_MAVEN_SETTINGS} -e -U ${altered} | ${filter_script_file}"
+    echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U -e ${altered} | ${filter_script_file}"
     if [ "${CI_OPT_DRYRUN}" != "true" ]; then
-        bash -c "set -e -o pipefail; mvn ${CI_OPT_MAVEN_SETTINGS} -e -U ${altered} | ${filter_script_file}"
+        bash -c "set -e -o pipefail; mvn ${CI_OPT_MAVEN_SETTINGS} -U -e ${altered} | ${filter_script_file}"
     fi
 }
 

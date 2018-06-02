@@ -14,20 +14,44 @@
     <name>build-docker</name>
     <packaging>pom</packaging>
 
+    <properties>
+        <io.fabric8_docker-maven-plugin.version>0.26.0</io.fabric8_docker-maven-plugin.version>
+        <com.spotify_docker-maven-plugin.version>1.1.1</com.spotify_docker-maven-plugin.version>
+        <com.spotify_dockerfile-maven-plugin.version>1.4.2</com.spotify_dockerfile-maven-plugin.version>
+
+        <dockerfile.build.skip>true</dockerfile.build.skip>
+        <dockerfile.useMavenSettingsForAuth>false</dockerfile.useMavenSettingsForAuth>
+    </properties>
+
     <build>
+        <extensions>
+            <extension>
+                <!-- for the dependency type 'docker-info' to be supported -->
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-extension</artifactId>
+                <version>${com.spotify_dockerfile-maven-plugin.version}</version>
+            </extension>
+        </extensions>
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>io.fabric8</groupId>
-                    <artifactId>docker-maven-plugin</artifactId>
-                    <version>0.26.0</version>
+                    <groupId>com.spotify</groupId>
+                    <artifactId>dockerfile-maven-plugin</artifactId>
+                    <version>${com.spotify_dockerfile-maven-plugin.version}</version>
+                    <configuration>
+                        <buildArgs>
+                            <JAR_FILE>${project.build.finalName}-exec.jar</JAR_FILE>
+                        </buildArgs>
+                        <tag>${project.version}</tag>
+                        <useMavenSettingsForAuth>${dockerfile.useMavenSettingsForAuth}</useMavenSettingsForAuth>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>com.spotify</groupId>
                     <artifactId>docker-maven-plugin</artifactId>
-                    <version>1.0.0</version>
+                    <version>${com.spotify_docker-maven-plugin.version}</version>
                     <configuration>
-                        <imageName>${docker.registry}/${project.artifactId}</imageName>
+                        <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
                         <imageTags>
                             <imageTag>${project.version}</imageTag>
                             <imageTag>latest</imageTag>
@@ -40,10 +64,8 @@
                                 <include>${project.build.finalName}-exec.jar</include>
                             </resource>
                         </resources>
-                        <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
+                        <dockerDirectory>${project.basedir}</dockerDirectory>
                         <noCache>true</noCache>
-                        <!-- Deprecated: this will use auth info in file :~/.docker/config.json -->
-                        <!--<useConfigFile>${docker-maven.useConfigFile}</useConfigFile>-->
                     </configuration>
                     <executions>
                         <execution>
@@ -54,6 +76,11 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>${io.fabric8_docker-maven-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -71,7 +98,7 @@
                         <configuration>
                             <target>
                                 <delete failonerror="false">
-                                    <fileset dir="${project.basedir}/src/main/docker" includes="Dockerfile"/>
+                                    <fileset dir="${project.basedir}" includes="Dockerfile"/>
                                 </delete>
                             </target>
                         </configuration>
@@ -88,7 +115,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.basedir}/src/main/docker</outputDirectory>
+                            <outputDirectory>${project.basedir}</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/resources/docker</directory>
@@ -106,16 +133,45 @@
     </build>
 
     <profiles>
+        <!-- @formatter:off -->
         <profile>
-            <id>default-docker-registry</id>
-            <activation>
-                <property>
-                    <name>!docker.registry</name>
-                </property>
-            </activation>
-            <properties>
-                <docker.registry>registry.docker.local</docker.registry>
-            </properties>
+            <id>default-docker-image-prefix</id>
+            <activation><property><name>!docker.image.prefix</name></property></activation>
+            <properties><docker.image.prefix>nexus3.local:5000</docker.image.prefix></properties>
+        </profile>
+        <profile>
+            <id>docker-hub-docker-image-prefix</id>
+            <activation><property><name>!docker.registry</name></property></activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>dockerfile-maven-plugin</artifactId>
+                            <configuration>
+                                <repository>${docker.image.prefix}/${project.artifactId}</repository>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <id>docker-registry-docker-image-prefix</id>
+            <activation><property><name>docker.registry</name></property></activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>dockerfile-maven-plugin</artifactId>
+                            <configuration>
+                                <repository>${docker.registry}/${project.artifactId}</repository>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
         </profile>
 
         <profile>
@@ -126,32 +182,45 @@
                     <name>!mvn_deploy_publish_segregation</name>
                 </property>
             </activation>
+            <properties>
+                <dockerfile.build.skip>false</dockerfile.build.skip>
+            </properties>
             <build>
                 <pluginManagement>
                     <plugins>
                         <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>dockerfile-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>default</id>
+                                    <goals>
+                                        <goal>build</goal>
+                                        <goal>push</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        <!--plugin>
                             <groupId>com.spotify</groupId>
                             <artifactId>docker-maven-plugin</artifactId>
                             <executions>
                                 <execution>
                                     <id>build-image</id>
                                     <phase>package</phase>
-                                    <goals>
-                                        <goal>build</goal>
-                                    </goals>
+                                    <goals><goal>build</goal></goals>
                                 </execution>
                                 <execution>
                                     <id>push-image</id>
                                     <phase>deploy</phase>
-                                    <goals>
-                                        <goal>push</goal>
-                                    </goals>
+                                    <goals><goal>push</goal></goals>
                                 </execution>
                             </executions>
-                        </plugin>
+                        </plugin-->
                     </plugins>
                 </pluginManagement>
             </build>
         </profile>
+        <!-- @formatter:on -->
     </profiles>
 </project>
