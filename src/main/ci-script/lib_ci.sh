@@ -358,9 +358,11 @@ function init_docker_config() {
 
 function maven_pull_base_image() {
     if type -p docker > /dev/null; then
-        if [ -n $(find . -name "*Docker*") ]; then
+        if [ -n "$(find . -name '*Docker*')" ]; then
             mvn ${CI_OPT_MAVEN_SETTINGS} -U -e process-resources
-            find . -name "*Docker*" | xargs cat | grep -E '^FROM' | awk '{print $2}' | xargs docker pull
+        fi
+        if [ -n "$(find . -name '*Docker*' | xargs cat | grep -E '^FROM' | awk '{print $2}')" ]; then
+            find . -name '*Docker*' | xargs cat | grep -E '^FROM' | awk '{print $2}' | uniq | xargs docker pull
         fi
     fi
 }
@@ -694,6 +696,7 @@ echo -e "\n<<<<<<<<<< ---------- options with important variables ---------- <<<
 
 if [ "$(ci_opt_user_docker)" == "true" ]; then
     init_docker_config
+    docker images | grep none | awk '{print $3}' | xargs docker rmi || echo "error on clean images"
 fi
 
 if [ -f pom.xml ]; then
