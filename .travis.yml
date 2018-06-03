@@ -32,8 +32,6 @@ env:
   # i.e. CI_OPT_CI_SCRIPT=https://github.com/ci-and-cd/maven-build/raw/master/src/main/ci-script/lib_ci.sh
   - CI_OPT_CI_SCRIPT=https://github.com/${TRAVIS_REPO_SLUG}/raw/${TRAVIS_BRANCH}/src/main/ci-script/lib_ci.sh
   - CI_OPT_INFRASTRUCTURE=opensource
-  - CI_OPT_ORIGIN_REPO_SLUG=ci-and-cd/maven-build
-  - CI_OPT_SITE=true
   - MAVEN_SKIP_RC=true
 group: edge
 install: true
@@ -42,7 +40,7 @@ jdk:
 #- oraclejdk9
 language: java
 script:
-- bash ci.sh clean install sonar:sonar site deploy site-deploy
+- bash ci.sh mvn clean install sonar:sonar site deploy site-deploy
 services:
 - docker
 sudo: required
