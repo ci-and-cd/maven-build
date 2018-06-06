@@ -104,7 +104,7 @@ function ci_opt_user_docker() {
     if [ -n "${CI_OPT_USE_DOCKER}" ]; then
         echo "${CI_OPT_USE_DOCKER}"
     else
-        if [ -n $(find . -name "*Docker*") ] || [ -n $(find . -name "*docker-compose*.yml") ]; then
+        if [ -n "$(find . -name '*Docker*')" ] || [ -n "$(find . -name '*docker-compose*.yml')" ]; then
             echo "true"
         else
             echo "false"
@@ -225,7 +225,7 @@ function ci_opt_site_path_prefix() {
 # >>>>>>>>>> ---------- CI option functions about infrastructures ---------- >>>>>>>>>>
 # arguments: default_value
 function find_git_prefix_from_ci_script() {
-    (>&2 echo "find CI_INFRA_OPT_GIT_PREFIX from CI_OPT_CI_SCRIPT: $CI_OPT_CI_SCRIPT, default_value: $1")
+    (>&2 echo "find CI_INFRA_OPT_GIT_PREFIX from CI_OPT_CI_SCRIPT: ${CI_OPT_CI_SCRIPT}, default_value: $1")
     if [[ "${CI_OPT_CI_SCRIPT}" == http* ]]; then
         echo $(echo ${CI_OPT_CI_SCRIPT} | sed -E 's#/[^/]+/[^/]+/raw/[^/]+/.+##')
     else
@@ -313,7 +313,8 @@ function ci_opt_maven_opts() {
         if [ -n "${CI_OPT_PMD_RULESET_LOCATION}" ]; then opts="${opts} -Dpmd.ruleset.location=${CI_OPT_PMD_RULESET_LOCATION}"; fi
         opts="${opts} -Dsite=$(ci_opt_site)"
         opts="${opts} -Dsite.path=$(ci_opt_site_path_prefix)-$(ci_opt_publish_channel)"
-        if [ "${CI_OPT_SONAR}" == "true" ]; then opts="${opts} -Dsonar=true"; fi
+        # if sonar=true, jacoco should be set to true also
+        if [ "${CI_OPT_SONAR}" == "true" ]; then opts="${opts} -Dsonar=true -Djacoco=true"; fi
         opts="${opts} -Duser.language=zh -Duser.region=CN -Duser.timezone=Asia/Shanghai"
         if [ -n "${CI_OPT_WAGON_SOURCE_FILEPATH}" ]; then opts="${opts} -Dwagon.source.filepath=${CI_OPT_WAGON_SOURCE_FILEPATH} -DaltDeploymentRepository=repo::default::file://${CI_OPT_WAGON_SOURCE_FILEPATH}"; fi
 

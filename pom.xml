@@ -860,6 +860,56 @@
             </build>
         </profile>
 
+        <profile>
+            <id>sonar</id>
+            <!-- if sonar=true, jacoco should be set to true also -->
+            <activation><property><name>sonar</name><value>true</value></property></activation>
+            <properties>
+                <!-- sonar.java.binaries issue when force language java  -->
+                <!--sonar.language>java</sonar.language-->
+                <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
+
+                <!--sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin-->
+                <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+                <sonar.jacoco.reportPath>${project.build.directory}/jacoco.exec</sonar.jacoco.reportPath>
+                <sonar.jacoco.itReportPath>${jacoco.itReportPath}</sonar.jacoco.itReportPath>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <!-- see: https://github.com/SonarSource/sonar-scanner-maven -->
+                        <plugin><groupId>org.sonarsource.scanner.maven</groupId><artifactId>sonar-maven-plugin</artifactId><version>3.4.0.905</version></plugin>
+                    </plugins>
+                </pluginManagement>
+                <plugins>
+                    <!-- see: https://dzone.com/articles/integration-jenkins-jacoco-and-sonarqube -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <!-- Specific to generate mapping between tests and covered code -->
+                            <properties>
+                                <property><name>listener</name><value>org.sonar.java.jacoco.JUnitListener</value></property>
+                            </properties>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <skip>${maven.integration-test.skip}</skip>
+                            <properties>
+                                <property><name>listener</name><value>org.sonar.java.jacoco.JUnitListener</value></property>
+                            </properties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <!-- sonar-jacoco-listeners's version should match version of sonar-java-plugin -->
+                <dependency><artifactId>sonar-jacoco-listeners</artifactId><groupId>org.sonarsource.java</groupId><version>${org.sonarsource.java_sonar-jacoco-listeners.version}</version><scope>test</scope></dependency>
+            </dependencies>
+        </profile>
+
         <!-- http://www.eclemma.org/jacoco/trunk/doc/maven.html -->
         <!-- see: https://github.com/timp/juice -->
         <!-- see: https://github.com/jacoco/jacoco/issues/409 -->
@@ -1559,55 +1609,6 @@
                     <plugin><groupId>org.codehaus.mojo</groupId><artifactId>clirr-maven-plugin</artifactId></plugin>
                 </plugins>
             </reporting>
-        </profile>
-
-        <profile>
-            <id>sonar</id>
-            <activation><property><name>sonar</name><value>true</value></property></activation>
-            <properties>
-                <!-- sonar.java.binaries issue when force language java  -->
-                <!--sonar.language>java</sonar.language-->
-                <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
-
-                <!--sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin-->
-                <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-                <sonar.jacoco.reportPath>${project.build.directory}/jacoco.exec</sonar.jacoco.reportPath>
-                <sonar.jacoco.itReportPath>${jacoco.itReportPath}</sonar.jacoco.itReportPath>
-            </properties>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <!-- see: https://github.com/SonarSource/sonar-scanner-maven -->
-                        <plugin><groupId>org.sonarsource.scanner.maven</groupId><artifactId>sonar-maven-plugin</artifactId><version>3.4.0.905</version></plugin>
-                    </plugins>
-                </pluginManagement>
-                <plugins>
-                    <!-- see: https://dzone.com/articles/integration-jenkins-jacoco-and-sonarqube -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <!-- Specific to generate mapping between tests and covered code -->
-                            <properties>
-                                <property><name>listener</name><value>org.sonar.java.jacoco.JUnitListener</value></property>
-                            </properties>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <configuration>
-                            <skip>${maven.integration-test.skip}</skip>
-                            <properties>
-                                <property><name>listener</name><value>org.sonar.java.jacoco.JUnitListener</value></property>
-                            </properties>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-            <dependencies>
-                <!-- sonar-jacoco-listeners's version should match version of sonar-java-plugin -->
-                <dependency><artifactId>sonar-jacoco-listeners</artifactId><groupId>org.sonarsource.java</groupId><version>${org.sonarsource.java_sonar-jacoco-listeners.version}</version><scope>test</scope></dependency>
-            </dependencies>
         </profile>
 
         <profile>
