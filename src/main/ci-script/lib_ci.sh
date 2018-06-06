@@ -352,7 +352,7 @@ function init_docker_config() {
     if [ "${CI_OPT_DRYRUN}" != "true" ]; then
         download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/docker/config.json" "${HOME}/.docker/config.json" "-H 'PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)'"
         if [ -n "${CI_OPT_DOCKER_REGISTRY_PASS}" ] && [ -n "${CI_OPT_DOCKER_REGISTRY_USER}" ]; then
-            docker login -p="${CI_OPT_DOCKER_REGISTRY_PASS}" -u="${CI_OPT_DOCKER_REGISTRY_USER}" ${CI_INFRA_OPT_DOCKER_REGISTRY_URL}
+            echo ${CI_OPT_DOCKER_REGISTRY_PASS} | docker login --password-stdin -u="${CI_OPT_DOCKER_REGISTRY_USER}" ${CI_INFRA_OPT_DOCKER_REGISTRY_URL}
         fi
     fi
 }
