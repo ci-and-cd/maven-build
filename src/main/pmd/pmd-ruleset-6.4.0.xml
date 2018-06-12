@@ -104,7 +104,7 @@
         <exclude name="AvoidInstantiatingObjectsInLoops"/>
     </rule>
     <rule deprecated="false" typeResolution="false">
-        <exclude name="AvoidConstantsInterface"/>
-        <exclude name="GuardLogStatementJavaUtil"/>
+        <exclude name="ConstantsInInterface"/>
+        <exclude name="GuardLogStatement"/>
     </rule>
 </ruleset>

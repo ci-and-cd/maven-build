@@ -168,6 +168,7 @@
                 <plugin><artifactId>maven-deploy-plugin</artifactId><version>2.8.2</version></plugin>
                 <plugin><artifactId>maven-enforcer-plugin</artifactId><version>3.0.0-M1</version></plugin>
                 <plugin><artifactId>maven-failsafe-plugin</artifactId><version>2.21.0</version></plugin>
+                <plugin><artifactId>maven-gpg-plugin</artifactId><version>1.6</version></plugin>
                 <plugin><artifactId>maven-install-plugin</artifactId><version>2.5.2</version></plugin>
                 <plugin><artifactId>maven-jar-plugin</artifactId><version>3.1.0</version></plugin>
                 <plugin><artifactId>maven-javadoc-plugin</artifactId><version>3.0.0</version></plugin>
@@ -247,8 +248,9 @@
                 <plugin><artifactId>maven-jxr-plugin</artifactId><version>2.5</version></plugin>
                 <!-- maven-pmd-plugin:3.6   depends on net.sourceforge.pmd:pmd:5.3.5 -->
                 <!-- maven-pmd-plugin:3.7   depends on net.sourceforge.pmd:pmd:5.5.1 -->
-                <!-- maven-pmd-plugin:3.9.0 depends on net.sourceforge.pmd:pmd:6.0.1 -->
-                <plugin><artifactId>maven-pmd-plugin</artifactId><version>3.9.0</version></plugin>
+                <!-- maven-pmd-plugin:3.9.0 depends on net.sourceforge.pmd:pmd:6.4.0 -->
+                <!-- maven-pmd-plugin:3.10.0 depends on net.sourceforge.pmd:pmd:6.4.0 -->
+                <plugin><artifactId>maven-pmd-plugin</artifactId><version>3.10.0</version></plugin>
                 <plugin><artifactId>maven-surefire-report-plugin</artifactId><version>2.21.0</version></plugin>
                 <!-- @formatter:on -->
             </plugins>
@@ -616,10 +618,29 @@
             <id>gpg-for-travis-and-maven-central</id>
             <activation><file><exists>${maven.multiModuleProjectDirectory}/codesigning.asc</exists></file><activeByDefault>true</activeByDefault></activation>
             <properties>
-                <gpg.executable>gpg</gpg.executable>
+                <!-- Do not set gpg.executable here -->
+                <!--<gpg.executable>gpg</gpg.executable>-->
                 <gpg.keyname>${env.CI_OPT_GPG_KEYNAME}</gpg.keyname>
                 <gpg.passphrase>${env.CI_OPT_GPG_PASSPHRASE}</gpg.passphrase>
             </properties>
+        </profile>
+        <profile>
+            <id>gpg2-arguments</id>
+            <activation><property><name>gpg.loopback</name><value>true</value></property></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <configuration>
+                            <gpgArguments>
+                                <gpgArgument>--use-agent</gpgArgument>
+                                <gpgArgument>--pinentry-mode</gpgArgument>
+                                <gpgArgument>loopback</gpgArgument>
+                            </gpgArguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
 
         <profile>
@@ -1072,9 +1093,7 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
                         <executions>
                             <execution><id>sign-artifacts</id><phase>verify</phase><goals><goal>sign</goal></goals></execution>
                         </executions>
@@ -1295,12 +1314,12 @@
             <activation><property><name>!checkstyle.config.location</name></property></activation>
             <properties><checkstyle.config.location>https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/checkstyle/google_checks_8.10.xml</checkstyle.config.location></properties>
         </profile>
-        <!--<file><exists>${maven.multiModuleProjectDirectory}/src/main/pmd/pmd-ruleset-6.0.1.xml</exists></file>-->
-        <!--pmd.ruleset.location>${maven.multiModuleProjectDirectory}/src/main/pmd/pmd-ruleset-6.0.1.xml</pmd.ruleset.location-->
+        <!--<file><exists>${maven.multiModuleProjectDirectory}/src/main/pmd/pmd-ruleset-6.4.0.xml</exists></file>-->
+        <!--pmd.ruleset.location>${maven.multiModuleProjectDirectory}/src/main/pmd/pmd-ruleset-6.4.0.xml</pmd.ruleset.location-->
         <profile>
             <id>default-pmd-ruleset</id>
             <activation><property><name>!pmd.ruleset.location</name></property></activation>
-            <properties><pmd.ruleset.location>https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/pmd/pmd-ruleset-6.0.1.xml</pmd.ruleset.location></properties>
+            <properties><pmd.ruleset.location>https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/pmd/pmd-ruleset-6.4.0.xml</pmd.ruleset.location></properties>
         </profile>
 
         <profile>

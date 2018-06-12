@@ -37,6 +37,7 @@
 
     <profiles>
         <profile>
+            <id>gpg-keyname</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
