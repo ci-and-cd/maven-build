@@ -13,12 +13,12 @@ before_install:
 - export PATH=$M2_HOME/bin:$PATH
 branches:
   only:
-  - master
-  - develop
-  - /^feature\/.*$/
-  - /^hotfix\/.*$/
-  - /^release\/.*$/
-  - /^v\d+\.\d+(\.\d+)?(-\S*)?/
+  #- master # do nothing on master branch
+  - develop # snapshots on develop branch
+  - /^feature\/.*$/ # build and test on feature branches
+  - /^hotfix\/.*$/ # release on hotfix branches
+  - /^release\/.*$/ # release on release branches
+  #- /^v\d+\.\d+(\.\d+)?(-\S*)?/ # do nothing on version tags
 cache:
   directories:
   - "$HOME/.cache"
