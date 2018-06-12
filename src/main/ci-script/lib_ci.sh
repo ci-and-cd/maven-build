@@ -191,7 +191,7 @@ function ci_opt_publish_channel() {
         "develop")
             echo "snapshot"
             ;;
-        "master")
+        hotfix*)
             echo "release"
             ;;
         release*)
@@ -199,6 +199,27 @@ function ci_opt_publish_channel() {
             ;;
         *)
             echo "snapshot"
+            ;;
+        esac
+    fi
+}
+
+function ci_opt_publish_to_repo() {
+    if [ -n "${CI_OPT_PUBLISH_TO_REPO}" ]; then
+        echo "${CI_OPT_PUBLISH_TO_REPO}"
+    else
+        case "$(ci_opt_ref_name)" in
+        "develop")
+            echo "true"
+            ;;
+        hotfix*)
+            echo "true"
+            ;;
+        release*)
+            echo "true"
+            ;;
+        *)
+            echo "false"
             ;;
         esac
     fi
@@ -375,9 +396,7 @@ function maven_pull_base_image() {
 }
 
 function alter_mvn() {
-    local is_origin_repo=$(ci_opt_is_origin_repo)
-    local ref_name=$(ci_opt_ref_name)
-    (>&2 echo "alter_mvn is_origin_repo: ${is_origin_repo}, ref_name: ${ref_name}")
+    (>&2 echo "alter_mvn is_origin_repo: $(ci_opt_is_origin_repo), ref_name: $(ci_opt_ref_name)")
 
     result=()
 
@@ -394,7 +413,7 @@ function alter_mvn() {
             if [[ "${element}" == *site* ]] && [ "$(ci_opt_site)" == true ]; then
             # if ci_opt_site=false, do not build site
                 result+=("${element}")
-            elif ([[ "${element}" == *clean ]] || [[ "${element}" == *install ]] || [[ "${element}" == *deploy ]]); then
+            elif ([[ "${element}" == *clean ]] || [[ "${element}" == *install ]]); then
             # goals need to alter
                 if [ "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]; then
                 # mvn deploy and publish segregation
@@ -403,19 +422,24 @@ function alter_mvn() {
                         result+=("org.apache.maven.plugins:maven-antrun-plugin:run@local-deploy-model-path-clean")
                     elif [[ "${element}" == *install ]]; then
                         result+=("deploy")
-                    elif [[ "${element}" == *deploy ]]; then
-                        result+=("org.codehaus.mojo:wagon-maven-plugin:merge-maven-repos@merge-maven-repos-deploy")
-                        if [ "$(ci_opt_user_docker)" == "true" ]; then
-                            result+=("dockerfile:build")
-                            result+=("dockerfile:push")
-                        fi
+                        if [ "$(ci_opt_user_docker)" == "true" ]; then result+=("dockerfile:build"); fi
                     fi
                 else
                     result+=("${element}")
                 fi
-            elif [ "true" == "${is_origin_repo}" ]; then
+            elif [[ "${element}" == *deploy ]]; then
+                if [ "$(ci_opt_publish_to_repo)" == "true" ]; then
+                    if [ "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]; then
+                    # mvn deploy and publish segregation
+                        result+=("org.codehaus.mojo:wagon-maven-plugin:merge-maven-repos@merge-maven-repos-deploy")
+                        if [ "$(ci_opt_user_docker)" == "true" ]; then result+=("dockerfile:push"); fi
+                    else
+                        result+=("${element}")
+                    fi
+                fi
+            elif [ "true" == "$(ci_opt_is_origin_repo)" ]; then
             # if is origin repo
-                case "${ref_name}" in
+                case "$(ci_opt_ref_name)" in
                 release*)
                     # if release (origin repo), skip sonar
                     if [[ "${element}" != *sonar ]]; then
