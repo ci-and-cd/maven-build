@@ -396,7 +396,7 @@ function maven_pull_base_image() {
 }
 
 function alter_mvn() {
-    (>&2 echo "alter_mvn is_origin_repo: $(ci_opt_is_origin_repo), ref_name: $(ci_opt_ref_name)")
+    (>&2 echo "alter_mvn is_origin_repo: $(ci_opt_is_origin_repo), ref_name: $(ci_opt_ref_name), args: $@")
 
     result=()
 
@@ -436,6 +436,8 @@ function alter_mvn() {
                     else
                         result+=("${element}")
                     fi
+                else
+                    (>&2 echo "skip ${element}")
                 fi
             elif [ "true" == "$(ci_opt_is_origin_repo)" ]; then
             # if is origin repo
@@ -444,6 +446,8 @@ function alter_mvn() {
                     # if release (origin repo), skip sonar
                     if [[ "${element}" != *sonar ]]; then
                         result+=("${element}")
+                    else
+                        (>&2 echo "skip ${element}")
                     fi
                     ;;
                 *)
@@ -459,6 +463,7 @@ function alter_mvn() {
         fi
     done
 
+    (>&2 echo "alter_mvn output: ${result[*]}")
     echo "${result[*]}"
 }
 
