@@ -715,7 +715,9 @@ echo -e "<<<<<<<<<< ---------- build context info ---------- <<<<<<<<<<\n"
 echo -e "\n>>>>>>>>>> ---------- important variables ---------- >>>>>>>>>>"
 if [ -z "${CI_OPT_MAVEN_BUILD_REPO}" ]; then
     if [[ "${CI_OPT_CI_SCRIPT}" == http* ]]; then
-        CI_OPT_MAVEN_BUILD_REPO=$(echo ${CI_OPT_CI_SCRIPT} | sed -r 's#/raw/([^/]+)/.+#/raw/\1#')
+        # test with: https://github.com/ci-and-cd/maven-build/raw/master/src/main/ci-script/lib_ci.sh
+        # test with: https://github.com/ci-and-cd/maven-build/raw/release/0.0.1.OSS/src/main/ci-script/lib_ci.sh
+        CI_OPT_MAVEN_BUILD_REPO="$(echo ${CI_OPT_CI_SCRIPT} | sed -r 's#/raw/.+#/raw#')/$(ci_opt_ref_name)"
     elif [ -n "${CI_OPT_CI_SCRIPT}" ]; then
         # use current directory
         CI_OPT_MAVEN_BUILD_REPO=""
