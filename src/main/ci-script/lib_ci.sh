@@ -104,7 +104,7 @@ function ci_opt_user_docker() {
     if [ -n "${CI_OPT_USE_DOCKER}" ]; then
         echo "${CI_OPT_USE_DOCKER}"
     else
-        if [ -n $(find . -name "*Docker*") ] || [ -n $(find . -name "*docker-compose*.yml") ]; then
+        if [ -n "$(find . -name '*Docker*')" ] || [ -n "$(find . -name '*docker-compose*.yml')" ]; then
             echo "true"
         else
             echo "false"
@@ -225,7 +225,7 @@ function ci_opt_site_path_prefix() {
 # >>>>>>>>>> ---------- CI option functions about infrastructures ---------- >>>>>>>>>>
 # arguments: default_value
 function find_git_prefix_from_ci_script() {
-    (>&2 echo "find CI_INFRA_OPT_GIT_PREFIX from CI_OPT_CI_SCRIPT: $CI_OPT_CI_SCRIPT, default_value: $1")
+    (>&2 echo "find CI_INFRA_OPT_GIT_PREFIX from CI_OPT_CI_SCRIPT: ${CI_OPT_CI_SCRIPT}, default_value: $1")
     if [[ "${CI_OPT_CI_SCRIPT}" == http* ]]; then
         echo $(echo ${CI_OPT_CI_SCRIPT} | sed -E 's#/[^/]+/[^/]+/raw/[^/]+/.+##')
     else
@@ -295,6 +295,12 @@ function ci_opt_maven_opts() {
         if [ -n "${CI_OPT_CHECKSTYLE_CONFIG_LOCATION}" ]; then opts="${opts} -Dcheckstyle.config.location=${CI_OPT_CHECKSTYLE_CONFIG_LOCATION}"; fi
         if [ "${CI_OPT_CLEAN_SKIP}" == "true" ]; then opts="${opts} -Dmaven.clean.skip=true"; fi
         if [ "${CI_OPT_DEPENDENCY_CHECK}" == "true" ]; then opts="${opts} -Ddependency-check=true"; fi
+
+        opts="${opts} -Dgpg.executable=${GPG_EXECUTABLE}"
+        if version_gt $(${GPG_EXECUTABLE} --batch=true --version | grep -E '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 | awk '{print $NF}') "2.1"; then
+            opts="${opts} -Dgpg.loopback=true"
+        fi
+
         if [ -n "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" ]; then
             local docker_registry=$(echo "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" | awk -F/ '{print $3}')
             if [[ "${docker_registry}" == *docker.io ]]; then CI_INFRA_OPT_DOCKER_REGISTRY=""; else CI_INFRA_OPT_DOCKER_REGISTRY="${docker_registry}"; fi
@@ -313,7 +319,8 @@ function ci_opt_maven_opts() {
         if [ -n "${CI_OPT_PMD_RULESET_LOCATION}" ]; then opts="${opts} -Dpmd.ruleset.location=${CI_OPT_PMD_RULESET_LOCATION}"; fi
         opts="${opts} -Dsite=$(ci_opt_site)"
         opts="${opts} -Dsite.path=$(ci_opt_site_path_prefix)-$(ci_opt_publish_channel)"
-        if [ "${CI_OPT_SONAR}" == "true" ]; then opts="${opts} -Dsonar=true"; fi
+        # if sonar=true, jacoco should be set to true also
+        if [ "${CI_OPT_SONAR}" == "true" ]; then opts="${opts} -Dsonar=true -Djacoco=true"; fi
         opts="${opts} -Duser.language=zh -Duser.region=CN -Duser.timezone=Asia/Shanghai"
         if [ -n "${CI_OPT_WAGON_SOURCE_FILEPATH}" ]; then opts="${opts} -Dwagon.source.filepath=${CI_OPT_WAGON_SOURCE_FILEPATH} -DaltDeploymentRepository=repo::default::file://${CI_OPT_WAGON_SOURCE_FILEPATH}"; fi
 
@@ -351,7 +358,7 @@ function init_docker_config() {
     if [ "${CI_OPT_DRYRUN}" != "true" ]; then
         download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/docker/config.json" "${HOME}/.docker/config.json" "-H 'PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)'"
         if [ -n "${CI_OPT_DOCKER_REGISTRY_PASS}" ] && [ -n "${CI_OPT_DOCKER_REGISTRY_USER}" ]; then
-            docker login -p="${CI_OPT_DOCKER_REGISTRY_PASS}" -u="${CI_OPT_DOCKER_REGISTRY_USER}" ${CI_INFRA_OPT_DOCKER_REGISTRY_URL}
+            echo ${CI_OPT_DOCKER_REGISTRY_PASS} | docker login --password-stdin -u="${CI_OPT_DOCKER_REGISTRY_USER}" ${CI_INFRA_OPT_DOCKER_REGISTRY_URL}
         fi
     fi
 }
@@ -601,19 +608,32 @@ echo -e "\n    >>>>>>>>>> ---------- decrypt files and handle keys ---------- >>
 GPG_TTY=$(tty || echo "")
 if [ -z "${GPG_TTY}" ]; then unset GPG_TTY; fi
 echo "gpg tty '${GPG_TTY}'"
-GPG="gpg"
+GPG_EXECUTABLE="gpg"
 echo determine gpg or gpg2 to use
 # invalid option --pinentry-mode loopback
-if which gpg2 > /dev/null; then GPG="gpg2 --use-agent"; elif which gpg > /dev/null; then GPG="gpg"; fi
-echo "using ${GPG}"
+if which gpg2 > /dev/null; then GPG_EXECUTABLE="gpg2"; GPG_CMD="gpg2 --use-agent"; elif which gpg > /dev/null; then GPG_EXECUTABLE="gpg"; GPG_CMD="gpg"; fi
+echo "using ${GPG_EXECUTABLE}"
 # use --batch=true to avoid 'gpg tty not a tty' error
-${GPG} --batch=true --version
-if version_gt $(gpg --batch=true --version | grep -E '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 | awk '{print $NF}') "2.1"; then
-    echo "GPG version greater than 2.1"
-    export GPG_OPTS='--pinentry-mode loopback'
-    echo GPG_OPTS: ${GPG_OPTS}
-    mkdir -p ~/.gnupg && chmod 700 ~/.gnupg && touch ~/.gnupg/gpg-agent.conf
-    #add 'allow-loopback-pinentry' to '~/.gnupg/gpg-agent.conf'
+${GPG_CMD} --batch=true --version
+if version_gt $(${GPG_EXECUTABLE} --batch=true --version | grep -E '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 | awk '{print $NF}') "2.1"; then
+    echo "gpg version greater than 2.1"
+    mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
+    touch ~/.gnupg/gpg.conf
+    echo "add 'use-agent' to '~/.gnupg/gpg.conf'"
+    echo 'use-agent' > ~/.gnupg/gpg.conf
+    # on gpg-2.1.11 'pinentry-mode loopback' is invalid option
+    #echo "add 'pinentry-mode loopback' to '~/.gnupg/gpg.conf'"
+    #echo 'pinentry-mode loopback' >> ~/.gnupg/gpg.conf
+    cat ~/.gnupg/gpg.conf
+    #GPG_CMD="${GPG_CMD} --pinentry-mode loopback"
+    #export GPG_OPTS='--pinentry-mode loopback'
+    #echo GPG_OPTS: ${GPG_OPTS}
+    echo "add 'allow-loopback-pinentry' to '~/.gnupg/gpg-agent.conf'"
+    touch ~/.gnupg/gpg-agent.conf
+    echo 'allow-loopback-pinentry' > ~/.gnupg/gpg-agent.conf
+    cat ~/.gnupg/gpg-agent.conf
+    echo restart the agent
+    echo RELOADAGENT | gpg-connect-agent
 fi
 if [ -f codesigning.asc.enc ] && [ -n "${CI_OPT_GPG_PASSPHRASE}" ]; then
     echo decrypt private key
@@ -621,28 +641,25 @@ if [ -f codesigning.asc.enc ] && [ -n "${CI_OPT_GPG_PASSPHRASE}" ]; then
 fi
 if [ -f codesigning.asc.gpg ] && [ -n "${CI_OPT_GPG_PASSPHRASE}" ]; then
     echo decrypt private key
-    LC_CTYPE="UTF-8" echo ${CI_OPT_GPG_PASSPHRASE} | ${GPG} --passphrase-fd 0 --yes --batch=true --cipher-algo AES256 -o codesigning.asc codesigning.asc.gpg
+    LC_CTYPE="UTF-8" echo ${CI_OPT_GPG_PASSPHRASE} | ${GPG_CMD} --passphrase-fd 0 --yes --batch=true --cipher-algo AES256 -o codesigning.asc codesigning.asc.gpg
 fi
 if [ -f codesigning.pub ]; then
     echo import public keys
-    ${GPG} --yes --batch --import codesigning.pub
+    ${GPG_CMD} --yes --batch --import codesigning.pub
 
-    echo public keys
-    ${GPG} --batch=true --list-keys
+    echo list public keys
+    ${GPG_CMD} --batch=true --list-keys
 fi
 if [ -f codesigning.asc ]; then
     echo import private keys
     # some versions only can import public key from a keypair file, some can import key pair
     if [ -f codesigning.pub ]; then
-        ${GPG} --yes --batch --import codesigning.asc
+        ${GPG_CMD} --yes --batch --import codesigning.asc
     else
-        if [ -z "$(${GPG} --list-secret-keys | grep ${CI_OPT_GPG_KEYNAME})" ]; then ${GPG} --yes --batch=true --fast-import codesigning.asc; fi
+        if [ -z "$(${GPG_CMD} --list-secret-keys | grep ${CI_OPT_GPG_KEYNAME})" ]; then ${GPG_CMD} --yes --batch=true --fast-import codesigning.asc; fi
     fi
     echo list private keys
-    ${GPG} --batch=true --list-secret-keys
-
-#    # set default key
-#    echo -e "trust\n5\ny\n" | ${GPG} --command-fd 0 --edit-key ${CI_OPT_GPG_KEYNAME};
+    ${GPG_CMD} --batch=true --list-secret-keys
 
     # issue: You need a passphrase to unlock the secret key
     # no-tty cause "gpg: Sorry, no terminal at all requested - can't get input"
@@ -650,14 +667,18 @@ if [ -f codesigning.asc ]; then
     #echo 'default-cache-ttl 600' > ~/.gnupg/gpg-agent.conf
 
     # test key
-    if [ -f LICENSE ]; then
-        echo test private key imported
-        echo ${CI_OPT_GPG_PASSPHRASE} | gpg --passphrase-fd 0 --yes --batch=true -u ${CI_OPT_GPG_KEYNAME} --armor --detach-sig LICENSE
-    fi
+    # this test not working on appveyor
+    # gpg: skipped "KEYID": secret key not available
+    # gpg: signing failed: secret key not available
+    #if [ -f LICENSE ]; then
+    #    echo test private key imported
+    #    echo ${CI_OPT_GPG_PASSPHRASE} | gpg --passphrase-fd 0 --yes --batch=true -u ${CI_OPT_GPG_KEYNAME} --armor --detach-sig LICENSE
+    #fi
+    echo set default key
     echo -e "trust\n5\ny\n" | gpg --command-fd 0 --batch=true --edit-key ${CI_OPT_GPG_KEYNAME}
 
     # for gradle build
-    if [ -n "${CI_OPT_GPG_KEYID}" ]; then ${GPG} --batch=true --keyring secring.gpg --export-secret-key ${CI_OPT_GPG_KEYID} > secring.gpg; fi
+    if [ -n "${CI_OPT_GPG_KEYID}" ]; then ${GPG_CMD} --batch=true --keyring secring.gpg --export-secret-key ${CI_OPT_GPG_KEYID} > secring.gpg; fi
 fi
 echo -e "    <<<<<<<<<< ---------- decrypt files and handle keys ---------- <<<<<<<<<<\n"
 

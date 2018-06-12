@@ -71,7 +71,7 @@ Need these properties only when profile 'sonar' is activated.
 Need to customize when github.com is not reachable.
 
 - pmd.ruleset.location
-> default: https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/pmd/pmd-ruleset-6.0.1.xml
+> default: https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/pmd/pmd-ruleset-6.4.0.xml
 Need to customize when github.com is not reachable.
 
 - project.reporting.outputEncoding
