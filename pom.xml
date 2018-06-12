@@ -518,12 +518,12 @@
                                 <exclude>*</exclude>
                             </excludes>
                             <includes>
-                                <include>*:commons-logging</include>
+                                <!--<include>*:commons-logging</include>-->
                             </includes>
                         </banTransitiveDependencies>
                         <bannedDependencies>
                             <includes>
-                                <include>*:commons-logging</include>
+                                <!--<include>*:commons-logging</include>-->
                             </includes>
                         </bannedDependencies>
                     </rules>
