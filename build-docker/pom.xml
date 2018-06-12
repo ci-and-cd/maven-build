@@ -6,7 +6,7 @@
     <parent>
         <groupId>cn.home1</groupId>
         <artifactId>maven-build</artifactId>
-        <version>0.0.2.OSS-SNAPSHOT</version>
+        <version>0.0.2.OSS-gitlab-ci-build-SNAPSHOT</version>
     </parent>
 
     <artifactId>build-docker</artifactId>
