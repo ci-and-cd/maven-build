@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>0.0.4.OSS</version>
+    <version>0.0.5.OSS</version>
 
     <modules>
         <module>build-docker</module>
@@ -60,6 +60,27 @@
             <releases><enabled>false</enabled></releases>
             <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
         </repository>
+        <repository>
+            <id>OSSRH-releases</id>
+            <name>central releases</name>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+            <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
+            <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+        <repository>
+            <id>OSSRH-snapshots</id>
+            <name>central snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
+        </repository>
+        <repository>
+            <id>OSSRH-thirdparty</id>
+            <name>central thirdparty</name>
+            <url>https://oss.sonatype.org/content/repositories/third-party-releases/</url>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>false</enabled></snapshots>
+        </repository>
         <!-- @formatter:on -->
     </repositories>
 
@@ -88,6 +109,27 @@
             <url>http://repo.spring.io/libs-snapshot</url>
             <releases><enabled>false</enabled></releases>
             <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>OSSRH-releases</id>
+            <name>central releases</name>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+            <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
+            <snapshots><enabled>false</enabled></snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>OSSRH-snapshots</id>
+            <name>central snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>OSSRH-thirdparty</id>
+            <name>central thirdparty</name>
+            <url>https://oss.sonatype.org/content/repositories/third-party-releases/</url>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
         <pluginRepository>
             <id>github-mvn-repo-github-maven-plugins</id>
@@ -660,37 +702,7 @@
             <properties>
                 <sonar.host.url>https://sonarqube.com</sonar.host.url>
             </properties>
-            <repositories>
-                <repository>
-                    <id>OSSRH-releases</id>
-                    <name>central releases</name>
-                    <url>https://oss.sonatype.org/content/repositories/releases/</url>
-                    <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
-                    <snapshots><enabled>false</enabled></snapshots>
-                </repository>
-                <repository>
-                    <id>OSSRH-snapshots</id>
-                    <name>central snapshots</name>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-                    <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
-                </repository>
-            </repositories>
             <pluginRepositories>
-                <pluginRepository>
-                    <id>OSSRH-snapshots</id>
-                    <name>central snapshots</name>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-                    <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
-                </pluginRepository>
-                <pluginRepository>
-                    <id>OSSRH-thirdparty</id>
-                    <name>central thirdparty</name>
-                    <url>https://oss.sonatype.org/content/repositories/third-party-releases/</url>
-                    <releases><enabled>true</enabled></releases>
-                    <snapshots><enabled>false</enabled></snapshots>
-                </pluginRepository>
                 <pluginRepository>
                     <id>github-mvn-repo-github-maven-plugins</id>
                     <url>https://raw.github.com/ci-and-cd/maven-plugins/mvn-repo</url>
