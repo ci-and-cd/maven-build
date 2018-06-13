@@ -30,6 +30,7 @@
         <menu ref="parent" />
         <menu name="DOCUMENTATION">
             <item href="README.html" name="README" />
+            <item href="GITFLOW_RELEASE.html" name="How to release Apache Maven projects" />
             <item href="MVN_DEPLOY_PUBLISH_SEGREGATION.html" name="mvn deploy and artifacts publish segregation" />
             <item href="TRAVISCI.html" name="travis-ci build" />
         </menu>

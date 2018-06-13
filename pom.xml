@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>0.0.1.OSS</version>
+    <version>0.0.2.OSS</version>
 
     <modules>
         <module>build-docker</module>
@@ -606,6 +606,17 @@
                 </executions>
             </plugin>
             <!-- @formatter:on -->
+
+            <!-- use mvn -N io.takari:maven:wrapper instead of mvn wrapper:wrapper -->
+            <!-- mvn wrapper:wrapper -->
+            <!--plugin>
+                <groupId>com.rimerosolutions.maven.plugins</groupId>
+                <artifactId>wrapper-maven-plugin</artifactId>
+                <version>0.0.4</version>
+                <configuration>
+                    <mavenVersion>3.3.3</mavenVersion>
+                </configuration>
+            </plugin-->
         </plugins>
 
         <!--extensions>

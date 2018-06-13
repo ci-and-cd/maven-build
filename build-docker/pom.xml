@@ -6,7 +6,7 @@
     <parent>
         <groupId>cn.home1</groupId>
         <artifactId>maven-build</artifactId>
-        <version>0.0.1.OSS</version>
+        <version>0.0.2.OSS</version>
     </parent>
 
     <artifactId>build-docker</artifactId>
@@ -217,7 +217,7 @@
                                 </execution>
                             </executions>
                         </plugin>
-                        <!--plugin>
+                        <plugin>
                             <groupId>com.spotify</groupId>
                             <artifactId>docker-maven-plugin</artifactId>
                             <executions>
@@ -232,7 +232,7 @@
                                     <goals><goal>push</goal></goals>
                                 </execution>
                             </executions>
-                        </plugin-->
+                        </plugin>
                     </plugins>
                 </pluginManagement>
             </build>
