@@ -664,7 +664,7 @@
                 <repository>
                     <id>OSSRH-releases</id>
                     <name>central releases</name>
-                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+                    <url>https://oss.sonatype.org/content/repositories/releases/</url>
                     <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </repository>
@@ -1098,7 +1098,7 @@
                 <wagon.merge-maven-repos.targetId>OSSRH-${build.publish.channel}s</wagon.merge-maven-repos.targetId>
             </properties>
             <distributionManagement>
-                <repository><id>OSSRH-releases</id><url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url></repository>
+                <repository><id>OSSRH-staging</id><url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url></repository>
                 <snapshotRepository><id>OSSRH-snapshots</id><url>https://oss.sonatype.org/content/repositories/snapshots</url></snapshotRepository>
             </distributionManagement>
             <build>
