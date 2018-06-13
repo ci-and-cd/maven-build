@@ -83,7 +83,18 @@ function git_repo_slug() {
     # echo "Fetch URL: http://user@pass:gitservice.org:20080/owner/repo.git" | ruby -ne 'puts /^\s*Fetch.*(:|\/){1}([^\/]+\/[^\/]+).git/.match($_)[2] rescue nil'
     # echo "Fetch URL: Fetch URL: git@github.com:ci-and-cd/maven-build.git" | ruby -ne 'puts /^\s*Fetch.*(:|\/){1}([^\/]+\/[^\/]+).git/.match($_)[2] rescue nil'
     # echo "Fetch URL: https://github.com/owner/repo.git" | ruby -ne 'puts /^\s*Fetch.*(:|\/){1}([^\/]+\/[^\/]+).git/.match($_)[2] rescue nil'
-    echo $(git remote show origin -n | ruby -ne 'puts /^\s*Fetch.*(:|\/){1}([^\/]+\/[^\/]+).git/.match($_)[2] rescue nil')
+    if [ -d .git ]; then
+        echo $(git remote show origin -n | ruby -ne 'puts /^\s*Fetch.*(:|\/){1}([^\/]+\/[^\/]+).git/.match($_)[2] rescue nil')
+    elif [ -n "${TRAVIS_REPO_SLUG}" ]; then
+        echo "${TRAVIS_REPO_SLUG}"
+    elif [ -n "${APPVEYOR_PROJECT_SLUG}" ]; then
+        echo "${APPVEYOR_PROJECT_SLUG}"
+    elif [ -n "${CI_PROJECT_PATH}" ]; then
+        ehco "${CI_PROJECT_PATH}"
+    else
+        (>&2 echo "Can not find value for git_repo_slug, exit")
+        return 1
+    fi
 }
 
 # see: http://stackoverflow.com/questions/16989598/bash-comparing-version-numbers
@@ -162,22 +173,36 @@ function ci_opt_infrastructure() {
 }
 
 # auto detect current build ref name by CI environment variables or local git info
+# gitlab-ci
 # ${CI_REF_NAME} show branch or tag since GitLab-CI 5.2
 # CI_REF_NAME for gitlab 8.x, see: https://gitlab.com/help/ci/variables/README.md
 # CI_COMMIT_REF_NAME for gitlab 9.x, see: https://gitlab.com/help/ci/variables/README.md
+#
+# travis-ci
 # TRAVIS_BRANCH for travis-ci, see: https://docs.travis-ci.com/user/environment-variables/
+# for builds triggered by a tag, this is the same as the name of the tag (TRAVIS_TAG).
+#
+# appveyor
+# APPVEYOR_REPO_BRANCH - build branch. For Pull Request commits it is base branch PR is merging into
+# APPVEYOR_REPO_TAG - true if build has started by pushed tag; otherwise false
+# APPVEYOR_REPO_TAG_NAME - contains tag name for builds started by tag; otherwise this variable is
 # returns: current build ref name, i.e. develop, release ...
 function ci_opt_ref_name() {
     if [ -n "${CI_OPT_REF_NAME}" ]; then
         echo "${CI_OPT_REF_NAME}"
     elif [ -n "${TRAVIS_BRANCH}" ]; then
         echo "${TRAVIS_BRANCH}"
+    elif [ -n "${APPVEYOR_REPO_TAG}" ]; then
+        if [ "${APPVEYOR_REPO_TAG_NAME}" == "false" ]; then echo "${APPVEYOR_REPO_TAG}"; else echo "${APPVEYOR_REPO_BRANCH}"; fi
     elif [ -n "${CI_REF_NAME}" ]; then
         echo "${CI_REF_NAME}"
     elif [ -n "${CI_COMMIT_REF_NAME}" ]; then
         echo "${CI_COMMIT_REF_NAME}"
-    else
+    elif [ -d .git ]; then
         echo "$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match)"
+    else
+        (>&2 echo "Can not find value for CI_OPT_REF_NAME, using default value 'master'")
+        echo "master"
     fi
 }
 
@@ -722,7 +747,14 @@ if [ -z "${CI_OPT_MAVEN_BUILD_REPO}" ]; then
     if [[ "${CI_OPT_CI_SCRIPT}" == http* ]]; then
         # test with: https://github.com/ci-and-cd/maven-build/raw/master/src/main/ci-script/lib_ci.sh
         # test with: https://github.com/ci-and-cd/maven-build/raw/release/0.0.1.OSS/src/main/ci-script/lib_ci.sh
-        CI_OPT_MAVEN_BUILD_REPO="$(echo ${CI_OPT_CI_SCRIPT} | sed -r 's#/raw/.+#/raw#')/$(ci_opt_ref_name)"
+        url_prefix="$(echo ${CI_OPT_CI_SCRIPT} | sed -r 's#/raw/.+#/raw#')"
+        if [ "$(git_repo_slug)" != "ci-and-cd/maven-build" ]; then
+            # For other projects, should use master branch by default.
+            CI_OPT_MAVEN_BUILD_REPO="${url_prefix}/master"
+        else
+            # Use current branch for ci-and-cd/maven-build project
+            CI_OPT_MAVEN_BUILD_REPO="${url_prefix}/$(ci_opt_ref_name)"
+        fi
     elif [ -n "${CI_OPT_CI_SCRIPT}" ]; then
         # use current directory
         CI_OPT_MAVEN_BUILD_REPO=""
