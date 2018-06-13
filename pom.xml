@@ -1115,9 +1115,13 @@
                         <version>1.6.8</version>
                         <extensions>true</extensions>
                         <configuration>
-                            <serverId>OSSRH-snapshots</serverId>
+                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                            <detectBuildFailures>true</detectBuildFailures>
                             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                            <serverId>OSSRH-staging</serverId>
+                            <!--<sslAllowAll>true</sslAllowAll>-->
+                            <stagingProgressPauseDurationSeconds>30</stagingProgressPauseDurationSeconds>
+                            <stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>
                         </configuration>
                     </plugin>
                 </plugins>
