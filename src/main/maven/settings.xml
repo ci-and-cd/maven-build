@@ -71,7 +71,7 @@
         -->
         <server><id>gpg.passphrase</id><passphrase>${env.CI_OPT_GPG_PASSPHRASE}</passphrase></server>
         <server><id>github</id><password>${env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</password></server>
-        <server><id>OSSRH-releases</id><username>${env.CI_OPT_MAVEN_CENTRAL_USER}</username><password>${env.CI_OPT_MAVEN_CENTRAL_PASS}</password></server>
+        <server><id>OSSRH-staging</id><username>${env.CI_OPT_MAVEN_CENTRAL_USER}</username><password>${env.CI_OPT_MAVEN_CENTRAL_PASS}</password></server>
         <server><id>OSSRH-snapshots</id><username>${env.CI_OPT_MAVEN_CENTRAL_USER}</username><password>${env.CI_OPT_MAVEN_CENTRAL_PASS}</password></server>
         <server>
             <id>docker-hub</id>
