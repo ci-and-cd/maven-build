@@ -40,7 +40,7 @@ jdk:
 #- oraclejdk9
 language: java
 script:
-- bash ci.sh mvn clean install sonar:sonar site deploy site-deploy
+- travis_wait 30 bash ci.sh mvn clean install sonar:sonar site deploy site-deploy
 services:
 - docker
 sudo: required
