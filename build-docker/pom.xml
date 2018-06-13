@@ -217,7 +217,7 @@
                                 </execution>
                             </executions>
                         </plugin>
-                        <!--plugin>
+                        <plugin>
                             <groupId>com.spotify</groupId>
                             <artifactId>docker-maven-plugin</artifactId>
                             <executions>
@@ -232,7 +232,7 @@
                                     <goals><goal>push</goal></goals>
                                 </execution>
                             </executions>
-                        </plugin-->
+                        </plugin>
                     </plugins>
                 </pluginManagement>
             </build>

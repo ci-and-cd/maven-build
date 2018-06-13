@@ -606,6 +606,17 @@
                 </executions>
             </plugin>
             <!-- @formatter:on -->
+
+            <!-- use mvn -N io.takari:maven:wrapper instead of mvn wrapper:wrapper -->
+            <!-- mvn wrapper:wrapper -->
+            <!--plugin>
+                <groupId>com.rimerosolutions.maven.plugins</groupId>
+                <artifactId>wrapper-maven-plugin</artifactId>
+                <version>0.0.4</version>
+                <configuration>
+                    <mavenVersion>3.3.3</mavenVersion>
+                </configuration>
+            </plugin-->
         </plugins>
 
         <!--extensions>
