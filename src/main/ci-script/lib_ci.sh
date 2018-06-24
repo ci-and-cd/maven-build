@@ -347,10 +347,6 @@ function ci_opt_maven_opts() {
             opts="${opts} -Dgpg.loopback=true"
         fi
 
-        if [ -n "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" ]; then
-            local docker_registry=$(echo "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" | awk -F/ '{print $3}')
-            if [[ "${docker_registry}" == *docker.io ]]; then CI_INFRA_OPT_DOCKER_REGISTRY=""; else CI_INFRA_OPT_DOCKER_REGISTRY="${docker_registry}"; fi
-        fi
         if [ -n "${CI_INFRA_OPT_DOCKER_REGISTRY}" ]; then opts="${opts} -Ddocker.registry=${CI_INFRA_OPT_DOCKER_REGISTRY}"; fi
         if [ -n "${CI_OPT_DOCKER_IMAGE_PREFIX}" ]; then opts="${opts} -Ddocker.image.prefix=${CI_OPT_DOCKER_IMAGE_PREFIX}"; fi
         opts="${opts} -Dfile.encoding=UTF-8"
@@ -400,11 +396,20 @@ function ci_opt_gradle_properties() {
 
 function init_docker_config() {
     if [ ! -d "${HOME}/.docker/" ]; then echo "mkdir ${HOME}/.docker/ "; mkdir -p "${HOME}/.docker/"; fi
-    # Download docker's config.json if current infrastructure has this file
+
     if [ "${CI_OPT_DRYRUN}" != "true" ]; then
-        download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/docker/config.json" "${HOME}/.docker/config.json" "-H 'PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)'"
-        if [ -n "${CI_OPT_DOCKER_REGISTRY_PASS}" ] && [ -n "${CI_OPT_DOCKER_REGISTRY_USER}" ]; then
-            echo ${CI_OPT_DOCKER_REGISTRY_PASS} | docker login --password-stdin -u="${CI_OPT_DOCKER_REGISTRY_USER}" ${CI_INFRA_OPT_DOCKER_REGISTRY_URL}
+        # Download docker's config.json if current infrastructure has this file
+        #download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/docker/config.json" "${HOME}/.docker/config.json" "-H 'PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)'"
+        #download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/docker/daemon.json" "${HOME}/.docker/daemon.json" "-H 'PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)'"
+
+        if [ -n "${CI_OPT_DOCKER_REGISTRY_PASS}" ] && [ -n "${CI_OPT_DOCKER_REGISTRY_USER}" ] && [ -n "${CI_INFRA_OPT_DOCKER_REGISTRY}" ]; then
+            if [[ "${CI_OPT_GRADLE_INIT_SCRIPT}" == https* ]]; then
+                echo logging into secure registry ${CI_INFRA_OPT_DOCKER_REGISTRY}
+                echo ${CI_OPT_DOCKER_REGISTRY_PASS} | docker login --password-stdin -u="${CI_OPT_DOCKER_REGISTRY_USER}" ${CI_INFRA_OPT_DOCKER_REGISTRY}
+            else
+                echo logging into insecure registry ${CI_INFRA_OPT_DOCKER_REGISTRY}
+                echo ${CI_OPT_DOCKER_REGISTRY_PASS} | DOCKER_OPTS="–insecure-registry ${CI_INFRA_OPT_DOCKER_REGISTRY}" docker login --password-stdin -u="${CI_OPT_DOCKER_REGISTRY_USER}" ${CI_INFRA_OPT_DOCKER_REGISTRY}
+            fi
         fi
     fi
 }
@@ -564,12 +569,24 @@ function run_mvn() {
     echo "alter_mvn result: mvn ${altered}"
     echo -e "<<<<<<<<<< ---------- run_mvn alter_mvn ---------- <<<<<<<<<<\n"
 
+    if [ -n "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" ]; then
+        local docker_registry=$(echo "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" | awk -F/ '{print $3}')
+        if [[ "${docker_registry}" == *docker.io ]]; then CI_INFRA_OPT_DOCKER_REGISTRY=""; else CI_INFRA_OPT_DOCKER_REGISTRY="${docker_registry}"; fi
+    fi
+
     echo -e "\n>>>>>>>>>> ---------- run_mvn options ---------- >>>>>>>>>>"
     export MAVEN_OPTS="$(ci_opt_maven_opts)"
     set | grep -E '^CI_INFRA_OPT_' | filter_secret_variables || echo "no any CI_INFRA_OPT_* present"
     set | grep -E '^CI_OPT_' | filter_secret_variables || echo "no any CI_OPT_* present"
     echo MAVEN_OPTS=${MAVEN_OPTS} | filter_secret_variables || echo "no MAVEN_OPTS present"
     echo -e "\n<<<<<<<<<< ---------- run_mvn options ---------- <<<<<<<<<<\n"
+
+    if [ "$(ci_opt_user_docker)" == "true" ]; then
+        # config and login
+        init_docker_config
+        # clean images
+        docker images | grep none | awk '{print $3}' | xargs docker rmi || echo "error on clean images"
+    fi
 
     echo -e "\n>>>>>>>>>> ---------- run_mvn project info ---------- >>>>>>>>>>"
     mvn ${CI_OPT_MAVEN_SETTINGS} -version
@@ -776,12 +793,6 @@ echo -e "\n<<<<<<<<<< ---------- options with important variables ---------- <<<
 
 
 # Load remote script library here
-
-
-if [ "$(ci_opt_user_docker)" == "true" ]; then
-    init_docker_config
-    docker images | grep none | awk '{print $3}' | xargs docker rmi || echo "error on clean images"
-fi
 
 if [ -f pom.xml ]; then
     run_mvn $@
