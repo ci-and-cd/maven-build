@@ -347,11 +347,7 @@ function ci_opt_maven_opts() {
             opts="${opts} -Dgpg.loopback=true"
         fi
 
-        if [ -n "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" ]; then
-            local docker_registry=$(echo "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" | awk -F/ '{print $3}')
-            if [[ "${docker_registry}" == *docker.io ]]; then CI_INFRA_OPT_DOCKER_REGISTRY=""; else CI_INFRA_OPT_DOCKER_REGISTRY="${docker_registry}"; fi
-        fi
-        if [ -n "${CI_INFRA_OPT_DOCKER_REGISTRY}" ]; then opts="${opts} -Ddocker.registry=${CI_INFRA_OPT_DOCKER_REGISTRY}"; fi
+        if [ -n "${CI_INFRA_OPT_DOCKER_REGISTRY}" ] && [[ "${CI_INFRA_OPT_DOCKER_REGISTRY}" != *docker.io ]]; then opts="${opts} -Ddocker.registry=${CI_INFRA_OPT_DOCKER_REGISTRY}"; fi
         if [ -n "${CI_OPT_DOCKER_IMAGE_PREFIX}" ]; then opts="${opts} -Ddocker.image.prefix=${CI_OPT_DOCKER_IMAGE_PREFIX}"; fi
         opts="${opts} -Dfile.encoding=UTF-8"
         if [ -n "${CI_OPT_FRONTEND_NODEDOWNLOADROOT}" ]; then opts="${opts} -Dfrontend.nodeDownloadRoot=${CI_OPT_FRONTEND_NODEDOWNLOADROOT}"; fi
@@ -575,6 +571,10 @@ function run_mvn() {
     local altered=$(alter_mvn $@)
     echo "alter_mvn result: mvn ${altered}"
     echo -e "<<<<<<<<<< ---------- run_mvn alter_mvn ---------- <<<<<<<<<<\n"
+
+    if [ -n "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" ]; then
+        CI_INFRA_OPT_DOCKER_REGISTRY=$(echo "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" | awk -F/ '{print $3}')
+    fi
 
     echo -e "\n>>>>>>>>>> ---------- run_mvn options ---------- >>>>>>>>>>"
     export MAVEN_OPTS="$(ci_opt_maven_opts)"
