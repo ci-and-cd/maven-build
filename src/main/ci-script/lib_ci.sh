@@ -66,9 +66,9 @@ cat >${target_file} <<EOL
 while IFS='' read -r LINE
 do
     echo "\${LINE}" \
-        | grep -v 'Downloading:' \
-        | grep -Ev '^Progress ' \
-        | grep -Ev '^Generating .+\.html\.\.\.'
+        | { grep -v 'Downloading:' || true; } \
+        | { grep -Ev '^Progress ' || true; } \
+        | { grep -Ev '^Generating .+\.html\.\.\.' || true; }
 done
 EOL
 
@@ -101,7 +101,7 @@ function git_repo_slug() {
 # arguments: first_version, second_version
 # return: if first_version is greater than second_version
 function version_gt() {
-    if [ ! -z "$(sort --help | grep GNU)" ]; then
+    if [ ! -z "$(sort --help | { grep GNU || true; })" ]; then
         test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1";
     else
         test "$(printf '%s\n' "$@" | sort | head -n 1)" != "$1";
@@ -343,7 +343,7 @@ function ci_opt_maven_opts() {
         if [ "${CI_OPT_DEPENDENCY_CHECK}" == "true" ]; then opts="${opts} -Ddependency-check=true"; fi
 
         opts="${opts} -Dgpg.executable=${GPG_EXECUTABLE}"
-        if version_gt $(${GPG_EXECUTABLE} --batch=true --version | grep -E '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 | awk '{print $NF}') "2.1"; then
+        if version_gt $(${GPG_EXECUTABLE} --batch=true --version | { grep -E '[0-9]+\.[0-9]+\.[0-9]+' || true; } | head -n1 | awk '{print $NF}') "2.1"; then
             opts="${opts} -Dgpg.loopback=true"
         fi
 
@@ -430,7 +430,7 @@ function maven_pull_base_image() {
             mvn ${CI_OPT_MAVEN_SETTINGS} -U -e process-resources
         fi
 
-        local base_images=($(find . -name '*Docker*' | xargs cat | grep -E '^FROM' | awk '{print $2}' | uniq))
+        local base_images=($(find . -name '*Docker*' | xargs cat | { grep -E '^FROM' || true; } | awk '{print $2}' | uniq))
         echo "Found ${#base_images[@]} base images, '${base_images[@]}'"
         if [ ${#base_images[@]} -gt 0 ]; then
             for base_image in ${base_images[@]}; do docker pull ${base_image}; done
@@ -599,10 +599,10 @@ function run_mvn() {
 
         # clean images
         echo find old docker images to clean
-        old_images=($(docker images | grep none | awk '{print $3}'))
+        local old_images=($(docker images | { grep 'none' || true; } | awk '{print $3}'))
         echo "Found ${#old_images[@]} old images, '${old_images[@]}'"
         if [ ${#old_images[@]} -gt 0 ]; then
-            for old_image in ${old_images[@]}; do docker rmi || echo "error on clean image ${old_image}"; done
+            for old_image in ${old_images[@]}; do docker rmi ${old_image} || echo "error on clean image ${old_image}"; done
         fi
     fi
 
@@ -704,7 +704,7 @@ if which gpg2 > /dev/null; then GPG_EXECUTABLE="gpg2"; GPG_CMD="gpg2 --use-agent
 echo "using ${GPG_EXECUTABLE}"
 # use --batch=true to avoid 'gpg tty not a tty' error
 ${GPG_CMD} --batch=true --version
-if version_gt $(${GPG_EXECUTABLE} --batch=true --version | grep -E '[0-9]+\.[0-9]+\.[0-9]+' | head -n1 | awk '{print $NF}') "2.1"; then
+if version_gt $(${GPG_EXECUTABLE} --batch=true --version | { grep -E '[0-9]+\.[0-9]+\.[0-9]+' || true; } | head -n1 | awk '{print $NF}') "2.1"; then
     echo "gpg version greater than 2.1"
     mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
     touch ~/.gnupg/gpg.conf
@@ -745,7 +745,7 @@ if [ -f codesigning.asc ]; then
     if [ -f codesigning.pub ]; then
         ${GPG_CMD} --yes --batch --import codesigning.asc
     else
-        if [ -z "$(${GPG_CMD} --list-secret-keys | grep ${CI_OPT_GPG_KEYNAME})" ]; then ${GPG_CMD} --yes --batch=true --fast-import codesigning.asc; fi
+        if [ -z "$(${GPG_CMD} --list-secret-keys | { grep ${CI_OPT_GPG_KEYNAME} || true; })" ]; then ${GPG_CMD} --yes --batch=true --fast-import codesigning.asc; fi
     fi
     echo list private keys
     ${GPG_CMD} --batch=true --list-secret-keys
