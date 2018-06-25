@@ -1637,8 +1637,7 @@
         <profile>
             <id>clirr</id>
             <activation>
-                <property><name>site</name><value>true</value></property>
-                <!--<property><name>!clirr</name></property>-->
+                <property><name>clirr</name><value>true</value></property>
             </activation>
             <build>
                 <pluginManagement>

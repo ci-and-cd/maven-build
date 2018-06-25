@@ -211,7 +211,7 @@ dependency-check
 need to be used together with `site` profile of build-site module.
 
 clirr
-> activate by set property 'site' to 'true'
+> activate by set property 'clirr' to 'true'
 
 sonar
 > activate by set property 'sonar' to 'true'
