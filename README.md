@@ -119,7 +119,7 @@ Need these properties only when deploy artifacts into maven central repository.
 com.github.eirslett:frontend-maven-plugin
 
 com.amashchenko.maven.plugin:gitflow-maven-plugin
-> Gitflow branch model
+> GitFlow branch model
 
 maven-compiler-plugin with errorprone
 > Source encoding.

@@ -21,7 +21,6 @@
 
         <dockerfile.build.skip>true</dockerfile.build.skip>
         <dockerfile.useMavenSettingsForAuth>false</dockerfile.useMavenSettingsForAuth>
-        <docker.registry>nexus3.local:5000</docker.registry>
     </properties>
 
     <build>
@@ -134,10 +133,16 @@
 
     <profiles>
         <!-- @formatter:off -->
+        <!-- value of ${docker.image.prefix} should ends with a '/' -->
+        <profile>
+            <id>default-docker-image-prefix</id>
+            <activation><property><name>!docker.image.prefix</name></property><activeByDefault>false</activeByDefault></activation>
+            <properties><docker.image.prefix></docker.image.prefix></properties>
+        </profile>
         <profile>
             <id>ues-private-docker-registry-no-docker-image-prefix</id>
             <activation>
-                <property><name>!docker.image.prefix</name></property>
+                <property><name>docker.registry</name></property>
                 <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
             </activation>
             <build>
@@ -147,14 +152,14 @@
                             <groupId>com.spotify</groupId>
                             <artifactId>dockerfile-maven-plugin</artifactId>
                             <configuration>
-                                <repository>${docker.registry}/${project.artifactId}</repository>
+                                <repository>${docker.registry}/${docker.image.prefix}${project.artifactId}</repository>
                             </configuration>
                         </plugin>
                         <plugin>
                             <groupId>com.spotify</groupId>
                             <artifactId>docker-maven-plugin</artifactId>
                             <configuration>
-                                <imageName>${docker.registry}/${project.artifactId}</imageName>
+                                <imageName>${docker.registry}/${docker.image.prefix}${project.artifactId}</imageName>
                             </configuration>
                         </plugin>
                     </plugins>
@@ -164,7 +169,7 @@
         <profile>
             <id>use-docker-hub-docker-image-prefix-no-docker-registry</id>
             <activation>
-                <property><name>docker.image.prefix</name></property>
+                <property><name>!docker.registry</name></property>
                 <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
             </activation>
             <build>
@@ -174,14 +179,14 @@
                             <groupId>com.spotify</groupId>
                             <artifactId>dockerfile-maven-plugin</artifactId>
                             <configuration>
-                                <repository>${docker.image.prefix}/${project.artifactId}</repository>
+                                <repository>${docker.image.prefix}${project.artifactId}</repository>
                             </configuration>
                         </plugin>
                         <plugin>
                             <groupId>com.spotify</groupId>
                             <artifactId>docker-maven-plugin</artifactId>
                             <configuration>
-                                <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+                                <imageName>${docker.image.prefix}${project.artifactId}</imageName>
                             </configuration>
                         </plugin>
                     </plugins>

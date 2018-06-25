@@ -106,7 +106,7 @@ Release Apache Maven projects using gitflow-maven-plugin
    If remote `release/${project.version}` branch not deleted automatically, you can do it manually by `git push -d release/${project.version}`
 
 5. Push tag `v${project.version}`
-   Gitflow plugin should push tag `v${project.version}` automatically, if not do it manually by `git push origin tag_name`.
+   GitFlow plugin should push tag `v${project.version}` automatically, if not do it manually by `git push origin tag_name`.
    If you use github, you can build archive on CI system and create a release on github.
    
 6. Make sure master and develop branch are pushed.

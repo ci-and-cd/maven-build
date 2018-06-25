@@ -347,6 +347,10 @@ function ci_opt_maven_opts() {
             opts="${opts} -Dgpg.loopback=true"
         fi
 
+        if [ -n "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" ]; then
+            local docker_registry=$(echo "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" | awk -F/ '{print $3}')
+            if [[ "${docker_registry}" == *docker.io ]]; then CI_INFRA_OPT_DOCKER_REGISTRY=""; else CI_INFRA_OPT_DOCKER_REGISTRY="${docker_registry}"; fi
+        fi
         if [ -n "${CI_INFRA_OPT_DOCKER_REGISTRY}" ]; then opts="${opts} -Ddocker.registry=${CI_INFRA_OPT_DOCKER_REGISTRY}"; fi
         if [ -n "${CI_OPT_DOCKER_IMAGE_PREFIX}" ]; then opts="${opts} -Ddocker.image.prefix=${CI_OPT_DOCKER_IMAGE_PREFIX}"; fi
         opts="${opts} -Dfile.encoding=UTF-8"
@@ -366,13 +370,16 @@ function ci_opt_maven_opts() {
         opts="${opts} -Duser.language=zh -Duser.region=CN -Duser.timezone=Asia/Shanghai"
         if [ -n "${CI_OPT_WAGON_SOURCE_FILEPATH}" ]; then opts="${opts} -Dwagon.source.filepath=${CI_OPT_WAGON_SOURCE_FILEPATH} -DaltDeploymentRepository=repo::default::file://${CI_OPT_WAGON_SOURCE_FILEPATH}"; fi
 
-        if [ -n "${CI_INFRA_OPT_SONAR_HOST_URL}" ]; then opts="${opts} -D$(ci_opt_infrastructure)-sonar.host.url=${CI_INFRA_OPT_SONAR_HOST_URL}"; fi
+        if [ "${CI_OPT_SONAR}" == "true" ] && [ -n "${CI_INFRA_OPT_SONAR_HOST_URL}" ]; then opts="${opts} -D$(ci_opt_infrastructure)-sonar.host.url=${CI_INFRA_OPT_SONAR_HOST_URL}"; fi
+        if [ "${CI_OPT_SONAR}" == "true" ] && [ -n "${CI_OPT_SONAR_LOGIN}" ]; then opts="${opts} -Dsonar.login=${CI_OPT_SONAR_LOGIN}"; fi
+        if [ "${CI_OPT_SONAR}" == "true" ] && [ -n "${CI_OPT_SONAR_LOGIN_TOKEN}" ]; then opts="${opts} -Dsonar.login=${CI_OPT_SONAR_LOGIN_TOKEN}"; fi
+        if [ "${CI_OPT_SONAR}" == "true" ] && [ -n "${CI_OPT_SONAR_PASSWORD}" ]; then opts="${opts} -Dsonar.password=${CI_OPT_SONAR_PASSWORD}"; fi
         if [ -n "${CI_INFRA_OPT_NEXUS3}" ]; then opts="${opts} -D$(ci_opt_infrastructure)-nexus3.repository=${CI_INFRA_OPT_NEXUS3}/nexus/repository"; fi
 
         # MAVEN_OPTS that need to kept secret
         if [ -n "${CI_OPT_JIRA_PROJECTKEY}" ]; then opts="${opts} -Djira.projectKey=${CI_OPT_JIRA_PROJECTKEY} -Djira.user=${CI_OPT_JIRA_USER} -Djira.password=${CI_OPT_JIRA_PASSWORD}"; fi
         # public sonarqube config, see: https://sonarcloud.io
-        if [ "opensource" == "$(ci_opt_infrastructure)" ]; then opts="${opts} -Dsonar.organization=${CI_OPT_SONAR_ORGANIZATION} -Dsonar.login=${CI_OPT_SONAR_LOGIN_TOKEN}"; fi
+        if [ "${CI_OPT_SONAR}" == "true" ] && [ -n "${CI_OPT_SONAR_ORGANIZATION}" ] && [ "opensource" == "$(ci_opt_infrastructure)" ]; then opts="${opts} -Dsonar.organization=${CI_OPT_SONAR_ORGANIZATION}"; fi
         if [ -n "${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE}" ] && [ -f "${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE}" ]; then opts="${opts} -Dsettings.security=${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE}"; fi
 
         echo "${opts}"
@@ -568,11 +575,6 @@ function run_mvn() {
     local altered=$(alter_mvn $@)
     echo "alter_mvn result: mvn ${altered}"
     echo -e "<<<<<<<<<< ---------- run_mvn alter_mvn ---------- <<<<<<<<<<\n"
-
-    if [ -n "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" ]; then
-        local docker_registry=$(echo "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" | awk -F/ '{print $3}')
-        if [[ "${docker_registry}" == *docker.io ]]; then CI_INFRA_OPT_DOCKER_REGISTRY=""; else CI_INFRA_OPT_DOCKER_REGISTRY="${docker_registry}"; fi
-    fi
 
     echo -e "\n>>>>>>>>>> ---------- run_mvn options ---------- >>>>>>>>>>"
     export MAVEN_OPTS="$(ci_opt_maven_opts)"
