@@ -406,13 +406,18 @@ function init_docker_config() {
         #download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/docker/daemon.json" "${HOME}/.docker/daemon.json" "-H 'PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)'"
 
         if [ -n "${CI_OPT_DOCKER_REGISTRY_PASS}" ] && [ -n "${CI_OPT_DOCKER_REGISTRY_USER}" ] && [ -n "${CI_INFRA_OPT_DOCKER_REGISTRY}" ]; then
-            if [[ "${CI_OPT_GRADLE_INIT_SCRIPT}" == https* ]]; then
+            if [[ "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" == https* ]]; then
+                echo "docker logging into secure registry ${CI_INFRA_OPT_DOCKER_REGISTRY} (${CI_INFRA_OPT_DOCKER_REGISTRY_URL})"
                 echo logging into secure registry ${CI_INFRA_OPT_DOCKER_REGISTRY}
                 echo ${CI_OPT_DOCKER_REGISTRY_PASS} | docker login --password-stdin -u="${CI_OPT_DOCKER_REGISTRY_USER}" ${CI_INFRA_OPT_DOCKER_REGISTRY}
             else
+                echo "docker logging into insecure registry ${CI_INFRA_OPT_DOCKER_REGISTRY} (${CI_INFRA_OPT_DOCKER_REGISTRY_URL})"
                 echo logging into insecure registry ${CI_INFRA_OPT_DOCKER_REGISTRY}
                 echo ${CI_OPT_DOCKER_REGISTRY_PASS} | DOCKER_OPTS="–insecure-registry ${CI_INFRA_OPT_DOCKER_REGISTRY}" docker login --password-stdin -u="${CI_OPT_DOCKER_REGISTRY_USER}" ${CI_INFRA_OPT_DOCKER_REGISTRY}
             fi
+            echo "docker login done"
+        else
+            echo "skip docker login"
         fi
     fi
 }
@@ -591,7 +596,9 @@ function run_mvn() {
     if [ "$(ci_opt_user_docker)" == "true" ]; then
         # config and login
         init_docker_config
+
         # clean images
+        echo find old docker images to clean
         old_images=($(docker images | grep none | awk '{print $3}'))
         echo "Found ${#old_images[@]} old images, '${old_images[@]}'"
         if [ ${#old_images[@]} -gt 0 ]; then
