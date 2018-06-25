@@ -20,6 +20,7 @@
     <description>This ruleset checks my code for bad stuff</description>
 
     <rule deprecated="false" ref="category/java/bestpractices.xml" typeResolution="false">
+        <exclude name="ConstantsInInterface"/>
         <exclude name="GuardLogStatement"/>
         <exclude name="JUnitAssertionsShouldIncludeMessage"/>
         <exclude name="SystemPrintln"/>
@@ -102,9 +103,5 @@
     </rule>
     <rule deprecated="false" ref="category/java/performance.xml" typeResolution="false">
         <exclude name="AvoidInstantiatingObjectsInLoops"/>
-    </rule>
-    <rule deprecated="false" typeResolution="false">
-        <exclude name="AvoidConstantsInterface"/>
-        <exclude name="GuardLogStatementJavaUtil"/>
     </rule>
 </ruleset>
