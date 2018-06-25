@@ -599,11 +599,13 @@ function run_mvn() {
 
         # clean images
         echo find old docker images to clean
-        old_images=($(docker images | grep none | awk '{print $3}'))
+        set -x
+        local old_images=($(docker images | grep none | awk '{print $3}'))
         echo "Found ${#old_images[@]} old images, '${old_images[@]}'"
         if [ ${#old_images[@]} -gt 0 ]; then
             for old_image in ${old_images[@]}; do docker rmi ${old_image} || echo "error on clean image ${old_image}"; done
         fi
+        set +x
     fi
 
     echo -e "\n>>>>>>>>>> ---------- run_mvn project info ---------- >>>>>>>>>>"
