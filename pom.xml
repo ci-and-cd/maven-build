@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>0.0.7.OSS</version>
+    <version>0.0.8.OSS</version>
 
     <modules>
         <module>build-docker</module>
@@ -1637,8 +1637,7 @@
         <profile>
             <id>clirr</id>
             <activation>
-                <property><name>site</name><value>true</value></property>
-                <!--<property><name>!clirr</name></property>-->
+                <property><name>clirr</name><value>true</value></property>
             </activation>
             <build>
                 <pluginManagement>
