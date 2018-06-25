@@ -419,11 +419,16 @@ function init_docker_config() {
 
 function maven_pull_base_image() {
     if type -p docker > /dev/null; then
-        if [ -n "$(find . -name '*Docker*')" ]; then
+        local dockerfiles=($(find . -name '*Docker*'))
+        echo "Found ${#dockerfiles[@]} Dockerfiles, '${dockerfiles[@]}'"
+        if [ ${#dockerfiles[@]} -gt 0 ]; then
             mvn ${CI_OPT_MAVEN_SETTINGS} -U -e process-resources
         fi
-        if [ -n "$(find . -name '*Docker*' | xargs cat | grep -E '^FROM' | awk '{print $2}')" ]; then
-            find . -name '*Docker*' | xargs cat | grep -E '^FROM' | awk '{print $2}' | uniq | xargs docker pull
+
+        local base_images=($(find . -name '*Docker*' | xargs cat | grep -E '^FROM' | awk '{print $2}' | uniq))
+        echo "Found ${#base_images[@]} base images, '${base_images[@]}'"
+        if [ ${#base_images[@]} -gt 0 ]; then
+            for base_image in ${base_images[@]}; do docker pull ${base_image}; done
         fi
     fi
 }
@@ -587,7 +592,11 @@ function run_mvn() {
         # config and login
         init_docker_config
         # clean images
-        docker images | grep none | awk '{print $3}' | xargs docker rmi || echo "error on clean images"
+        old_images=($(docker images | grep none | awk '{print $3}'))
+        echo "Found ${#old_images[@]} old images, '${old_images[@]}'"
+        if [ ${#old_images[@]} -gt 0 ]; then
+            for old_image in ${old_images[@]}; do docker rmi || echo "error on clean image ${old_image}"; done
+        fi
     fi
 
     echo -e "\n>>>>>>>>>> ---------- run_mvn project info ---------- >>>>>>>>>>"
