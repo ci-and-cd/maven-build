@@ -645,7 +645,7 @@ function run_mvn() {
     fi
 
     local filter_script_file=$(filter_script "$(ci_opt_cache_directory)/filter")
-    echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U -e ${altered} | ${filter_script_file}"
+    echo "mvn ${CI_OPT_MAVEN_SETTINGS} ${altered} | ${filter_script_file}"
     if [ "${CI_OPT_DRYRUN}" != "true" ]; then
         bash -c "set -e -o pipefail; mvn ${CI_OPT_MAVEN_SETTINGS} -U -e ${altered} | ${filter_script_file}"
     fi
