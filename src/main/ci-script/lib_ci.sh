@@ -422,13 +422,15 @@ function init_docker_config() {
     fi
 }
 
-function maven_pull_base_image() {
+function pull_base_image() {
     if type -p docker > /dev/null; then
         local dockerfiles=($(find . -name '*Docker*'))
         echo "Found ${#dockerfiles[@]} Dockerfiles, '${dockerfiles[@]}'"
-        if [ ${#dockerfiles[@]} -gt 0 ]; then
-            mvn ${CI_OPT_MAVEN_SETTINGS} -U -e process-resources
-        fi
+        # mvn could not resolve sibling dependencies on first build of a version
+        #if [ ${#dockerfiles[@]} -gt 0 ]; then
+        #    echo mvn ${CI_OPT_MAVEN_SETTINGS} -e process-resources
+        #    mvn ${CI_OPT_MAVEN_SETTINGS} -e process-resources
+        #fi
 
         local base_images=($(find . -name '*Docker*' | xargs cat | { grep -E '^FROM' || true; } | awk '{print $2}' | uniq))
         echo "Found ${#base_images[@]} base images, '${base_images[@]}'"
@@ -640,9 +642,11 @@ function run_mvn() {
     fi
     echo -e "<<<<<<<<<< ---------- run_mvn project info ---------- <<<<<<<<<<\n"
 
+    echo -e "\n>>>>>>>>>> ---------- pull_base_image ---------- >>>>>>>>>>"
     if [ "$(ci_opt_user_docker)" == "true" ] && [ "${CI_OPT_DRYRUN}" != "true" ]; then
-        maven_pull_base_image
+        pull_base_image
     fi
+    echo -e "<<<<<<<<<< ---------- pull_base_image ---------- <<<<<<<<<<\n"
 
     local filter_script_file=$(filter_script "$(ci_opt_cache_directory)/filter")
     echo -e "\n>>>>>>>>>> ---------- mvn ${CI_OPT_MAVEN_SETTINGS} ${altered} | ${filter_script_file} ---------- >>>>>>>>>>"
