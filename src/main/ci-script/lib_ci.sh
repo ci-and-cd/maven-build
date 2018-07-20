@@ -237,6 +237,9 @@ function ci_opt_publish_to_repo() {
         "develop")
             echo "true"
             ;;
+        feature*)
+            echo "true"
+            ;;
         hotfix*)
             echo "true"
             ;;
@@ -455,7 +458,20 @@ function alter_mvn() {
         else
             (>&2 echo "alter_mvn goal '${element}' found")
 
-            if [[ "${element}" == *site* ]] && [ "$(ci_opt_site)" == true ]; then
+            if [[ "${element}" == *deploy ]]; then
+            # deploy, site-deploy, push (docker)
+                if [ "$(ci_opt_publish_to_repo)" == "true" ]; then
+                    if [ "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]; then
+                    # mvn deploy and publish segregation
+                        result+=("org.codehaus.mojo:wagon-maven-plugin:merge-maven-repos@merge-maven-repos-deploy")
+                        if [ "$(ci_opt_user_docker)" == "true" ]; then result+=("dockerfile:push"); fi
+                    else
+                        result+=("${element}")
+                    fi
+                else
+                    (>&2 echo "skip ${element}")
+                fi
+            elif [[ "${element}" == *site* ]] && [ "$(ci_opt_site)" == true ]; then
             # if ci_opt_site=false, do not build site
                 result+=("${element}")
             elif ([[ "${element}" == *clean ]] || [[ "${element}" == *install ]]); then
@@ -471,18 +487,6 @@ function alter_mvn() {
                     fi
                 else
                     result+=("${element}")
-                fi
-            elif [[ "${element}" == *deploy ]]; then
-                if [ "$(ci_opt_publish_to_repo)" == "true" ]; then
-                    if [ "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]; then
-                    # mvn deploy and publish segregation
-                        result+=("org.codehaus.mojo:wagon-maven-plugin:merge-maven-repos@merge-maven-repos-deploy")
-                        if [ "$(ci_opt_user_docker)" == "true" ]; then result+=("dockerfile:push"); fi
-                    else
-                        result+=("${element}")
-                    fi
-                else
-                    (>&2 echo "skip ${element}")
                 fi
             elif [ "true" == "$(ci_opt_is_origin_repo)" ]; then
             # if is origin repo
