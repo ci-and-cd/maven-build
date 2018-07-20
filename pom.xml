@@ -218,7 +218,6 @@
                 <plugin><artifactId>maven-resources-plugin</artifactId><version>3.0.1</version></plugin>
                 <plugin><artifactId>maven-surefire-plugin</artifactId><version>2.21.0</version></plugin>
                 <plugin><artifactId>maven-toolchains-plugin</artifactId><version>1.1</version></plugin>
-                <plugin><groupId>pl.project13.maven</groupId><artifactId>git-commit-id-plugin</artifactId><version>2.2.4</version></plugin>
 
                 <plugin><artifactId>maven-project-info-reports-plugin</artifactId><version>2.9</version></plugin>
                 <!-- @formatter:on -->
@@ -294,6 +293,31 @@
                 <!-- maven-pmd-plugin:3.10.0 depends on net.sourceforge.pmd:pmd:6.4.0 -->
                 <plugin><artifactId>maven-pmd-plugin</artifactId><version>3.10.0</version></plugin>
                 <plugin><artifactId>maven-surefire-report-plugin</artifactId><version>2.21.0</version></plugin>
+
+                <plugin>
+                    <groupId>pl.project13.maven</groupId>
+                    <artifactId>git-commit-id-plugin</artifactId>
+                    <version>2.2.4</version>
+                    <executions>
+                        <execution>
+                            <id>get-the-git-infos</id>
+                            <phase>initialize</phase>
+                            <goals><goal>revision</goal></goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <commitIdGenerationMode>flat</commitIdGenerationMode>
+                        <dotGitDirectory>${maven.multiModuleProjectDirectory}/.git</dotGitDirectory>
+                        <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                        <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                        <!--generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename-->
+                        <generateGitPropertiesFilename>src/main/resources/git.properties</generateGitPropertiesFilename>
+                        <injectAllReactorProjects>true</injectAllReactorProjects>
+                        <prefix>git</prefix>
+                        <skipPoms>false</skipPoms>
+                        <verbose>false</verbose>
+                    </configuration>
+                </plugin>
                 <!-- @formatter:on -->
             </plugins>
         </pluginManagement>
@@ -360,6 +384,12 @@
                                 </delete>
                             </target>
                         </configuration>
+                    </execution>
+                    <execution>
+                        <id>echo-maven-multiModuleProjectDirectory</id>
+                        <phase>initialize</phase>
+                        <goals><goal>run</goal></goals>
+                        <configuration><tasks><echo>maven.multiModuleProjectDirectory: '${maven.multiModuleProjectDirectory}'</echo></tasks></configuration>
                     </execution>
                     <execution>
                         <id>ensure-dot-gitkeep</id>
@@ -874,31 +904,13 @@
 
         <profile>
             <id>git-commit-id</id>
-            <activation><file><exists>${maven.multiModuleProjectDirectory}/.git/HEAD</exists></file></activation>
+            <!-- works on both git submodule and normal local repository -->
+            <activation><file><exists>${maven.multiModuleProjectDirectory}/.git</exists></file><activeByDefault>false</activeByDefault></activation>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>pl.project13.maven</groupId>
                         <artifactId>git-commit-id-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>get-the-git-infos</id>
-                                <phase>initialize</phase>
-                                <goals><goal>revision</goal></goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <commitIdGenerationMode>flat</commitIdGenerationMode>
-                            <dotGitDirectory>${maven.multiModuleProjectDirectory}/.git</dotGitDirectory>
-                            <failOnNoGitDirectory>false</failOnNoGitDirectory>
-                            <generateGitPropertiesFile>true</generateGitPropertiesFile>
-                            <!--generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename-->
-                            <generateGitPropertiesFilename>src/main/resources/git.properties</generateGitPropertiesFilename>
-                            <injectAllReactorProjects>true</injectAllReactorProjects>
-                            <prefix>git</prefix>
-                            <skipPoms>false</skipPoms>
-                            <verbose>false</verbose>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
@@ -1334,15 +1346,11 @@
 
         <!-- @formatter:off -->
         <!-- set property checkstyle.config.location in MAVEN_OPTS, pom.xml or settings.xml. -->
-        <!--<file><exists>${maven.multiModuleProjectDirectory}/src/main/checkstyle/google_checks_8.10.xml</exists></file>-->
-        <!--checkstyle.config.location>${maven.multiModuleProjectDirectory}/src/main/checkstyle/google_checks_8.10.xml</checkstyle.config.location-->
         <profile>
             <id>default-checkstyle-config</id>
             <activation><property><name>!checkstyle.config.location</name></property></activation>
             <properties><checkstyle.config.location>https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/checkstyle/google_checks_8.10.xml</checkstyle.config.location></properties>
         </profile>
-        <!--<file><exists>${maven.multiModuleProjectDirectory}/src/main/pmd/pmd-ruleset-6.4.0.xml</exists></file>-->
-        <!--pmd.ruleset.location>${maven.multiModuleProjectDirectory}/src/main/pmd/pmd-ruleset-6.4.0.xml</pmd.ruleset.location-->
         <profile>
             <id>default-pmd-ruleset</id>
             <activation><property><name>!pmd.ruleset.location</name></property></activation>
