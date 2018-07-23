@@ -33,6 +33,7 @@
         <pluginGroup>org.apache.tomcat.maven</pluginGroup>
         <pluginGroup>org.codehaus.mojo</pluginGroup>
         <pluginGroup>org.sonarsource.scanner.maven</pluginGroup>
+        <pluginGroup>org.springframework.boot</pluginGroup>
     </pluginGroups>
 
     <profiles>

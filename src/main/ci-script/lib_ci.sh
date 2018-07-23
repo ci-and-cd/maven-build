@@ -600,6 +600,7 @@ function run_mvn() {
     echo -e "\n<<<<<<<<<< ---------- run_mvn options ---------- <<<<<<<<<<\n"
 
     if [ "$(ci_opt_user_docker)" == "true" ]; then
+        docker version
         # config and login
         init_docker_config
 
