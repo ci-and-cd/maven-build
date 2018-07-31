@@ -15,13 +15,13 @@
         <!--mirror>
             <id>mirror</id>
             <name>mirror</name>
-            <url>http://nexus3.local:28081/nexus/repository/maven-public/</url>
+            <url>http://nexus3:28081/nexus/repository/maven-public/</url>
             <mirrorOf>*</mirrorOf>
         </mirror-->
         <!--mirror>
             <id>mirror</id>
             <name>mirror</name>
-            <url>http://nexus3.internal:28081/nexus/repository/maven-public/</url>
+            <url>http://nexus3:28081/nexus/repository/maven-public/</url>
             <mirrorOf>*</mirrorOf>
         </mirror-->
     </mirrors>
@@ -80,21 +80,21 @@
             <configuration><email>${env.CI_OPT_DOCKER_DOCKERHUB_MAIL}</email></configuration>
         </server>
 
-        <server><id>internal-nexus3-releases</id><username>deployment</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
-        <server><id>internal-nexus3-snapshots</id><username>deployment</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
-        <server><id>internal-nexus3-thirdparty</id><username>deployment</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
-        <server><id>internal-mvnsite</id><username>root</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
+        <server><id>private-nexus3-releases</id><username>deployment</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
+        <server><id>private-nexus3-snapshots</id><username>deployment</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
+        <server><id>private-nexus3-thirdparty</id><username>deployment</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
+        <server><id>private-mvnsite</id><username>root</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
         <server><id>nexus3.internal:5000</id><username>deployment</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
 
         <!-- see: http://maven.apache.org/guides/mini/guide-encryption.html -->
         <!-- mvn &#x002d;&#x002d;encrypt-password ${password} -->
         <!-- accept RSA key fingerprint -->
         <!-- ssh -o UserKnownHostsFile=~/.ssh/known_hosts root@mvnsite.local -p 10022 -->
-        <server><id>local-nexus3-releases</id><username>deployment</username><password>deployment</password></server>
-        <server><id>local-nexus3-snapshots</id><username>deployment</username><password>deployment</password></server>
-        <server><id>local-nexus3-thirdparty</id><username>deployment</username><password>deployment</password></server>
+        <server><id>private-nexus3-releases</id><username>deployment</username><password>deployment</password></server>
+        <server><id>private-nexus3-snapshots</id><username>deployment</username><password>deployment</password></server>
+        <server><id>private-nexus3-thirdparty</id><username>deployment</username><password>deployment</password></server>
         <server>
-            <id>local-mvnsite</id>
+            <id>private-mvnsite</id>
             <!--<username>root</username><passphrase>if required</passphrase><privateKey>${user.home}/.ssh/mvnsite.local</privateKey>-->
             <username>deployment</username><password>deployment</password>
             <configuration>

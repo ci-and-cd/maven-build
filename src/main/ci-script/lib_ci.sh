@@ -159,16 +159,16 @@ function ci_opt_is_origin_repo() {
 
 # auto detect infrastructure using for this build.
 # example of gitlab-ci's CI_PROJECT_URL: "https://example.com/gitlab-org/gitlab-ce"
-# returns: opensource, internal or local
+# returns: opensource, private or customized infrastructure name
 function ci_opt_infrastructure() {
     if [ -n "${CI_OPT_INFRASTRUCTURE}" ]; then
         echo ${CI_OPT_INFRASTRUCTURE}
     elif [ -n "${TRAVIS_REPO_SLUG}" ]; then
         echo "opensource"
-    elif [ -n "${CI_PROJECT_URL}" ] && [[ "${CI_PROJECT_URL}" == ${CI_INFRA_OPT_INTERNAL_GIT_PREFIX}* ]]; then
-        echo "internal"
+    elif [ -n "${CI_PROJECT_URL}" ] && [[ "${CI_PROJECT_URL}" == ${CI_INFRA_OPT_PRIVATE_GIT_PREFIX}* ]]; then
+        echo "private"
     else
-        echo "local"
+        echo "private"
     fi
 }
 
@@ -294,12 +294,9 @@ function ci_infra_opt_git_prefix() {
         if [ "opensource" == "${infrastructure}" ]; then
             default_value="https://github.com"
             CI_INFRA_OPT_GIT_PREFIX="${CI_INFRA_OPT_OPENSOURCE_GIT_PREFIX}"
-        elif [ "internal" == "${infrastructure}" ]; then
-            default_value="http://gitlab.internal"
-            CI_INFRA_OPT_GIT_PREFIX="${CI_INFRA_OPT_INTERNAL_GIT_PREFIX}"
-        elif [ "local" == "${infrastructure}" ] || [ -z "${infrastructure}" ]; then
-            default_value="http://gitlab.local:10080"
-            CI_INFRA_OPT_GIT_PREFIX="${CI_INFRA_OPT_LOCAL_GIT_PREFIX}"
+        elif [ "private" == "${infrastructure}" ] || [ -z "${infrastructure}" ]; then
+            default_value="http://gitlab"
+            CI_INFRA_OPT_GIT_PREFIX="${CI_INFRA_OPT_PRIVATE_GIT_PREFIX}"
         fi
 
         if [ -z "${CI_INFRA_OPT_GIT_PREFIX}" ] && [ -n "${default_value}" ]; then
@@ -369,7 +366,7 @@ function ci_opt_maven_opts() {
         opts="${opts} -Duser.language=zh -Duser.region=CN -Duser.timezone=Asia/Shanghai"
         if [ -n "${CI_OPT_WAGON_SOURCE_FILEPATH}" ]; then opts="${opts} -Dwagon.source.filepath=${CI_OPT_WAGON_SOURCE_FILEPATH} -DaltDeploymentRepository=repo::default::file://${CI_OPT_WAGON_SOURCE_FILEPATH}"; fi
 
-        if [ "${CI_OPT_SONAR}" == "true" ] && [ -n "${CI_INFRA_OPT_SONAR_HOST_URL}" ]; then opts="${opts} -D$(ci_opt_infrastructure)-sonar.host.url=${CI_INFRA_OPT_SONAR_HOST_URL}"; fi
+        if [ "${CI_OPT_SONAR}" == "true" ] && [ -n "${CI_INFRA_OPT_SONAR_HOST_URL}" ]; then opts="${opts} -D$(ci_opt_infrastructure)-sonarqube.host.url=${CI_INFRA_OPT_SONAR_HOST_URL}"; fi
         if [ "${CI_OPT_SONAR}" == "true" ] && [ -n "${CI_OPT_SONAR_LOGIN}" ]; then opts="${opts} -Dsonar.login=${CI_OPT_SONAR_LOGIN}"; fi
         if [ "${CI_OPT_SONAR}" == "true" ] && [ -n "${CI_OPT_SONAR_LOGIN_TOKEN}" ]; then opts="${opts} -Dsonar.login=${CI_OPT_SONAR_LOGIN_TOKEN}"; fi
         if [ "${CI_OPT_SONAR}" == "true" ] && [ -n "${CI_OPT_SONAR_PASSWORD}" ]; then opts="${opts} -Dsonar.password=${CI_OPT_SONAR_PASSWORD}"; fi

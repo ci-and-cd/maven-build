@@ -23,11 +23,11 @@ You need to provide few properties and environment variables, see next chapter.
 ## II. Properties, Environment variables and their default values
 
 ### 1. fetch or deploy
-- internal-nexus3.repository
-> default: http://nexus3.internal:28081/nexus/repository
+- private-nexus3.repository
+> default: http://nexus3:28081/nexus/repository
 Set this property to a real world url.
 
-- local-nexus3.repository
+- private-nexus3.repository
 > default: http://nexus3.localal:28081/nexus/repository
 Set this property to a real world url.
 
@@ -57,10 +57,10 @@ Customize these properties only when building front-end projects and default sit
 
 ### 4. report
 #### 4.1 sonarqube
-- internal-sonar.host.url
-> default: http://sonarqube.internal:9000
-- local-sonar.host.url
-> default: http://sonarqube.local:9000
+- private-sonarqube.host.url
+> default: http://sonarqube:9000
+- private-sonarqube.host.url
+> default: http://sonarqube:9000
 
 Need these properties only when profile 'sonar' is activated.
 
@@ -173,7 +173,7 @@ infrastructure_opensource
 > Use maven central service.
 Deploy maven site to github.
 
-infrastructure_internal
+infrastructure_private
 > Use nexus service at organization internal network.
 Deploy maven site into organization internal mvnsite.
 
