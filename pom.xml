@@ -851,20 +851,24 @@
             <!-- if sonar=true, jacoco should be set to true also -->
             <activation><property><name>sonar</name><value>true</value></property></activation>
             <properties>
-                <!-- sonar.java.binaries issue when force language java  -->
-                <!--sonar.language>java</sonar.language-->
-                <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
+                <!--<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>-->
 
-                <!--sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin-->
+                <sonar.groovy.binaries>target/classes</sonar.groovy.binaries>
+
                 <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
                 <sonar.jacoco.reportPath>${jacoco.reportPath}</sonar.jacoco.reportPath>
                 <sonar.jacoco.itReportPath>${jacoco.itReportPath}</sonar.jacoco.itReportPath>
+
+                <!-- sonar.java.binaries issue when force language java  -->
+                <!--<sonar.language>java</sonar.language>-->
+
+                <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
             </properties>
             <build>
                 <pluginManagement>
                     <plugins>
                         <!-- see: https://github.com/SonarSource/sonar-scanner-maven -->
-                        <plugin><groupId>org.sonarsource.scanner.maven</groupId><artifactId>sonar-maven-plugin</artifactId><version>3.4.0.905</version></plugin>
+                        <plugin><groupId>org.sonarsource.scanner.maven</groupId><artifactId>sonar-maven-plugin</artifactId><version>3.4.1.1170</version></plugin>
                     </plugins>
                 </pluginManagement>
                 <plugins>
