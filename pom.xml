@@ -1908,6 +1908,19 @@
             </properties>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-groovy-sources</id><phase>generate-sources</phase><goals><goal>add-source</goal></goals>
+                                <configuration><sources><source>src/main/groovy</source></sources></configuration>
+                            </execution>
+                            <execution>
+                                <id>add-groovy-test-sources</id><phase>generate-sources</phase><goals><goal>add-test-source</goal></goals>
+                                <configuration><sources><source>src/test/groovy</source></sources></configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin><groupId>org.codehaus.groovy</groupId><artifactId>groovy-eclipse-compiler</artifactId><version>${groovy-eclipse-compiler.version}</version><extensions>true</extensions></plugin>
                 </plugins>
                 <pluginManagement>
