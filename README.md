@@ -1,4 +1,11 @@
 # maven-build
+
+[![Sonar](https://sonarcloud.io/api/project_badges/measure?project=cn.home1%3Amaven-build&metric=alert_status)](https://sonarcloud.io/dashboard?id=cn.home1%3Amaven-build)  
+[Maven Site](https://maven-site.infra.top/ci-and-cd/maven-build/staging/index.html)  
+[Source Repository](https://github.com/ci-and-cd/maven-build/tree/develop)  
+[![Build Status](https://travis-ci.org/ci-and-cd/maven-build.svg?branch=develop)](https://travis-ci.org/ci-and-cd/maven-build)  
+
+
 Parent pom for maven based projects
 
 maven-build support code environment segregation and build deploy segregation.  
