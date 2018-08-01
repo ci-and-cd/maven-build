@@ -847,10 +847,12 @@
         </profile>
 
         <profile>
+            <!-- see: https://github.com/SonarSource/sonar-scanning-examples -->
             <id>sonar</id>
             <!-- if sonar=true, jacoco should be set to true also -->
             <activation><property><name>sonar</name><value>true</value></property></activation>
             <properties>
+                <!-- see: https://docs.sonarqube.org/display/SONAR/Analysis+Parameters -->
                 <!--<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>-->
 
                 <sonar.groovy.binaries>target/classes</sonar.groovy.binaries>
@@ -863,6 +865,10 @@
                 <!--<sonar.language>java</sonar.language>-->
 
                 <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
+
+                <sonar.sources>.</sonar.sources>
+                <sonar.inclusions>src/main/**</sonar.inclusions>
+                <sonar.test.inclusions>src/test/**</sonar.test.inclusions>
             </properties>
             <build>
                 <pluginManagement>
