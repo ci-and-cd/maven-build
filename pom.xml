@@ -213,7 +213,7 @@
                 <plugin><artifactId>maven-surefire-plugin</artifactId><version>2.21.0</version></plugin>
                 <plugin><artifactId>maven-toolchains-plugin</artifactId><version>1.1</version></plugin>
 
-                <plugin><artifactId>maven-project-info-reports-plugin</artifactId><version>2.9</version></plugin>
+                <plugin><artifactId>maven-project-info-reports-plugin</artifactId><version>3.0.0</version></plugin>
                 <!-- @formatter:on -->
 
                 <!-- @formatter:off -->
