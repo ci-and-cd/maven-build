@@ -37,8 +37,6 @@
         <menu name="Projects">
             <item href="build-docker/index.html" name="build-docker" />
             <item href="#" name="-----" />
-            <item href="build-docker/maven-build-java8/index.html" name="maven-build-java8" />
-            <item href="build-docker/maven-build-java9/index.html" name="maven-build-java9" />
         </menu>
         <menu ref="modules" />
         <!--<menu ref="reports" />-->
