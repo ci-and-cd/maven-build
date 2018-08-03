@@ -1507,22 +1507,25 @@
                         <reportSets>
                             <reportSet>
                                 <reports>
-                                    <report>cim</report>
+                                    <report>ci-management</report>
                                     <report>dependencies</report>
-                                    <!--
+                                    <!---->
                                     <report>dependency-convergence</report>
                                     <report>dependency-info</report>
                                     <report>dependency-management</report>
                                     <report>distribution-management</report>
-                                    -->
+                                    <!---->
+                                    <report>help</report>
                                     <report>index</report>
-                                    <report>summary</report>
-                                    <report>mailing-list</report>
-                                    <report>issue-tracking</report>
+                                    <report>issue-management</report>
+                                    <report>licenses</report>
+                                    <report>mailing-lists</report>
                                     <report>modules</report>
-                                    <report>project-team</report>
+                                    <report>plugin-management</report>
+                                    <report>plugins</report>
                                     <report>scm</report>
-                                    <report>license</report>
+                                    <report>summary</report>
+                                    <report>team</report>
                                 </reports>
                             </reportSet>
                         </reportSets>
