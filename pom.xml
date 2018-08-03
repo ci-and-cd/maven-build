@@ -509,11 +509,7 @@
                     </excludes>
                 </configuration>
                 <executions>
-                    <execution>
-                        <id>default-test</id>
-                        <goals><goal>test</goal></goals>
-                        <configuration><skip>${maven.test.skip}</skip></configuration>
-                    </execution>
+                    <execution><id>default-test</id><goals><goal>test</goal></goals><configuration><skip>${maven.test.skip}</skip></configuration></execution>
                 </executions>
             </plugin>
             <plugin>
@@ -536,16 +532,8 @@
                     </excludes>
                 </configuration>
                 <executions>
-                    <execution>
-                        <id>failsafe-integration-test</id>
-                        <phase>integration-test</phase>
-                        <goals><goal>integration-test</goal></goals>
-                    </execution>
-                    <execution>
-                        <id>failsafe-verify</id>
-                        <phase>post-integration-test</phase>
-                        <goals><goal>verify</goal></goals>
-                    </execution>
+                    <execution><id>failsafe-integration-test</id><phase>integration-test</phase><goals><goal>integration-test</goal></goals></execution>
+                    <execution><id>failsafe-verify</id><phase>post-integration-test</phase><goals><goal>verify</goal></goals></execution>
                 </executions>
             </plugin>
             <plugin>
@@ -553,13 +541,11 @@
                 <configuration>
                     <rules>
                         <!-- Note: travis-ci uses old maven version  -->
-                        <requireMavenVersion><version>[3.5.0,)</version></requireMavenVersion>
+                        <requireMavenVersion><version>[3.5.3,)</version></requireMavenVersion>
                         <!--requireUpperBoundDeps-->
                         <dependencyConvergence><uniqueVersions>false</uniqueVersions></dependencyConvergence>
                         <banTransitiveDependencies>
-                            <excludes>
-                                <exclude>*</exclude>
-                            </excludes>
+                            <excludes><exclude>*</exclude></excludes>
                             <includes>
                                 <!--<include>*:commons-logging</include>-->
                             </includes>
@@ -573,19 +559,13 @@
                     <fail>true</fail>
                 </configuration>
                 <executions>
-                    <execution>
-                        <id>enforce-banned-dependencies</id>
-                        <phase>validate</phase>
-                        <goals><goal>enforce</goal></goals>
-                    </execution>
+                    <execution><id>enforce-banned-dependencies</id><phase>validate</phase><goals><goal>enforce</goal></goals></execution>
                 </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <failOnError>false</failOnError>
-                    <charset>${project.build.sourceEncoding}</charset>
-                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <failOnError>false</failOnError><charset>${project.build.sourceEncoding}</charset><encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
                 <executions>
                     <execution><id>attach-javadocs</id><goals><goal>jar</goal></goals></execution>
@@ -601,17 +581,17 @@
                 </executions>
             </plugin>
 
-            <!--<plugin>-->
-                <!--<groupId>org.codehaus.groovy.maven</groupId>-->
-                <!--<artifactId>gmaven-plugin</artifactId>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<goals><goal>execute</goal></goals>-->
-                        <!--<phase>initialize</phase>-->
-                        <!--<configuration><source>System.setProperty("local.deploy.model.path", "${project.groupId}".replace('.', '/')+"/${project.artifactId}")</source></configuration>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
+            <!--<plugin>
+                <groupId>org.codehaus.groovy.maven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals><goal>execute</goal></goals>
+                        <phase>initialize</phase>
+                        <configuration><source>System.setProperty("local.deploy.model.path", "${project.groupId}".replace('.', '/')+"/${project.artifactId}")</source></configuration>
+                    </execution>
+                </executions>
+            </plugin>-->
             <plugin>
                 <groupId>org.codehaus.gmaven</groupId>
                 <artifactId>groovy-maven-plugin</artifactId>
@@ -638,20 +618,14 @@
                     <failsOnError>false</failsOnError>
                 </configuration>
                 <executions>
-                    <execution>
-                        <id>validate</id>
-                        <phase>validate</phase>
-                        <goals><goal>check</goal></goals>
-                    </execution>
+                    <execution><id>validate</id><phase>validate</phase><goals><goal>check</goal></goals></execution>
                 </executions>
             </plugin>
             <!-- see: http://maven.apache.org/plugins/maven-pmd-plugin/examples/multi-module-config.html -->
             <plugin>
                 <artifactId>maven-pmd-plugin</artifactId>
                 <configuration>
-                    <failOnViolation>false</failOnViolation>
-                    <printFailingErrors>true</printFailingErrors>
-                    <rulesets><ruleset>${pmd.ruleset.location}</ruleset></rulesets>
+                    <failOnViolation>false</failOnViolation><printFailingErrors>true</printFailingErrors><rulesets><ruleset>${pmd.ruleset.location}</ruleset></rulesets>
                 </configuration>
                 <executions>
                     <execution><goals><goal>check</goal><goal>cpd-check</goal></goals></execution>
@@ -661,14 +635,10 @@
 
             <!-- use mvn -N io.takari:maven:wrapper instead of mvn wrapper:wrapper -->
             <!-- mvn wrapper:wrapper -->
-            <!--plugin>
-                <groupId>com.rimerosolutions.maven.plugins</groupId>
-                <artifactId>wrapper-maven-plugin</artifactId>
-                <version>0.0.4</version>
-                <configuration>
-                    <mavenVersion>3.3.3</mavenVersion>
-                </configuration>
-            </plugin-->
+            <!--<plugin>
+                <groupId>com.rimerosolutions.maven.plugins</groupId><artifactId>wrapper-maven-plugin</artifactId><version>0.0.4</version>
+                <configuration><mavenVersion>3.5.4</mavenVersion></configuration>
+            </plugin>-->
         </plugins>
 
         <!--extensions>
@@ -713,10 +683,7 @@
             <activation><file><exists>${maven.multiModuleProjectDirectory}/.git</exists></file><activeByDefault>false</activeByDefault></activation>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>pl.project13.maven</groupId>
-                        <artifactId>git-commit-id-plugin</artifactId>
-                    </plugin>
+                    <plugin><groupId>pl.project13.maven</groupId><artifactId>git-commit-id-plugin</artifactId></plugin>
                 </plugins>
             </build>
         </profile>
@@ -1148,14 +1115,8 @@
                 <pluginManagement>
                     <plugins>
                         <plugin>
-                            <groupId>com.github.github</groupId>
-                            <artifactId>site-maven-plugin</artifactId>
-                            <version>0.13.0.OSS-M1</version>
-                            <configuration>
-                                <merge>true</merge>
-                                <noJekyll>true</noJekyll>
-                                <repositoryOwner>${env.CI_OPT_GITHUB_SITE_REPO_OWNER}</repositoryOwner>
-                            </configuration>
+                            <groupId>com.github.github</groupId><artifactId>site-maven-plugin</artifactId><version>0.13.0.OSS-M1</version>
+                            <configuration><merge>true</merge><noJekyll>true</noJekyll><repositoryOwner>${env.CI_OPT_GITHUB_SITE_REPO_OWNER}</repositoryOwner></configuration>
                         </plugin>
                     </plugins>
                 </pluginManagement>
@@ -1178,8 +1139,7 @@
         <profile>
             <id>infrastructure_opensource_github_site</id>
             <activation>
-                <property><name>infrastructure</name><value>opensource</value></property>
-                <property><name>github-site-publish</name></property>
+                <property><name>github-site-publish</name><value>true</value></property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <build>
@@ -1232,10 +1192,7 @@
         <profile>
             <id>infrastructure_opensource_site</id>
             <activation>
-                <property><name>infrastructure</name><value>opensource</value></property>
-                <property><name>!github-site-publish</name></property>
-                <property><name>opensource-nexus3.repository</name></property>
-                <activeByDefault>false</activeByDefault>
+                <property><name>github-site-publish</name><value>false</value></property>
             </activation>
             <distributionManagement>
                 <site><id>opensource-mvnsite</id><url>dav:${opensource-nexus3.repository}/mvnsite/${site.path}</url></site>
@@ -1251,9 +1208,7 @@
                 <site><id>private-mvnsite</id><url>dav:${private-nexus3.repository}/mvnsite/${site.path}</url></site>
             </distributionManagement>
         </profile>
-        <!-- @formatter:on -->
 
-        <!-- @formatter:off -->
         <!-- set property checkstyle.config.location in MAVEN_OPTS, pom.xml or settings.xml. -->
         <profile>
             <id>default-checkstyle-config</id>
@@ -1322,28 +1277,21 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>animal-sniffer-maven-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId><artifactId>animal-sniffer-maven-plugin</artifactId>
                         <configuration>
                             <signature><groupId>org.codehaus.mojo.signature</groupId><artifactId>java18</artifactId><version>1.0</version></signature>
                         </configuration>
                     </plugin>
-                    <!--plugin>
+                    <!--<plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
                         <executions>
                             <execution>
                                 <id>analyze</id>
-                                <goals>
-                                    <goal>analyze-only</goal>
-                                </goals>
-                                <configuration>
-                                    <failOnWarning>false</failOnWarning>
-                                    <ignoreNonCompile>true</ignoreNonCompile>
-                                    <outputXML>true</outputXML>
-                                </configuration>
+                                <goals><goal>analyze-only</goal></goals>
+                                <configuration><failOnWarning>false</failOnWarning><ignoreNonCompile>true</ignoreNonCompile><outputXML>true</outputXML></configuration>
                             </execution>
                         </executions>
-                    </plugin-->
+                    </plugin>-->
                 </plugins>
             </build>
             <reporting>
@@ -1351,14 +1299,8 @@
                     <plugin>
                         <artifactId>maven-surefire-report-plugin</artifactId>
                         <reportSets>
-                            <reportSet>
-                                <id>unit-tests</id>
-                                <reports><report>report-only</report></reports>
-                            </reportSet>
-                            <reportSet>
-                                <id>integration-tests</id>
-                                <reports><report>failsafe-report-only</report></reports>
-                            </reportSet>
+                            <reportSet><id>unit-tests</id><reports><report>report-only</report></reports></reportSet>
+                            <reportSet><id>integration-tests</id><reports><report>failsafe-report-only</report></reports></reportSet>
                         </reportSets>
                     </plugin>
                     <plugin><groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId></plugin>
@@ -1385,44 +1327,24 @@
                             <charset>${project.build.sourceEncoding}</charset>
                             <encoding>${project.build.sourceEncoding}</encoding>
                             <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
-                            <docletArtifact>
-                                <groupId>org.umlgraph</groupId>
-                                <artifactId>umlgraph</artifactId>
-                                <version>${umlgraph.version}</version>
-                            </docletArtifact>
+                            <docletArtifact><groupId>org.umlgraph</groupId><artifactId>umlgraph</artifactId><version>${umlgraph.version}</version></docletArtifact>
                             <additionalOptions>-views -all</additionalOptions>
                             <!-- UML Graph需要通过匹配标签插入javadoc生成的html -->
                             <additionalJOption>-J-Duser.language=en</additionalJOption>
                             <useStandardDocletOptions>true</useStandardDocletOptions>
                         </configuration>
                         <reportSets>
-                            <reportSet>
-                                <id>non-aggregate</id>
-                                <reports>
-                                    <report>javadoc</report>
-                                    <!--report>it-javadoc</report-->
-                                </reports>
-                            </reportSet>
+                            <reportSet><id>non-aggregate</id><reports><report>javadoc</report><!--report>it-javadoc</report--></reports></reportSet>
                             <!-- aggregate reportSet, to define in poms having modules -->
                             <!-- don't run aggregate in child modules -->
                             <!-- TODO inherited false bug? -->
-                            <!--reportSet>
-                                <id>aggregate</id>
-                                <inherited>false</inherited>
-                                <reports>
-                                    <report>aggregate</report>
-                                </reports>
-                            </reportSet-->
+                            <!--<reportSet><id>aggregate</id><inherited>false</inherited><reports><report>aggregate</report></reports></reportSet>-->
                         </reportSets>
                     </plugin>
                     <plugin>
                         <artifactId>maven-jxr-plugin</artifactId>
                         <reportSets>
-                            <reportSet>
-                                <id>aggregate</id>
-                                <inherited>false</inherited>
-                                <reports><report>aggregate</report></reports>
-                            </reportSet>
+                            <reportSet><id>aggregate</id><inherited>false</inherited><reports><report>aggregate</report></reports></reportSet>
                         </reportSets>
                     </plugin>
                     <!-- Taglist plugin MUST be executed after the JXR plugin. -->
@@ -1504,16 +1426,9 @@
             <reporting>
                 <plugins>
                     <plugin>
-                        <groupId>org.jacoco</groupId>
-                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId>
                         <reportSets>
-                            <reportSet>
-                                <reports>
-                                    <report>report</report>
-                                    <report>report-integration</report>
-                                    <!--report>report-aggregate</report-->
-                                </reports>
-                            </reportSet>
+                            <reportSet><reports><report>report</report><report>report-integration</report><!--<report>report-aggregate</report>--></reports></reportSet>
                         </reportSets>
                     </plugin>
                 </plugins>
@@ -1531,20 +1446,15 @@
             <reporting>
                 <plugins>
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>versions-maven-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId><artifactId>versions-maven-plugin</artifactId>
                         <reportSets>
                             <reportSet>
-                                <reports>
-                                    <report>dependency-updates-report</report>
-                                    <report>plugin-updates-report</report>
-                                </reports>
+                                <reports><report>dependency-updates-report</report><report>plugin-updates-report</report></reports>
                             </reportSet>
                         </reportSets>
                     </plugin>
                     <plugin>
-                        <groupId>org.owasp</groupId>
-                        <artifactId>dependency-check-maven</artifactId>
+                        <groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId>
                         <reportSets>
                             <reportSet><reports><report>aggregate</report></reports></reportSet>
                         </reportSets>
@@ -1597,12 +1507,7 @@
             <build>
                 <pluginManagement>
                     <plugins>
-                        <plugin>
-                            <artifactId>maven-compiler-plugin</artifactId>
-                            <configuration>
-                                <compilerVersion>${java.version}</compilerVersion>
-                            </configuration>
-                        </plugin>
+                        <plugin><artifactId>maven-compiler-plugin</artifactId><configuration><compilerVersion>${java.version}</compilerVersion></configuration></plugin>
                     </plugins>
                 </pluginManagement>
             </build>
@@ -1623,10 +1528,7 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <source>${java.version}</source>
-                            <target>${java.version}</target>
-                        </configuration>
+                        <configuration><source>${java.version}</source><target>${java.version}</target></configuration>
                     </plugin>
                     <plugin>
                         <artifactId>maven-enforcer-plugin</artifactId>
@@ -1669,10 +1571,7 @@
                     <plugins>
                         <plugin>
                             <artifactId>maven-compiler-plugin</artifactId>
-                            <configuration>
-                                <compilerVersion>${java.version}</compilerVersion>
-                                <compilerArgs><arg>--add-modules</arg><arg>${jvmArguments.addModules}</arg></compilerArgs>
-                            </configuration>
+                            <configuration><compilerVersion>${java.version}</compilerVersion><compilerArgs><arg>--add-modules</arg><arg>${jvmArguments.addModules}</arg></compilerArgs></configuration>
                         </plugin>
                     </plugins>
                 </pluginManagement>
@@ -1723,10 +1622,7 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <source>${java.version}</source>
-                            <target>${java.version}</target>
-                        </configuration>
+                        <configuration><source>${java.version}</source><target>${java.version}</target></configuration>
                     </plugin>
                     <plugin>
                         <artifactId>maven-enforcer-plugin</artifactId>
@@ -1776,10 +1672,7 @@
                     <plugins>
                         <plugin>
                             <artifactId>maven-compiler-plugin</artifactId>
-                            <configuration>
-                                <compilerVersion>${java.version}</compilerVersion>
-                                <compilerArgs><arg>--add-modules</arg><arg>${jvmArguments.addModules}</arg></compilerArgs>
-                            </configuration>
+                            <configuration><compilerVersion>${java.version}</compilerVersion><compilerArgs><arg>--add-modules</arg><arg>${jvmArguments.addModules}</arg></compilerArgs></configuration>
                         </plugin>
                     </plugins>
                 </pluginManagement>
@@ -1812,8 +1705,7 @@
                 <pluginManagement>
                     <plugins>
                         <plugin>
-                            <groupId>com.spotify</groupId>
-                            <artifactId>docker-maven-plugin</artifactId>
+                            <groupId>com.spotify</groupId><artifactId>docker-maven-plugin</artifactId>
                             <dependencies>
                                 <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
                             </dependencies>
@@ -1831,10 +1723,7 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <source>${java.version}</source>
-                            <target>${java.version}</target>
-                        </configuration>
+                        <configuration><source>${java.version}</source><target>${java.version}</target></configuration>
                     </plugin>
                     <plugin>
                         <artifactId>maven-enforcer-plugin</artifactId>
@@ -1964,19 +1853,14 @@
             <build>
                 <pluginManagement>
                     <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-changes-plugin</artifactId>
-                            <version>2.12.1</version>
-                        </plugin>
+                        <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-changes-plugin</artifactId><version>2.12.1</version></plugin>
                     </plugins>
                 </pluginManagement>
             </build>
             <reporting>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-changes-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId><artifactId>maven-changes-plugin</artifactId>
                         <configuration>
                             <!-- if jira version > 5.1, set 'useJql' to true -->
                             <useJql>true</useJql>

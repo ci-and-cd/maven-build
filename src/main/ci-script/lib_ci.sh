@@ -361,6 +361,13 @@ function ci_opt_maven_opts() {
         if [ -n "${CI_OPT_PMD_RULESET_LOCATION}" ]; then opts="${opts} -Dpmd.ruleset.location=${CI_OPT_PMD_RULESET_LOCATION}"; fi
         opts="${opts} -Dsite=$(ci_opt_site)"
         opts="${opts} -Dsite.path=$(ci_opt_site_path_prefix)-$(ci_opt_publish_channel)"
+        if [ "$(ci_opt_site)" == "true" ] && [ "$(ci_opt_infrastructure)" == "opensource" ]; then
+            if [ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]; then
+                opts="${opts} -Dgithub-site-publish=true"
+            else
+                opts="${opts} -Dgithub-site-publish=false"
+            fi
+        fi
         # if sonar=true, jacoco should be set to true also
         if [ "${CI_OPT_SONAR}" == "true" ]; then opts="${opts} -Dsonar=true -Djacoco=true"; fi
         opts="${opts} -Duser.language=zh -Duser.region=CN -Duser.timezone=Asia/Shanghai"
@@ -375,7 +382,7 @@ function ci_opt_maven_opts() {
         # MAVEN_OPTS that need to kept secret
         if [ -n "${CI_OPT_JIRA_PROJECTKEY}" ]; then opts="${opts} -Djira.projectKey=${CI_OPT_JIRA_PROJECTKEY} -Djira.user=${CI_OPT_JIRA_USER} -Djira.password=${CI_OPT_JIRA_PASSWORD}"; fi
         # public sonarqube config, see: https://sonarcloud.io
-        if [ "${CI_OPT_SONAR}" == "true" ] && [ -n "${CI_OPT_SONAR_ORGANIZATION}" ] && [ "opensource" == "$(ci_opt_infrastructure)" ]; then opts="${opts} -Dsonar.organization=${CI_OPT_SONAR_ORGANIZATION}"; fi
+        if [ "${CI_OPT_SONAR}" == "true" ] && [ -n "${CI_OPT_SONAR_ORGANIZATION}" ] && [ "$(ci_opt_infrastructure)" == "opensource" ]; then opts="${opts} -Dsonar.organization=${CI_OPT_SONAR_ORGANIZATION}"; fi
         if [ -n "${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE}" ] && [ -f "${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE}" ]; then opts="${opts} -Dsettings.security=${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE}"; fi
 
         echo "${opts}"

@@ -232,7 +232,7 @@ set `-Dsite.path=maven-build-snapshot` to specify upload directory.
 
 infrastructure_opensource_site_publish
 > publish project site to github  
-activate on property 'github-site-publish' present  
+activate on property 'github-site-publish' is true  
 needs:  
 env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN  
 env.CI_OPT_GITHUB_SITE_REPO_OWNER
