@@ -46,7 +46,8 @@ script:
 # When prefixed with `travis_wait 30`, no log output until it is done.
 # see: https://github.com/travis-ci/travis-ci/issues/4190 or https://github.com/HaxeFoundation/hxcpp/issues/709
 - while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
-- bash ci.sh mvn clean install sonar:sonar site deploy site-deploy
+#- bash ci.sh mvn clean install sonar:sonar site deploy site-deploy
+- bash ci.sh mvn clean install sonar:sonar site deploy site:stage site:stage-deploy
 - kill %1
 services:
 - docker
