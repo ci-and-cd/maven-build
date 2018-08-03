@@ -716,7 +716,7 @@
                 <pluginManagement>
                     <plugins>
                         <!-- see: https://github.com/SonarSource/sonar-scanner-maven -->
-                        <plugin><groupId>org.sonarsource.scanner.maven</groupId><artifactId>sonar-maven-plugin</artifactId><version>3.4.1.1170</version></plugin>
+                        <plugin><groupId>org.sonarsource.scanner.maven</groupId><artifactId>sonar-maven-plugin</artifactId><version>3.4.1.1168</version></plugin>
                     </plugins>
                 </pluginManagement>
                 <plugins>
