@@ -1109,8 +1109,11 @@
         </profile>
 
         <profile>
-            <id>github-site</id>
-            <activation><property><name>infrastructure</name><value>opensource</value></property></activation>
+            <id>infrastructure_opensource_github_site</id>
+            <activation>
+                <property><name>github-site-publish</name><value>true</value></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
             <build>
                 <pluginManagement>
                     <plugins>
@@ -1120,33 +1123,9 @@
                         </plugin>
                     </plugins>
                 </pluginManagement>
-            </build>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>github-mvn-repo-github-maven-plugins</id>
-                    <url>https://raw.github.com/ci-and-cd/maven-plugins/mvn-repo</url>
-                    <name>Forked github-maven-plugins that upload faster</name>
-                    <layout>default</layout>
-                    <snapshots><enabled>true</enabled></snapshots>
-                    <releases><enabled>true</enabled></releases>
-                </pluginRepository>
-            </pluginRepositories>
-            <properties>
-
-            </properties>
-        </profile>
-
-        <profile>
-            <id>infrastructure_opensource_github_site</id>
-            <activation>
-                <property><name>github-site-publish</name><value>true</value></property>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <build>
                 <plugins>
                     <plugin>
-                        <groupId>com.github.github</groupId>
-                        <artifactId>site-maven-plugin</artifactId>
+                        <groupId>com.github.github</groupId><artifactId>site-maven-plugin</artifactId>
                         <configuration>
                             <message>Creating site for ${project.artifactId}-${project.version}</message>
                             <!--<path>${github.site.path}</path>-->
@@ -1170,6 +1149,16 @@
                     <url>${build.publish.channel}</url>
                 </site>
             </distributionManagement>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>github-mvn-repo-github-maven-plugins</id>
+                    <url>https://raw.github.com/ci-and-cd/maven-plugins/mvn-repo</url>
+                    <name>Forked github-maven-plugins that upload faster</name>
+                    <layout>default</layout>
+                    <snapshots><enabled>true</enabled></snapshots>
+                    <releases><enabled>true</enabled></releases>
+                </pluginRepository>
+            </pluginRepositories>
             <properties>
                 <!-- for site on github, id (github.global.server) must match the config in your settings.xml -->
                 <github.global.server>github</github.global.server>
