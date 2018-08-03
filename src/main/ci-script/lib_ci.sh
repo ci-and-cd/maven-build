@@ -584,6 +584,7 @@ function run_mvn() {
         if [ -z "${CI_OPT_GITHUB_SITE_REPO_OWNER}" ]; then CI_OPT_GITHUB_SITE_REPO_OWNER="$(echo $(git_repo_slug) | cut -d '/' -f1-)"; fi
     fi
 
+    if [ -z "${CI_OPT_MAVEN_EFFECTIVE_POM}" ]; then CI_OPT_MAVEN_EFFECTIVE_POM="true"; fi
     if [ -z "${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}" ]; then CI_OPT_MAVEN_EFFECTIVE_POM_FILE="$(ci_opt_cache_directory)/effective-pom.xml"; fi
     echo -e "<<<<<<<<<< ---------- run_mvn properties and environment variables ---------- <<<<<<<<<<\n"
 
@@ -622,7 +623,7 @@ function run_mvn() {
 
     # Maven effective pom
     mkdir -p $(dirname ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}) && touch ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
-    if [ "${CI_OPT_DRYRUN}" != "true" ]; then
+    if [ "${CI_OPT_MAVEN_EFFECTIVE_POM}" == "true" ] && [ "${CI_OPT_DRYRUN}" != "true" ]; then
         if [ "${CI_OPT_SHELL_EXIT_ON_ERROR}" == "true" ]; then set +e; fi
         if [ "${CI_OPT_OUTPUT_MAVEN_EFFECTIVE_POM_TO_CONSOLE}" == "true" ]; then
             if [ -n "${TRAVIS_EVENT_TYPE}" ]; then
