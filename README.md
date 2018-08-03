@@ -41,6 +41,7 @@ Set this property to a real world url.
 - build.publish.channel
 > default: snapshot
 Set this property to 'release' when building release artifact.
+Note: CI_OPT_GITHUB_SITE_REPO_OWNER
 
 ### 2. maven-surefire-plugin and maven-failsafe-plugin
 

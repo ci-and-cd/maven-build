@@ -132,14 +132,6 @@
             <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
         <pluginRepository>
-            <id>github-mvn-repo-github-maven-plugins</id>
-            <url>https://raw.github.com/ci-and-cd/maven-plugins/mvn-repo</url>
-            <name>Forked github-maven-plugins that upload faster</name>
-            <layout>default</layout>
-            <snapshots><enabled>true</enabled></snapshots>
-            <releases><enabled>true</enabled></releases>
-        </pluginRepository>
-        <pluginRepository>
             <id>github-mvn-repo-wagon-maven-plugin</id>
             <url>https://raw.github.com/ci-and-cd/wagon-maven-plugin/mvn-repo/</url>
             <name>Fixed issue of merge snapshotVersion</name>
@@ -154,10 +146,6 @@
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <downloadSources>true</downloadSources>
-
-        <!-- for site on github, id (github.global.server) must match the config in your settings.xml -->
-        <github.global.server>github</github.global.server>
-        <github.global.oauth2Token>${env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</github.global.oauth2Token>
 
         <groovy.version>2.4.15</groovy.version>
         <!--<groovy.version>2.5.1</groovy.version>-->
@@ -250,17 +238,6 @@
                     <executions>
                         <execution><id>attach-descriptor</id><goals><goal>attach-descriptor</goal></goals></execution>
                     </executions>
-                </plugin>
-
-                <plugin>
-                    <groupId>com.github.github</groupId>
-                    <artifactId>site-maven-plugin</artifactId>
-                    <version>0.13.0.OSS-M1</version>
-                    <configuration>
-                        <merge>true</merge>
-                        <noJekyll>true</noJekyll>
-                        <repositoryOwner>${env.CI_OPT_GITHUB_SITE_REPO_OWNER}</repositoryOwner>
-                    </configuration>
                 </plugin>
                 <!-- @formatter:on -->
 
@@ -651,9 +628,7 @@
                 <artifactId>maven-site-plugin</artifactId>
                 <configuration><attach>true</attach></configuration>
             </plugin>
-            <!-- @formatter:on -->
 
-            <!-- @formatter:off -->
             <plugin>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <configuration>
@@ -703,120 +678,20 @@
     <profiles>
         <!-- @formatter:off -->
         <profile>
-            <id>gpg-for-travis-and-maven-central</id>
-            <activation><file><exists>${maven.multiModuleProjectDirectory}/codesigning.asc</exists></file><activeByDefault>true</activeByDefault></activation>
-            <properties>
-                <!-- Do not set gpg.executable here -->
-                <!--<gpg.executable>gpg</gpg.executable>-->
-                <gpg.keyname>${env.CI_OPT_GPG_KEYNAME}</gpg.keyname>
-                <gpg.passphrase>${env.CI_OPT_GPG_PASSPHRASE}</gpg.passphrase>
-            </properties>
-        </profile>
-        <profile>
-            <id>gpg2-arguments</id>
-            <activation><property><name>gpg.loopback</name><value>true</value></property></activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <configuration>
-                            <gpgArguments>
-                                <gpgArgument>--use-agent</gpgArgument>
-                                <gpgArgument>--pinentry-mode</gpgArgument>
-                                <gpgArgument>loopback</gpgArgument>
-                            </gpgArguments>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>infrastructure-opensource</id>
-            <activation><property><name>infrastructure</name><value>opensource</value></property></activation>
-            <properties>
-                <sonar.host.url>https://sonarqube.com</sonar.host.url>
-            </properties>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>github-mvn-repo-github-maven-plugins</id>
-                    <url>https://raw.github.com/ci-and-cd/maven-plugins/mvn-repo</url>
-                    <name>Forked github-maven-plugins that upload faster</name>
-                    <layout>default</layout>
-                    <snapshots><enabled>true</enabled></snapshots>
-                    <releases><enabled>true</enabled></releases>
-                </pluginRepository>
-            </pluginRepositories>
-        </profile>
-
-        <profile>
             <id>default-private-nexus3.repository</id>
             <activation><property><name>!private-nexus3.repository</name></property></activation>
             <properties><private-nexus3.repository>http://nexus3:28081/nexus/repository</private-nexus3.repository></properties>
         </profile>
         <profile>
-            <id>default-sonarqube-host-url</id>
+            <id>default-opensource-nexus3.repository</id>
+            <activation><property><name>!opensource-nexus3.repository</name></property></activation>
+            <properties><opensource-nexus3.repository>http://nexus3:28081/nexus/repository</opensource-nexus3.repository></properties>
+        </profile>
+        <profile>
+            <id>default-private-sonarqube-host-url</id>
             <activation><property><name>!private-sonarqube.host.url</name></property></activation>
             <properties><private-sonarqube.host.url>http://sonarqube:9000</private-sonarqube.host.url></properties>
         </profile>
-        <profile>
-            <id>infrastructure-private</id>
-            <activation><property><name>infrastructure</name><value>private</value></property></activation>
-            <properties>
-                <sonar.host.url>${private-sonarqube.host.url}</sonar.host.url>
-                <!--sonar.jdbc.url>jdbc:h2:tcp://sonarqube.local/sonar</sonar.jdbc.url>
-                <sonar.jdbc.url>jdbc:postgresql://postgresql:5432/sonar</sonar.jdbc.url-->
-            </properties>
-            <repositories>
-                <repository>
-                    <id>private-nexus3-releases</id>
-                    <name>private nexus3 releases</name>
-                    <url>${private-nexus3.repository}/maven-releases/</url>
-                    <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
-                    <snapshots><enabled>false</enabled></snapshots>
-                </repository>
-                <repository>
-                    <id>private-nexus3-snapshots</id>
-                    <name>private nexus3 snapshots</name>
-                    <url>${private-nexus3.repository}/maven-snapshots/</url>
-                    <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
-                </repository>
-                <repository>
-                    <id>private-nexus3-thirdparty</id>
-                    <name>private nexus3 thirdparty</name>
-                    <url>${private-nexus3.repository}/maven-thirdparty/</url>
-                    <releases><enabled>true</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
-                </repository>
-            </repositories>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>private-nexus3-releases</id>
-                    <name>private nexus3 releases</name>
-                    <url>${private-nexus3.repository}/maven-releases/</url>
-                    <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
-                    <snapshots><enabled>false</enabled></snapshots>
-                </pluginRepository>
-                <pluginRepository>
-                    <id>private-nexus3-snapshots</id>
-                    <name>private nexus3 snapshots</name>
-                    <url>${private-nexus3.repository}/maven-snapshots/</url>
-                    <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
-                </pluginRepository>
-                <pluginRepository>
-                    <id>private-nexus3-thirdparty</id>
-                    <name>private nexus3 thirdparty</name>
-                    <url>${private-nexus3.repository}/maven-thirdparty/</url>
-                    <releases><enabled>true</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
-                </pluginRepository>
-            </pluginRepositories>
-        </profile>
-        <!-- @formatter:on -->
-
-        <!-- @formatter:off -->
         <profile>
             <id>default-maven-test-failure-ignore</id>
             <activation><property><name>!maven.test.failure.ignore</name></property></activation>
@@ -1053,6 +928,35 @@
 
         <!-- @formatter:off -->
         <profile>
+            <id>gpg2-arguments</id>
+            <activation><property><name>gpg.loopback</name><value>true</value></property></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <configuration>
+                            <gpgArguments>
+                                <gpgArgument>--use-agent</gpgArgument>
+                                <gpgArgument>--pinentry-mode</gpgArgument>
+                                <gpgArgument>loopback</gpgArgument>
+                            </gpgArguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>gpg-for-travis-and-maven-central</id>
+            <activation><file><exists>${maven.multiModuleProjectDirectory}/codesigning.asc</exists></file><activeByDefault>true</activeByDefault></activation>
+            <properties>
+                <!-- Do not set gpg.executable here -->
+                <!--<gpg.executable>gpg</gpg.executable>-->
+                <gpg.keyname>${env.CI_OPT_GPG_KEYNAME}</gpg.keyname>
+                <gpg.passphrase>${env.CI_OPT_GPG_PASSPHRASE}</gpg.passphrase>
+            </properties>
+        </profile>
+
+        <profile>
             <id>default-build-publish-channel</id>
             <activation><property><name>!build.publish.channel</name></property></activation>
             <properties><build.publish.channel>snapshot</build.publish.channel></properties>
@@ -1062,6 +966,7 @@
             <id>infrastructure_opensource</id>
             <activation><property><name>infrastructure</name><value>opensource</value></property><activeByDefault>false</activeByDefault></activation>
             <properties>
+                <sonar.host.url>https://sonarqube.com</sonar.host.url>
                 <!--<wagon.merge-maven-repos.target>https://oss.sonatype.org/content/repositories/snapshots</wagon.merge-maven-repos.target>-->
                 <wagon.merge-maven-repos.target>https://oss.sonatype.org/service/local/staging/deploy/maven2</wagon.merge-maven-repos.target>
                 <wagon.merge-maven-repos.targetId>OSSRH-${build.publish.channel}s</wagon.merge-maven-repos.targetId>
@@ -1101,6 +1006,10 @@
             <id>infrastructure_private</id>
             <activation><property><name>infrastructure</name><value>internal</value></property><activeByDefault>false</activeByDefault></activation>
             <properties>
+                <sonar.host.url>${private-sonarqube.host.url}</sonar.host.url>
+                <!--sonar.jdbc.url>jdbc:h2:tcp://sonarqube.local/sonar</sonar.jdbc.url>
+                <sonar.jdbc.url>jdbc:postgresql://postgresql:5432/sonar</sonar.jdbc.url-->
+
                 <wagon.merge-maven-repos.target>${private-nexus3.repository}/maven-${build.publish.channel}s</wagon.merge-maven-repos.target>
                 <wagon.merge-maven-repos.targetId>private-nexus3-${build.publish.channel}s</wagon.merge-maven-repos.targetId>
             </properties>
@@ -1108,19 +1017,52 @@
                 <repository><id>private-nexus3-releases</id><url>${private-nexus3.repository}/maven-releases</url></repository>
                 <snapshotRepository><id>private-nexus3-snapshots</id><url>${private-nexus3.repository}/maven-snapshots</url></snapshotRepository>
             </distributionManagement>
-        </profile>
-
-        <profile>
-            <id>infrastructure_local</id>
-            <activation><property><name>infrastructure</name><value>local</value></property><activeByDefault>false</activeByDefault></activation>
-            <properties>
-                <wagon.merge-maven-repos.target>${private-nexus3.repository}/maven-${build.publish.channel}s</wagon.merge-maven-repos.target>
-                <wagon.merge-maven-repos.targetId>private-nexus3-${build.publish.channel}s</wagon.merge-maven-repos.targetId>
-            </properties>
-            <distributionManagement>
-                <repository><id>private-nexus3-releases</id><url>${private-nexus3.repository}/maven-releases/</url></repository>
-                <snapshotRepository><id>private-nexus3-snapshots</id><url>${private-nexus3.repository}/maven-snapshots/</url></snapshotRepository>
-            </distributionManagement>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>private-nexus3-releases</id>
+                    <name>private nexus3 releases</name>
+                    <url>${private-nexus3.repository}/maven-releases/</url>
+                    <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>private-nexus3-snapshots</id>
+                    <name>private nexus3 snapshots</name>
+                    <url>${private-nexus3.repository}/maven-snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>private-nexus3-thirdparty</id>
+                    <name>private nexus3 thirdparty</name>
+                    <url>${private-nexus3.repository}/maven-thirdparty/</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+            <repositories>
+                <repository>
+                    <id>private-nexus3-releases</id>
+                    <name>private nexus3 releases</name>
+                    <url>${private-nexus3.repository}/maven-releases/</url>
+                    <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </repository>
+                <repository>
+                    <id>private-nexus3-snapshots</id>
+                    <name>private nexus3 snapshots</name>
+                    <url>${private-nexus3.repository}/maven-snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
+                </repository>
+                <repository>
+                    <id>private-nexus3-thirdparty</id>
+                    <name>private nexus3 thirdparty</name>
+                    <url>${private-nexus3.repository}/maven-thirdparty/</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </repository>
+            </repositories>
         </profile>
 
         <profile>
@@ -1200,14 +1142,63 @@
         </profile>
 
         <profile>
-            <id>infrastructure_opensource_site</id>
-            <activation><property><name>infrastructure</name><value>opensource</value></property><activeByDefault>false</activeByDefault></activation>
+            <id>github-site</id>
+            <activation><property><name>infrastructure</name><value>opensource</value></property></activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.github.github</groupId>
+                            <artifactId>site-maven-plugin</artifactId>
+                            <version>0.13.0.OSS-M1</version>
+                            <configuration>
+                                <merge>true</merge>
+                                <noJekyll>true</noJekyll>
+                                <repositoryOwner>${env.CI_OPT_GITHUB_SITE_REPO_OWNER}</repositoryOwner>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>github-mvn-repo-github-maven-plugins</id>
+                    <url>https://raw.github.com/ci-and-cd/maven-plugins/mvn-repo</url>
+                    <name>Forked github-maven-plugins that upload faster</name>
+                    <layout>default</layout>
+                    <snapshots><enabled>true</enabled></snapshots>
+                    <releases><enabled>true</enabled></releases>
+                </pluginRepository>
+            </pluginRepositories>
             <properties>
-                <!-- In child projects, do not add url. Let it inherit from parent.-->
-                <!--<github.site.path>${project.version}/${project.artifactId}</github.site.path>-->
-                <!--<github.site.path>${project.version}</github.site.path>-->
-                <maven.site.deploy.skip>true</maven.site.deploy.skip>
+
             </properties>
+        </profile>
+
+        <profile>
+            <id>infrastructure_opensource_github_site</id>
+            <activation>
+                <property><name>infrastructure</name><value>opensource</value></property>
+                <property><name>github-site-publish</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.github</groupId>
+                        <artifactId>site-maven-plugin</artifactId>
+                        <configuration>
+                            <message>Creating site for ${project.artifactId}-${project.version}</message>
+                            <!--<path>${github.site.path}</path>-->
+                            <path>${project.distributionManagement.site.url}</path>
+                            <repositoryName>${env.CI_OPT_GITHUB_SITE_REPO_NAME}</repositoryName>
+                        </configuration>
+                        <executions>
+                            <execution><goals><goal>site</goal></goals><phase>site-deploy</phase><!--<phase>site</phase>--></execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
             <distributionManagement>
                 <!-- Do mvn site site:stage -DstagingDirectory=/tmp/path first,
                 then manually add/push to the gh-pages branch on GitHub -->
@@ -1219,49 +1210,17 @@
                     <url>${build.publish.channel}</url>
                 </site>
             </distributionManagement>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.github</groupId>
-                        <artifactId>site-maven-plugin</artifactId>
-                        <configuration>
-                            <message>Creating site for ${project.artifactId}-${project.version}</message>
-                            <path>${project.distributionManagement.site.url}</path>
-                            <repositoryName>${env.CI_OPT_GITHUB_SITE_REPO_NAME}</repositoryName>
-                        </configuration>
-                        <executions>
-                            <execution><goals><goal>site</goal></goals><phase>site-deploy</phase><!--<phase>site</phase>--></execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>infrastructure_opensource_site_publish</id>
-            <activation><property><name>github-site-publish</name></property></activation>
             <properties>
-                <!-- In child projects Do not add url. Let it inherit from parent. -->
+                <!-- for site on github, id (github.global.server) must match the config in your settings.xml -->
+                <github.global.server>github</github.global.server>
+                <github.global.oauth2Token>${env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</github.global.oauth2Token>
+
+                <!-- In child projects, do not add url. inherit it from parent.-->
                 <!--<github.site.path>${project.version}/${project.artifactId}</github.site.path>-->
-                <github.site.path>${project.version}</github.site.path>
-                <!--<maven.site.deploy.skip>true</maven.site.deploy.skip>-->
+                <!--<github.site.path>${project.version}</github.site.path>-->
+                <!--<github.site.path>${project.version}</github.site.path>-->
+                <maven.site.deploy.skip>true</maven.site.deploy.skip>
             </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.github</groupId>
-                        <artifactId>site-maven-plugin</artifactId>
-                        <configuration>
-                            <message>Creating site for ${project.artifactId}-${project.version}</message>
-                            <path>${github.site.path}</path>
-                            <!--<repositoryName>${env.CI_OPT_GITHUB_SITE_REPO_NAME}</repositoryName>-->
-                        </configuration>
-                        <executions>
-                            <execution><goals><goal>site</goal></goals><phase>site</phase></execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
 
         <profile>
@@ -1271,19 +1230,24 @@
         </profile>
 
         <profile>
-            <id>infrastructure_private_site</id>
-            <activation><property><name>infrastructure</name><value>internal</value></property><activeByDefault>false</activeByDefault></activation>
+            <id>infrastructure_opensource_site</id>
+            <activation>
+                <property><name>infrastructure</name><value>opensource</value></property>
+                <property><name>!github-site-publish</name></property>
+                <property><name>opensource-nexus3.repository</name></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
             <distributionManagement>
-                <!-- scpexe uses privateKey, scp uses password -->
-                <!-- scpexe://${domain_or_ip}:22/path/to/sites -->
-                <site><id>private-mvnsite</id><url>dav:${private-nexus3.repository}/mvnsite/${site.path}</url></site>
+                <site><id>opensource-mvnsite</id><url>dav:${opensource-nexus3.repository}/mvnsite/${site.path}</url></site>
             </distributionManagement>
         </profile>
 
         <profile>
-            <id>infrastructure_local_site</id>
-            <activation><property><name>infrastructure</name><value>local</value></property><activeByDefault>false</activeByDefault></activation>
+            <id>infrastructure_private_site</id>
+            <activation><property><name>infrastructure</name><value>private</value></property><activeByDefault>false</activeByDefault></activation>
             <distributionManagement>
+                <!-- scpexe uses privateKey, scp uses password -->
+                <!-- scpexe://${domain_or_ip}:22/path/to/sites -->
                 <site><id>private-mvnsite</id><url>dav:${private-nexus3.repository}/mvnsite/${site.path}</url></site>
             </distributionManagement>
         </profile>
@@ -1996,19 +1960,25 @@
 
         <profile>
             <id>jira_project</id>
-            <activation>
-                <property>
-                    <name>jira.projectKey</name>
-                </property>
-            </activation>
+            <activation><property><name>jira.projectKey</name></property><activeByDefault>false</activeByDefault></activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-changes-plugin</artifactId>
+                            <version>2.12.1</version>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
             <reporting>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-changes-plugin</artifactId>
-                        <version>2.12.1</version>
-                        <!-- if jira version > 5.1, use this flag -->
                         <configuration>
+                            <!-- if jira version > 5.1, set 'useJql' to true -->
                             <useJql>true</useJql>
                             <jiraUser>${jira.user}</jiraUser>
                             <jiraPassword>${jira.password}</jiraPassword>
