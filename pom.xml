@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>0.0.8.OSS</version>
+    <version>0.1.0</version>
 
     <modules>
         <module>build-docker</module>
@@ -132,14 +132,6 @@
             <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
         <pluginRepository>
-            <id>github-mvn-repo-github-maven-plugins</id>
-            <url>https://raw.github.com/ci-and-cd/maven-plugins/mvn-repo</url>
-            <name>Forked github-maven-plugins that upload faster</name>
-            <layout>default</layout>
-            <snapshots><enabled>true</enabled></snapshots>
-            <releases><enabled>true</enabled></releases>
-        </pluginRepository>
-        <pluginRepository>
             <id>github-mvn-repo-wagon-maven-plugin</id>
             <url>https://raw.github.com/ci-and-cd/wagon-maven-plugin/mvn-repo/</url>
             <name>Fixed issue of merge snapshotVersion</name>
@@ -155,9 +147,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <downloadSources>true</downloadSources>
 
-        <!-- for site on github, id (github.global.server) must match the config in your settings.xml -->
-        <github.global.server>github</github.global.server>
-        <github.global.oauth2Token>${env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</github.global.oauth2Token>
+        <groovy.version>2.4.15</groovy.version>
+        <!--<groovy.version>2.5.1</groovy.version>-->
 
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -168,33 +159,24 @@
         <com.google.errorprone_error_prone_core.version>2.3.1</com.google.errorprone_error_prone_core.version>
 
         <org.jacoco_jacoco.version>0.8.1</org.jacoco_jacoco.version>
+        <jacoco.reportPath>${project.build.directory}/jacoco.exec</jacoco.reportPath>
         <jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</jacoco.itReportPath>
         <org.sonarsource.java_sonar-jacoco-listeners.version>5.3.0.13828</org.sonarsource.java_sonar-jacoco-listeners.version>
-        <!--create blank property for surefire and failsafe when not running under coverage profile-->
-        <argLine></argLine>
     </properties>
 
     <build>
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>com.github.eirslett</groupId>
-                    <artifactId>frontend-maven-plugin</artifactId>
-                    <version>1.6</version>
-                    <configuration>
-                        <installDirectory>.mvn</installDirectory>
-                        <!-- Defaults to https://nodejs.org/dist/ -->
-                        <nodeDownloadRoot>${frontend.nodeDownloadRoot}</nodeDownloadRoot>
-                        <!-- Defaults to http://registry.npmjs.org/npm/-/ -->
-                        <npmDownloadRoot>${frontend.npmDownloadRoot}</npmDownloadRoot>
-                    </configuration>
-                </plugin>
                 <!-- @formatter:off -->
                 <plugin><groupId>com.amashchenko.maven.plugin</groupId><artifactId>gitflow-maven-plugin</artifactId><version>1.9.0</version></plugin>
                 <plugin><groupId>com.mysema.maven</groupId><artifactId>apt-maven-plugin</artifactId><version>1.1.3</version></plugin>
                 <plugin><groupId>com.soebes.maven.plugins</groupId><artifactId>echo-maven-plugin</artifactId><version>0.3.0</version></plugin>
                 <!-- TODO find a newer plugin for groovy scripts to replace gmaven-plugin -->
-                <plugin><groupId>org.codehaus.groovy.maven</groupId><artifactId>gmaven-plugin</artifactId><version>1.0</version></plugin>
+                <!--<plugin><groupId>org.codehaus.groovy.maven</groupId><artifactId>gmaven-plugin</artifactId><version>1.0</version></plugin>-->
+                <plugin>
+                    <groupId>org.codehaus.gmaven</groupId><artifactId>groovy-maven-plugin</artifactId><version>2.1</version>
+                    <dependencies><dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId><version>${groovy.version}</version></dependency></dependencies>
+                </plugin>
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.0.0</version></plugin>
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>properties-maven-plugin</artifactId><version>1.0.0</version></plugin>
                 <plugin>
@@ -205,7 +187,7 @@
                     </dependencies>
                 </plugin>
                 <plugin><artifactId>maven-clean-plugin</artifactId><version>3.1.0</version></plugin>
-                <plugin><artifactId>maven-compiler-plugin</artifactId><version>3.7.0</version></plugin>
+                <plugin><artifactId>maven-compiler-plugin</artifactId><version>3.8.0</version></plugin>
                 <plugin><artifactId>maven-dependency-plugin</artifactId><version>3.1.0</version></plugin>
                 <plugin><artifactId>maven-deploy-plugin</artifactId><version>2.8.2</version></plugin>
                 <plugin><artifactId>maven-enforcer-plugin</artifactId><version>3.0.0-M1</version></plugin>
@@ -218,9 +200,8 @@
                 <plugin><artifactId>maven-resources-plugin</artifactId><version>3.0.1</version></plugin>
                 <plugin><artifactId>maven-surefire-plugin</artifactId><version>2.21.0</version></plugin>
                 <plugin><artifactId>maven-toolchains-plugin</artifactId><version>1.1</version></plugin>
-                <plugin><groupId>pl.project13.maven</groupId><artifactId>git-commit-id-plugin</artifactId><version>2.2.4</version></plugin>
 
-                <plugin><artifactId>maven-project-info-reports-plugin</artifactId><version>2.9</version></plugin>
+                <plugin><artifactId>maven-project-info-reports-plugin</artifactId><version>3.0.0</version></plugin>
                 <!-- @formatter:on -->
 
                 <!-- @formatter:off -->
@@ -258,17 +239,6 @@
                         <execution><id>attach-descriptor</id><goals><goal>attach-descriptor</goal></goals></execution>
                     </executions>
                 </plugin>
-
-                <plugin>
-                    <groupId>com.github.github</groupId>
-                    <artifactId>site-maven-plugin</artifactId>
-                    <version>0.13.0.OSS-M1</version>
-                    <configuration>
-                        <merge>true</merge>
-                        <noJekyll>true</noJekyll>
-                        <repositoryOwner>${env.CI_OPT_GITHUB_SITE_REPO_OWNER}</repositoryOwner>
-                    </configuration>
-                </plugin>
                 <!-- @formatter:on -->
 
                 <!-- @formatter:off -->
@@ -294,6 +264,31 @@
                 <!-- maven-pmd-plugin:3.10.0 depends on net.sourceforge.pmd:pmd:6.4.0 -->
                 <plugin><artifactId>maven-pmd-plugin</artifactId><version>3.10.0</version></plugin>
                 <plugin><artifactId>maven-surefire-report-plugin</artifactId><version>2.21.0</version></plugin>
+
+                <plugin>
+                    <groupId>pl.project13.maven</groupId>
+                    <artifactId>git-commit-id-plugin</artifactId>
+                    <version>2.2.4</version>
+                    <executions>
+                        <execution>
+                            <id>get-the-git-infos</id>
+                            <phase>initialize</phase>
+                            <goals><goal>revision</goal></goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <commitIdGenerationMode>flat</commitIdGenerationMode>
+                        <dotGitDirectory>${maven.multiModuleProjectDirectory}/.git</dotGitDirectory>
+                        <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                        <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                        <!--generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename-->
+                        <generateGitPropertiesFilename>src/main/resources/git.properties</generateGitPropertiesFilename>
+                        <injectAllReactorProjects>true</injectAllReactorProjects>
+                        <prefix>git</prefix>
+                        <skipPoms>false</skipPoms>
+                        <verbose>false</verbose>
+                    </configuration>
+                </plugin>
                 <!-- @formatter:on -->
             </plugins>
         </pluginManagement>
@@ -360,6 +355,12 @@
                                 </delete>
                             </target>
                         </configuration>
+                    </execution>
+                    <execution>
+                        <id>echo-maven-multiModuleProjectDirectory</id>
+                        <phase>initialize</phase>
+                        <goals><goal>run</goal></goals>
+                        <configuration><tasks><echo>maven.multiModuleProjectDirectory: '${maven.multiModuleProjectDirectory}'</echo></tasks></configuration>
                     </execution>
                     <execution>
                         <id>ensure-dot-gitkeep</id>
@@ -508,11 +509,7 @@
                     </excludes>
                 </configuration>
                 <executions>
-                    <execution>
-                        <id>default-test</id>
-                        <goals><goal>test</goal></goals>
-                        <configuration><skip>${maven.test.skip}</skip></configuration>
-                    </execution>
+                    <execution><id>default-test</id><goals><goal>test</goal></goals><configuration><skip>${maven.test.skip}</skip></configuration></execution>
                 </executions>
             </plugin>
             <plugin>
@@ -535,16 +532,8 @@
                     </excludes>
                 </configuration>
                 <executions>
-                    <execution>
-                        <id>failsafe-integration-test</id>
-                        <phase>integration-test</phase>
-                        <goals><goal>integration-test</goal></goals>
-                    </execution>
-                    <execution>
-                        <id>failsafe-verify</id>
-                        <phase>post-integration-test</phase>
-                        <goals><goal>verify</goal></goals>
-                    </execution>
+                    <execution><id>failsafe-integration-test</id><phase>integration-test</phase><goals><goal>integration-test</goal></goals></execution>
+                    <execution><id>failsafe-verify</id><phase>post-integration-test</phase><goals><goal>verify</goal></goals></execution>
                 </executions>
             </plugin>
             <plugin>
@@ -552,13 +541,11 @@
                 <configuration>
                     <rules>
                         <!-- Note: travis-ci uses old maven version  -->
-                        <requireMavenVersion><version>[3.5.0,)</version></requireMavenVersion>
+                        <requireMavenVersion><version>[3.5.3,)</version></requireMavenVersion>
                         <!--requireUpperBoundDeps-->
                         <dependencyConvergence><uniqueVersions>false</uniqueVersions></dependencyConvergence>
                         <banTransitiveDependencies>
-                            <excludes>
-                                <exclude>*</exclude>
-                            </excludes>
+                            <excludes><exclude>*</exclude></excludes>
                             <includes>
                                 <!--<include>*:commons-logging</include>-->
                             </includes>
@@ -572,19 +559,13 @@
                     <fail>true</fail>
                 </configuration>
                 <executions>
-                    <execution>
-                        <id>enforce-banned-dependencies</id>
-                        <phase>validate</phase>
-                        <goals><goal>enforce</goal></goals>
-                    </execution>
+                    <execution><id>enforce-banned-dependencies</id><phase>validate</phase><goals><goal>enforce</goal></goals></execution>
                 </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <failOnError>false</failOnError>
-                    <charset>${project.build.sourceEncoding}</charset>
-                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <failOnError>false</failOnError><charset>${project.build.sourceEncoding}</charset><encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
                 <executions>
                     <execution><id>attach-javadocs</id><goals><goal>jar</goal></goals></execution>
@@ -600,9 +581,20 @@
                 </executions>
             </plugin>
 
-            <plugin>
+            <!--<plugin>
                 <groupId>org.codehaus.groovy.maven</groupId>
                 <artifactId>gmaven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals><goal>execute</goal></goals>
+                        <phase>initialize</phase>
+                        <configuration><source>System.setProperty("local.deploy.model.path", "${project.groupId}".replace('.', '/')+"/${project.artifactId}")</source></configuration>
+                    </execution>
+                </executions>
+            </plugin>-->
+            <plugin>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>groovy-maven-plugin</artifactId>
                 <executions>
                     <execution>
                         <goals><goal>execute</goal></goals>
@@ -616,9 +608,7 @@
                 <artifactId>maven-site-plugin</artifactId>
                 <configuration><attach>true</attach></configuration>
             </plugin>
-            <!-- @formatter:on -->
 
-            <!-- @formatter:off -->
             <plugin>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <configuration>
@@ -628,20 +618,14 @@
                     <failsOnError>false</failsOnError>
                 </configuration>
                 <executions>
-                    <execution>
-                        <id>validate</id>
-                        <phase>validate</phase>
-                        <goals><goal>check</goal></goals>
-                    </execution>
+                    <execution><id>validate</id><phase>validate</phase><goals><goal>check</goal></goals></execution>
                 </executions>
             </plugin>
             <!-- see: http://maven.apache.org/plugins/maven-pmd-plugin/examples/multi-module-config.html -->
             <plugin>
                 <artifactId>maven-pmd-plugin</artifactId>
                 <configuration>
-                    <failOnViolation>false</failOnViolation>
-                    <printFailingErrors>true</printFailingErrors>
-                    <rulesets><ruleset>${pmd.ruleset.location}</ruleset></rulesets>
+                    <failOnViolation>false</failOnViolation><printFailingErrors>true</printFailingErrors><rulesets><ruleset>${pmd.ruleset.location}</ruleset></rulesets>
                 </configuration>
                 <executions>
                     <execution><goals><goal>check</goal><goal>cpd-check</goal></goals></execution>
@@ -651,14 +635,10 @@
 
             <!-- use mvn -N io.takari:maven:wrapper instead of mvn wrapper:wrapper -->
             <!-- mvn wrapper:wrapper -->
-            <!--plugin>
-                <groupId>com.rimerosolutions.maven.plugins</groupId>
-                <artifactId>wrapper-maven-plugin</artifactId>
-                <version>0.0.4</version>
-                <configuration>
-                    <mavenVersion>3.3.3</mavenVersion>
-                </configuration>
-            </plugin-->
+            <!--<plugin>
+                <groupId>com.rimerosolutions.maven.plugins</groupId><artifactId>wrapper-maven-plugin</artifactId><version>0.0.4</version>
+                <configuration><mavenVersion>3.5.4</mavenVersion></configuration>
+            </plugin>-->
         </plugins>
 
         <!--extensions>
@@ -668,183 +648,20 @@
     <profiles>
         <!-- @formatter:off -->
         <profile>
-            <id>gpg-for-travis-and-maven-central</id>
-            <activation><file><exists>${maven.multiModuleProjectDirectory}/codesigning.asc</exists></file><activeByDefault>true</activeByDefault></activation>
-            <properties>
-                <!-- Do not set gpg.executable here -->
-                <!--<gpg.executable>gpg</gpg.executable>-->
-                <gpg.keyname>${env.CI_OPT_GPG_KEYNAME}</gpg.keyname>
-                <gpg.passphrase>${env.CI_OPT_GPG_PASSPHRASE}</gpg.passphrase>
-            </properties>
+            <id>default-private-nexus3.repository</id>
+            <activation><property><name>!private-nexus3.repository</name></property></activation>
+            <properties><private-nexus3.repository>http://nexus3:28081/nexus/repository</private-nexus3.repository></properties>
         </profile>
         <profile>
-            <id>gpg2-arguments</id>
-            <activation><property><name>gpg.loopback</name><value>true</value></property></activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <configuration>
-                            <gpgArguments>
-                                <gpgArgument>--use-agent</gpgArgument>
-                                <gpgArgument>--pinentry-mode</gpgArgument>
-                                <gpgArgument>loopback</gpgArgument>
-                            </gpgArguments>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>infrastructure-opensource</id>
-            <activation><property><name>infrastructure</name><value>opensource</value></property></activation>
-            <properties>
-                <sonar.host.url>https://sonarqube.com</sonar.host.url>
-            </properties>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>github-mvn-repo-github-maven-plugins</id>
-                    <url>https://raw.github.com/ci-and-cd/maven-plugins/mvn-repo</url>
-                    <name>Forked github-maven-plugins that upload faster</name>
-                    <layout>default</layout>
-                    <snapshots><enabled>true</enabled></snapshots>
-                    <releases><enabled>true</enabled></releases>
-                </pluginRepository>
-            </pluginRepositories>
-        </profile>
-
-        <profile>
-            <id>default-internal-nexus3.repository</id>
-            <activation><property><name>!internal-nexus3.repository</name></property></activation>
-            <properties><internal-nexus3.repository>http://nexus3.internal:28081/nexus/repository</internal-nexus3.repository></properties>
+            <id>default-opensource-nexus3.repository</id>
+            <activation><property><name>!opensource-nexus3.repository</name></property></activation>
+            <properties><opensource-nexus3.repository>http://nexus3:28081/nexus/repository</opensource-nexus3.repository></properties>
         </profile>
         <profile>
-            <id>default-internal-sonar-host-url</id>
-            <activation><property><name>!internal-sonar.host.url</name></property></activation>
-            <properties><internal-sonar.host.url>http://sonarqube.internal:9000</internal-sonar.host.url></properties>
+            <id>default-private-sonarqube-host-url</id>
+            <activation><property><name>!private-sonarqube.host.url</name></property></activation>
+            <properties><private-sonarqube.host.url>http://sonarqube:9000</private-sonarqube.host.url></properties>
         </profile>
-        <profile>
-            <id>infrastructure-internal</id>
-            <activation><property><name>infrastructure</name><value>internal</value></property></activation>
-            <properties><sonar.host.url>${internal-sonar.host.url}</sonar.host.url></properties>
-            <repositories>
-                <repository>
-                    <id>internal-nexus3-releases</id>
-                    <name>internal nexus3 releases</name>
-                    <url>${internal-nexus3.repository}/maven-releases/</url>
-                    <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
-                    <snapshots><enabled>false</enabled></snapshots>
-                </repository>
-                <repository>
-                    <id>internal-nexus3-snapshots</id>
-                    <name>internal nexus3 snapshots</name>
-                    <url>${internal-nexus3.repository}/maven-snapshots/</url>
-                    <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
-                </repository>
-                <repository>
-                    <id>internal-nexus3-thirdparty</id>
-                    <name>internal nexus3 thirdparty</name>
-                    <url>${internal-nexus3.repository}/maven-thirdparty/</url>
-                    <releases><enabled>true</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
-                </repository>
-            </repositories>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>internal-nexus3-releases</id>
-                    <name>internal nexus3 releases</name>
-                    <url>${internal-nexus3.repository}/maven-releases/</url>
-                    <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
-                    <snapshots><enabled>false</enabled></snapshots>
-                </pluginRepository>
-                <pluginRepository>
-                    <id>internal-nexus3-snapshots</id>
-                    <name>internal nexus3 snapshots</name>
-                    <url>${internal-nexus3.repository}/maven-snapshots/</url>
-                    <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
-                </pluginRepository>
-                <pluginRepository>
-                    <id>internal-nexus3-thirdparty</id>
-                    <name>internal nexus3 thirdparty</name>
-                    <url>${internal-nexus3.repository}/maven-thirdparty/</url>
-                    <releases><enabled>true</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
-                </pluginRepository>
-            </pluginRepositories>
-        </profile>
-
-        <profile>
-            <id>default-local-nexus3.repository</id>
-            <activation><property><name>!local-nexus3.repository</name></property></activation>
-            <properties><local-nexus3.repository>http://nexus3.local:28081/nexus/repository</local-nexus3.repository></properties>
-        </profile>
-        <profile>
-            <id>default-local-sonar-host-url</id>
-            <activation><property><name>!local-sonar.host.url</name></property></activation>
-            <properties><local-sonar.host.url>http://sonarqube.local:9000</local-sonar.host.url></properties>
-        </profile>
-        <profile>
-            <id>infrastructure-local</id>
-            <activation><property><name>infrastructure</name><value>local</value></property></activation>
-            <properties>
-                <!-- default values -->
-                <sonar.host.url>${local-sonar.host.url}</sonar.host.url>
-                <!--sonar.jdbc.url>jdbc:h2:tcp://sonarqube.local/sonar</sonar.jdbc.url>
-                <sonar.jdbc.url>jdbc:postgresql://postgresql.local:5432/sonar</sonar.jdbc.url-->
-            </properties>
-            <repositories>
-                <repository>
-                    <id>local-nexus3-releases</id>
-                    <name>local nexus3 releases</name>
-                    <url>${local-nexus3.repository}/maven-releases/</url>
-                    <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
-                    <snapshots><enabled>false</enabled></snapshots>
-                </repository>
-                <repository>
-                    <id>local-nexus3-snapshots</id>
-                    <name>local nexus3 snapshots</name>
-                    <url>${local-nexus3.repository}/maven-snapshots/</url>
-                    <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
-                </repository>
-                <repository>
-                    <id>local-nexus3-thirdparty</id>
-                    <name>local nexus3 thirdparty</name>
-                    <url>${local-nexus3.repository}/maven-thirdparty/</url>
-                    <releases><enabled>true</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
-                </repository>
-            </repositories>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>local-nexus3-releases</id>
-                    <name>local nexus3 releases</name>
-                    <url>${local-nexus3.repository}/maven-releases/</url>
-                    <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
-                    <snapshots><enabled>false</enabled></snapshots>
-                </pluginRepository>
-                <pluginRepository>
-                    <id>local-nexus3-snapshots</id>
-                    <name>local nexus3 snapshots</name>
-                    <url>${local-nexus3.repository}/maven-snapshots/</url>
-                    <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
-                </pluginRepository>
-                <pluginRepository>
-                    <id>local-nexus3-thirdparty</id>
-                    <name>local nexus3 thirdparty</name>
-                    <url>${local-nexus3.repository}/maven-thirdparty/</url>
-                    <releases><enabled>true</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
-                </pluginRepository>
-            </pluginRepositories>
-        </profile>
-        <!-- @formatter:on -->
-
-        <!-- @formatter:off -->
         <profile>
             <id>default-maven-test-failure-ignore</id>
             <activation><property><name>!maven.test.failure.ignore</name></property></activation>
@@ -859,70 +676,47 @@
             <activation><property><name>!maven.integration-test.skip</name></property></activation>
             <properties><maven.integration-test.skip>false</maven.integration-test.skip></properties>
         </profile>
-        <!--<frontend.nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</frontend.nodeDownloadRoot>-->
-        <profile>
-            <id>default-frontend-nodeDownloadRoot</id>
-            <activation><property><name>!frontend.nodeDownloadRoot</name></property></activation>
-            <properties><frontend.nodeDownloadRoot>https://nodejs.org/dist/</frontend.nodeDownloadRoot></properties>
-        </profile>
-        <!--<frontend.npmDownloadRoot>http://registry.npm.taobao.org/npm/-/</frontend.npmDownloadRoot>-->
-        <profile>
-            <id>default-frontend-npmDownloadRoot</id>
-            <activation><property><name>!frontend.npmDownloadRoot</name></property></activation>
-            <properties><frontend.npmDownloadRoot>https://registry.npmjs.org/npm/-/</frontend.npmDownloadRoot></properties>
-        </profile>
 
         <profile>
             <id>git-commit-id</id>
-            <activation><file><exists>${maven.multiModuleProjectDirectory}/.git/HEAD</exists></file></activation>
+            <!-- works on both git submodule and normal local repository -->
+            <activation><file><exists>${maven.multiModuleProjectDirectory}/.git</exists></file><activeByDefault>false</activeByDefault></activation>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>pl.project13.maven</groupId>
-                        <artifactId>git-commit-id-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>get-the-git-infos</id>
-                                <phase>initialize</phase>
-                                <goals><goal>revision</goal></goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <commitIdGenerationMode>flat</commitIdGenerationMode>
-                            <dotGitDirectory>${maven.multiModuleProjectDirectory}/.git</dotGitDirectory>
-                            <failOnNoGitDirectory>false</failOnNoGitDirectory>
-                            <generateGitPropertiesFile>true</generateGitPropertiesFile>
-                            <!--generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename-->
-                            <generateGitPropertiesFilename>src/main/resources/git.properties</generateGitPropertiesFilename>
-                            <injectAllReactorProjects>true</injectAllReactorProjects>
-                            <prefix>git</prefix>
-                            <skipPoms>false</skipPoms>
-                            <verbose>false</verbose>
-                        </configuration>
-                    </plugin>
+                    <plugin><groupId>pl.project13.maven</groupId><artifactId>git-commit-id-plugin</artifactId></plugin>
                 </plugins>
             </build>
         </profile>
 
         <profile>
+            <!-- see: https://github.com/SonarSource/sonar-scanning-examples -->
             <id>sonar</id>
             <!-- if sonar=true, jacoco should be set to true also -->
             <activation><property><name>sonar</name><value>true</value></property></activation>
             <properties>
+                <!-- see: https://docs.sonarqube.org/display/SONAR/Analysis+Parameters -->
+                <!--<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>-->
+
+                <sonar.groovy.binaries>target/classes</sonar.groovy.binaries>
+
+                <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+                <sonar.jacoco.reportPath>${jacoco.reportPath}</sonar.jacoco.reportPath>
+                <sonar.jacoco.itReportPath>${jacoco.itReportPath}</sonar.jacoco.itReportPath>
+
                 <!-- sonar.java.binaries issue when force language java  -->
-                <!--sonar.language>java</sonar.language-->
+                <!--<sonar.language>java</sonar.language>-->
+
                 <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
 
-                <!--sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin-->
-                <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-                <sonar.jacoco.reportPath>${project.build.directory}/jacoco.exec</sonar.jacoco.reportPath>
-                <sonar.jacoco.itReportPath>${jacoco.itReportPath}</sonar.jacoco.itReportPath>
+                <sonar.sources>.</sonar.sources>
+                <sonar.inclusions>pom.xml,src/main/**</sonar.inclusions>
+                <sonar.test.inclusions>src/test/**</sonar.test.inclusions>
             </properties>
             <build>
                 <pluginManagement>
                     <plugins>
                         <!-- see: https://github.com/SonarSource/sonar-scanner-maven -->
-                        <plugin><groupId>org.sonarsource.scanner.maven</groupId><artifactId>sonar-maven-plugin</artifactId><version>3.4.0.905</version></plugin>
+                        <plugin><groupId>org.sonarsource.scanner.maven</groupId><artifactId>sonar-maven-plugin</artifactId><version>3.4.1.1168</version></plugin>
                     </plugins>
                 </pluginManagement>
                 <plugins>
@@ -958,6 +752,11 @@
         <!-- see: https://github.com/timp/juice -->
         <!-- see: https://github.com/jacoco/jacoco/issues/409 -->
         <!-- https://www.petrikainulainen.net/programming/maven/creating-code-coverage-reports-for-unit-and-integration-tests-with-the-jacoco-maven-plugin/ -->
+        <profile>
+            <id>default-argLine</id>
+            <activation><property><name>!jacoco</name></property></activation>
+            <properties><argLine></argLine></properties>
+        </profile>
         <profile>
             <id>jacoco-build</id>
             <activation><property><name>jacoco</name><value>true</value></property></activation>
@@ -1096,6 +895,35 @@
 
         <!-- @formatter:off -->
         <profile>
+            <id>gpg2-arguments</id>
+            <activation><property><name>gpg.loopback</name><value>true</value></property></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <configuration>
+                            <gpgArguments>
+                                <gpgArgument>--use-agent</gpgArgument>
+                                <gpgArgument>--pinentry-mode</gpgArgument>
+                                <gpgArgument>loopback</gpgArgument>
+                            </gpgArguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>gpg-for-travis-and-maven-central</id>
+            <activation><file><exists>${maven.multiModuleProjectDirectory}/codesigning.asc</exists></file><activeByDefault>true</activeByDefault></activation>
+            <properties>
+                <!-- Do not set gpg.executable here -->
+                <!--<gpg.executable>gpg</gpg.executable>-->
+                <gpg.keyname>${env.CI_OPT_GPG_KEYNAME}</gpg.keyname>
+                <gpg.passphrase>${env.CI_OPT_GPG_PASSPHRASE}</gpg.passphrase>
+            </properties>
+        </profile>
+
+        <profile>
             <id>default-build-publish-channel</id>
             <activation><property><name>!build.publish.channel</name></property></activation>
             <properties><build.publish.channel>snapshot</build.publish.channel></properties>
@@ -1105,6 +933,7 @@
             <id>infrastructure_opensource</id>
             <activation><property><name>infrastructure</name><value>opensource</value></property><activeByDefault>false</activeByDefault></activation>
             <properties>
+                <sonar.host.url>https://sonarqube.com</sonar.host.url>
                 <!--<wagon.merge-maven-repos.target>https://oss.sonatype.org/content/repositories/snapshots</wagon.merge-maven-repos.target>-->
                 <wagon.merge-maven-repos.target>https://oss.sonatype.org/service/local/staging/deploy/maven2</wagon.merge-maven-repos.target>
                 <wagon.merge-maven-repos.targetId>OSSRH-${build.publish.channel}s</wagon.merge-maven-repos.targetId>
@@ -1141,29 +970,66 @@
         </profile>
 
         <profile>
-            <id>infrastructure_internal</id>
+            <id>infrastructure_private</id>
             <activation><property><name>infrastructure</name><value>internal</value></property><activeByDefault>false</activeByDefault></activation>
             <properties>
-                <wagon.merge-maven-repos.target>${internal-nexus3.repository}/maven-${build.publish.channel}s</wagon.merge-maven-repos.target>
-                <wagon.merge-maven-repos.targetId>internal-nexus3-${build.publish.channel}s</wagon.merge-maven-repos.targetId>
-            </properties>
-            <distributionManagement>
-                <repository><id>internal-nexus3-releases</id><url>${internal-nexus3.repository}/maven-releases</url></repository>
-                <snapshotRepository><id>internal-nexus3-snapshots</id><url>${internal-nexus3.repository}/maven-snapshots</url></snapshotRepository>
-            </distributionManagement>
-        </profile>
+                <sonar.host.url>${private-sonarqube.host.url}</sonar.host.url>
+                <!--sonar.jdbc.url>jdbc:h2:tcp://sonarqube.local/sonar</sonar.jdbc.url>
+                <sonar.jdbc.url>jdbc:postgresql://postgresql:5432/sonar</sonar.jdbc.url-->
 
-        <profile>
-            <id>infrastructure_local</id>
-            <activation><property><name>infrastructure</name><value>local</value></property><activeByDefault>false</activeByDefault></activation>
-            <properties>
-                <wagon.merge-maven-repos.target>${local-nexus3.repository}/maven-${build.publish.channel}s</wagon.merge-maven-repos.target>
-                <wagon.merge-maven-repos.targetId>local-nexus3-${build.publish.channel}s</wagon.merge-maven-repos.targetId>
+                <wagon.merge-maven-repos.target>${private-nexus3.repository}/maven-${build.publish.channel}s</wagon.merge-maven-repos.target>
+                <wagon.merge-maven-repos.targetId>private-nexus3-${build.publish.channel}s</wagon.merge-maven-repos.targetId>
             </properties>
             <distributionManagement>
-                <repository><id>local-nexus3-releases</id><url>${local-nexus3.repository}/maven-releases/</url></repository>
-                <snapshotRepository><id>local-nexus3-snapshots</id><url>${local-nexus3.repository}/maven-snapshots/</url></snapshotRepository>
+                <repository><id>private-nexus3-releases</id><url>${private-nexus3.repository}/maven-releases</url></repository>
+                <snapshotRepository><id>private-nexus3-snapshots</id><url>${private-nexus3.repository}/maven-snapshots</url></snapshotRepository>
             </distributionManagement>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>private-nexus3-releases</id>
+                    <name>private nexus3 releases</name>
+                    <url>${private-nexus3.repository}/maven-releases/</url>
+                    <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>private-nexus3-snapshots</id>
+                    <name>private nexus3 snapshots</name>
+                    <url>${private-nexus3.repository}/maven-snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>private-nexus3-thirdparty</id>
+                    <name>private nexus3 thirdparty</name>
+                    <url>${private-nexus3.repository}/maven-thirdparty/</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+            <repositories>
+                <repository>
+                    <id>private-nexus3-releases</id>
+                    <name>private nexus3 releases</name>
+                    <url>${private-nexus3.repository}/maven-releases/</url>
+                    <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </repository>
+                <repository>
+                    <id>private-nexus3-snapshots</id>
+                    <name>private nexus3 snapshots</name>
+                    <url>${private-nexus3.repository}/maven-snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
+                </repository>
+                <repository>
+                    <id>private-nexus3-thirdparty</id>
+                    <name>private nexus3 thirdparty</name>
+                    <url>${private-nexus3.repository}/maven-thirdparty/</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </repository>
+            </repositories>
         </profile>
 
         <profile>
@@ -1174,12 +1040,12 @@
         <profile>
             <id>default-wagon-merge-maven-repos-target</id>
             <activation><property><name>!wagon.merge-maven-repos.target</name></property><activeByDefault>false</activeByDefault></activation>
-            <properties><wagon.merge-maven-repos.target>${local-nexus3.repository}/maven-${build.publish.channel}s</wagon.merge-maven-repos.target></properties>
+            <properties><wagon.merge-maven-repos.target>${private-nexus3.repository}/maven-${build.publish.channel}s</wagon.merge-maven-repos.target></properties>
         </profile>
         <profile>
             <id>default-wagon-merge-maven-repos-targetId</id>
             <activation><property><name>!wagon.merge-maven-repos.targetId</name></property><activeByDefault>false</activeByDefault></activation>
-            <properties><wagon.merge-maven-repos.targetId>local-nexus3-${build.publish.channel}s</wagon.merge-maven-repos.targetId></properties>
+            <properties><wagon.merge-maven-repos.targetId>private-nexus3-${build.publish.channel}s</wagon.merge-maven-repos.targetId></properties>
         </profile>
         <!-- Why org.codehaus.mojo:wagon-maven-plugin:wagon-maven-plugin-2.0.1-snapshot-chshawkn-1.6?
             see: https://www.mail-archive.com/users@maven.apache.org/msg129243.html -->
@@ -1243,14 +1109,35 @@
         </profile>
 
         <profile>
-            <id>infrastructure_opensource_site</id>
-            <activation><property><name>infrastructure</name><value>opensource</value></property><activeByDefault>false</activeByDefault></activation>
-            <properties>
-                <!-- In child projects, do not add url. Let it inherit from parent.-->
-                <!--<github.site.path>${project.version}/${project.artifactId}</github.site.path>-->
-                <!--<github.site.path>${project.version}</github.site.path>-->
-                <maven.site.deploy.skip>true</maven.site.deploy.skip>
-            </properties>
+            <id>infrastructure_opensource_github_site</id>
+            <activation>
+                <property><name>github-site-publish</name><value>true</value></property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.github.github</groupId><artifactId>site-maven-plugin</artifactId><version>0.13.0.OSS-M1</version>
+                            <configuration><merge>true</merge><noJekyll>true</noJekyll><repositoryOwner>${env.CI_OPT_GITHUB_SITE_REPO_OWNER}</repositoryOwner></configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.github</groupId><artifactId>site-maven-plugin</artifactId>
+                        <configuration>
+                            <message>Creating site for ${project.artifactId}-${project.version}</message>
+                            <!--<path>${github.site.path}</path>-->
+                            <path>${project.distributionManagement.site.url}</path>
+                            <repositoryName>${env.CI_OPT_GITHUB_SITE_REPO_NAME}</repositoryName>
+                        </configuration>
+                        <executions>
+                            <execution><goals><goal>site</goal></goals><phase>site-deploy</phase><!--<phase>site</phase>--></execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
             <distributionManagement>
                 <!-- Do mvn site site:stage -DstagingDirectory=/tmp/path first,
                 then manually add/push to the gh-pages branch on GitHub -->
@@ -1262,87 +1149,61 @@
                     <url>${build.publish.channel}</url>
                 </site>
             </distributionManagement>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.github</groupId>
-                        <artifactId>site-maven-plugin</artifactId>
-                        <configuration>
-                            <message>Creating site for ${project.artifactId}-${project.version}</message>
-                            <path>${project.distributionManagement.site.url}</path>
-                            <repositoryName>${env.CI_OPT_GITHUB_SITE_REPO_NAME}</repositoryName>
-                        </configuration>
-                        <executions>
-                            <execution><goals><goal>site</goal></goals><phase>site-deploy</phase><!--<phase>site</phase>--></execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>infrastructure_opensource_site_publish</id>
-            <activation><property><name>github-site-publish</name></property></activation>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>github-mvn-repo-github-maven-plugins</id>
+                    <url>https://raw.github.com/ci-and-cd/maven-plugins/mvn-repo</url>
+                    <name>Forked github-maven-plugins that upload faster</name>
+                    <layout>default</layout>
+                    <snapshots><enabled>true</enabled></snapshots>
+                    <releases><enabled>true</enabled></releases>
+                </pluginRepository>
+            </pluginRepositories>
             <properties>
-                <!-- In child projects Do not add url. Let it inherit from parent. -->
+                <!-- for site on github, id (github.global.server) must match the config in your settings.xml -->
+                <github.global.server>github</github.global.server>
+                <github.global.oauth2Token>${env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</github.global.oauth2Token>
+
+                <!-- In child projects, do not add url. inherit it from parent.-->
                 <!--<github.site.path>${project.version}/${project.artifactId}</github.site.path>-->
-                <github.site.path>${project.version}</github.site.path>
-                <!--<maven.site.deploy.skip>true</maven.site.deploy.skip>-->
+                <!--<github.site.path>${project.version}</github.site.path>-->
+                <!--<github.site.path>${project.version}</github.site.path>-->
+                <maven.site.deploy.skip>true</maven.site.deploy.skip>
             </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.github</groupId>
-                        <artifactId>site-maven-plugin</artifactId>
-                        <configuration>
-                            <message>Creating site for ${project.artifactId}-${project.version}</message>
-                            <path>${github.site.path}</path>
-                            <!--<repositoryName>${env.CI_OPT_GITHUB_SITE_REPO_NAME}</repositoryName>-->
-                        </configuration>
-                        <executions>
-                            <execution><goals><goal>site</goal></goals><phase>site</phase></execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
 
         <profile>
             <id>default-site-path</id>
             <activation><property><name>!site.path</name></property></activation>
-            <properties><site.path>${project.artifactId}-${build.publish.channel}</site.path></properties>
+            <properties><site.path>${project.artifactId}/${build.publish.channel}</site.path></properties>
         </profile>
 
         <profile>
-            <id>infrastructure_internal_site</id>
-            <activation><property><name>infrastructure</name><value>internal</value></property><activeByDefault>false</activeByDefault></activation>
+            <id>infrastructure_opensource_site</id>
+            <activation>
+                <property><name>github-site-publish</name><value>false</value></property>
+            </activation>
+            <distributionManagement>
+                <site><id>opensource-mvnsite</id><url>dav:${opensource-nexus3.repository}/mvnsite/${site.path}</url></site>
+            </distributionManagement>
+        </profile>
+
+        <profile>
+            <id>infrastructure_private_site</id>
+            <activation><property><name>infrastructure</name><value>private</value></property><activeByDefault>false</activeByDefault></activation>
             <distributionManagement>
                 <!-- scpexe uses privateKey, scp uses password -->
                 <!-- scpexe://${domain_or_ip}:22/path/to/sites -->
-                <site><id>internal-mvnsite</id><url>dav:${internal-nexus3.repository}/mvnsite/${site.path}</url></site>
+                <site><id>private-mvnsite</id><url>dav:${private-nexus3.repository}/mvnsite/${site.path}</url></site>
             </distributionManagement>
         </profile>
 
-        <profile>
-            <id>infrastructure_local_site</id>
-            <activation><property><name>infrastructure</name><value>local</value></property><activeByDefault>false</activeByDefault></activation>
-            <distributionManagement>
-                <site><id>local-mvnsite</id><url>dav:${local-nexus3.repository}/mvnsite/${site.path}</url></site>
-            </distributionManagement>
-        </profile>
-        <!-- @formatter:on -->
-
-        <!-- @formatter:off -->
         <!-- set property checkstyle.config.location in MAVEN_OPTS, pom.xml or settings.xml. -->
-        <!--<file><exists>${maven.multiModuleProjectDirectory}/src/main/checkstyle/google_checks_8.10.xml</exists></file>-->
-        <!--checkstyle.config.location>${maven.multiModuleProjectDirectory}/src/main/checkstyle/google_checks_8.10.xml</checkstyle.config.location-->
         <profile>
             <id>default-checkstyle-config</id>
             <activation><property><name>!checkstyle.config.location</name></property></activation>
             <properties><checkstyle.config.location>https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/checkstyle/google_checks_8.10.xml</checkstyle.config.location></properties>
         </profile>
-        <!--<file><exists>${maven.multiModuleProjectDirectory}/src/main/pmd/pmd-ruleset-6.4.0.xml</exists></file>-->
-        <!--pmd.ruleset.location>${maven.multiModuleProjectDirectory}/src/main/pmd/pmd-ruleset-6.4.0.xml</pmd.ruleset.location-->
         <profile>
             <id>default-pmd-ruleset</id>
             <activation><property><name>!pmd.ruleset.location</name></property></activation>
@@ -1405,28 +1266,21 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>animal-sniffer-maven-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId><artifactId>animal-sniffer-maven-plugin</artifactId>
                         <configuration>
                             <signature><groupId>org.codehaus.mojo.signature</groupId><artifactId>java18</artifactId><version>1.0</version></signature>
                         </configuration>
                     </plugin>
-                    <!--plugin>
+                    <!--<plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
                         <executions>
                             <execution>
                                 <id>analyze</id>
-                                <goals>
-                                    <goal>analyze-only</goal>
-                                </goals>
-                                <configuration>
-                                    <failOnWarning>false</failOnWarning>
-                                    <ignoreNonCompile>true</ignoreNonCompile>
-                                    <outputXML>true</outputXML>
-                                </configuration>
+                                <goals><goal>analyze-only</goal></goals>
+                                <configuration><failOnWarning>false</failOnWarning><ignoreNonCompile>true</ignoreNonCompile><outputXML>true</outputXML></configuration>
                             </execution>
                         </executions>
-                    </plugin-->
+                    </plugin>-->
                 </plugins>
             </build>
             <reporting>
@@ -1434,14 +1288,8 @@
                     <plugin>
                         <artifactId>maven-surefire-report-plugin</artifactId>
                         <reportSets>
-                            <reportSet>
-                                <id>unit-tests</id>
-                                <reports><report>report-only</report></reports>
-                            </reportSet>
-                            <reportSet>
-                                <id>integration-tests</id>
-                                <reports><report>failsafe-report-only</report></reports>
-                            </reportSet>
+                            <reportSet><id>unit-tests</id><reports><report>report-only</report></reports></reportSet>
+                            <reportSet><id>integration-tests</id><reports><report>failsafe-report-only</report></reports></reportSet>
                         </reportSets>
                     </plugin>
                     <plugin><groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId></plugin>
@@ -1468,44 +1316,24 @@
                             <charset>${project.build.sourceEncoding}</charset>
                             <encoding>${project.build.sourceEncoding}</encoding>
                             <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
-                            <docletArtifact>
-                                <groupId>org.umlgraph</groupId>
-                                <artifactId>umlgraph</artifactId>
-                                <version>${umlgraph.version}</version>
-                            </docletArtifact>
+                            <docletArtifact><groupId>org.umlgraph</groupId><artifactId>umlgraph</artifactId><version>${umlgraph.version}</version></docletArtifact>
                             <additionalOptions>-views -all</additionalOptions>
                             <!-- UML Graph需要通过匹配标签插入javadoc生成的html -->
                             <additionalJOption>-J-Duser.language=en</additionalJOption>
                             <useStandardDocletOptions>true</useStandardDocletOptions>
                         </configuration>
                         <reportSets>
-                            <reportSet>
-                                <id>non-aggregate</id>
-                                <reports>
-                                    <report>javadoc</report>
-                                    <!--report>it-javadoc</report-->
-                                </reports>
-                            </reportSet>
+                            <reportSet><id>non-aggregate</id><reports><report>javadoc</report><!--report>it-javadoc</report--></reports></reportSet>
                             <!-- aggregate reportSet, to define in poms having modules -->
                             <!-- don't run aggregate in child modules -->
                             <!-- TODO inherited false bug? -->
-                            <!--reportSet>
-                                <id>aggregate</id>
-                                <inherited>false</inherited>
-                                <reports>
-                                    <report>aggregate</report>
-                                </reports>
-                            </reportSet-->
+                            <!--<reportSet><id>aggregate</id><inherited>false</inherited><reports><report>aggregate</report></reports></reportSet>-->
                         </reportSets>
                     </plugin>
                     <plugin>
                         <artifactId>maven-jxr-plugin</artifactId>
                         <reportSets>
-                            <reportSet>
-                                <id>aggregate</id>
-                                <inherited>false</inherited>
-                                <reports><report>aggregate</report></reports>
-                            </reportSet>
+                            <reportSet><id>aggregate</id><inherited>false</inherited><reports><report>aggregate</report></reports></reportSet>
                         </reportSets>
                     </plugin>
                     <!-- Taglist plugin MUST be executed after the JXR plugin. -->
@@ -1554,22 +1382,25 @@
                         <reportSets>
                             <reportSet>
                                 <reports>
-                                    <report>cim</report>
+                                    <report>ci-management</report>
                                     <report>dependencies</report>
-                                    <!--
+                                    <!---->
                                     <report>dependency-convergence</report>
                                     <report>dependency-info</report>
                                     <report>dependency-management</report>
                                     <report>distribution-management</report>
-                                    -->
+                                    <!---->
+                                    <report>help</report>
                                     <report>index</report>
-                                    <report>summary</report>
-                                    <report>mailing-list</report>
-                                    <report>issue-tracking</report>
+                                    <report>issue-management</report>
+                                    <report>licenses</report>
+                                    <report>mailing-lists</report>
                                     <report>modules</report>
-                                    <report>project-team</report>
+                                    <report>plugin-management</report>
+                                    <report>plugins</report>
                                     <report>scm</report>
-                                    <report>license</report>
+                                    <report>summary</report>
+                                    <report>team</report>
                                 </reports>
                             </reportSet>
                         </reportSets>
@@ -1584,16 +1415,9 @@
             <reporting>
                 <plugins>
                     <plugin>
-                        <groupId>org.jacoco</groupId>
-                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId>
                         <reportSets>
-                            <reportSet>
-                                <reports>
-                                    <report>report</report>
-                                    <report>report-integration</report>
-                                    <!--report>report-aggregate</report-->
-                                </reports>
-                            </reportSet>
+                            <reportSet><reports><report>report</report><report>report-integration</report><!--<report>report-aggregate</report>--></reports></reportSet>
                         </reportSets>
                     </plugin>
                 </plugins>
@@ -1611,20 +1435,15 @@
             <reporting>
                 <plugins>
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>versions-maven-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId><artifactId>versions-maven-plugin</artifactId>
                         <reportSets>
                             <reportSet>
-                                <reports>
-                                    <report>dependency-updates-report</report>
-                                    <report>plugin-updates-report</report>
-                                </reports>
+                                <reports><report>dependency-updates-report</report><report>plugin-updates-report</report></reports>
                             </reportSet>
                         </reportSets>
                     </plugin>
                     <plugin>
-                        <groupId>org.owasp</groupId>
-                        <artifactId>dependency-check-maven</artifactId>
+                        <groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId>
                         <reportSets>
                             <reportSet><reports><report>aggregate</report></reports></reportSet>
                         </reportSets>
@@ -1632,6 +1451,366 @@
                 </plugins>
             </reporting>
         </profile>
+
+
+        <!--<frontend.nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</frontend.nodeDownloadRoot>-->
+        <profile>
+            <id>default-frontend-nodeDownloadRoot</id>
+            <activation><property><name>!frontend.nodeDownloadRoot</name></property></activation>
+            <properties><frontend.nodeDownloadRoot>https://nodejs.org/dist/</frontend.nodeDownloadRoot></properties>
+        </profile>
+        <!--<frontend.npmDownloadRoot>http://registry.npm.taobao.org/npm/-/</frontend.npmDownloadRoot>-->
+        <profile>
+            <id>default-frontend-npmDownloadRoot</id>
+            <activation><property><name>!frontend.npmDownloadRoot</name></property></activation>
+            <properties><frontend.npmDownloadRoot>https://registry.npmjs.org/npm/-/</frontend.npmDownloadRoot></properties>
+        </profile>
+        <profile>
+            <id>frontend</id>
+            <activation><file><exists>${basedir}/package.json</exists></file><activeByDefault>false</activeByDefault></activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.github.eirslett</groupId>
+                            <artifactId>frontend-maven-plugin</artifactId>
+                            <version>1.6</version>
+                            <configuration>
+                                <installDirectory>.mvn</installDirectory>
+                                <!-- Defaults to https://nodejs.org/dist/ -->
+                                <nodeDownloadRoot>${frontend.nodeDownloadRoot}</nodeDownloadRoot>
+                                <!-- Defaults to http://registry.npmjs.org/npm/-/ -->
+                                <npmDownloadRoot>${frontend.npmDownloadRoot}</npmDownloadRoot>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
+        <!-- @formatter:off -->
+        <profile>
+            <id>java8-without-groovy</id>
+            <activation><jdk>8</jdk><file><missing>${basedir}/src/main/groovy</missing></file><activeByDefault>false</activeByDefault></activation>
+            <properties><java.version>1.8</java.version></properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin><artifactId>maven-compiler-plugin</artifactId><configuration><compilerVersion>${java.version}</compilerVersion></configuration></plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <id>java8</id>
+            <activation><jdk>1.8</jdk><activeByDefault>false</activeByDefault></activation>
+            <properties><java.version>1.8</java.version></properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>echo-argLine</id><phase>test</phase><goals><goal>run</goal></goals><configuration><target><echo message="java8 argLine: ${argLine}"/></target></configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration><source>${java.version}</source><target>${java.version}</target></configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <message><![CDATA[You are running an older version of Java. This application requires at least JDK ${java.version}.]]></message>
+                                    <version>[${java.version}.0,)</version>
+                                </requireJavaVersion>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </plugin>
+                    <plugin><artifactId>maven-failsafe-plugin</artifactId><configuration><argLine>${argLine}</argLine></configuration></plugin>
+                    <plugin><artifactId>maven-surefire-plugin</artifactId><configuration><argLine>${argLine}</argLine></configuration></plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId><artifactId>maven-toolchains-plugin</artifactId>
+                        <configuration><toolchains><jdk><version>${java.version}</version><!--<vendor>oracle</vendor>--></jdk></toolchains></configuration>
+                        <executions><execution><phase>validate</phase><goals><goal>toolchain</goal></goals></execution></executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <reporting>
+                <plugins>
+                    <plugin><artifactId>maven-pmd-plugin</artifactId><configuration><targetJdk>${java.version}</targetJdk></configuration></plugin>
+                </plugins>
+            </reporting>
+        </profile>
+        <profile>
+            <id>default-java9-jvmArguments-addModules</id>
+            <activation><jdk>9</jdk><property><name>!jvmArguments.addModules</name></property></activation>
+            <properties><jvmArguments.addModules>java.xml.bind,java.xml.ws,java.xml.ws.annotation</jvmArguments.addModules></properties>
+        </profile>
+        <profile>
+            <id>java9-without-groovy</id>
+            <activation><jdk>9</jdk><file><missing>${basedir}/src/main/groovy</missing></file><activeByDefault>false</activeByDefault></activation>
+            <properties><java.version>9</java.version></properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration><compilerVersion>${java.version}</compilerVersion><compilerArgs><arg>--add-modules</arg><arg>${jvmArguments.addModules}</arg></compilerArgs></configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <id>java9-with-groovy</id>
+            <activation><jdk>9</jdk><file><exists>${basedir}/src/main/groovy</exists></file><activeByDefault>false</activeByDefault></activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration><compilerArgs><arg>-J--add-modules</arg><arg>-J${jvmArguments.addModules}</arg></compilerArgs></configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <id>java9</id>
+            <activation><jdk>9</jdk><activeByDefault>false</activeByDefault></activation>
+            <properties>
+                <!-- Runtime modules for java9 -->
+                <javax.activation.version>1.1.1</javax.activation.version>
+                <jaxb-api.version>2.3.0</jaxb-api.version>
+                <java.version>9</java.version>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.spotify</groupId><artifactId>docker-maven-plugin</artifactId>
+                            <dependencies>
+                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
+                            </dependencies>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>echo-argLine</id><phase>test</phase><goals><goal>run</goal></goals><configuration><target><echo message="java9 argLine: ${argLine}"/></target></configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration><source>${java.version}</source><target>${java.version}</target></configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <message><![CDATA[You are running an older version of Java. This application requires at least JDK ${java.version}.]]></message>
+                                    <version>[${java.version}.0,)</version>
+                                </requireJavaVersion>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </plugin>
+                    <plugin><artifactId>maven-failsafe-plugin</artifactId><configuration><argLine>--add-modules ${jvmArguments.addModules} ${argLine}</argLine></configuration></plugin>
+                    <plugin><artifactId>maven-surefire-plugin</artifactId><configuration><argLine>--add-modules ${jvmArguments.addModules} ${argLine}</argLine></configuration></plugin>
+                    <plugin>
+                        <artifactId>maven-toolchains-plugin</artifactId>
+                        <configuration><toolchains><jdk><version>${java.version}</version><!--<vendor>oracle</vendor>--></jdk></toolchains></configuration>
+                        <executions><execution><phase>validate</phase><goals><goal>toolchain</goal></goals></execution></executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
+                    <!-- Hibernate java.lang.NoClassDefFoundError: javax/xml/bind/JAXBException -->
+                    <dependency><groupId>javax.xml.bind</groupId><artifactId>jaxb-api</artifactId><version>${jaxb-api.version}</version></dependency>
+                </dependencies>
+            </dependencyManagement>
+            <reporting>
+                <plugins>
+                    <plugin><artifactId>maven-pmd-plugin</artifactId><configuration><targetJdk>${java.version}</targetJdk></configuration></plugin>
+                </plugins>
+            </reporting>
+        </profile>
+        <profile>
+            <id>default-java10-jvmArguments-addModules</id>
+            <activation><jdk>10</jdk><property><name>!jvmArguments.addModules</name></property></activation>
+            <properties><jvmArguments.addModules>java.xml.bind,java.xml.ws,java.xml.ws.annotation</jvmArguments.addModules></properties>
+        </profile>
+        <profile>
+            <id>java10-without-groovy</id>
+            <activation><jdk>10</jdk><file><missing>${basedir}/src/main/groovy</missing></file><activeByDefault>false</activeByDefault></activation>
+            <properties><java.version>10</java.version></properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration><compilerVersion>${java.version}</compilerVersion><compilerArgs><arg>--add-modules</arg><arg>${jvmArguments.addModules}</arg></compilerArgs></configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <id>java10-with-groovy</id>
+            <activation><jdk>10</jdk><file><exists>${basedir}/src/main/groovy</exists></file><activeByDefault>false</activeByDefault></activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration><compilerArgs><arg>-J--add-modules</arg><arg>-J${jvmArguments.addModules}</arg></compilerArgs></configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <id>java10</id>
+            <activation><jdk>10</jdk><activeByDefault>false</activeByDefault></activation>
+            <properties>
+                <!-- Runtime modules for java10 -->
+                <javax.activation.version>1.1.1</javax.activation.version>
+                <jaxb-api.version>2.3.0</jaxb-api.version>
+                <java.version>10</java.version>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.spotify</groupId><artifactId>docker-maven-plugin</artifactId>
+                            <dependencies>
+                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
+                            </dependencies>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>echo-argLine</id><phase>test</phase><goals><goal>run</goal></goals><configuration><target><echo message="java10 argLine: ${argLine}"/></target></configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration><source>${java.version}</source><target>${java.version}</target></configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <message><![CDATA[You are running an older version of Java. This application requires at least JDK ${java.version}.]]></message>
+                                    <version>[${java.version}.0,)</version>
+                                </requireJavaVersion>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </plugin>
+                    <plugin><artifactId>maven-failsafe-plugin</artifactId><configuration><argLine>--add-modules ${jvmArguments.addModules} ${argLine}</argLine></configuration></plugin>
+                    <plugin><artifactId>maven-surefire-plugin</artifactId><configuration><argLine>--add-modules ${jvmArguments.addModules} ${argLine}</argLine></configuration></plugin>
+                    <plugin>
+                        <artifactId>maven-toolchains-plugin</artifactId>
+                        <configuration><toolchains><jdk><version>${java.version}</version><!--<vendor>oracle</vendor>--></jdk></toolchains></configuration>
+                        <executions><execution><phase>validate</phase><goals><goal>toolchain</goal></goals></execution></executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
+                    <!-- Hibernate java.lang.NoClassDefFoundError: javax/xml/bind/JAXBException -->
+                    <dependency><groupId>javax.xml.bind</groupId><artifactId>jaxb-api</artifactId><version>${jaxb-api.version}</version></dependency>
+                </dependencies>
+            </dependencyManagement>
+            <reporting>
+                <plugins>
+                    <plugin><artifactId>maven-pmd-plugin</artifactId><configuration><targetJdk>${java.version}</targetJdk></configuration></plugin>
+                </plugins>
+            </reporting>
+        </profile>
+        <profile>
+            <id>groovy</id>
+            <activation><file><exists>${basedir}/src/main/groovy</exists></file><activeByDefault>false</activeByDefault></activation>
+            <properties>
+                <!--<groovy-eclipse-compiler.version>2.9.3-01</groovy-eclipse-compiler.version>-->
+                <groovy-eclipse-compiler.version>3.0.0-01</groovy-eclipse-compiler.version>
+                <!--<groovy-eclipse-batch.version>2.4.15-01</groovy-eclipse-batch.version>-->
+                <groovy-eclipse-batch.version>2.5.1-02</groovy-eclipse-batch.version>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-groovy-sources</id><phase>generate-sources</phase><goals><goal>add-source</goal></goals>
+                                <configuration><sources><source>src/main/groovy</source></sources></configuration>
+                            </execution>
+                            <execution>
+                                <id>add-groovy-test-sources</id><phase>generate-sources</phase><goals><goal>add-test-source</goal></goals>
+                                <configuration><sources><source>src/test/groovy</source></sources></configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin><groupId>org.codehaus.groovy</groupId><artifactId>groovy-eclipse-compiler</artifactId><version>${groovy-eclipse-compiler.version}</version><extensions>true</extensions></plugin>
+                </plugins>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <!-- see https://stackoverflow.com/questions/8524891/maven-groovy-and-java-lombok -->
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration>
+                                <!-- IMPORTANT -->
+                                <useIncrementalCompilation>false</useIncrementalCompilation>
+                                <compilerId>groovy-eclipse-compiler</compilerId><!-- Use Groovy Eclipse Compiler -->
+                            </configuration>
+                            <dependencies>
+                                <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-eclipse-compiler</artifactId><version>${groovy-eclipse-compiler.version}</version></dependency>
+                                <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-eclipse-batch</artifactId><version>${groovy-eclipse-batch.version}</version></dependency>
+                            </dependencies>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+            <dependencies>
+                <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId></dependency>
+            </dependencies>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId><version>${groovy.version}</version></dependency>
+                </dependencies>
+            </dependencyManagement>
+            <pluginRepositories>
+                <pluginRepository>
+                    <!-- Needed for latest Groovy Eclipse version -->
+                    <id>groovy-bintray</id><name>Groovy Bintray</name><url>https://dl.bintray.com/groovy/maven</url>
+                    <releases><updatePolicy>never</updatePolicy></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+        <!-- @formatter:on -->
+
 
         <!-- this plugin has error sometimes, you can disable it by mvn -Dclirr=false -->
         <profile>
@@ -1656,21 +1835,23 @@
             </reporting>
         </profile>
 
+
         <profile>
             <id>jira_project</id>
-            <activation>
-                <property>
-                    <name>jira.projectKey</name>
-                </property>
-            </activation>
+            <activation><property><name>jira.projectKey</name></property><activeByDefault>false</activeByDefault></activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-changes-plugin</artifactId><version>2.12.1</version></plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
             <reporting>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-changes-plugin</artifactId>
-                        <version>2.12.1</version>
-                        <!-- if jira version > 5.1, use this flag -->
+                        <groupId>org.apache.maven.plugins</groupId><artifactId>maven-changes-plugin</artifactId>
                         <configuration>
+                            <!-- if jira version > 5.1, set 'useJql' to true -->
                             <useJql>true</useJql>
                             <jiraUser>${jira.user}</jiraUser>
                             <jiraPassword>${jira.password}</jiraPassword>

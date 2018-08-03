@@ -1,4 +1,11 @@
 # maven-build
+
+[![Sonar](https://sonarcloud.io/api/project_badges/measure?project=cn.home1%3Amaven-build&metric=alert_status)](https://sonarcloud.io/dashboard?id=cn.home1%3Amaven-build)  
+[Maven Site](https://maven-site.infra.top/ci-and-cd/maven-build/staging/index.html)  
+[Source Repository](https://github.com/ci-and-cd/maven-build/tree/develop)  
+[![Build Status](https://travis-ci.org/ci-and-cd/maven-build.svg?branch=develop)](https://travis-ci.org/ci-and-cd/maven-build)  
+
+
 Parent pom for maven based projects
 
 maven-build support code environment segregation and build deploy segregation.  
@@ -23,17 +30,18 @@ You need to provide few properties and environment variables, see next chapter.
 ## II. Properties, Environment variables and their default values
 
 ### 1. fetch or deploy
-- internal-nexus3.repository
-> default: http://nexus3.internal:28081/nexus/repository
+- private-nexus3.repository
+> default: http://nexus3:28081/nexus/repository
 Set this property to a real world url.
 
-- local-nexus3.repository
+- private-nexus3.repository
 > default: http://nexus3.localal:28081/nexus/repository
 Set this property to a real world url.
 
 - build.publish.channel
 > default: snapshot
 Set this property to 'release' when building release artifact.
+Note: CI_OPT_GITHUB_SITE_REPO_OWNER
 
 ### 2. maven-surefire-plugin and maven-failsafe-plugin
 
@@ -57,10 +65,10 @@ Customize these properties only when building front-end projects and default sit
 
 ### 4. report
 #### 4.1 sonarqube
-- internal-sonar.host.url
-> default: http://sonarqube.internal:9000
-- local-sonar.host.url
-> default: http://sonarqube.local:9000
+- private-sonarqube.host.url
+> default: http://sonarqube:9000
+- private-sonarqube.host.url
+> default: http://sonarqube:9000
 
 Need these properties only when profile 'sonar' is activated.
 
@@ -173,7 +181,7 @@ infrastructure_opensource
 > Use maven central service.
 Deploy maven site to github.
 
-infrastructure_internal
+infrastructure_private
 > Use nexus service at organization internal network.
 Deploy maven site into organization internal mvnsite.
 
@@ -224,7 +232,7 @@ set `-Dsite.path=maven-build-snapshot` to specify upload directory.
 
 infrastructure_opensource_site_publish
 > publish project site to github  
-activate on property 'github-site-publish' present  
+activate on property 'github-site-publish' is true  
 needs:  
 env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN  
 env.CI_OPT_GITHUB_SITE_REPO_OWNER

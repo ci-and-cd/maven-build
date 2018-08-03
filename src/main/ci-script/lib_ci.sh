@@ -159,16 +159,16 @@ function ci_opt_is_origin_repo() {
 
 # auto detect infrastructure using for this build.
 # example of gitlab-ci's CI_PROJECT_URL: "https://example.com/gitlab-org/gitlab-ce"
-# returns: opensource, internal or local
+# returns: opensource, private or customized infrastructure name
 function ci_opt_infrastructure() {
     if [ -n "${CI_OPT_INFRASTRUCTURE}" ]; then
         echo ${CI_OPT_INFRASTRUCTURE}
     elif [ -n "${TRAVIS_REPO_SLUG}" ]; then
         echo "opensource"
-    elif [ -n "${CI_PROJECT_URL}" ] && [[ "${CI_PROJECT_URL}" == ${CI_INFRA_OPT_INTERNAL_GIT_PREFIX}* ]]; then
-        echo "internal"
+    elif [ -n "${CI_PROJECT_URL}" ] && [[ "${CI_PROJECT_URL}" == ${CI_INFRA_OPT_PRIVATE_GIT_PREFIX}* ]]; then
+        echo "private"
     else
-        echo "local"
+        echo "private"
     fi
 }
 
@@ -294,12 +294,9 @@ function ci_infra_opt_git_prefix() {
         if [ "opensource" == "${infrastructure}" ]; then
             default_value="https://github.com"
             CI_INFRA_OPT_GIT_PREFIX="${CI_INFRA_OPT_OPENSOURCE_GIT_PREFIX}"
-        elif [ "internal" == "${infrastructure}" ]; then
-            default_value="http://gitlab.internal"
-            CI_INFRA_OPT_GIT_PREFIX="${CI_INFRA_OPT_INTERNAL_GIT_PREFIX}"
-        elif [ "local" == "${infrastructure}" ] || [ -z "${infrastructure}" ]; then
-            default_value="http://gitlab.local:10080"
-            CI_INFRA_OPT_GIT_PREFIX="${CI_INFRA_OPT_LOCAL_GIT_PREFIX}"
+        elif [ "private" == "${infrastructure}" ] || [ -z "${infrastructure}" ]; then
+            default_value="http://gitlab"
+            CI_INFRA_OPT_GIT_PREFIX="${CI_INFRA_OPT_PRIVATE_GIT_PREFIX}"
         fi
 
         if [ -z "${CI_INFRA_OPT_GIT_PREFIX}" ] && [ -n "${default_value}" ]; then
@@ -363,13 +360,20 @@ function ci_opt_maven_opts() {
         if [ "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]; then opts="${opts} -Dmvn_deploy_publish_segregation=true"; fi
         if [ -n "${CI_OPT_PMD_RULESET_LOCATION}" ]; then opts="${opts} -Dpmd.ruleset.location=${CI_OPT_PMD_RULESET_LOCATION}"; fi
         opts="${opts} -Dsite=$(ci_opt_site)"
-        opts="${opts} -Dsite.path=$(ci_opt_site_path_prefix)-$(ci_opt_publish_channel)"
+        opts="${opts} -Dsite.path=$(ci_opt_site_path_prefix)/$(ci_opt_publish_channel)"
+        if [ "$(ci_opt_site)" == "true" ] && [ "$(ci_opt_infrastructure)" == "opensource" ]; then
+            if [ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]; then
+                opts="${opts} -Dgithub-site-publish=true"
+            else
+                opts="${opts} -Dgithub-site-publish=false"
+            fi
+        fi
         # if sonar=true, jacoco should be set to true also
         if [ "${CI_OPT_SONAR}" == "true" ]; then opts="${opts} -Dsonar=true -Djacoco=true"; fi
         opts="${opts} -Duser.language=zh -Duser.region=CN -Duser.timezone=Asia/Shanghai"
         if [ -n "${CI_OPT_WAGON_SOURCE_FILEPATH}" ]; then opts="${opts} -Dwagon.source.filepath=${CI_OPT_WAGON_SOURCE_FILEPATH} -DaltDeploymentRepository=repo::default::file://${CI_OPT_WAGON_SOURCE_FILEPATH}"; fi
 
-        if [ "${CI_OPT_SONAR}" == "true" ] && [ -n "${CI_INFRA_OPT_SONAR_HOST_URL}" ]; then opts="${opts} -D$(ci_opt_infrastructure)-sonar.host.url=${CI_INFRA_OPT_SONAR_HOST_URL}"; fi
+        if [ "${CI_OPT_SONAR}" == "true" ] && [ -n "${CI_INFRA_OPT_SONAR_HOST_URL}" ]; then opts="${opts} -D$(ci_opt_infrastructure)-sonarqube.host.url=${CI_INFRA_OPT_SONAR_HOST_URL}"; fi
         if [ "${CI_OPT_SONAR}" == "true" ] && [ -n "${CI_OPT_SONAR_LOGIN}" ]; then opts="${opts} -Dsonar.login=${CI_OPT_SONAR_LOGIN}"; fi
         if [ "${CI_OPT_SONAR}" == "true" ] && [ -n "${CI_OPT_SONAR_LOGIN_TOKEN}" ]; then opts="${opts} -Dsonar.login=${CI_OPT_SONAR_LOGIN_TOKEN}"; fi
         if [ "${CI_OPT_SONAR}" == "true" ] && [ -n "${CI_OPT_SONAR_PASSWORD}" ]; then opts="${opts} -Dsonar.password=${CI_OPT_SONAR_PASSWORD}"; fi
@@ -378,7 +382,7 @@ function ci_opt_maven_opts() {
         # MAVEN_OPTS that need to kept secret
         if [ -n "${CI_OPT_JIRA_PROJECTKEY}" ]; then opts="${opts} -Djira.projectKey=${CI_OPT_JIRA_PROJECTKEY} -Djira.user=${CI_OPT_JIRA_USER} -Djira.password=${CI_OPT_JIRA_PASSWORD}"; fi
         # public sonarqube config, see: https://sonarcloud.io
-        if [ "${CI_OPT_SONAR}" == "true" ] && [ -n "${CI_OPT_SONAR_ORGANIZATION}" ] && [ "opensource" == "$(ci_opt_infrastructure)" ]; then opts="${opts} -Dsonar.organization=${CI_OPT_SONAR_ORGANIZATION}"; fi
+        if [ "${CI_OPT_SONAR}" == "true" ] && [ -n "${CI_OPT_SONAR_ORGANIZATION}" ] && [ "$(ci_opt_infrastructure)" == "opensource" ]; then opts="${opts} -Dsonar.organization=${CI_OPT_SONAR_ORGANIZATION}"; fi
         if [ -n "${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE}" ] && [ -f "${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE}" ]; then opts="${opts} -Dsettings.security=${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE}"; fi
 
         echo "${opts}"
@@ -580,6 +584,7 @@ function run_mvn() {
         if [ -z "${CI_OPT_GITHUB_SITE_REPO_OWNER}" ]; then CI_OPT_GITHUB_SITE_REPO_OWNER="$(echo $(git_repo_slug) | cut -d '/' -f1-)"; fi
     fi
 
+    if [ -z "${CI_OPT_MAVEN_EFFECTIVE_POM}" ]; then CI_OPT_MAVEN_EFFECTIVE_POM="true"; fi
     if [ -z "${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}" ]; then CI_OPT_MAVEN_EFFECTIVE_POM_FILE="$(ci_opt_cache_directory)/effective-pom.xml"; fi
     echo -e "<<<<<<<<<< ---------- run_mvn properties and environment variables ---------- <<<<<<<<<<\n"
 
@@ -618,7 +623,7 @@ function run_mvn() {
 
     # Maven effective pom
     mkdir -p $(dirname ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}) && touch ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
-    if [ "${CI_OPT_DRYRUN}" != "true" ]; then
+    if [ "${CI_OPT_MAVEN_EFFECTIVE_POM}" == "true" ] && [ "${CI_OPT_DRYRUN}" != "true" ]; then
         if [ "${CI_OPT_SHELL_EXIT_ON_ERROR}" == "true" ]; then set +e; fi
         if [ "${CI_OPT_OUTPUT_MAVEN_EFFECTIVE_POM_TO_CONSOLE}" == "true" ]; then
             if [ -n "${TRAVIS_EVENT_TYPE}" ]; then

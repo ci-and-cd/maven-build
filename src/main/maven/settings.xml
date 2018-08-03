@@ -8,22 +8,13 @@
     <localRepository>${user.home}/.m2/repository</localRepository>
 
     <mirrors>
+        <!-- @formatter:off -->
         <!-- Do not use variable substitution in mirrors when using an IDE, it does not works. -->
         <!-- mirrorOf: pom.xml repositories repository id -->
         <!--<mirrorOf>central</mirrorOf>-->
         <!--<mirrorOf>external:*,!github-mvn-repo-wagon-maven-plugin</mirrorOf>-->
-        <!--mirror>
-            <id>mirror</id>
-            <name>mirror</name>
-            <url>http://nexus3.local:28081/nexus/repository/maven-public/</url>
-            <mirrorOf>*</mirrorOf>
-        </mirror-->
-        <!--mirror>
-            <id>mirror</id>
-            <name>mirror</name>
-            <url>http://nexus3.internal:28081/nexus/repository/maven-public/</url>
-            <mirrorOf>*</mirrorOf>
-        </mirror-->
+        <!--<mirror><id>mirror</id><name>mirror</name><url>http://nexus3:28081/nexus/repository/maven-public/</url><mirrorOf>*</mirrorOf></mirror>-->
+        <!-- @formatter:on -->
     </mirrors>
 
     <offline/>
@@ -33,18 +24,17 @@
         <pluginGroup>org.apache.tomcat.maven</pluginGroup>
         <pluginGroup>org.codehaus.mojo</pluginGroup>
         <pluginGroup>org.sonarsource.scanner.maven</pluginGroup>
+        <pluginGroup>org.springframework.boot</pluginGroup>
     </pluginGroups>
 
     <profiles>
+        <!-- @formatter:off -->
         <profile>
             <id>gpg-keyname</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <gpg.keyname>${env.CI_OPT_GPG_KEYNAME}</gpg.keyname>
-            </properties>
+            <activation><activeByDefault>true</activeByDefault></activation>
+            <properties><gpg.keyname>${env.CI_OPT_GPG_KEYNAME}</gpg.keyname></properties>
         </profile>
+        <!-- @formatter:on -->
     </profiles>
 
     <proxies>
@@ -53,10 +43,14 @@
     </proxies>
 
     <servers>
-        <!-- custom servers -> -->
-        <!-- <- custom servers -->
-
         <!-- @formatter:off -->
+
+        <server>
+            <id>docker-hub</id>
+            <username>${env.CI_OPT_DOCKER_REGISTRY_USER}</username><password>${env.CI_OPT_DOCKER_REGISTRY_PASS}</password>
+            <configuration><email>${env.CI_OPT_DOCKER_DOCKERHUB_MAIL}</email></configuration>
+        </server>
+        <server><id>github</id><password>${env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</password></server>
         <!--
         To fix issue: gpg: signing failed: Inappropriate ioctl for device
         1.
@@ -70,32 +64,19 @@
         echo RELOADAGENT | gpg-connect-agent
         -->
         <server><id>gpg.passphrase</id><passphrase>${env.CI_OPT_GPG_PASSPHRASE}</passphrase></server>
-        <server><id>github</id><password>${env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</password></server>
-        <server><id>OSSRH-staging</id><username>${env.CI_OPT_MAVEN_CENTRAL_USER}</username><password>${env.CI_OPT_MAVEN_CENTRAL_PASS}</password></server>
+        <server><id>opensource-mvnsite</id><username>${env.CI_INFRA_OPT_OPENSOURCE_MVNSITE_USERNAME}</username><password>${env.CI_INFRA_OPT_OPENSOURCE_MVNSITE_PASSWORD}</password></server>
         <server><id>OSSRH-snapshots</id><username>${env.CI_OPT_MAVEN_CENTRAL_USER}</username><password>${env.CI_OPT_MAVEN_CENTRAL_PASS}</password></server>
-        <server>
-            <id>docker-hub</id>
-            <username>${env.CI_OPT_DOCKER_REGISTRY_USER}</username><password>${env.CI_OPT_DOCKER_REGISTRY_PASS}</password>
-            <configuration><email>${env.CI_OPT_DOCKER_DOCKERHUB_MAIL}</email></configuration>
-        </server>
+        <server><id>OSSRH-staging</id><username>${env.CI_OPT_MAVEN_CENTRAL_USER}</username><password>${env.CI_OPT_MAVEN_CENTRAL_PASS}</password></server>
 
-        <server><id>internal-nexus3-releases</id><username>deployment</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
-        <server><id>internal-nexus3-snapshots</id><username>deployment</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
-        <server><id>internal-nexus3-thirdparty</id><username>deployment</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
-        <server><id>internal-mvnsite</id><username>root</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
-        <server><id>nexus3.internal:5000</id><username>deployment</username><password>{FE0UOW9YPJAHooS5sMXxtsI9ni6D1cyGHRDUFn6Ps9s=}</password></server>
-
+        <server><id>nexus3:5000</id><username>deployment</username><password>deployment</password></server>
         <!-- see: http://maven.apache.org/guides/mini/guide-encryption.html -->
         <!-- mvn &#x002d;&#x002d;encrypt-password ${password} -->
         <!-- accept RSA key fingerprint -->
         <!-- ssh -o UserKnownHostsFile=~/.ssh/known_hosts root@mvnsite.local -p 10022 -->
-        <server><id>local-nexus3-releases</id><username>deployment</username><password>deployment</password></server>
-        <server><id>local-nexus3-snapshots</id><username>deployment</username><password>deployment</password></server>
-        <server><id>local-nexus3-thirdparty</id><username>deployment</username><password>deployment</password></server>
         <server>
-            <id>local-mvnsite</id>
-            <!--<username>root</username><passphrase>if required</passphrase><privateKey>${user.home}/.ssh/mvnsite.local</privateKey>-->
+            <id>private-mvnsite</id>
             <username>deployment</username><password>deployment</password>
+            <!--<username>root</username><passphrase>if required</passphrase><privateKey>${user.home}/.ssh/mvnsite.local</privateKey>-->
             <configuration>
                 <!-- see: https://maven.apache.org/wagon/apidocs/index.html -->
                 <!-- java.lang.ClassNotFoundException: org.apache.maven.wagon.providers.ssh.knownhost.NullKnownHostProvider -->
@@ -104,7 +85,9 @@
                 </knownHostsProvider-->
             </configuration>
         </server>
-        <server><id>nexus3.local:5000</id><username>deployment</username><password>deployment</password></server>
+        <server><id>private-nexus3-releases</id><username>deployment</username><password>deployment</password></server>
+        <server><id>private-nexus3-snapshots</id><username>deployment</username><password>deployment</password></server>
+        <server><id>private-nexus3-thirdparty</id><username>deployment</username><password>deployment</password></server>
         <!-- @formatter:on -->
     </servers>
 

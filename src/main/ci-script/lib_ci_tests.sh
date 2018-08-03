@@ -2,9 +2,9 @@
 
 # usage: ./src/main/ci-script/lib_ci_tests.sh | grep ASSERT
 
-if [ -z "${CI_INFRA_OPT_LOCAL_GIT_AUTH_TOKEN}" ]; then echo "Error, please set CI_INFRA_OPT_LOCAL_GIT_AUTH_TOKEN"; exit 1; fi
+if [ -z "${CI_INFRA_OPT_PRIVATE_GIT_AUTH_TOKEN}" ]; then echo "Error, please set CI_INFRA_OPT_PRIVATE_GIT_AUTH_TOKEN"; exit 1; fi
 
-export CI_INFRA_OPT_GIT_AUTH_TOKEN="${CI_INFRA_OPT_LOCAL_GIT_AUTH_TOKEN}"
+export CI_INFRA_OPT_GIT_AUTH_TOKEN="${CI_INFRA_OPT_PRIVATE_GIT_AUTH_TOKEN}"
 export CI_OPT_CI_SCRIPT="src/main/ci-script/lib_ci.sh"
 export CI_OPT_DRYRUN="true"
 

@@ -8,8 +8,11 @@ addons:
     - graphviz
     - openssl
 before_install:
-- aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -o apache-maven-3.5.3-bin.zip https://archive.apache.org/dist/maven/maven-3/3.5.3/binaries/apache-maven-3.5.3-bin.zip && unzip -qq apache-maven-3.5.3-bin.zip
-- export M2_HOME=$PWD/apache-maven-3.5.3
+- wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
+- bash install-jdk.sh -F 10 -L BCL --target /home/travis/oraclejdk10 --workspace $HOME/.cache/install-jdk
+- if [ -d /home/travis/oraclejdk10 ]; then sudo mkdir -p /usr/lib/jvm; sudo ln -s /home/travis/oraclejdk10 /usr/lib/jvm/java-10-oracle; fi
+- aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -o apache-maven-3.5.4-bin.zip https://archive.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip && unzip -qq apache-maven-3.5.4-bin.zip
+- export M2_HOME=$PWD/apache-maven-3.5.4
 - export PATH=$M2_HOME/bin:$PATH
 branches:
   only:
@@ -43,7 +46,8 @@ script:
 # When prefixed with `travis_wait 30`, no log output until it is done.
 # see: https://github.com/travis-ci/travis-ci/issues/4190 or https://github.com/HaxeFoundation/hxcpp/issues/709
 - while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
-- bash ci.sh mvn clean install sonar:sonar site deploy site-deploy
+#- bash ci.sh mvn clean install sonar:sonar site deploy site-deploy
+- bash ci.sh mvn clean install sonar:sonar site deploy site:stage site:stage-deploy
 - kill %1
 services:
 - docker
