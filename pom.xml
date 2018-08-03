@@ -1175,7 +1175,7 @@
         <profile>
             <id>default-site-path</id>
             <activation><property><name>!site.path</name></property></activation>
-            <properties><site.path>${project.artifactId}-${build.publish.channel}</site.path></properties>
+            <properties><site.path>${project.artifactId}/${build.publish.channel}</site.path></properties>
         </profile>
 
         <profile>

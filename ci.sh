@@ -13,7 +13,7 @@ if [ -z "${CI_OPT_GITHUB_SITE_REPO_OWNER}" ]; then CI_OPT_GITHUB_SITE_REPO_OWNER
 if [ -z "${CI_OPT_GPG_KEYNAME}" ]; then CI_OPT_GPG_KEYNAME="59DBF10E"; fi
 if [ -z "${CI_OPT_ORIGIN_REPO_SLUG}" ]; then CI_OPT_ORIGIN_REPO_SLUG="ci-and-cd/maven-build"; fi
 if [ -z "${CI_OPT_SITE}" ]; then CI_OPT_SITE="true"; fi
-if [ -z "${CI_OPT_SITE_PATH_PREFIX}" ]; then CI_OPT_SITE_PATH_PREFIX="ci-and-cd"; fi
+if [ -z "${CI_OPT_SITE_PATH_PREFIX}" ]; then CI_OPT_SITE_PATH_PREFIX="ci-and-cd/maven-build"; fi
 if [ -z "${CI_OPT_SONAR_ORGANIZATION}" ]; then CI_OPT_SONAR_ORGANIZATION="home1-oss-github"; fi
 if [ -z "${CI_OPT_SONAR}" ]; then CI_OPT_SONAR="true"; fi
 echo -e "<<<<<<<<<< ---------- custom, override options ---------- <<<<<<<<<<\n"

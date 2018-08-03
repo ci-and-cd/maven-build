@@ -360,7 +360,7 @@ function ci_opt_maven_opts() {
         if [ "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]; then opts="${opts} -Dmvn_deploy_publish_segregation=true"; fi
         if [ -n "${CI_OPT_PMD_RULESET_LOCATION}" ]; then opts="${opts} -Dpmd.ruleset.location=${CI_OPT_PMD_RULESET_LOCATION}"; fi
         opts="${opts} -Dsite=$(ci_opt_site)"
-        opts="${opts} -Dsite.path=$(ci_opt_site_path_prefix)-$(ci_opt_publish_channel)"
+        opts="${opts} -Dsite.path=$(ci_opt_site_path_prefix)/$(ci_opt_publish_channel)"
         if [ "$(ci_opt_site)" == "true" ] && [ "$(ci_opt_infrastructure)" == "opensource" ]; then
             if [ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]; then
                 opts="${opts} -Dgithub-site-publish=true"
