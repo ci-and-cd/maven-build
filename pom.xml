@@ -132,6 +132,14 @@
             <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
         <pluginRepository>
+            <id>github-mvn-repo-github-maven-plugins</id>
+            <url>https://raw.github.com/ci-and-cd/maven-plugins/mvn-repo</url>
+            <name>Forked github-maven-plugins that upload faster</name>
+            <layout>default</layout>
+            <snapshots><enabled>true</enabled></snapshots>
+            <releases><enabled>true</enabled></releases>
+        </pluginRepository>
+        <pluginRepository>
             <id>github-mvn-repo-wagon-maven-plugin</id>
             <url>https://raw.github.com/ci-and-cd/wagon-maven-plugin/mvn-repo/</url>
             <name>Fixed issue of merge snapshotVersion</name>
@@ -143,25 +151,29 @@
     </pluginRepositories>
 
     <properties>
-        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <com.google.errorprone_error_prone_core.version>2.3.1</com.google.errorprone_error_prone_core.version>
         <downloadSources>true</downloadSources>
 
         <groovy.version>2.4.15</groovy.version>
         <!--<groovy.version>2.5.1</groovy.version>-->
 
+        <jacoco.reportPath>${project.build.directory}/jacoco.exec</jacoco.reportPath>
+        <jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</jacoco.itReportPath>
+
+        <kotlin.version>1.2.60</kotlin.version>
+
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+
+        <org.codehaus.plexus_plexus-compiler-javac-errorprone>2.8.4</org.codehaus.plexus_plexus-compiler-javac-errorprone>
+        <org.jacoco_jacoco.version>0.8.1</org.jacoco_jacoco.version>
+        <org.sonarsource.java_sonar-jacoco-listeners.version>5.3.0.13828</org.sonarsource.java_sonar-jacoco-listeners.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <repositories.releases.updatePolicy>always</repositories.releases.updatePolicy>
         <repositories.snapshots.updatePolicy>always</repositories.snapshots.updatePolicy>
 
-        <org.codehaus.plexus_plexus-compiler-javac-errorprone>2.8.4</org.codehaus.plexus_plexus-compiler-javac-errorprone>
-        <com.google.errorprone_error_prone_core.version>2.3.1</com.google.errorprone_error_prone_core.version>
-
-        <org.jacoco_jacoco.version>0.8.1</org.jacoco_jacoco.version>
-        <jacoco.reportPath>${project.build.directory}/jacoco.exec</jacoco.reportPath>
-        <jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</jacoco.itReportPath>
-        <org.sonarsource.java_sonar-jacoco-listeners.version>5.3.0.13828</org.sonarsource.java_sonar-jacoco-listeners.version>
+        <scala.version>2.12.6</scala.version>
     </properties>
 
     <build>
@@ -1109,6 +1121,7 @@
         </profile>
 
         <profile>
+            <!-- Do mvn site site:stage -DstagingDirectory=/tmp/path first, then manually add/push to the gh-pages branch on GitHub? -->
             <id>infrastructure_opensource_github_site</id>
             <activation>
                 <property><name>github-site-publish</name><value>true</value></property>
@@ -1119,18 +1132,32 @@
                     <plugins>
                         <plugin>
                             <groupId>com.github.github</groupId><artifactId>site-maven-plugin</artifactId><version>0.13.0.OSS-M1</version>
-                            <configuration><merge>true</merge><noJekyll>true</noJekyll><repositoryOwner>${env.CI_OPT_GITHUB_SITE_REPO_OWNER}</repositoryOwner></configuration>
                         </plugin>
                     </plugins>
                 </pluginManagement>
                 <plugins>
                     <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>echo-github-site-info</id><phase>test</phase><goals><goal>run</goal></goals>
+                                <configuration><target>
+                                    <echo message="github site path: ${github.site.path}"/>
+                                    <echo message="github site repositoryName: ${github.global.repositoryName}"/>
+                                    <echo message="github site repositoryOwner: ${github.global.repositoryOwner}"/>
+                                </target></configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <groupId>com.github.github</groupId><artifactId>site-maven-plugin</artifactId>
                         <configuration>
+                            <merge>true</merge>
                             <message>Creating site for ${project.artifactId}-${project.version}</message>
-                            <!--<path>${github.site.path}</path>-->
-                            <path>${project.distributionManagement.site.url}</path>
-                            <repositoryName>${env.CI_OPT_GITHUB_SITE_REPO_NAME}</repositoryName>
+                            <noJekyll>true</noJekyll>
+                            <path>${github.site.path}</path>
+                            <repositoryName>${github.global.repositoryName}</repositoryName>
+                            <repositoryOwner>${github.global.repositoryOwner}</repositoryOwner>
                         </configuration>
                         <executions>
                             <execution><goals><goal>site</goal></goals><phase>site-deploy</phase><!--<phase>site</phase>--></execution>
@@ -1138,36 +1165,18 @@
                     </plugin>
                 </plugins>
             </build>
-            <distributionManagement>
-                <!-- Do mvn site site:stage -DstagingDirectory=/tmp/path first,
-                then manually add/push to the gh-pages branch on GitHub -->
-                <site>
-                    <id>github-site</id>
-                    <name>Deployment through GitHub's site deployment plugin</name>
-                    <!--If sub projects/module inherit the site URL from a parent POM,they will automatically append their <artifactId>
-                    to their effective deployment location. More info in http://maven.apache.org/guides/mini/guide-site.html-->
-                    <url>${build.publish.channel}</url>
-                </site>
-            </distributionManagement>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>github-mvn-repo-github-maven-plugins</id>
-                    <url>https://raw.github.com/ci-and-cd/maven-plugins/mvn-repo</url>
-                    <name>Forked github-maven-plugins that upload faster</name>
-                    <layout>default</layout>
-                    <snapshots><enabled>true</enabled></snapshots>
-                    <releases><enabled>true</enabled></releases>
-                </pluginRepository>
-            </pluginRepositories>
             <properties>
                 <!-- for site on github, id (github.global.server) must match the config in your settings.xml -->
-                <github.global.server>github</github.global.server>
                 <github.global.oauth2Token>${env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</github.global.oauth2Token>
+                <github.global.repositoryName>${env.CI_OPT_GITHUB_SITE_REPO_NAME}</github.global.repositoryName>
+                <github.global.repositoryOwner>${env.CI_OPT_GITHUB_SITE_REPO_OWNER}</github.global.repositoryOwner>
+                <github.global.server>github</github.global.server>
 
                 <!-- In child projects, do not add url. inherit it from parent.-->
                 <!--<github.site.path>${project.version}/${project.artifactId}</github.site.path>-->
                 <!--<github.site.path>${project.version}</github.site.path>-->
-                <!--<github.site.path>${project.version}</github.site.path>-->
+                <github.site.path>${build.publish.channel}</github.site.path>
+
                 <maven.site.deploy.skip>true</maven.site.deploy.skip>
             </properties>
         </profile>
@@ -1809,8 +1818,61 @@
                 </pluginRepository>
             </pluginRepositories>
         </profile>
-        <!-- @formatter:on -->
-
+        <profile>
+            <id>scala</id>
+            <activation><file><exists>${basedir}/src/main/scala</exists></file><activeByDefault>false</activeByDefault></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>net.alchim31.maven</groupId><artifactId>scala-maven-plugin</artifactId><version>3.4.2</version>
+                        <executions>
+                            <execution>
+                                <phase>process-sources</phase>
+                                <goals>
+                                    <goal>compile</goal>
+                                    <goal>testCompile</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceDir>src/main/scala</sourceDir>
+                                    <testSourceDir>src/test/scala</testSourceDir>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency><groupId>org.scala-lang</groupId><artifactId>scala-library</artifactId><version>${scala.version}</version></dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>kotlin</id>
+            <activation><file><exists>${basedir}/src/main/kotlin</exists></file><activeByDefault>false</activeByDefault></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-maven-plugin</artifactId><version>${kotlin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>compile</id>
+                                <phase>process-sources</phase>
+                                <goals><goal>compile</goal></goals>
+                                <configuration><sourceDirs><source>src/main/kotlin</source></sourceDirs></configuration>
+                            </execution>
+                            <execution>
+                                <id>test-compile</id>
+                                <phase>process-test-sources</phase>
+                                <goals><goal>test-compile</goal></goals>
+                                <configuration><sourceDirs><source>src/test/kotlin</source></sourceDirs></configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-stdlib</artifactId><version>${kotlin.version}</version></dependency>
+            </dependencies>
+        </profile>
 
         <!-- this plugin has error sometimes, you can disable it by mvn -Dclirr=false -->
         <profile>

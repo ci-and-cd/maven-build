@@ -198,7 +198,8 @@ function ci_opt_ref_name() {
         echo "${CI_REF_NAME}"
     elif [ -n "${CI_COMMIT_REF_NAME}" ]; then
         echo "${CI_COMMIT_REF_NAME}"
-    elif [ -d .git ]; then
+    elif [ -d .git ] || [ -f .git ]; then
+        # .git is a file in git submodule
         echo "$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match)"
     else
         (>&2 echo "Can not find value for CI_OPT_REF_NAME, using default value 'master'")
@@ -582,6 +583,9 @@ function run_mvn() {
     if [ "opensource" == "$(ci_opt_infrastructure)" ]; then
         if [ -z "${CI_OPT_GITHUB_SITE_REPO_NAME}" ]; then CI_OPT_GITHUB_SITE_REPO_NAME="$(ci_opt_site_path_prefix)"; fi
         if [ -z "${CI_OPT_GITHUB_SITE_REPO_OWNER}" ]; then CI_OPT_GITHUB_SITE_REPO_OWNER="$(echo $(git_repo_slug) | cut -d '/' -f1-)"; fi
+        # export and expose to maven sub process
+        export CI_OPT_GITHUB_SITE_REPO_NAME
+        export CI_OPT_GITHUB_SITE_REPO_OWNER
     fi
 
     if [ -z "${CI_OPT_MAVEN_EFFECTIVE_POM}" ]; then CI_OPT_MAVEN_EFFECTIVE_POM="true"; fi

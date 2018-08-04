@@ -32,9 +32,11 @@ cache:
 dist: trusty
 env:
   global:
-  # i.e. CI_OPT_CI_SCRIPT=https://github.com/ci-and-cd/maven-build/raw/master/src/main/ci-script/lib_ci.sh
-  - CI_OPT_CI_SCRIPT=https://github.com/${TRAVIS_REPO_SLUG}/raw/${TRAVIS_BRANCH}/src/main/ci-script/lib_ci.sh
+  # e.g. CI_OPT_CI_SCRIPT=https://github.com/ci-and-cd/maven-build/raw/master/src/main/ci-script/lib_ci.sh
+  - CI_OPT_CI_SCRIPT=https://github.com/${TRAVIS_REPO_SLUG:-ci-and-cd/maven-build}/raw/${TRAVIS_BRANCH:-develop}/src/main/ci-script/lib_ci.sh
+  - CI_OPT_GITHUB_SITE_PUBLISH=true
   - CI_OPT_INFRASTRUCTURE=opensource
+  #- CI_OPT_MAVEN_EFFECTIVE_POM=true
   - MAVEN_SKIP_RC=true
 group: edge
 install: true
@@ -46,8 +48,11 @@ script:
 # When prefixed with `travis_wait 30`, no log output until it is done.
 # see: https://github.com/travis-ci/travis-ci/issues/4190 or https://github.com/HaxeFoundation/hxcpp/issues/709
 - while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
-#- bash ci.sh mvn clean install sonar:sonar site deploy site-deploy
-- bash ci.sh mvn clean install sonar:sonar site deploy site:stage site:stage-deploy
+- if [ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]; then
+    bash ci.sh mvn clean install sonar:sonar site deploy site-deploy;
+  else
+    bash ci.sh mvn clean install sonar:sonar site deploy site:stage site:stage-deploy;
+  fi
 - kill %1
 services:
 - docker
