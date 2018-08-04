@@ -1,0 +1,89 @@
+
+branches:
+  only:
+  #- master # do nothing on master branch
+  - develop # snapshots on develop branch
+  - /^feature\/.*$/ # build and test on feature branches
+  - /^hotfix\/.*$/ # release on hotfix branches
+  - /^release\/.*$/ # release on release branches
+  #- /^v\d+\.\d+(\.\d+)?(-\S*)?/ # build and publish a github release (can skip tests here) or do nothing on version tags
+
+image: ubuntu
+
+environment:
+  APPVEYOR_ENABLED: true
+
+  CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN:
+    secure: b8+kCKw7dSSIWSmdlsRzDKz9m5xU3BO1uBzd4voLqDmbGn+pVQxOQzpEzqNqw0xq
+  CI_INFRA_OPT_OPENSOURCE_MVNSITE_PASSWORD:
+    secure: Yd4Z2S34bY3NQnWMP/GflQ==
+  CI_INFRA_OPT_OPENSOURCE_MVNSITE_USERNAME:
+    secure: 5a/nGFeI/YGReZ+YZrz9xWytrHl8OotByWS/L6A/Gos=
+  CI_OPT_GPG_PASSPHRASE:
+    secure: 9W3TKuaDpCwfEF8yNbbbNCaelmjnZqHdxUqfITdKTWM=
+  CI_OPT_MAVEN_CENTRAL_PASS:
+    secure: +2YtkaPZye6Fo+3YW32xokOGFkKQJBbWDFglvcKMGVo=
+  CI_OPT_MAVEN_CENTRAL_USER:
+    secure: zmJLi24kwYRes3vI0ngWqg==
+  CI_OPT_SONAR_LOGIN_TOKEN:
+    secure: W4k/mwIb6WWM/XKvncWlDEvlfn+dz88sB8qlbYsL7nF41+9BADm/uYgiYt5SPoiJ
+
+  # e.g. CI_OPT_CI_SCRIPT=https://github.com/ci-and-cd/maven-build/raw/master/src/main/ci-script/lib_ci.sh
+  CI_OPT_CI_SCRIPT: https://github.com/${APPVEYOR_REPO_NAME:-ci-and-cd/maven-build}/raw/${APPVEYOR_REPO_BRANCH:-develop}/src/main/ci-script/lib_ci.sh
+  CI_OPT_GITHUB_SITE_PUBLISH: true
+  CI_OPT_INFRASTRUCTURE: opensource
+  #CI_OPT_MAVEN_EFFECTIVE_POM: true
+  MAVEN_SKIP_RC: true
+
+init:
+
+cache:
+- "$HOME/.cache"
+- "$HOME/.gradle"
+- "$HOME/.m2"
+- "$HOME/.sonar/cache"
+
+# see: https://www.appveyor.com/docs/build-environment/
+stack: node 9, jdk 8, jdk 9, jdk 10
+
+install:
+- ls -al
+- sh: sudo apt-get update > /dev/null
+- sh: sudo apt-get install -yq --no-install-suggests --no-install-recommends aria2 gnupg2 graphviz openssl
+- sh: unset M2_HOME
+- sh: sudo mkdir -p /opt/maven
+- sh: sudo aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -d /opt/maven -o apache-maven-3.5.4-bin.zip https://archive.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip && sudo unzip /opt/maven/apache-maven-3.5.4-bin.zip -d /opt/maven > /dev/null
+- sh: sudo ln -sfn apache-maven-3.5.4 /opt/maven/latest
+- sh: export M3_HOME=/opt/maven/latest
+- sh: export PATH=$M3_HOME/bin:$PATH
+- sh: sudo mkdir -p /opt/gradle
+- sh: sudo aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -d /opt/gradle -o gradle-4.7-all.zip https://services.gradle.org/distributions/gradle-4.7-all.zip && sudo unzip /opt/gradle/gradle-4.7-all.zip -d /opt/gradle > /dev/null
+- sh: sudo ln -sfn gradle-4.7 /opt/gradle/latest
+- sh: ls -la /opt/gradle
+- sh: ls -la /opt/gradle/latest/
+- sh: export GRADLE_HOME=/opt/gradle/latest
+- sh: export PATH=$GRADLE_HOME/bin:$PATH
+- sh: echo M3_HOME=$M3_HOME, GRADLE_HOME=$GRADLE_HOME, PATH=$PATH
+# make AppVeyor's JDK path (/usr/lib/jvm/java-8-openjdk-amd64) compatible with travis-ci's style (/usr/lib/jvm/java-8-oracle) to make toolchains.xml valid
+- sh: sudo ln -s /usr/lib/jvm/java-8-openjdk-amd64 /usr/lib/jvm/java-8-oracle
+- sh: sudo ln -s /usr/lib/jvm/java-9-openjdk-amd64 /usr/lib/jvm/java-9-oracle
+- sh: sudo ln -s /usr/lib/jvm/java-10-openjdk-amd64 /usr/lib/jvm/java-10-oracle
+- sh: export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+- sh: export PATH=$JAVA_HOME:$PATH
+
+services:
+- docker
+
+test_script:
+- sh: |
+    if [ "${APPVEYOR_ENABLED}" == "true" ]; then
+      if [ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]; then
+        bash ci.sh mvn clean install sonar:sonar site deploy site-deploy;
+      else
+        bash ci.sh mvn clean install sonar:sonar site deploy site:stage site:stage-deploy;
+      fi
+    fi
+
+# build phase should be off as,
+# by default, it’s set to MSBuild mode for automatic discovery and building of .NET Core projects (see the section below).
+build: off
