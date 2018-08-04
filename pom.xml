@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
 
     <modules>
         <module>build-docker</module>
@@ -1155,7 +1155,7 @@
                             <merge>true</merge>
                             <message>Creating site for ${project.artifactId}-${project.version}</message>
                             <noJekyll>true</noJekyll>
-                            <path>${github.site.path}</path>
+                            <path>${project.distributionManagement.site.url}</path>
                             <repositoryName>${github.global.repositoryName}</repositoryName>
                             <repositoryOwner>${github.global.repositoryOwner}</repositoryOwner>
                         </configuration>
@@ -1165,6 +1165,16 @@
                     </plugin>
                 </plugins>
             </build>
+            <distributionManagement>
+                <!-- Make github site-maven-plugin to support multi-module site deployment -->
+                <!-- see: https://github.com/github/maven-plugins/issues/22 -->
+                <!-- If subprojects inherit the site URL from a parent POM, they will automatically append their artifactId to form their effective deployment location. -->
+                <site>
+                    <id>github-pages-site</id>
+                    <name>Deployment through GitHub's site deployment plugin</name>
+                    <url>${github.site.path}</url>
+                </site>
+            </distributionManagement>
             <properties>
                 <!-- for site on github, id (github.global.server) must match the config in your settings.xml -->
                 <github.global.oauth2Token>${env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</github.global.oauth2Token>
@@ -1172,9 +1182,7 @@
                 <github.global.repositoryOwner>${env.CI_OPT_GITHUB_SITE_REPO_OWNER}</github.global.repositoryOwner>
                 <github.global.server>github</github.global.server>
 
-                <!-- In child projects, do not add url. inherit it from parent.-->
-                <!--<github.site.path>${project.version}/${project.artifactId}</github.site.path>-->
-                <!--<github.site.path>${project.version}</github.site.path>-->
+                <!--<github.site.path>${build.publish.channel}/${project.version}</github.site.path>-->
                 <github.site.path>${build.publish.channel}</github.site.path>
 
                 <maven.site.deploy.skip>true</maven.site.deploy.skip>

@@ -4,7 +4,8 @@
 [Maven Site (github.io)](https://ci-and-cd.github.io/ci-and-cd/snapshot/index.html)  
 [Maven site (infra.top)](https://maven-site.infra.top/ci-and-cd/maven-build/snapshot/staging/index.html)  
 [Source Repository](https://github.com/ci-and-cd/maven-build/tree/develop)  
-[![Build Status](https://travis-ci.org/ci-and-cd/maven-build.svg?branch=develop)](https://travis-ci.org/ci-and-cd/maven-build)  
+[![Build Status](https://travis-ci.org/ci-and-cd/maven-build.svg?branch=develop)travis-ci](https://travis-ci.org/ci-and-cd/maven-build)  
+[![Build status](https://ci.appveyor.com/api/projects/status/08er85vpj4qk9g9u?svg=true)appveyor](https://ci.appveyor.com/project/chshawkn/deps-spring-boot)  
 
 
 Parent pom for maven based projects
