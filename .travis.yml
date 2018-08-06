@@ -33,7 +33,7 @@ dist: trusty
 env:
   global:
   - TRAVIS_ENABLED=true
-  # e.g. CI_OPT_CI_SCRIPT=https://github.com/ci-and-cd/maven-build/raw/master/src/main/ci-script/lib_ci.sh
+  # e.g. CI_OPT_CI_SCRIPT=https://github.com/ci-and-cd/maven-build/raw/v0.1.3/src/main/ci-script/lib_ci.sh
   - CI_OPT_CI_SCRIPT=https://github.com/${TRAVIS_REPO_SLUG:-ci-and-cd/maven-build}/raw/${TRAVIS_BRANCH:-develop}/src/main/ci-script/lib_ci.sh
   - CI_OPT_GITHUB_SITE_PUBLISH=true
   - CI_OPT_INFRASTRUCTURE=opensource
