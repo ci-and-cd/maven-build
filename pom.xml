@@ -1923,8 +1923,8 @@
                             <jiraUser>${jira.user}</jiraUser>
                             <jiraPassword>${jira.password}</jiraPassword>
                             <!--<onlyCurrentVersion>true</onlyCurrentVersion>-->
-                            <!-- http://jira7.internal/rest/api/2/resolution/ -->
-                            <!-- http://jira7.internal/rest/api/2/status/ -->
+                            <!-- http://jira7/rest/api/2/resolution/ -->
+                            <!-- http://jira7/rest/api/2/status/ -->
                             <resolutionIds>完成</resolutionIds>
                             <statusIds>关闭</statusIds>
                         </configuration>
