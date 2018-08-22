@@ -156,11 +156,16 @@
 
         <groovy.version>2.4.15</groovy.version>
         <!--<groovy.version>2.5.1</groovy.version>-->
+        <groovy-eclipse-compiler.version>2.9.3-01</groovy-eclipse-compiler.version>
+        <!--<groovy-eclipse-compiler.version>3.0.0-01</groovy-eclipse-compiler.version>-->
+        <groovy-eclipse-batch.version>2.4.15-01</groovy-eclipse-batch.version>
+        <!--<groovy-eclipse-batch.version>2.5.1-02</groovy-eclipse-batch.version>-->
 
         <jacoco.reportPath>${project.build.directory}/jacoco.exec</jacoco.reportPath>
         <jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</jacoco.itReportPath>
 
         <kotlin.version>1.2.60</kotlin.version>
+        <lombok.version>1.18.2</lombok.version>
 
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
 
@@ -504,7 +509,7 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <useSystemClassLoader>false</useSystemClassLoader>
+                    <reuseForks>false</reuseForks>
                     <includes>
                         <include>**/*Test.java</include>
                         <include>**/*Tests.java</include>
@@ -519,6 +524,7 @@
                         <exclude>**/Deprecated*.java</exclude>
                         <exclude>**/*IT.java</exclude>
                     </excludes>
+                    <useSystemClassLoader>false</useSystemClassLoader>
                 </configuration>
                 <executions>
                     <execution><id>default-test</id><goals><goal>test</goal></goals><configuration><skip>${maven.test.skip}</skip></configuration></execution>
@@ -1763,14 +1769,9 @@
             </reporting>
         </profile>
         <profile>
+            <!-- see: https://github.com/groovy/groovy-eclipse/wiki/Groovy-Eclipse-Maven-plugin -->
             <id>groovy</id>
             <activation><file><exists>${basedir}/src/main/groovy</exists></file><activeByDefault>false</activeByDefault></activation>
-            <properties>
-                <!--<groovy-eclipse-compiler.version>2.9.3-01</groovy-eclipse-compiler.version>-->
-                <groovy-eclipse-compiler.version>3.0.0-01</groovy-eclipse-compiler.version>
-                <!--<groovy-eclipse-batch.version>2.4.15-01</groovy-eclipse-batch.version>-->
-                <groovy-eclipse-batch.version>2.5.1-02</groovy-eclipse-batch.version>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -1797,10 +1798,16 @@
                                 <!-- IMPORTANT -->
                                 <useIncrementalCompilation>false</useIncrementalCompilation>
                                 <compilerId>groovy-eclipse-compiler</compilerId><!-- Use Groovy Eclipse Compiler -->
+                                <compilerArguments>
+                                    <!--<indy/>-->
+                                    <javaAgentClass>lombok.launch.Agent</javaAgentClass>
+                                </compilerArguments>
+                                <fork>true</fork>
                             </configuration>
                             <dependencies>
                                 <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-eclipse-compiler</artifactId><version>${groovy-eclipse-compiler.version}</version></dependency>
                                 <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-eclipse-batch</artifactId><version>${groovy-eclipse-batch.version}</version></dependency>
+                                <dependency><groupId>org.projectlombok</groupId><artifactId>lombok</artifactId><version>${lombok.version}</version></dependency>
                             </dependencies>
                         </plugin>
                     </plugins>
@@ -1808,10 +1815,12 @@
             </build>
             <dependencies>
                 <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId></dependency>
+                <!--<dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId><classifier>indy</classifier></dependency>-->
             </dependencies>
             <dependencyManagement>
                 <dependencies>
                     <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId><version>${groovy.version}</version></dependency>
+                    <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId><classifier>indy</classifier><version>${groovy.version}</version></dependency>
                 </dependencies>
             </dependencyManagement>
             <pluginRepositories>
@@ -1827,9 +1836,16 @@
             <id>scala</id>
             <activation><file><exists>${basedir}/src/main/scala</exists></file><activeByDefault>false</activeByDefault></activation>
             <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>net.alchim31.maven</groupId><artifactId>scala-maven-plugin</artifactId><version>3.4.2</version>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
                 <plugins>
                     <plugin>
-                        <groupId>net.alchim31.maven</groupId><artifactId>scala-maven-plugin</artifactId><version>3.4.2</version>
+                        <groupId>net.alchim31.maven</groupId><artifactId>scala-maven-plugin</artifactId>
                         <executions>
                             <execution>
                                 <phase>process-sources</phase>
@@ -1847,14 +1863,32 @@
                 </plugins>
             </build>
             <dependencies>
-                <dependency><groupId>org.scala-lang</groupId><artifactId>scala-library</artifactId><version>${scala.version}</version></dependency>
+                <dependency><groupId>org.scala-lang</groupId><artifactId>scala-library</artifactId></dependency>
             </dependencies>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency><groupId>org.scala-lang</groupId><artifactId>scala-library</artifactId><version>${scala.version}</version></dependency>
+                </dependencies>
+            </dependencyManagement>
         </profile>
         <profile>
             <id>kotlin</id>
             <activation><file><exists>${basedir}/src/main/kotlin</exists></file><activeByDefault>false</activeByDefault></activation>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-kotlin-sources</id><phase>generate-sources</phase><goals><goal>add-source</goal></goals>
+                                <configuration><sources><source>src/main/kotlin</source></sources></configuration>
+                            </execution>
+                            <execution>
+                                <id>add-kotlin-test-sources</id><phase>generate-sources</phase><goals><goal>add-test-source</goal></goals>
+                                <configuration><sources><source>src/test/kotlin</source></sources></configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-maven-plugin</artifactId><version>${kotlin.version}</version>
                         <executions>
