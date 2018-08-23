@@ -155,15 +155,18 @@
         <downloadSources>true</downloadSources>
 
         <groovy.version>2.4.15</groovy.version>
-        <!--<groovy.version>2.5.1</groovy.version>-->
+        <!--<groovy-eclipse-compiler.version>2.9.2-02</groovy-eclipse-compiler.version>-->
+        <!--<groovy-eclipse-batch.version>2.4.12-03</groovy-eclipse-batch.version>-->
         <groovy-eclipse-compiler.version>2.9.3-01</groovy-eclipse-compiler.version>
-        <!--<groovy-eclipse-compiler.version>3.0.0-01</groovy-eclipse-compiler.version>-->
         <groovy-eclipse-batch.version>2.4.15-01</groovy-eclipse-batch.version>
+        <!--<groovy-eclipse-compiler.version>3.0.0-01</groovy-eclipse-compiler.version>-->
         <!--<groovy-eclipse-batch.version>2.5.1-02</groovy-eclipse-batch.version>-->
 
         <jacoco.reportPath>${project.build.directory}/jacoco.exec</jacoco.reportPath>
         <jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</jacoco.itReportPath>
 
+        <!--<kotlin.version>1.1.2-2</kotlin.version>-->
+        <!--<kotlin.version>1.2.51</kotlin.version>-->
         <kotlin.version>1.2.60</kotlin.version>
         <lombok.version>1.18.2</lombok.version>
 
@@ -1395,9 +1398,8 @@
                     <!--</plugin>-->
                     <plugin>
                         <artifactId>maven-project-info-reports-plugin</artifactId>
-                        <!--inherited>true</inherited-->
+                        <!--<inherited>true</inherited>-->
                         <configuration>
-                            <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
                         </configuration>
                         <reportSets>
                             <reportSet>
