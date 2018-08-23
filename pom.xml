@@ -154,6 +154,9 @@
         <com.google.errorprone_error_prone_core.version>2.3.1</com.google.errorprone_error_prone_core.version>
         <downloadSources>true</downloadSources>
 
+        <surefire.fork.count>1</surefire.fork.count>
+        <surefire.fork.reuse>false</surefire.fork.reuse>
+
         <groovy.version>2.4.15</groovy.version>
         <!--<groovy-eclipse-compiler.version>2.9.2-02</groovy-eclipse-compiler.version>-->
         <!--<groovy-eclipse-batch.version>2.4.12-03</groovy-eclipse-batch.version>-->
@@ -512,7 +515,8 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <reuseForks>false</reuseForks>
+                    <forkCount>${surefire.fork.count}</forkCount>
+                    <reuseForks>${surefire.fork.reuse}</reuseForks>
                     <includes>
                         <include>**/*Test.java</include>
                         <include>**/*Tests.java</include>
