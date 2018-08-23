@@ -53,7 +53,7 @@ Variables in travis repo settings:
     env:
       global:
       # ci-script and infrastructure config ref, ex master/develop/v1.0.8
-      - CI_OPT_CI_SCRIPT=https://github.com/ci-and-cd/maven-build/raw/master/src/main/ci-script/lib_ci.sh
+      - CI_OPT_CI_SCRIPT=https://github.com/ci-and-cd/maven-build/raw/v0.1.3/src/main/ci-script/lib_ci.sh
       # or delete /etc/mavenrc
       - MAVEN_SKIP_RC=true
     # Skipping the Installation Step

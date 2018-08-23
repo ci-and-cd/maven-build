@@ -1,8 +1,8 @@
 # maven-build
 
 [![Sonar](https://sonarcloud.io/api/project_badges/measure?project=cn.home1%3Amaven-build&metric=alert_status)](https://sonarcloud.io/dashboard?id=cn.home1%3Amaven-build)  
-[Maven Site (github.io)](https://ci-and-cd.github.io/ci-and-cd/snapshot/index.html)  
-[Maven site (infra.top)](https://maven-site.infra.top/ci-and-cd/maven-build/snapshot/staging/index.html)  
+[Maven Site release (github.io)](https://ci-and-cd.github.io/ci-and-cd/release/index.html)  
+[Maven site snapshot (infra.top)](https://maven-site.infra.top/ci-and-cd/maven-build/snapshot/staging/index.html)  
 [Source Repository](https://github.com/ci-and-cd/maven-build/tree/develop)  
 [![Build Status](https://travis-ci.org/ci-and-cd/maven-build.svg?branch=develop)travis-ci](https://travis-ci.org/ci-and-cd/maven-build)  
 [![Build status](https://ci.appveyor.com/api/projects/status/kacuklbdu48bt7l1?svg=true)appveyor](https://ci.appveyor.com/project/chshawkn/maven-build)  

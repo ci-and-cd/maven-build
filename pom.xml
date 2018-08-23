@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>0.1.3</version>
+    <version>0.1.5</version>
 
     <modules>
         <module>build-docker</module>
@@ -154,13 +154,24 @@
         <com.google.errorprone_error_prone_core.version>2.3.1</com.google.errorprone_error_prone_core.version>
         <downloadSources>true</downloadSources>
 
+        <surefire.fork.count>1</surefire.fork.count>
+        <surefire.fork.reuse>false</surefire.fork.reuse>
+
         <groovy.version>2.4.15</groovy.version>
-        <!--<groovy.version>2.5.1</groovy.version>-->
+        <!--<groovy-eclipse-compiler.version>2.9.2-02</groovy-eclipse-compiler.version>-->
+        <!--<groovy-eclipse-batch.version>2.4.12-03</groovy-eclipse-batch.version>-->
+        <groovy-eclipse-compiler.version>2.9.3-01</groovy-eclipse-compiler.version>
+        <groovy-eclipse-batch.version>2.4.15-01</groovy-eclipse-batch.version>
+        <!--<groovy-eclipse-compiler.version>3.0.0-01</groovy-eclipse-compiler.version>-->
+        <!--<groovy-eclipse-batch.version>2.5.1-02</groovy-eclipse-batch.version>-->
 
         <jacoco.reportPath>${project.build.directory}/jacoco.exec</jacoco.reportPath>
         <jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</jacoco.itReportPath>
 
+        <!--<kotlin.version>1.1.2-2</kotlin.version>-->
+        <!--<kotlin.version>1.2.51</kotlin.version>-->
         <kotlin.version>1.2.60</kotlin.version>
+        <lombok.version>1.18.2</lombok.version>
 
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
 
@@ -504,7 +515,8 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <useSystemClassLoader>false</useSystemClassLoader>
+                    <forkCount>${surefire.fork.count}</forkCount>
+                    <reuseForks>${surefire.fork.reuse}</reuseForks>
                     <includes>
                         <include>**/*Test.java</include>
                         <include>**/*Tests.java</include>
@@ -519,6 +531,7 @@
                         <exclude>**/Deprecated*.java</exclude>
                         <exclude>**/*IT.java</exclude>
                     </excludes>
+                    <useSystemClassLoader>false</useSystemClassLoader>
                 </configuration>
                 <executions>
                     <execution><id>default-test</id><goals><goal>test</goal></goals><configuration><skip>${maven.test.skip}</skip></configuration></execution>
@@ -1123,10 +1136,7 @@
         <profile>
             <!-- Do mvn site site:stage -DstagingDirectory=/tmp/path first, then manually add/push to the gh-pages branch on GitHub? -->
             <id>infrastructure_opensource_github_site</id>
-            <activation>
-                <property><name>github-site-publish</name><value>true</value></property>
-                <activeByDefault>false</activeByDefault>
-            </activation>
+            <activation><property><name>github-site-publish</name><value>true</value></property><activeByDefault>false</activeByDefault></activation>
             <build>
                 <pluginManagement>
                     <plugins>
@@ -1392,9 +1402,8 @@
                     <!--</plugin>-->
                     <plugin>
                         <artifactId>maven-project-info-reports-plugin</artifactId>
-                        <!--inherited>true</inherited-->
+                        <!--<inherited>true</inherited>-->
                         <configuration>
-                            <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
                         </configuration>
                         <reportSets>
                             <reportSet>
@@ -1511,17 +1520,19 @@
             <activation><jdk>8</jdk><file><missing>${basedir}/src/main/groovy</missing></file><activeByDefault>false</activeByDefault></activation>
             <properties><java.version>1.8</java.version></properties>
             <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin><artifactId>maven-compiler-plugin</artifactId><configuration><compilerVersion>${java.version}</compilerVersion></configuration></plugin>
-                    </plugins>
-                </pluginManagement>
+                <plugins>
+                    <plugin><artifactId>maven-compiler-plugin</artifactId><configuration><compilerVersion>${java.version}</compilerVersion></configuration></plugin>
+                </plugins>
             </build>
         </profile>
         <profile>
             <id>java8</id>
             <activation><jdk>1.8</jdk><activeByDefault>false</activeByDefault></activation>
-            <properties><java.version>1.8</java.version></properties>
+            <properties>
+                <java.version>1.8</java.version>
+                <maven.compiler.source>1.8</maven.compiler.source>
+                <maven.compiler.target>1.8</maven.compiler.target>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -1565,46 +1576,45 @@
         </profile>
         <profile>
             <id>default-java9-jvmArguments-addModules</id>
-            <activation><jdk>9</jdk><property><name>!jvmArguments.addModules</name></property></activation>
+            <activation><jdk>1.9</jdk><property><name>!jvmArguments.addModules</name></property></activation>
             <properties><jvmArguments.addModules>java.xml.bind,java.xml.ws,java.xml.ws.annotation</jvmArguments.addModules></properties>
         </profile>
         <profile>
             <id>java9-without-groovy</id>
-            <activation><jdk>9</jdk><file><missing>${basedir}/src/main/groovy</missing></file><activeByDefault>false</activeByDefault></activation>
-            <properties><java.version>9</java.version></properties>
+            <activation><jdk>1.9</jdk><file><missing>${basedir}/src/main/groovy</missing></file><activeByDefault>false</activeByDefault></activation>
+            <properties><java.version>1.9</java.version></properties>
             <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <artifactId>maven-compiler-plugin</artifactId>
-                            <configuration><compilerVersion>${java.version}</compilerVersion><compilerArgs><arg>--add-modules</arg><arg>${jvmArguments.addModules}</arg></compilerArgs></configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration><compilerVersion>${java.version}</compilerVersion><compilerArgs><arg>--add-modules</arg><arg>${jvmArguments.addModules}</arg></compilerArgs></configuration>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
         <profile>
             <id>java9-with-groovy</id>
-            <activation><jdk>9</jdk><file><exists>${basedir}/src/main/groovy</exists></file><activeByDefault>false</activeByDefault></activation>
+            <activation><jdk>1.9</jdk><file><exists>${basedir}/src/main/groovy</exists></file><activeByDefault>false</activeByDefault></activation>
             <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <artifactId>maven-compiler-plugin</artifactId>
-                            <configuration><compilerArgs><arg>-J--add-modules</arg><arg>-J${jvmArguments.addModules}</arg></compilerArgs></configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration><compilerArgs><arg>-J--add-modules</arg><arg>-J${jvmArguments.addModules}</arg></compilerArgs></configuration>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
         <profile>
             <id>java9</id>
-            <activation><jdk>9</jdk><activeByDefault>false</activeByDefault></activation>
+            <activation><jdk>1.9</jdk><activeByDefault>false</activeByDefault></activation>
             <properties>
                 <!-- Runtime modules for java9 -->
                 <javax.activation.version>1.1.1</javax.activation.version>
                 <jaxb-api.version>2.3.0</jaxb-api.version>
-                <java.version>9</java.version>
+                <java.version>1.9</java.version>
+                <maven.compiler.release>9</maven.compiler.release>
+                <maven.compiler.source>1.9</maven.compiler.source>
+                <maven.compiler.target>1.9</maven.compiler.target>
             </properties>
             <build>
                 <pluginManagement>
@@ -1628,7 +1638,7 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration><source>${java.version}</source><target>${java.version}</target></configuration>
+                        <configuration><release>${maven.compiler.release}</release><source>${java.version}</source><target>${java.version}</target></configuration>
                     </plugin>
                     <plugin>
                         <artifactId>maven-enforcer-plugin</artifactId>
@@ -1666,46 +1676,45 @@
         </profile>
         <profile>
             <id>default-java10-jvmArguments-addModules</id>
-            <activation><jdk>10</jdk><property><name>!jvmArguments.addModules</name></property></activation>
+            <activation><jdk>1.10</jdk><property><name>!jvmArguments.addModules</name></property></activation>
             <properties><jvmArguments.addModules>java.xml.bind,java.xml.ws,java.xml.ws.annotation</jvmArguments.addModules></properties>
         </profile>
         <profile>
             <id>java10-without-groovy</id>
-            <activation><jdk>10</jdk><file><missing>${basedir}/src/main/groovy</missing></file><activeByDefault>false</activeByDefault></activation>
-            <properties><java.version>10</java.version></properties>
+            <activation><jdk>1.10</jdk><file><missing>${basedir}/src/main/groovy</missing></file><activeByDefault>false</activeByDefault></activation>
+            <properties><java.version>1.10</java.version></properties>
             <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <artifactId>maven-compiler-plugin</artifactId>
-                            <configuration><compilerVersion>${java.version}</compilerVersion><compilerArgs><arg>--add-modules</arg><arg>${jvmArguments.addModules}</arg></compilerArgs></configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration><compilerVersion>${java.version}</compilerVersion><compilerArgs><arg>--add-modules</arg><arg>${jvmArguments.addModules}</arg></compilerArgs></configuration>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
         <profile>
             <id>java10-with-groovy</id>
-            <activation><jdk>10</jdk><file><exists>${basedir}/src/main/groovy</exists></file><activeByDefault>false</activeByDefault></activation>
+            <activation><jdk>1.10</jdk><file><exists>${basedir}/src/main/groovy</exists></file><activeByDefault>false</activeByDefault></activation>
             <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <artifactId>maven-compiler-plugin</artifactId>
-                            <configuration><compilerArgs><arg>-J--add-modules</arg><arg>-J${jvmArguments.addModules}</arg></compilerArgs></configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration><compilerArgs><arg>-J--add-modules</arg><arg>-J${jvmArguments.addModules}</arg></compilerArgs></configuration>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
         <profile>
             <id>java10</id>
-            <activation><jdk>10</jdk><activeByDefault>false</activeByDefault></activation>
+            <activation><jdk>1.10</jdk><activeByDefault>false</activeByDefault></activation>
             <properties>
                 <!-- Runtime modules for java10 -->
                 <javax.activation.version>1.1.1</javax.activation.version>
                 <jaxb-api.version>2.3.0</jaxb-api.version>
-                <java.version>10</java.version>
+                <java.version>1.10</java.version>
+                <maven.compiler.release>10</maven.compiler.release>
+                <maven.compiler.source>1.10</maven.compiler.source>
+                <maven.compiler.target>1.10</maven.compiler.target>
             </properties>
             <build>
                 <pluginManagement>
@@ -1729,7 +1738,7 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration><source>${java.version}</source><target>${java.version}</target></configuration>
+                        <configuration><release>${maven.compiler.release}</release><source>${java.version}</source><target>${java.version}</target></configuration>
                     </plugin>
                     <plugin>
                         <artifactId>maven-enforcer-plugin</artifactId>
@@ -1766,14 +1775,9 @@
             </reporting>
         </profile>
         <profile>
+            <!-- see: https://github.com/groovy/groovy-eclipse/wiki/Groovy-Eclipse-Maven-plugin -->
             <id>groovy</id>
             <activation><file><exists>${basedir}/src/main/groovy</exists></file><activeByDefault>false</activeByDefault></activation>
-            <properties>
-                <!--<groovy-eclipse-compiler.version>2.9.3-01</groovy-eclipse-compiler.version>-->
-                <groovy-eclipse-compiler.version>3.0.0-01</groovy-eclipse-compiler.version>
-                <!--<groovy-eclipse-batch.version>2.4.15-01</groovy-eclipse-batch.version>-->
-                <groovy-eclipse-batch.version>2.5.1-02</groovy-eclipse-batch.version>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -1800,10 +1804,16 @@
                                 <!-- IMPORTANT -->
                                 <useIncrementalCompilation>false</useIncrementalCompilation>
                                 <compilerId>groovy-eclipse-compiler</compilerId><!-- Use Groovy Eclipse Compiler -->
+                                <compilerArguments>
+                                    <!--<indy/>-->
+                                    <javaAgentClass>lombok.launch.Agent</javaAgentClass>
+                                </compilerArguments>
+                                <fork>true</fork>
                             </configuration>
                             <dependencies>
                                 <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-eclipse-compiler</artifactId><version>${groovy-eclipse-compiler.version}</version></dependency>
                                 <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-eclipse-batch</artifactId><version>${groovy-eclipse-batch.version}</version></dependency>
+                                <dependency><groupId>org.projectlombok</groupId><artifactId>lombok</artifactId><version>${lombok.version}</version></dependency>
                             </dependencies>
                         </plugin>
                     </plugins>
@@ -1811,10 +1821,12 @@
             </build>
             <dependencies>
                 <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId></dependency>
+                <!--<dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId><classifier>indy</classifier></dependency>-->
             </dependencies>
             <dependencyManagement>
                 <dependencies>
                     <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId><version>${groovy.version}</version></dependency>
+                    <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId><classifier>indy</classifier><version>${groovy.version}</version></dependency>
                 </dependencies>
             </dependencyManagement>
             <pluginRepositories>
@@ -1830,9 +1842,16 @@
             <id>scala</id>
             <activation><file><exists>${basedir}/src/main/scala</exists></file><activeByDefault>false</activeByDefault></activation>
             <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>net.alchim31.maven</groupId><artifactId>scala-maven-plugin</artifactId><version>3.4.2</version>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
                 <plugins>
                     <plugin>
-                        <groupId>net.alchim31.maven</groupId><artifactId>scala-maven-plugin</artifactId><version>3.4.2</version>
+                        <groupId>net.alchim31.maven</groupId><artifactId>scala-maven-plugin</artifactId>
                         <executions>
                             <execution>
                                 <phase>process-sources</phase>
@@ -1850,14 +1869,32 @@
                 </plugins>
             </build>
             <dependencies>
-                <dependency><groupId>org.scala-lang</groupId><artifactId>scala-library</artifactId><version>${scala.version}</version></dependency>
+                <dependency><groupId>org.scala-lang</groupId><artifactId>scala-library</artifactId></dependency>
             </dependencies>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency><groupId>org.scala-lang</groupId><artifactId>scala-library</artifactId><version>${scala.version}</version></dependency>
+                </dependencies>
+            </dependencyManagement>
         </profile>
         <profile>
             <id>kotlin</id>
             <activation><file><exists>${basedir}/src/main/kotlin</exists></file><activeByDefault>false</activeByDefault></activation>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-kotlin-sources</id><phase>generate-sources</phase><goals><goal>add-source</goal></goals>
+                                <configuration><sources><source>src/main/kotlin</source></sources></configuration>
+                            </execution>
+                            <execution>
+                                <id>add-kotlin-test-sources</id><phase>generate-sources</phase><goals><goal>add-test-source</goal></goals>
+                                <configuration><sources><source>src/test/kotlin</source></sources></configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-maven-plugin</artifactId><version>${kotlin.version}</version>
                         <executions>
@@ -1926,8 +1963,8 @@
                             <jiraUser>${jira.user}</jiraUser>
                             <jiraPassword>${jira.password}</jiraPassword>
                             <!--<onlyCurrentVersion>true</onlyCurrentVersion>-->
-                            <!-- http://jira7.internal/rest/api/2/resolution/ -->
-                            <!-- http://jira7.internal/rest/api/2/status/ -->
+                            <!-- http://jira7/rest/api/2/resolution/ -->
+                            <!-- http://jira7/rest/api/2/status/ -->
                             <resolutionIds>完成</resolutionIds>
                             <statusIds>关闭</statusIds>
                         </configuration>

@@ -16,9 +16,9 @@ environment:
   CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN:
     secure: b8+kCKw7dSSIWSmdlsRzDKz9m5xU3BO1uBzd4voLqDmbGn+pVQxOQzpEzqNqw0xq
   CI_INFRA_OPT_OPENSOURCE_MVNSITE_PASSWORD:
-    secure: Yd4Z2S34bY3NQnWMP/GflQ==
-  CI_INFRA_OPT_OPENSOURCE_MVNSITE_USERNAME:
     secure: 5a/nGFeI/YGReZ+YZrz9xWytrHl8OotByWS/L6A/Gos=
+  CI_INFRA_OPT_OPENSOURCE_MVNSITE_USERNAME:
+    secure: Yd4Z2S34bY3NQnWMP/GflQ==
   CI_OPT_GPG_PASSPHRASE:
     secure: 9W3TKuaDpCwfEF8yNbbbNCaelmjnZqHdxUqfITdKTWM=
   CI_OPT_MAVEN_CENTRAL_PASS:
@@ -28,7 +28,7 @@ environment:
   CI_OPT_SONAR_LOGIN_TOKEN:
     secure: W4k/mwIb6WWM/XKvncWlDEvlfn+dz88sB8qlbYsL7nF41+9BADm/uYgiYt5SPoiJ
 
-  # e.g. CI_OPT_CI_SCRIPT=https://github.com/ci-and-cd/maven-build/raw/master/src/main/ci-script/lib_ci.sh
+  # e.g. CI_OPT_CI_SCRIPT=https://github.com/ci-and-cd/maven-build/raw/v0.1.3/src/main/ci-script/lib_ci.sh
   CI_OPT_CI_SCRIPT: https://github.com/${APPVEYOR_REPO_NAME:-ci-and-cd/maven-build}/raw/${APPVEYOR_REPO_BRANCH:-develop}/src/main/ci-script/lib_ci.sh
   CI_OPT_GITHUB_SITE_PUBLISH: true
   CI_OPT_INFRASTRUCTURE: opensource
