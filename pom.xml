@@ -157,6 +157,8 @@
         <surefire.fork.count>1</surefire.fork.count>
         <surefire.fork.reuse>false</surefire.fork.reuse>
 
+        <git-commit-id.skip>false</git-commit-id.skip>
+
         <groovy.version>2.4.15</groovy.version>
         <!--<groovy-eclipse-compiler.version>2.9.2-02</groovy-eclipse-compiler.version>-->
         <!--<groovy-eclipse-batch.version>2.4.12-03</groovy-eclipse-batch.version>-->
@@ -303,11 +305,13 @@
                         <commitIdGenerationMode>flat</commitIdGenerationMode>
                         <dotGitDirectory>${maven.multiModuleProjectDirectory}/.git</dotGitDirectory>
                         <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                        <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
                         <generateGitPropertiesFile>true</generateGitPropertiesFile>
                         <!--generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename-->
                         <generateGitPropertiesFilename>src/main/resources/git.properties</generateGitPropertiesFilename>
                         <injectAllReactorProjects>true</injectAllReactorProjects>
                         <prefix>git</prefix>
+                        <skip>${git-commit-id.skip}</skip>
                         <skipPoms>false</skipPoms>
                         <verbose>false</verbose>
                     </configuration>
