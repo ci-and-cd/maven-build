@@ -300,8 +300,8 @@ function ci_infra_opt_git_prefix() {
             CI_INFRA_OPT_GIT_PREFIX="${CI_INFRA_OPT_PRIVATE_GIT_PREFIX}"
         fi
 
-        if [ -z "${CI_INFRA_OPT_GIT_PREFIX}" ] && [ -n "${default_value}" ]; then
-            find_git_prefix_from_ci_script "${default_value}";
+        if [ -z "${CI_INFRA_OPT_GIT_PREFIX}" ]; then
+            CI_INFRA_OPT_GIT_PREFIX=$(find_git_prefix_from_ci_script "${default_value}")
         elif [ -n "${CI_PROJECT_URL}" ]; then
             CI_INFRA_OPT_GIT_PREFIX=$(echo "${CI_PROJECT_URL}" | sed 's,/*[^/]\+/*$,,' | sed 's,/*[^/]\+/*$,,')
         fi
@@ -623,6 +623,7 @@ function run_mvn() {
     fi
 
     echo -e "\n>>>>>>>>>> ---------- run_mvn project info ---------- >>>>>>>>>>"
+    echo JAVA_HOME "'${JAVA_HOME}'"
     mvn ${CI_OPT_MAVEN_SETTINGS} -version
 
     # Maven effective pom
@@ -647,11 +648,7 @@ function run_mvn() {
             echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE} ..."
             mvn ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
         fi
-        if [ $? -ne 0 ]; then
-            echo "error on generate effective-pom"
-            cat ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
-            return 1
-        fi
+        if [ $? -ne 0 ]; then echo "error on generate effective-pom"; cat ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}; exit 1; else echo "effective-pom generated successfully"; fi
         if [ "${CI_OPT_SHELL_EXIT_ON_ERROR}" == "true" ]; then set -e -o pipefail; fi
     fi
     echo -e "<<<<<<<<<< ---------- run_mvn project info ---------- <<<<<<<<<<\n"
