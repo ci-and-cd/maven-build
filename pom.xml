@@ -632,34 +632,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <plugin>
-                <artifactId>maven-site-plugin</artifactId>
-                <configuration><attach>true</attach></configuration>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <configuration>
-                    <configLocation>${checkstyle.config.location}</configLocation>
-                    <encoding>${project.reporting.outputEncoding}</encoding>
-                    <consoleOutput>true</consoleOutput>
-                    <failsOnError>false</failsOnError>
-                </configuration>
-                <executions>
-                    <execution><id>validate</id><phase>validate</phase><goals><goal>check</goal></goals></execution>
-                </executions>
-            </plugin>
-            <!-- see: http://maven.apache.org/plugins/maven-pmd-plugin/examples/multi-module-config.html -->
-            <plugin>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <configuration>
-                    <failOnViolation>false</failOnViolation><printFailingErrors>true</printFailingErrors><rulesets><ruleset>${pmd.ruleset.location}</ruleset></rulesets>
-                </configuration>
-                <executions>
-                    <execution><goals><goal>check</goal><goal>cpd-check</goal></goals></execution>
-                </executions>
-            </plugin>
             <!-- @formatter:on -->
 
             <!-- use mvn -N io.takari:maven:wrapper instead of mvn wrapper:wrapper -->
@@ -1296,6 +1268,34 @@
             </properties>
             <build>
                 <plugins>
+                    <plugin>
+                        <artifactId>maven-site-plugin</artifactId>
+                        <configuration><attach>true</attach></configuration>
+                    </plugin>
+
+                    <plugin>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <configuration>
+                            <configLocation>${checkstyle.config.location}</configLocation>
+                            <encoding>${project.reporting.outputEncoding}</encoding>
+                            <consoleOutput>true</consoleOutput>
+                            <failsOnError>false</failsOnError>
+                        </configuration>
+                        <executions>
+                            <execution><id>validate</id><phase>validate</phase><goals><goal>check</goal></goals></execution>
+                        </executions>
+                    </plugin>
+                    <!-- see: http://maven.apache.org/plugins/maven-pmd-plugin/examples/multi-module-config.html -->
+                    <plugin>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                        <configuration>
+                            <failOnViolation>false</failOnViolation><printFailingErrors>true</printFailingErrors><rulesets><ruleset>${pmd.ruleset.location}</ruleset></rulesets>
+                        </configuration>
+                        <executions>
+                            <execution><goals><goal>check</goal><goal>cpd-check</goal></goals></execution>
+                        </executions>
+                    </plugin>
+
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId><artifactId>animal-sniffer-maven-plugin</artifactId>
                         <configuration>
