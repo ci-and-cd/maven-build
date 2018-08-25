@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>0.1.5</version>
+    <version>0.1.6</version>
 
     <modules>
         <module>build-docker</module>
@@ -157,6 +157,8 @@
         <surefire.fork.count>1</surefire.fork.count>
         <surefire.fork.reuse>false</surefire.fork.reuse>
 
+        <git-commit-id.skip>false</git-commit-id.skip>
+
         <groovy.version>2.4.15</groovy.version>
         <!--<groovy-eclipse-compiler.version>2.9.2-02</groovy-eclipse-compiler.version>-->
         <!--<groovy-eclipse-batch.version>2.4.12-03</groovy-eclipse-batch.version>-->
@@ -303,11 +305,13 @@
                         <commitIdGenerationMode>flat</commitIdGenerationMode>
                         <dotGitDirectory>${maven.multiModuleProjectDirectory}/.git</dotGitDirectory>
                         <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                        <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
                         <generateGitPropertiesFile>true</generateGitPropertiesFile>
                         <!--generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename-->
                         <generateGitPropertiesFilename>src/main/resources/git.properties</generateGitPropertiesFilename>
                         <injectAllReactorProjects>true</injectAllReactorProjects>
                         <prefix>git</prefix>
+                        <skip>${git-commit-id.skip}</skip>
                         <skipPoms>false</skipPoms>
                         <verbose>false</verbose>
                     </configuration>
@@ -626,34 +630,6 @@
                         <phase>initialize</phase>
                         <configuration><source>System.setProperty("local.deploy.model.path", "${project.groupId}".replace('.', '/')+"/${project.artifactId}")</source></configuration>
                     </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-site-plugin</artifactId>
-                <configuration><attach>true</attach></configuration>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <configuration>
-                    <configLocation>${checkstyle.config.location}</configLocation>
-                    <encoding>${project.reporting.outputEncoding}</encoding>
-                    <consoleOutput>true</consoleOutput>
-                    <failsOnError>false</failsOnError>
-                </configuration>
-                <executions>
-                    <execution><id>validate</id><phase>validate</phase><goals><goal>check</goal></goals></execution>
-                </executions>
-            </plugin>
-            <!-- see: http://maven.apache.org/plugins/maven-pmd-plugin/examples/multi-module-config.html -->
-            <plugin>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <configuration>
-                    <failOnViolation>false</failOnViolation><printFailingErrors>true</printFailingErrors><rulesets><ruleset>${pmd.ruleset.location}</ruleset></rulesets>
-                </configuration>
-                <executions>
-                    <execution><goals><goal>check</goal><goal>cpd-check</goal></goals></execution>
                 </executions>
             </plugin>
             <!-- @formatter:on -->
@@ -1292,6 +1268,34 @@
             </properties>
             <build>
                 <plugins>
+                    <plugin>
+                        <artifactId>maven-site-plugin</artifactId>
+                        <configuration><attach>true</attach></configuration>
+                    </plugin>
+
+                    <plugin>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <configuration>
+                            <configLocation>${checkstyle.config.location}</configLocation>
+                            <encoding>${project.reporting.outputEncoding}</encoding>
+                            <consoleOutput>true</consoleOutput>
+                            <failsOnError>false</failsOnError>
+                        </configuration>
+                        <executions>
+                            <execution><id>validate</id><phase>validate</phase><goals><goal>check</goal></goals></execution>
+                        </executions>
+                    </plugin>
+                    <!-- see: http://maven.apache.org/plugins/maven-pmd-plugin/examples/multi-module-config.html -->
+                    <plugin>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                        <configuration>
+                            <failOnViolation>false</failOnViolation><printFailingErrors>true</printFailingErrors><rulesets><ruleset>${pmd.ruleset.location}</ruleset></rulesets>
+                        </configuration>
+                        <executions>
+                            <execution><goals><goal>check</goal><goal>cpd-check</goal></goals></execution>
+                        </executions>
+                    </plugin>
+
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId><artifactId>animal-sniffer-maven-plugin</artifactId>
                         <configuration>

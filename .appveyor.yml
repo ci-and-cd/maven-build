@@ -77,6 +77,7 @@ services:
 
 test_script:
 - sh: |
+    if [[ "${TRAVIS_BRANCH}" =~ ^release/.+ ]]; then export CI_OPT_GITHUB_SITE_PUBLISH=true; else export CI_OPT_GITHUB_SITE_PUBLISH=false; fi;
     if [ "${APPVEYOR_ENABLED}" == "true" ]; then
       if [ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]; then
         bash ci.sh mvn clean install sonar:sonar site deploy site-deploy;
