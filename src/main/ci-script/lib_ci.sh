@@ -83,18 +83,21 @@ function git_repo_slug() {
     # echo "Fetch URL: http://user@pass:gitservice.org:20080/owner/repo.git" | ruby -ne 'puts /^\s*Fetch.*(:|\/){1}([^\/]+\/[^\/]+).git/.match($_)[2] rescue nil'
     # echo "Fetch URL: Fetch URL: git@github.com:ci-and-cd/maven-build.git" | ruby -ne 'puts /^\s*Fetch.*(:|\/){1}([^\/]+\/[^\/]+).git/.match($_)[2] rescue nil'
     # echo "Fetch URL: https://github.com/owner/repo.git" | ruby -ne 'puts /^\s*Fetch.*(:|\/){1}([^\/]+\/[^\/]+).git/.match($_)[2] rescue nil'
-    if [ -d .git ]; then
-        echo $(git remote show origin -n | ruby -ne 'puts /^\s*Fetch.*(:|\/){1}([^\/]+\/[^\/]+).git/.match($_)[2] rescue nil')
-    elif [ -n "${TRAVIS_REPO_SLUG}" ]; then
-        echo "${TRAVIS_REPO_SLUG}"
-    elif [ -n "${APPVEYOR_PROJECT_SLUG}" ]; then
-        echo "${APPVEYOR_PROJECT_SLUG}"
+    local repo_slug=""
+    if [ -n "${TRAVIS_REPO_SLUG}" ]; then
+        repo_slug="${TRAVIS_REPO_SLUG}"
+    elif [ -n "${APPVEYOR_REPO_NAME}" ]; then
+        repo_slug="${APPVEYOR_REPO_NAME}"
     elif [ -n "${CI_PROJECT_PATH}" ]; then
-        ehco "${CI_PROJECT_PATH}"
+        repo_slug="${CI_PROJECT_PATH}"
+    elif [ -d .git ]; then
+        repo_slug=$(git remote show origin -n | ruby -ne 'puts /^\s*Fetch.*(:|\/){1}([^\/]+\/[^\/]+).git/.match($_)[2] rescue nil')
     else
         (>&2 echo "Can not find value for git_repo_slug, exit")
         return 1
     fi
+    (>&2 echo "git_repo_slug result: ${repo_slug}")
+    echo "${repo_slug}"
 }
 
 # see: http://stackoverflow.com/questions/16989598/bash-comparing-version-numbers
@@ -234,23 +237,44 @@ function ci_opt_publish_to_repo() {
     if [ -n "${CI_OPT_PUBLISH_TO_REPO}" ]; then
         echo "${CI_OPT_PUBLISH_TO_REPO}"
     else
-        case "$(ci_opt_ref_name)" in
-        "develop")
-            echo "true"
-            ;;
-        feature*)
-            echo "true"
-            ;;
-        hotfix*)
-            echo "true"
-            ;;
-        release*)
-            echo "true"
-            ;;
-        *)
-            echo "false"
-            ;;
-        esac
+        local ref_name="$(ci_opt_ref_name)"
+        if [ "$(ci_opt_is_origin_repo)" == "true" ]; then
+            case "${ref_name}" in
+            "develop")
+                echo "true"
+                ;;
+            feature*)
+                echo "true"
+                ;;
+            hotfix*)
+                echo "true"
+                ;;
+            release*)
+                echo "true"
+                ;;
+            *)
+                echo "false"
+                ;;
+            esac
+        else
+            case "${ref_name}" in
+            "develop")
+                echo "false"
+                ;;
+            feature*)
+                echo "true"
+                ;;
+            hotfix*)
+                echo "false"
+                ;;
+            release*)
+                echo "false"
+                ;;
+            *)
+                echo "false"
+                ;;
+            esac
+        fi
     fi
 }
 
@@ -451,6 +475,7 @@ function pull_base_image() {
 function alter_mvn() {
     (>&2 echo "alter_mvn is_origin_repo: $(ci_opt_is_origin_repo), ref_name: $(ci_opt_ref_name), args: $@")
 
+    goals=()
     result=()
 
     for element in $@; do
@@ -468,55 +493,46 @@ function alter_mvn() {
                 if [ "$(ci_opt_publish_to_repo)" == "true" ]; then
                     if [ "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]; then
                     # mvn deploy and publish segregation
-                        result+=("org.codehaus.mojo:wagon-maven-plugin:merge-maven-repos@merge-maven-repos-deploy")
-                        if [ "$(ci_opt_user_docker)" == "true" ]; then result+=("dockerfile:push"); fi
+                        goals+=("org.codehaus.mojo:wagon-maven-plugin:merge-maven-repos@merge-maven-repos-deploy")
+                        if [ "$(ci_opt_user_docker)" == "true" ]; then goals+=("dockerfile:push"); fi
                     else
-                        result+=("${element}")
+                        goals+=("${element}")
                     fi
                 else
                     (>&2 echo "skip ${element}")
                 fi
             elif [[ "${element}" == *site* ]] && [ "$(ci_opt_site)" == true ]; then
             # if ci_opt_site=false, do not build site
-                result+=("${element}")
+                goals+=("${element}")
             elif ([[ "${element}" == *clean ]] || [[ "${element}" == *install ]]); then
             # goals need to alter
                 if [ "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]; then
                 # mvn deploy and publish segregation
                     if [[ "${element}" == *clean ]]; then
-                        result+=("clean")
-                        result+=("org.apache.maven.plugins:maven-antrun-plugin:run@local-deploy-model-path-clean")
+                        goals+=("clean")
+                        goals+=("org.apache.maven.plugins:maven-antrun-plugin:run@local-deploy-model-path-clean")
                     elif [[ "${element}" == *install ]]; then
-                        result+=("deploy")
-                        if [ "$(ci_opt_user_docker)" == "true" ]; then result+=("dockerfile:build"); fi
+                        goals+=("deploy")
+                        if [ "$(ci_opt_user_docker)" == "true" ]; then goals+=("dockerfile:build"); fi
                     fi
                 else
-                    result+=("${element}")
+                    goals+=("${element}")
                 fi
-            elif [ "true" == "$(ci_opt_is_origin_repo)" ]; then
-            # if is origin repo
-                case "$(ci_opt_ref_name)" in
-                release*)
-                    # if release (origin repo), skip sonar
-                    if [[ "${element}" != *sonar ]]; then
-                        result+=("${element}")
-                    else
-                        (>&2 echo "skip ${element}")
-                    fi
-                    ;;
-                *)
-                    # if not release (origin repo)
-                    result+=("${element}")
-                    #(>&2 echo "alter_mvn (origin repo) drop '${element}'")
-                esac
+            elif [[ "${element}" == *sonar ]]; then
+                if [ "$(ci_opt_ref_name)" == "develop" ] && [ "$(ci_opt_is_origin_repo)" == "true" ]; then
+                    goals+=("${element}")
+                else
+                    (>&2 echo "skip ${element}")
+                fi
             else
                 # if not origin repo (forked)
-                result+=("${element}")
+                goals+=("${element}")
                 #(>&2 echo "alter_mvn (forked repo) drop '${element}'")
             fi
         fi
     done
 
+    for goal in ${goals[@]}; do result+=("${goal}"); done
     (>&2 echo "alter_mvn output: ${result[*]}")
     echo "${result[*]}"
 }
@@ -595,6 +611,14 @@ function run_mvn() {
     echo -e "\n>>>>>>>>>> ---------- run_mvn alter_mvn ---------- >>>>>>>>>>"
     local altered=$(alter_mvn $@)
     echo "alter_mvn result: mvn ${altered}"
+    local mvn_opts_and_goals=("${altered}")
+    local mvn_goals=()
+    for element in ${mvn_opts_and_goals[@]}; do if [[ "${element}" == -* ]]; then continue; else mvn_goals+=("${element}"); fi; done
+    echo "alter_mvn found ${#mvn_goals[@]} goals: ${mvn_goals[@]}"
+    if [ ${#mvn_goals[@]} -eq 0 ]; then
+        echo "There are not goals to run, exit.";
+        return 0;
+    fi
     echo -e "<<<<<<<<<< ---------- run_mvn alter_mvn ---------- <<<<<<<<<<\n"
 
     if [ -n "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" ]; then
