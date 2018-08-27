@@ -86,8 +86,8 @@ function git_repo_slug() {
     local repo_slug=""
     if [ -n "${TRAVIS_REPO_SLUG}" ]; then
         repo_slug="${TRAVIS_REPO_SLUG}"
-    elif [ -n "${APPVEYOR_PROJECT_SLUG}" ]; then
-        repo_slug="${APPVEYOR_PROJECT_SLUG}"
+    elif [ -n "${APPVEYOR_REPO_NAME}" ]; then
+        repo_slug="${APPVEYOR_REPO_NAME}"
     elif [ -n "${CI_PROJECT_PATH}" ]; then
         repo_slug="${CI_PROJECT_PATH}"
     elif [ -d .git ]; then
