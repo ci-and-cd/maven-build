@@ -25,7 +25,7 @@ branches:
   - /^feature\/.*$/ # build and test on feature branches
   - /^hotfix\/.*$/ # release on hotfix branches
   - /^release\/.*$/ # release on release branches
-  - /^support\/.*$/ # release on release branches
+  - /^support\/.*$/ # release on support branches
   #- /^v\d+\.\d+(\.\d+)?(-\S*)?/ # build and publish a github release (can skip tests here) or do nothing on version tags
 cache:
   directories:
