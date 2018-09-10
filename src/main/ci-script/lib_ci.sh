@@ -226,6 +226,9 @@ function ci_opt_publish_channel() {
         release*)
             echo "release"
             ;;
+        support*)
+            echo "release"
+            ;;
         *)
             echo "snapshot"
             ;;
@@ -252,6 +255,9 @@ function ci_opt_publish_to_repo() {
             release*)
                 echo "true"
                 ;;
+            support*)
+                echo "true"
+                ;;
             *)
                 echo "false"
                 ;;
@@ -268,6 +274,9 @@ function ci_opt_publish_to_repo() {
                 echo "false"
                 ;;
             release*)
+                echo "false"
+                ;;
+            support*)
                 echo "false"
                 ;;
             *)
