@@ -6,6 +6,7 @@ branches:
   - /^feature\/.*$/ # build and test on feature branches
   - /^hotfix\/.*$/ # release on hotfix branches
   - /^release\/.*$/ # release on release branches
+  - /^support\/.*$/ # release on support branches
   #- /^v\d+\.\d+(\.\d+)?(-\S*)?/ # build and publish a github release (can skip tests here) or do nothing on version tags
 
 image: ubuntu
@@ -28,7 +29,7 @@ environment:
   CI_OPT_SONAR_LOGIN_TOKEN:
     secure: W4k/mwIb6WWM/XKvncWlDEvlfn+dz88sB8qlbYsL7nF41+9BADm/uYgiYt5SPoiJ
 
-  # e.g. CI_OPT_CI_SCRIPT=https://github.com/ci-and-cd/maven-build/raw/v0.1.3/src/main/ci-script/lib_ci.sh
+  # e.g. CI_OPT_CI_SCRIPT=https://github.com/ci-and-cd/maven-build/raw/v0.2.1/src/main/ci-script/lib_ci.sh
   CI_OPT_CI_SCRIPT: https://github.com/${APPVEYOR_REPO_NAME:-ci-and-cd/maven-build}/raw/${APPVEYOR_REPO_BRANCH:-develop}/src/main/ci-script/lib_ci.sh
   CI_OPT_GITHUB_SITE_PUBLISH: true
   CI_OPT_INFRASTRUCTURE: opensource
@@ -50,7 +51,8 @@ install:
 - ls -al
 - sh: |
     sudo apt-get update > /dev/null
-    sudo apt-get install -yq --no-install-suggests --no-install-recommends aria2 gnupg2 graphviz openssl
+    sudo apt-get install -yq --no-install-suggests --no-install-recommends aria2 gnupg2 graphviz openssl whois
+    whois $(curl ipinfo.io/ip)
     unset M2_HOME
     sudo mkdir -p /opt/maven
     sudo aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -d /opt/maven -o apache-maven-3.5.4-bin.zip https://archive.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip && sudo unzip /opt/maven/apache-maven-3.5.4-bin.zip -d /opt/maven > /dev/null

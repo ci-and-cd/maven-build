@@ -1,5 +1,7 @@
-<code_scheme name="GoogleStyle" version="173">
+<code_scheme name="CustomStyle" version="173">
+  <option name="RIGHT_MARGIN" value="140" />
   <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="true" />
+  <option name="FORMATTER_TAGS_ENABLED" value="true" />
   <JavaCodeStyleSettings>
     <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
     <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
@@ -310,8 +312,8 @@
   <codeStyleSettings language="JAVA">
     <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
     <indentOptions>
-      <option name="INDENT_SIZE" value="4" />
       <option name="CONTINUATION_INDENT_SIZE" value="4" />
+      <option name="INDENT_SIZE" value="4" />
       <option name="TAB_SIZE" value="4" />
     </indentOptions>
   </codeStyleSettings>
