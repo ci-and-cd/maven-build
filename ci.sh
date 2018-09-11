@@ -10,7 +10,7 @@
 echo -e "\n>>>>>>>>>> ---------- custom, override options ---------- >>>>>>>>>>"
 if [ -z "${CI_OPT_CI_SCRIPT}" ] && [ -n "${TRAVIS}" ]; then CI_OPT_CI_SCRIPT="https://github.com/${TRAVIS_REPO_SLUG}/raw/${TRAVIS_BRANCH}/src/main/ci-script/lib_ci.sh"; fi
 if [ -z "${CI_OPT_CI_SCRIPT}" ] && [ -n "${APPVEYOR}" ]; then CI_OPT_CI_SCRIPT="https://github.com/${APPVEYOR_REPO_NAME}/raw/${APPVEYOR_REPO_BRANCH}/src/main/ci-script/lib_ci.sh"; fi
-if [ -z "${CI_OPT_CI_SCRIPT}" ]; then CI_OPT_CI_SCRIPT="https://github.com/ci-and-cd/maven-build/raw/v0.2.1/src/main/ci-script/lib_ci.sh"; fi
+if [ -z "${CI_OPT_CI_SCRIPT}" ]; then CI_OPT_CI_SCRIPT="https://github.com/ci-and-cd/maven-build/raw/v0.2.2/src/main/ci-script/lib_ci.sh"; fi
 if [ -z "${CI_OPT_GITHUB_SITE_PUBLISH}" ]; then CI_OPT_GITHUB_SITE_PUBLISH="false"; fi
 if [ -z "${CI_OPT_GITHUB_SITE_REPO_OWNER}" ]; then CI_OPT_GITHUB_SITE_REPO_OWNER="ci-and-cd"; fi
 if [ -z "${CI_OPT_GPG_KEYNAME}" ]; then CI_OPT_GPG_KEYNAME="59DBF10E"; fi
