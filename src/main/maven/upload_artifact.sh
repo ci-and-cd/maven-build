@@ -2,7 +2,7 @@
 
 # Usage:
 # ./upload_artifact.sh
-# ./upload_artifact.sh "dubbo-parent" "com.alibaba" "2.8.3" "internal"
+# ./upload_artifact.sh "dubbo-parent" "com.alibaba" "2.8.3" "private"
 # ./upload_artifact.sh "dubbo" "com.alibaba" "2.8.3" "local"
 
 LOCAL_REPOSITORY="${HOME}/.m2/repository"
@@ -36,7 +36,7 @@ else
     done
 
     echo "select CI_OPT_INFRASTRUCTURE to use."
-    infrastructures=("internal" "local")
+    infrastructures=("private" "local")
     while true; do
         select inf in "${infrastructures[@]}"; do
             echo "selected ${inf}"

@@ -184,8 +184,8 @@ infrastructure_opensource
 Deploy maven site to github.
 
 infrastructure_private
-> Use nexus service at organization internal network.
-Deploy maven site into organization internal mvnsite.
+> Use nexus service at organization private (internal) network.
+Deploy maven site into organization private (internal) mvnsite.
 
 infrastructure_local
 > Use nexus service at user's local (see [docker-nexus3](../../docker-nexus3/README.html)).
