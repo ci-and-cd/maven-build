@@ -829,7 +829,7 @@ echo -e "<<<<<<<<<< ---------- build context info ---------- <<<<<<<<<<\n"
 echo -e "\n>>>>>>>>>> ---------- important variables ---------- >>>>>>>>>>"
 if [ -z "${CI_OPT_MAVEN_BUILD_REPO}" ]; then
     if [[ "${CI_OPT_CI_SCRIPT}" == http* ]]; then
-        # test with: https://github.com/ci-and-cd/maven-build/raw/v0.2.2/src/main/ci-script/lib_ci.sh
+        # test with: https://github.com/ci-and-cd/maven-build/raw/v0.2.3/src/main/ci-script/lib_ci.sh
         url_prefix="$(echo ${CI_OPT_CI_SCRIPT} | sed -r 's#/raw/.+#/raw#')"
         if [ "$(git_repo_slug)" != "ci-and-cd/maven-build" ]; then
             # For other projects, should use master branch by default.
