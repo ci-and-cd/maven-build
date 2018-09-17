@@ -152,7 +152,7 @@ function ci_opt_is_origin_repo() {
         echo "${CI_OPT_IS_ORIGIN_REPO}"
     else
         if [ -z "${CI_OPT_ORIGIN_REPO_SLUG}" ]; then CI_OPT_ORIGIN_REPO_SLUG="unknown/unknown"; fi
-        if ([ "${CI_OPT_ORIGIN_REPO_SLUG}" == "$(git_repo_slug)" ] && [ "${TRAVIS_EVENT_TYPE}" != "pull_request" ]); then
+        if ([ "${CI_OPT_ORIGIN_REPO_SLUG}" == "$(git_repo_slug)" ] && [ "${TRAVIS_EVENT_TYPE}" != "pull_request" ] && [ -z "${APPVEYOR_PULL_REQUEST_HEAD_REPO_NAME}" ]); then
             echo "true";
         else
             echo "false";
