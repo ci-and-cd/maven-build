@@ -972,7 +972,7 @@
 
         <profile>
             <id>infrastructure_private</id>
-            <activation><property><name>infrastructure</name><value>internal</value></property><activeByDefault>false</activeByDefault></activation>
+            <activation><property><name>infrastructure</name><value>private</value></property><activeByDefault>false</activeByDefault></activation>
             <properties>
                 <sonar.host.url>${private-sonarqube.host.url}</sonar.host.url>
                 <!--sonar.jdbc.url>jdbc:h2:tcp://sonarqube.local/sonar</sonar.jdbc.url>
