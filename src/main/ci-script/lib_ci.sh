@@ -152,7 +152,7 @@ function ci_opt_is_origin_repo() {
         echo "${CI_OPT_IS_ORIGIN_REPO}"
     else
         if [ -z "${CI_OPT_ORIGIN_REPO_SLUG}" ]; then CI_OPT_ORIGIN_REPO_SLUG="unknown/unknown"; fi
-        if ([ "${CI_OPT_ORIGIN_REPO_SLUG}" == "$(git_repo_slug)" ] && [ "${TRAVIS_EVENT_TYPE}" != "pull_request" ]); then
+        if ([ "${CI_OPT_ORIGIN_REPO_SLUG}" == "$(git_repo_slug)" ] && [ "${TRAVIS_EVENT_TYPE}" != "pull_request" ] && [ -z "${APPVEYOR_PULL_REQUEST_HEAD_REPO_NAME}" ]); then
             echo "true";
         else
             echo "false";
@@ -848,7 +848,14 @@ if [ -z "${CI_OPT_MAVEN_BUILD_REPO}" ]; then
 fi
 CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO="$(ci_infra_opt_git_prefix)/ci-and-cd/maven-build-opts-$(ci_opt_infrastructure)/raw/master"
 if [ -z "${CI_OPT_CI_OPTS_SCRIPT}" ]; then CI_OPT_CI_OPTS_SCRIPT="src/main/ci-script/ci_opts.sh"; fi
-if [ -z "$(ci_infra_opt_git_auth_token)" ]; then echo "CI_INFRA_OPT_GIT_AUTH_TOKEN not set, exit."; return 1; fi
+if [ -z "$(ci_infra_opt_git_auth_token)" ]; then
+    if [ "$(ci_opt_is_origin_repo)" == "true" ]; then
+        echo "ERROR, CI_INFRA_OPT_GIT_AUTH_TOKEN not set and using origin repo, exit."; return 1;
+    else
+        # For PR build on travis-ci or appveyor
+        echo "WARN, CI_INFRA_OPT_GIT_AUTH_TOKEN not set.";
+    fi
+fi
 echo -e "<<<<<<<<<< ---------- important variables ---------- <<<<<<<<<<\n"
 
 

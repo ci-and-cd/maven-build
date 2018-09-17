@@ -915,13 +915,23 @@
         </profile>
         <profile>
             <id>gpg-for-travis-and-maven-central</id>
-            <activation><file><exists>${maven.multiModuleProjectDirectory}/codesigning.asc</exists></file><activeByDefault>true</activeByDefault></activation>
+            <activation><file><exists>${maven.multiModuleProjectDirectory}/codesigning.asc</exists></file><activeByDefault>false</activeByDefault></activation>
             <properties>
                 <!-- Do not set gpg.executable here -->
                 <!--<gpg.executable>gpg</gpg.executable>-->
                 <gpg.keyname>${env.CI_OPT_GPG_KEYNAME}</gpg.keyname>
                 <gpg.passphrase>${env.CI_OPT_GPG_PASSPHRASE}</gpg.passphrase>
             </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution><id>sign-artifacts</id><phase>verify</phase><goals><goal>sign</goal></goals></execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
 
         <profile>
@@ -945,12 +955,6 @@
             </distributionManagement>
             <build>
                 <plugins>
-                    <plugin>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <executions>
-                            <execution><id>sign-artifacts</id><phase>verify</phase><goals><goal>sign</goal></goals></execution>
-                        </executions>
-                    </plugin>
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
