@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>0.2.3</version>
+    <version>0.2.5</version>
 
     <modules>
         <module>build-docker</module>
@@ -1323,8 +1323,22 @@
                     <plugin>
                         <artifactId>maven-surefire-report-plugin</artifactId>
                         <reportSets>
-                            <reportSet><id>unit-tests</id><reports><report>report-only</report></reports></reportSet>
-                            <reportSet><id>integration-tests</id><reports><report>failsafe-report-only</report></reports></reportSet>
+                            <reportSet>
+                                <id>unit-tests</id>
+                                <configuration>
+                                    <aggregate>true</aggregate>
+                                </configuration>
+                                <inherited>false</inherited>
+                                <reports><report>report-only</report></reports>
+                            </reportSet>
+                            <reportSet>
+                                <id>integration-tests</id>
+                                <configuration>
+                                    <aggregate>true</aggregate>
+                                </configuration>
+                                <inherited>false</inherited>
+                                <reports><report>failsafe-report-only</report></reports>
+                            </reportSet>
                         </reportSets>
                     </plugin>
                     <plugin><groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId></plugin>
@@ -1341,6 +1355,11 @@
                                     <linkXRef>true</linkXRef>
                                 </configuration>
                                 <reports><report>checkstyle</report></reports>
+                            </reportSet>
+                            <reportSet>
+                                <id>aggregate</id>
+                                <inherited>false</inherited>
+                                <reports><report>checkstyle-aggregate</report></reports>
                             </reportSet>
                         </reportSets>
                     </plugin>
@@ -1359,10 +1378,7 @@
                         </configuration>
                         <reportSets>
                             <reportSet><id>non-aggregate</id><reports><report>javadoc</report><!--report>it-javadoc</report--></reports></reportSet>
-                            <!-- aggregate reportSet, to define in poms having modules -->
-                            <!-- don't run aggregate in child modules -->
-                            <!-- TODO inherited false bug? -->
-                            <!--<reportSet><id>aggregate</id><inherited>false</inherited><reports><report>aggregate</report></reports></reportSet>-->
+                            <reportSet><id>aggregate</id><inherited>false</inherited><reports><report>aggregate</report></reports></reportSet>
                         </reportSets>
                     </plugin>
                     <plugin>
@@ -1376,6 +1392,7 @@
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>taglist-maven-plugin</artifactId>
                         <configuration>
+                            <aggregate>true</aggregate>
                             <tagListOptions>
                                 <tagClasses>
                                     <tagClass>
@@ -1392,6 +1409,7 @@
                     <plugin>
                         <artifactId>maven-pmd-plugin</artifactId>
                         <configuration>
+                            <aggregate>true</aggregate>
                             <linkXRef>true</linkXRef>
                             <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
                             <minimumTokens>100</minimumTokens>
@@ -1424,7 +1442,6 @@
                                     <!--<report>dependency-management</report>-->
                                     <report>distribution-management</report>
                                     <!---->
-                                    <report>help</report>
                                     <report>index</report>
                                     <report>issue-management</report>
                                     <report>licenses</report>
