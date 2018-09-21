@@ -247,5 +247,120 @@
             </build>
         </profile>
         <!-- @formatter:on -->
+
+        <!-- @formatter:off -->
+        <profile>
+            <!-- see: http://petr.kozelka.net/blog/2009/10/22/how-to-build-a-zip-output-artifact-in-maven/ -->
+            <id>deploy-config-package</id>
+            <activation>
+                <file><exists>${basedir}/docker-compose-base.yml</exists></file>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>deploy-config-package</id>
+                                <phase>prepare-package</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration>
+                                    <target>
+                                        <zip destfile="${project.build.directory}/${project.artifactId}-${project.version}-deploy.zip">
+                                            <fileset dir="."
+                                                     defaultexcludes="no"
+                                                     includes="data/**/.gitignore,data/**/permissions,${project.artifactId}.properties,instance.properties"
+                                                     excludes="**/*.log,**/*.tmp,**/*.bak"
+                                            />
+                                            <fileset dir="." includes="docker-compose*.yml"/>
+                                        </zip>
+                                        <copy file="${project.build.directory}/${project.artifactId}-${project.version}-deploy.zip"
+                                              tofile="${project.basedir}/src/main/docker/deploy.zip"
+                                              overwrite="true"
+                                        />
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-deploy-config-package</id>
+                                <phase>prepare-package</phase>
+                                <goals><goal>attach-artifact</goal></goals>
+                                <configuration>
+                                    <artifacts>
+                                        <artifact>
+                                            <classifier>deploy</classifier>
+                                            <file>${project.build.directory}/${project.artifactId}-${project.version}-deploy.zip</file>
+                                            <type>zip</type>
+                                        </artifact>
+                                    </artifacts>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!--
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-deploy-config-package</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.basedir}/src/main/docker</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.build.directory}</directory>
+                                            <includes>
+                                                <include>${project.artifactId}-${project.version}-deploy.zip</include>
+                                            </includes>
+                                            <filtering>false</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    -->
+                    <!-- maven-jar-plugin can not copy .* hidden files -->
+                    <!--
+                    <plugin>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>deploy-config-package</id>
+                                <phase>package</phase>
+                                <configuration>
+                                    <classifier>deploy</classifier>
+                                    <classesDirectory>${project.basedir}</classesDirectory>
+                                    <includes>
+                                        <include>/docker-compose*.yml</include>
+                                        <include>/data/**/*</include>
+                                    </includes>
+                                    <excludes>
+                                        <exclude>**/*.log</exclude>
+                                        <exclude>**/*.tmp</exclude>
+                                        <exclude>**/*.bak</exclude>
+                                    </excludes>
+                                </configuration>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    -->
+                </plugins>
+            </build>
+        </profile>
+        <!-- @formatter:on -->
     </profiles>
 </project>
