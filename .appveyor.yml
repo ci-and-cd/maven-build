@@ -79,7 +79,7 @@ services:
 
 test_script:
 - sh: |
-    if [[ "${APPVEYOR_REPO_BRANCH}" =~ ^release/.+ ]] || [[ "${APPVEYOR_REPO_BRANCH}" =~ ^support/.+ ]]; then export CI_OPT_GITHUB_SITE_PUBLISH=true; else export CI_OPT_GITHUB_SITE_PUBLISH=false; fi;
+    if [[ "${APPVEYOR_REPO_BRANCH}" =~ ^release/.+ ]] || [[ "${APPVEYOR_REPO_BRANCH}" =~ ^support/.+ ]]; then export CI_OPT_GITHUB_SITE_PUBLISH=true; else export CI_OPT_GITHUB_SITE_PUBLISH=true; fi;
     if [ "${APPVEYOR_ENABLED}" == "true" ]; then
       if [ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]; then
         bash ci.sh mvn clean install sonar:sonar site deploy site-deploy;
