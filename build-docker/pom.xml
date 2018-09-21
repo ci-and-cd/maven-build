@@ -15,9 +15,9 @@
     <packaging>pom</packaging>
 
     <properties>
-        <io.fabric8_docker-maven-plugin.version>0.26.0</io.fabric8_docker-maven-plugin.version>
+        <io.fabric8_docker-maven-plugin.version>0.26.1</io.fabric8_docker-maven-plugin.version>
         <com.spotify_docker-maven-plugin.version>1.1.1</com.spotify_docker-maven-plugin.version>
-        <com.spotify_dockerfile-maven-plugin.version>1.4.2</com.spotify_dockerfile-maven-plugin.version>
+        <com.spotify_dockerfile-maven-plugin.version>1.4.4</com.spotify_dockerfile-maven-plugin.version>
 
         <dockerfile.build.skip>true</dockerfile.build.skip>
         <dockerfile.useMavenSettingsForAuth>false</dockerfile.useMavenSettingsForAuth>
@@ -40,7 +40,11 @@
                     <version>${com.spotify_dockerfile-maven-plugin.version}</version>
                     <configuration>
                         <buildArgs>
+                            <BUILD_TIMESTAMP>${maven.build.timestamp}</BUILD_TIMESTAMP>
+                            <GIT_COMMIT_ID>${git.commit.id}</GIT_COMMIT_ID>
+                            <GIT_REMOTE_ORIGIN_URL>${git.remote.origin.url}</GIT_REMOTE_ORIGIN_URL>
                             <JAR_FILE>${project.build.finalName}-exec.jar</JAR_FILE>
+                            <PROJECT_VERSION>${project.version}</PROJECT_VERSION>
                         </buildArgs>
                         <tag>${project.version}</tag>
                         <useMavenSettingsForAuth>${dockerfile.useMavenSettingsForAuth}</useMavenSettingsForAuth>
