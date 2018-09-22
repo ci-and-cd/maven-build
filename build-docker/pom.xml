@@ -6,7 +6,7 @@
     <parent>
         <groupId>cn.home1</groupId>
         <artifactId>maven-build</artifactId>
-        <version>0.3.0</version>
+        <version>0.3.1</version>
     </parent>
 
     <artifactId>build-docker</artifactId>
@@ -260,7 +260,7 @@
             <!-- see: http://petr.kozelka.net/blog/2009/10/22/how-to-build-a-zip-output-artifact-in-maven/ -->
             <id>deploy-config-package</id>
             <activation>
-                <file><exists>${basedir}/docker-compose_${project.artifactId}.yml</exists></file>
+                <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <build>
