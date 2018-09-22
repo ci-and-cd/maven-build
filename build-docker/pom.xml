@@ -40,9 +40,13 @@
                     <version>${com.spotify_dockerfile-maven-plugin.version}</version>
                     <configuration>
                         <buildArgs>
+                            <ARTIFACT_REPOSITORY>${private-nexus3.repository}</ARTIFACT_REPOSITORY>
                             <BUILD_TIMESTAMP>${maven.build.timestamp}</BUILD_TIMESTAMP>
+                            <DOCKER_REGISTRY>${docker.registry}</DOCKER_REGISTRY>
+                            <GIT_BRANCH>${git.branch}</GIT_BRANCH>
                             <GIT_COMMIT_ID>${git.commit.id}</GIT_COMMIT_ID>
                             <GIT_COMMIT_ID_ABBREV>${git.commit.id.abbrev}</GIT_COMMIT_ID_ABBREV>
+                            <GIT_COMMIT_TIME>${git.commit.time}</GIT_COMMIT_TIME>
                             <GIT_REMOTE_ORIGIN_URL>${git.remote.origin.url}</GIT_REMOTE_ORIGIN_URL>
                             <JAR_FILE>${project.build.finalName}-exec.jar</JAR_FILE>
                             <PROJECT_ARTIFACTID>${project.artifactId}</PROJECT_ARTIFACTID>
@@ -274,9 +278,13 @@
                                 <goals><goal>run</goal></goals>
                                 <configuration>
                                     <target>
+                                        <replace file="docker-compose-base.yml" token="@artifact.repository@" value="${private-nexus3.repository}"/>
                                         <replace file="docker-compose-base.yml" token="@build.timestamp@" value="${maven.build.timestamp}"/>
+                                        <replace file="docker-compose-base.yml" token="@docker.registry@" value="${docker.registry}"/>
+                                        <replace file="docker-compose-base.yml" token="@git.branch@" value="${git.branch}"/>
                                         <replace file="docker-compose-base.yml" token="@git.commit.id@" value="${git.commit.id}"/>
                                         <replace file="docker-compose-base.yml" token="@git.commit.id.abbrev@" value="${git.commit.id.abbrev}"/>
+                                        <replace file="docker-compose-base.yml" token="@git.commit.time@" value="${git.commit.time}"/>
                                         <replace file="docker-compose-base.yml" token="@git.remote.origin.url@" value="${git.remote.origin.url}"/>
                                         <replace file="docker-compose-base.yml" token="@project.artifactId@" value="${project.artifactId}"/>
                                         <replace file="docker-compose-base.yml" token="@project.groupId@" value="${project.groupId}"/>
