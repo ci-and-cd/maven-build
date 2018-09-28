@@ -753,6 +753,7 @@ if which gpg2 > /dev/null; then GPG_EXECUTABLE="gpg2"; GPG_CMD="gpg2 --use-agent
 echo "using ${GPG_EXECUTABLE}"
 # use --batch=true to avoid 'gpg tty not a tty' error
 ${GPG_CMD} --batch=true --version
+openssl version -a
 if version_gt $(${GPG_EXECUTABLE} --batch=true --version | { grep -E '[0-9]+\.[0-9]+\.[0-9]+' || true; } | head -n1 | awk '{print $NF}') "2.1"; then
     echo "gpg version greater than 2.1"
     mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
@@ -775,7 +776,10 @@ if version_gt $(${GPG_EXECUTABLE} --batch=true --version | { grep -E '[0-9]+\.[0
 fi
 if [ -f codesigning.asc.enc ] && [ -n "${CI_OPT_GPG_PASSPHRASE}" ]; then
     echo decrypt private key
-    openssl aes-256-cbc -k ${CI_OPT_GPG_PASSPHRASE} -in codesigning.asc.enc -out codesigning.asc -d
+    # bad decrypt
+    # 140611360391616:error:06065064:digital envelope routines:EVP_DecryptFinal_ex:bad decrypt:../crypto/evp/evp_enc.c:536:
+    # see: https://stackoverflow.com/questions/34304570/how-to-resolve-the-evp-decryptfinal-ex-bad-decrypt-during-file-decryption
+    openssl aes-256-cbc -k ${CI_OPT_GPG_PASSPHRASE} -in codesigning.asc.enc -out codesigning.asc -d -md md5
 fi
 if [ -f codesigning.asc.gpg ] && [ -n "${CI_OPT_GPG_PASSPHRASE}" ]; then
     echo decrypt private key
