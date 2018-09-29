@@ -28,12 +28,7 @@ environment:
     secure: zmJLi24kwYRes3vI0ngWqg==
   CI_OPT_SONAR_LOGIN_TOKEN:
     secure: W4k/mwIb6WWM/XKvncWlDEvlfn+dz88sB8qlbYsL7nF41+9BADm/uYgiYt5SPoiJ
-
-  # e.g. CI_OPT_CI_SCRIPT=https://github.com/ci-and-cd/maven-build/raw/v0.3.0/src/main/ci-script/lib_ci.sh
-  CI_OPT_CI_SCRIPT: https://github.com/${APPVEYOR_REPO_NAME:-ci-and-cd/maven-build}/raw/${APPVEYOR_REPO_BRANCH:-develop}/src/main/ci-script/lib_ci.sh
-  CI_OPT_GITHUB_SITE_PUBLISH: true
-  CI_OPT_INFRASTRUCTURE: opensource
-  #CI_OPT_MAVEN_EFFECTIVE_POM: true
+  CI_OPT_MAVEN_EFFECTIVE_POM: true
   MAVEN_SKIP_RC: true
 
 init:
@@ -79,7 +74,7 @@ services:
 
 test_script:
 - sh: |
-    if [[ "${APPVEYOR_REPO_BRANCH}" =~ ^release/.+ ]] || [[ "${APPVEYOR_REPO_BRANCH}" =~ ^support/.+ ]]; then export CI_OPT_GITHUB_SITE_PUBLISH=true; else export CI_OPT_GITHUB_SITE_PUBLISH=true; fi;
+    if [[ "${APPVEYOR_REPO_BRANCH}" =~ ^release/.+ ]] || [[ "${APPVEYOR_REPO_BRANCH}" =~ ^support/.+ ]]; then export CI_OPT_GITHUB_SITE_PUBLISH=true; else export CI_OPT_GITHUB_SITE_PUBLISH=false; fi;
     if [ "${APPVEYOR_ENABLED}" == "true" ]; then
       if [ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]; then
         bash ci.sh mvn clean install sonar:sonar site deploy site-deploy;

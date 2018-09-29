@@ -20,6 +20,7 @@
 [CI (travis-ci)](https://travis-ci.org/ci-and-cd/maven-build)  
 [![Build Status](https://travis-ci.org/ci-and-cd/maven-build.svg?branch=develop)travis-ci](https://travis-ci.org/ci-and-cd/maven-build)  
 
+
 Parent pom for maven based projects
 
 maven-build support code environment segregation and build deploy segregation.  
