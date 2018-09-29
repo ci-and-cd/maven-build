@@ -39,6 +39,7 @@ build_snapshots:
   - master
   - /^hotfix\/.+$/
   - /^release\/.+$/
+  - /^support\/.*$/
   - /^v\d+\.\d+(\.\d+)?(-\S*)?/
   script:
   - export CI_OPT_MAVEN_EFFECTIVE_POM=true;
@@ -75,6 +76,7 @@ publish_snapshots:
   - master
   - /^hotfix\/.+$/
   - /^release\/.+$/
+  - /^support\/.*$/
   - /^v\d+\.\d+(\.\d+)?(-\S*)?/
   script:
   - if [ -f artifacts.tar.gz ]; then tar -xzf artifacts.tar.gz; fi;
@@ -112,6 +114,7 @@ build_releases:
   only:
   - /^hotfix\/.+$/
   - /^release\/.+$/
+  - /^support\/.*$/
   script:
   - export CI_OPT_MAVEN_EFFECTIVE_POM=true;
     bash ci.sh mvn -e clean package;
@@ -128,6 +131,7 @@ publish_releases:
   #- temp
   - /^hotfix\/.+$/
   - /^release\/.+$/
+  - /^support\/.*$/
   script:
   # force publish on temp branch push
   #- export CI_OPT_PUBLISH_TO_REPO=true
@@ -145,6 +149,7 @@ site_releases:
   - publish_releases
   only:
   - /^release\/.+$/
+  - /^support\/.*$/
   script:
   - if [ -f artifacts.tar.gz ]; then tar -xzf artifacts.tar.gz; fi;
     export CI_OPT_CLEAN_SKIP=true; export CI_OPT_INTEGRATION_TEST_SKIP=true; export CI_OPT_TEST_SKIP=true;
