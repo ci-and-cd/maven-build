@@ -3,9 +3,11 @@
 # Issue 4072 artifacts ignore paths                              , see: https://gitlab.com/gitlab-org/gitlab-ce/issues/4072
 
 before_script:
+- if [ -f ~/env ]; then source ~/env; fi;
 - set -ex;
 # info
-- echo working directory `pwd`;
+- echo "HOST_HOSTNAME '${HOST_HOSTNAME}', HOST_IPADDRESS '${HOST_IPADDRESS}'";
+  echo working directory `pwd`;
   echo CI_PROJECT_URL ${CI_PROJECT_URL} CI_COMMIT_REF_NAME ${CI_COMMIT_REF_NAME}, CI_COMMIT_SHA ${CI_COMMIT_SHA}, CI_PROJECT_NAME ${CI_PROJECT_NAME}, CI_PROJECT_NAMESPACE ${CI_PROJECT_NAMESPACE};
 # environment variables
 - export CI_INFRA_OPT_GIT_HOST=gitlab.com;
@@ -39,6 +41,7 @@ build_snapshots:
   - master
   - /^hotfix\/.+$/
   - /^release\/.+$/
+  - /^support\/.*$/
   - /^v\d+\.\d+(\.\d+)?(-\S*)?/
   script:
   - export CI_OPT_MAVEN_EFFECTIVE_POM=true;
@@ -75,6 +78,7 @@ publish_snapshots:
   - master
   - /^hotfix\/.+$/
   - /^release\/.+$/
+  - /^support\/.*$/
   - /^v\d+\.\d+(\.\d+)?(-\S*)?/
   script:
   - if [ -f artifacts.tar.gz ]; then tar -xzf artifacts.tar.gz; fi;
@@ -112,6 +116,7 @@ build_releases:
   only:
   - /^hotfix\/.+$/
   - /^release\/.+$/
+  - /^support\/.*$/
   script:
   - export CI_OPT_MAVEN_EFFECTIVE_POM=true;
     bash ci.sh mvn -e clean package;
@@ -128,6 +133,7 @@ publish_releases:
   #- temp
   - /^hotfix\/.+$/
   - /^release\/.+$/
+  - /^support\/.*$/
   script:
   # force publish on temp branch push
   #- export CI_OPT_PUBLISH_TO_REPO=true
@@ -145,6 +151,7 @@ site_releases:
   - publish_releases
   only:
   - /^release\/.+$/
+  - /^support\/.*$/
   script:
   - if [ -f artifacts.tar.gz ]; then tar -xzf artifacts.tar.gz; fi;
     export CI_OPT_CLEAN_SKIP=true; export CI_OPT_INTEGRATION_TEST_SKIP=true; export CI_OPT_TEST_SKIP=true;
