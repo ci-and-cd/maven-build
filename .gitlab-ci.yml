@@ -3,9 +3,11 @@
 # Issue 4072 artifacts ignore paths                              , see: https://gitlab.com/gitlab-org/gitlab-ce/issues/4072
 
 before_script:
+- if [ -f ~/env ]; then source ~/env; fi;
 - set -ex;
 # info
-- echo working directory `pwd`;
+- echo "HOST_HOSTNAME '${HOST_HOSTNAME}', HOST_IPADDRESS '${HOST_IPADDRESS}'";
+  echo working directory `pwd`;
   echo CI_PROJECT_URL ${CI_PROJECT_URL} CI_COMMIT_REF_NAME ${CI_COMMIT_REF_NAME}, CI_COMMIT_SHA ${CI_COMMIT_SHA}, CI_PROJECT_NAME ${CI_PROJECT_NAME}, CI_PROJECT_NAMESPACE ${CI_PROJECT_NAMESPACE};
 # environment variables
 - export CI_INFRA_OPT_GIT_HOST=gitlab.com;
