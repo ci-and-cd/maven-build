@@ -93,7 +93,7 @@ function git_repo_slug() {
     elif [ -d .git ]; then
         repo_slug=$(git remote show origin -n | ruby -ne 'puts /^\s*Fetch.*(:|\/){1}([^\/]+\/[^\/]+).git/.match($_)[2] rescue nil')
     else
-        (>&2 echo "Can not find value for git_repo_slug, exit")
+        (>&2 echo "[ERROR] Can not find value for git_repo_slug, exit")
         return 1
     fi
     (>&2 echo "git_repo_slug result: ${repo_slug}")
@@ -355,7 +355,7 @@ function ci_infra_opt_git_auth_token() {
             (>&2 echo "ci_infra_opt_git_auth_token ZSH_VERSION: ${ZSH_VERSION}")
             echo "${(P)var_name}"
         else
-            (>&2 echo "unsupported ${SHELL}")
+            (>&2 echo "[ERROR] unsupported ${SHELL}")
             return 1
         fi
     fi
@@ -467,10 +467,10 @@ function pull_base_image() {
     if type -p docker > /dev/null; then
         local dockerfiles=($(find . -name '*Docker*'))
         echo "Found ${#dockerfiles[@]} Dockerfiles, '${dockerfiles[@]}'"
-        # mvn could not resolve sibling dependencies on first build of a version
+        # maven could not resolve sibling dependencies on first build of a version
         #if [ ${#dockerfiles[@]} -gt 0 ]; then
-        #    echo mvn ${CI_OPT_MAVEN_SETTINGS} -e process-resources
-        #    mvn ${CI_OPT_MAVEN_SETTINGS} -e process-resources
+        #    echo ${MVN_CMD} ${CI_OPT_MAVEN_SETTINGS} -e process-resources
+        #    ${MVN_CMD} ${CI_OPT_MAVEN_SETTINGS} -e process-resources
         #fi
 
         local base_images=($(find . -name '*Docker*' | xargs cat | { grep -E '^FROM' || true; } | awk '{print $2}' | uniq))
@@ -488,7 +488,7 @@ function alter_mvn() {
     result=()
 
     for element in $@; do
-        if [ "${element}" == "mvn" ]; then
+        if [ "${element}" == "mvn" ] || [ "${element}" == "${MVN_CMD}" ]; then
             #(>&2 echo "alter_mvn command '${element}' found")
             continue
         elif [[ "${element}" == -* ]]; then
@@ -501,7 +501,7 @@ function alter_mvn() {
             # deploy, site-deploy, push (docker)
                 if [ "$(ci_opt_publish_to_repo)" == "true" ]; then
                     if [ "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]; then
-                    # mvn deploy and publish segregation
+                    # maven deploy and publish segregation
                         goals+=("org.codehaus.mojo:wagon-maven-plugin:merge-maven-repos@merge-maven-repos-deploy")
                         if [ "$(ci_opt_user_docker)" == "true" ]; then goals+=("dockerfile:push"); fi
                     else
@@ -516,7 +516,7 @@ function alter_mvn() {
             elif ([[ "${element}" == *clean ]] || [[ "${element}" == *install ]]); then
             # goals need to alter
                 if [ "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]; then
-                # mvn deploy and publish segregation
+                # maven deploy and publish segregation
                     if [[ "${element}" == *clean ]]; then
                         goals+=("clean")
                         goals+=("org.apache.maven.plugins:maven-antrun-plugin:run@local-deploy-model-path-clean")
@@ -570,7 +570,7 @@ function run_mvn() {
                 download "${CI_OPT_MAVEN_SETTINGS_FILE_URL}" "${CI_OPT_MAVEN_SETTINGS_FILE}" "${curl_options}"
                 CI_OPT_MAVEN_SETTINGS="-s ${CI_OPT_MAVEN_SETTINGS_FILE}"
             else
-                echo "Error, can not download ${CI_OPT_MAVEN_SETTINGS_FILE_URL}"
+                echo "[ERROR] can not download ${CI_OPT_MAVEN_SETTINGS_FILE_URL}"
                 return 1
             fi
         else
@@ -619,13 +619,13 @@ function run_mvn() {
 
     echo -e "\n>>>>>>>>>> ---------- run_mvn alter_mvn ---------- >>>>>>>>>>"
     local altered=$(alter_mvn $@)
-    echo "alter_mvn result: mvn ${altered}"
+    echo "alter_mvn result: ${MVN_CMD} ${altered}"
     local mvn_opts_and_goals=("${altered}")
     local mvn_goals=()
     for element in ${mvn_opts_and_goals[@]}; do if [[ "${element}" == -* ]]; then continue; else mvn_goals+=("${element}"); fi; done
     echo "alter_mvn found ${#mvn_goals[@]} goals: ${mvn_goals[@]}"
     if [ ${#mvn_goals[@]} -eq 0 ]; then
-        echo "There are not goals to run, exit.";
+        echo "[WARN] There are not goals to run, exit.";
         return 0;
     fi
     echo -e "<<<<<<<<<< ---------- run_mvn alter_mvn ---------- <<<<<<<<<<\n"
@@ -657,7 +657,7 @@ function run_mvn() {
 
     echo -e "\n>>>>>>>>>> ---------- run_mvn project info ---------- >>>>>>>>>>"
     echo JAVA_HOME "'${JAVA_HOME}'"
-    mvn ${CI_OPT_MAVEN_SETTINGS} -version
+    ${MVN_CMD} ${CI_OPT_MAVEN_SETTINGS} -version
 
     # Maven effective pom
     mkdir -p $(dirname ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}) && touch ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
@@ -666,22 +666,22 @@ function run_mvn() {
         if [ "${CI_OPT_OUTPUT_MAVEN_EFFECTIVE_POM_TO_CONSOLE}" == "true" ]; then
             if [ -n "${TRAVIS_EVENT_TYPE}" ]; then
                 echo travis-ci has log limit of 10000 lines, merge every 10 lines of log into 1, avoid travis timeout and to much lines
-                echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom | awk 'NR%10{printf \"%s \",\$0;next;}1'' ..."
-                mvn ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom | awk 'NR%10{printf "%s ",$0;next;}1'
+                echo "${MVN_CMD} ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom | awk 'NR%10{printf \"%s \",\$0;next;}1'' ..."
+                ${MVN_CMD} ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom | awk 'NR%10{printf "%s ",$0;next;}1'
             elif [ -n "${CI_COMMIT_REF_NAME}" ]; then
                 echo gitlab-ci has log limit of 4194304 bytes
-                echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE} ..."
-                mvn ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
+                echo "${MVN_CMD} ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE} ..."
+                ${MVN_CMD} ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
             else
-                echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom >&3 ..."
+                echo "${MVN_CMD} ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom >&3 ..."
                 exec 3> >(tee ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE})
-                mvn ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom >&3
+                ${MVN_CMD} ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom >&3
             fi
         else
-            echo "mvn ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE} ..."
-            mvn ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
+            echo "${MVN_CMD} ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE} ..."
+            ${MVN_CMD} ${CI_OPT_MAVEN_SETTINGS} -U -e help:effective-pom > ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}
         fi
-        if [ $? -ne 0 ]; then echo "error on generate effective-pom"; cat ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}; exit 1; else echo "effective-pom generated successfully"; fi
+        if [ $? -ne 0 ]; then echo "[ERROR] error on generate effective-pom"; cat ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}; exit 1; else echo "effective-pom generated successfully"; fi
         if [ "${CI_OPT_SHELL_EXIT_ON_ERROR}" == "true" ]; then set -e -o pipefail; fi
     fi
     echo -e "<<<<<<<<<< ---------- run_mvn project info ---------- <<<<<<<<<<\n"
@@ -693,11 +693,11 @@ function run_mvn() {
     echo -e "<<<<<<<<<< ---------- pull_base_image ---------- <<<<<<<<<<\n"
 
     local filter_script_file=$(filter_script "$(ci_opt_cache_directory)/filter")
-    echo -e "\n>>>>>>>>>> ---------- mvn ${CI_OPT_MAVEN_SETTINGS} ${altered} | ${filter_script_file} ---------- >>>>>>>>>>"
+    echo -e "\n>>>>>>>>>> ---------- ${MVN_CMD} ${CI_OPT_MAVEN_SETTINGS} ${altered} | ${filter_script_file} ---------- >>>>>>>>>>"
     if [ "${CI_OPT_DRYRUN}" != "true" ]; then
-        bash -c "set -e -o pipefail; mvn ${CI_OPT_MAVEN_SETTINGS} ${altered} | ${filter_script_file}"
+        bash -c "set -e -o pipefail; ${MVN_CMD} ${CI_OPT_MAVEN_SETTINGS} ${altered} | ${filter_script_file}"
     fi
-    echo -e "<<<<<<<<<< ---------- mvn ${CI_OPT_MAVEN_SETTINGS} ${altered} | ${filter_script_file} ---------- <<<<<<<<<<\n"
+    echo -e "<<<<<<<<<< ---------- ${MVN_CMD} ${CI_OPT_MAVEN_SETTINGS} ${altered} | ${filter_script_file} ---------- <<<<<<<<<<\n"
 }
 
 function run_gradle() {
@@ -711,7 +711,7 @@ function run_gradle() {
     # <<<<<<<<<< ---------- gradle properties and environment variables ---------- <<<<<<<<<<
 
     # >>>>>>>>>> ---------- gradle project info ---------- >>>>>>>>>>
-    gradle --stacktrace ${GRADLE_PROPERTIES} -version
+    ${GRADLE_CMD} --stacktrace ${GRADLE_PROPERTIES} -version
     # <<<<<<<<<< ---------- gradle project info ---------- <<<<<<<<<<
 }
 
@@ -846,7 +846,7 @@ if [ -z "${CI_OPT_MAVEN_BUILD_REPO}" ]; then
         # use current directory
         CI_OPT_MAVEN_BUILD_REPO=""
     else
-        echo "Both CI_OPT_MAVEN_BUILD_REPO and CI_OPT_CI_SCRIPT are not set, exit."
+        echo "[ERROR] Both CI_OPT_MAVEN_BUILD_REPO and CI_OPT_CI_SCRIPT are not set, exit."
         return 1
     fi
 fi
@@ -854,10 +854,10 @@ CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO="$(ci_infra_opt_git_prefix)/ci-and-cd/maven-b
 if [ -z "${CI_OPT_CI_OPTS_SCRIPT}" ]; then CI_OPT_CI_OPTS_SCRIPT="src/main/ci-script/ci_opts.sh"; fi
 if [ -z "$(ci_infra_opt_git_auth_token)" ]; then
     if [ "$(ci_opt_is_origin_repo)" == "true" ]; then
-        echo "ERROR, CI_INFRA_OPT_GIT_AUTH_TOKEN not set and using origin repo, exit."; return 1;
+        echo "[ERROR] CI_INFRA_OPT_GIT_AUTH_TOKEN not set and using origin repo, exit."; return 1;
     else
         # For PR build on travis-ci or appveyor
-        echo "WARN, CI_INFRA_OPT_GIT_AUTH_TOKEN not set.";
+        echo "[WARN] CI_INFRA_OPT_GIT_AUTH_TOKEN not set.";
     fi
 fi
 echo -e "<<<<<<<<<< ---------- important variables ---------- <<<<<<<<<<\n"
@@ -871,10 +871,18 @@ echo -e "\n<<<<<<<<<< ---------- options with important variables ---------- <<<
 
 # Load remote script library here
 
+if [ -z "${MVN_CMD}" ]; then MVN_CMD="mvn"; fi
 if [ -f pom.xml ]; then
+    if [ -f mvnw ]; then MVN_CMD="./mvnw"; fi
+    echo "MVN_CMD '${MVN_CMD}'"
+
     run_mvn $@
 fi
 
+if [ -z "${GRADLE_CMD}" ]; then GRADLE_CMD="gradle"; fi
 if [ -f build.gradle ]; then
-    run_gradle
+    if [ -f gradlew ]; then GRADLE_CMD="./gradlew"; fi
+    echo "GRADLE_CMD '${GRADLE_CMD}'"
+
+    run_gradle $@
 fi
