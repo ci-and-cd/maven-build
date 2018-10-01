@@ -871,18 +871,20 @@ echo -e "\n<<<<<<<<<< ---------- options with important variables ---------- <<<
 
 # Load remote script library here
 
-if [ -z "${MVN_CMD}" ]; then MVN_CMD="mvn"; fi
-if [ -f pom.xml ]; then
+if [ -z "${MVN_CMD}" ]; then
+    MVN_CMD="mvn"
     if [ -f mvnw ]; then MVN_CMD="./mvnw"; fi
     echo "MVN_CMD '${MVN_CMD}'"
-
+fi
+if [ -f pom.xml ]; then
     run_mvn $@
 fi
 
-if [ -z "${GRADLE_CMD}" ]; then GRADLE_CMD="gradle"; fi
-if [ -f build.gradle ]; then
+if [ -z "${GRADLE_CMD}" ]; then
+    GRADLE_CMD="gradle"
     if [ -f gradlew ]; then GRADLE_CMD="./gradlew"; fi
     echo "GRADLE_CMD '${GRADLE_CMD}'"
-
+fi
+if [ -f build.gradle ]; then
     run_gradle $@
 fi
