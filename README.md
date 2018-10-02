@@ -23,6 +23,14 @@ maven-build support code environment segregation and build deploy segregation.
 
 ## I. Usage
 
+Copy `maven-build/src/main/maven/toolchains.xml` to `~/.m2/toolchains.xml`
+```bash
+cp src/main/maven/toolchains.xml ~/.m2/toolchains.xml
+# or
+cp src/main/maven/toolchains-1.8.0_181-Darwin.xml ~/.m2/toolchains.xml
+```
+Update jdkHome in ~/.m2/toolchains.xml
+
 Set maven-build as parent in maven projects.
 
         <parent>
