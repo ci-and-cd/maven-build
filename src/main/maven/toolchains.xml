@@ -14,10 +14,10 @@
             <!--
             # Disable SIP (System Integrity Protection)
             # see: https://apple.stackexchange.com/questions/208764/cant-write-to-usr-lib
-            # Boot by Recovery partition and run `csrutil disable` in Terminal.app
+            # Boot by Recovery OS and run `csrutil disable` in Terminal.app
             mkdir -p /usr/lib/jvm
-            ln -s /Library/Java/JavaVirtualMachines/jdk1.8.0_171.jdk/Contents/Home /usr/lib/jvm/java-8-oracle
-            # run `csrutil enable` in Terminal.app
+            ln -s /Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home /usr/lib/jvm/java-8-oracle
+            # run `csrutil enable` in Terminal.app (Recovery OS)
             -->
             <jdkHome>/usr/lib/jvm/java-8-oracle</jdkHome>
         </configuration>

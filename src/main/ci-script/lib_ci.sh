@@ -723,6 +723,20 @@ function is_config_repository() {
     false
 }
 
+# see: https://qiita.com/narumi_888/items/e425f29b84da6b72ad62
+if sed --version 2>/dev/null | grep -q GNU; then
+    alias sedi='sed -i '
+else
+    alias sedi='sed -i "" '
+    echo "[ERROR] Only GNU sed is supported."
+    echo "Run 'brew install gnu-sed' to install GNU sed on Mac OSX"
+
+    if [ -f /usr/local/opt/gnu-sed/bin/gsed ]; then
+        export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
+        export MANPATH="/usr/local/opt/gnu-sed/libexec/gnuman:$MANPATH"
+    fi
+fi
+
 
 if [ -z "${CI_OPT_SHELL_PRINT_EXECUTED_COMMANDS}" ]; then CI_OPT_SHELL_PRINT_EXECUTED_COMMANDS="false"; fi
 if [ "${CI_OPT_SHELL_PRINT_EXECUTED_COMMANDS}" == "true" ]; then set -x; fi
@@ -743,84 +757,101 @@ echo "gitlab-ci variables: CI_REF_NAME: ${CI_REF_NAME}, CI_COMMIT_REF_NAME: ${CI
 echo "travis-ci variables: TRAVIS_BRANCH: ${TRAVIS_BRANCH}, TRAVIS_EVENT_TYPE: ${TRAVIS_EVENT_TYPE}, TRAVIS_REPO_SLUG: ${TRAVIS_REPO_SLUG}, TRAVIS_PULL_REQUEST: ${TRAVIS_PULL_REQUEST}"
 
 echo -e "\n    >>>>>>>>>> ---------- decrypt files and handle keys ---------- >>>>>>>>>>"
-GPG_TTY=$(tty || echo "")
-if [ -z "${GPG_TTY}" ]; then unset GPG_TTY; fi
-echo "gpg tty '${GPG_TTY}'"
-GPG_EXECUTABLE="gpg"
+GPG_CMD=""
+GPG_EXECUTABLE=""
 echo determine gpg or gpg2 to use
 # invalid option --pinentry-mode loopback
-if which gpg2 > /dev/null; then GPG_EXECUTABLE="gpg2"; GPG_CMD="gpg2 --use-agent"; elif which gpg > /dev/null; then GPG_EXECUTABLE="gpg"; GPG_CMD="gpg"; fi
-echo "using ${GPG_EXECUTABLE}"
-# use --batch=true to avoid 'gpg tty not a tty' error
-${GPG_CMD} --batch=true --version
-openssl version -a
-if version_gt $(${GPG_EXECUTABLE} --batch=true --version | { grep -E '[0-9]+\.[0-9]+\.[0-9]+' || true; } | head -n1 | awk '{print $NF}') "2.1"; then
-    echo "gpg version greater than 2.1"
-    mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
-    touch ~/.gnupg/gpg.conf
-    echo "add 'use-agent' to '~/.gnupg/gpg.conf'"
-    echo 'use-agent' > ~/.gnupg/gpg.conf
-    # on gpg-2.1.11 'pinentry-mode loopback' is invalid option
-    #echo "add 'pinentry-mode loopback' to '~/.gnupg/gpg.conf'"
-    #echo 'pinentry-mode loopback' >> ~/.gnupg/gpg.conf
-    cat ~/.gnupg/gpg.conf
-    #GPG_CMD="${GPG_CMD} --pinentry-mode loopback"
-    #export GPG_OPTS='--pinentry-mode loopback'
-    #echo GPG_OPTS: ${GPG_OPTS}
-    echo "add 'allow-loopback-pinentry' to '~/.gnupg/gpg-agent.conf'"
-    touch ~/.gnupg/gpg-agent.conf
-    echo 'allow-loopback-pinentry' > ~/.gnupg/gpg-agent.conf
-    cat ~/.gnupg/gpg-agent.conf
-    echo restart the agent
-    echo RELOADAGENT | gpg-connect-agent
+if which gpg2 > /dev/null; then
+    GPG_CMD="gpg2 --use-agent"
+    GPG_EXECUTABLE="gpg2"
+elif which gpg > /dev/null; then
+    GPG_CMD="gpg"
+    GPG_EXECUTABLE="gpg"
 fi
-if [ -f codesigning.asc.enc ] && [ -n "${CI_OPT_GPG_PASSPHRASE}" ]; then
-    echo decrypt private key
-    # bad decrypt
-    # 140611360391616:error:06065064:digital envelope routines:EVP_DecryptFinal_ex:bad decrypt:../crypto/evp/evp_enc.c:536:
-    # see: https://stackoverflow.com/questions/34304570/how-to-resolve-the-evp-decryptfinal-ex-bad-decrypt-during-file-decryption
-    openssl aes-256-cbc -k ${CI_OPT_GPG_PASSPHRASE} -in codesigning.asc.enc -out codesigning.asc -d -md md5
-fi
-if [ -f codesigning.asc.gpg ] && [ -n "${CI_OPT_GPG_PASSPHRASE}" ]; then
-    echo decrypt private key
-    LC_CTYPE="UTF-8" echo ${CI_OPT_GPG_PASSPHRASE} | ${GPG_CMD} --passphrase-fd 0 --yes --batch=true --cipher-algo AES256 -o codesigning.asc codesigning.asc.gpg
-fi
-if [ -f codesigning.pub ]; then
-    echo import public keys
-    ${GPG_CMD} --yes --batch --import codesigning.pub
+if [ -n "${GPG_EXECUTABLE}" ]; then
+    echo "using ${GPG_EXECUTABLE}"
+    GPG_TTY=$(tty || echo "")
+    if [ -z "${GPG_TTY}" ]; then unset GPG_TTY; fi
+    echo "gpg tty '${GPG_TTY}'"
 
-    echo list public keys
-    ${GPG_CMD} --batch=true --list-keys
-fi
-if [ -f codesigning.asc ]; then
-    echo import private keys
-    # some versions only can import public key from a keypair file, some can import key pair
-    if [ -f codesigning.pub ]; then
-        ${GPG_CMD} --yes --batch --import codesigning.asc
-    else
-        if [ -z "$(${GPG_CMD} --list-secret-keys | { grep ${CI_OPT_GPG_KEYNAME} || true; })" ]; then ${GPG_CMD} --yes --batch=true --fast-import codesigning.asc; fi
+    # use --batch=true to avoid 'gpg tty not a tty' error
+    ${GPG_CMD} --batch=true --version
+
+    # config gpg (version >= 2.2)
+    if version_gt $(${GPG_EXECUTABLE} --batch=true --version | { grep -E '[0-9]+\.[0-9]+\.[0-9]+' || true; } | head -n1 | awk '{print $NF}') "2.1"; then
+        echo "gpg version greater than 2.1"
+        mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
+        touch ~/.gnupg/gpg.conf
+        echo "add 'use-agent' to '~/.gnupg/gpg.conf'"
+        echo 'use-agent' > ~/.gnupg/gpg.conf
+        # on gpg-2.1.11 'pinentry-mode loopback' is invalid option
+        #echo "add 'pinentry-mode loopback' to '~/.gnupg/gpg.conf'"
+        #echo 'pinentry-mode loopback' >> ~/.gnupg/gpg.conf
+        cat ~/.gnupg/gpg.conf
+        #GPG_CMD="${GPG_CMD} --pinentry-mode loopback"
+        #export GPG_OPTS='--pinentry-mode loopback'
+        #echo GPG_OPTS: ${GPG_OPTS}
+        echo "add 'allow-loopback-pinentry' to '~/.gnupg/gpg-agent.conf'"
+        touch ~/.gnupg/gpg-agent.conf
+        echo 'allow-loopback-pinentry' > ~/.gnupg/gpg-agent.conf
+        cat ~/.gnupg/gpg-agent.conf
+        echo restart the agent
+        echo RELOADAGENT | gpg-connect-agent
     fi
-    echo list private keys
-    ${GPG_CMD} --batch=true --list-secret-keys
 
-    # issue: You need a passphrase to unlock the secret key
-    # no-tty cause "gpg: Sorry, no terminal at all requested - can't get input"
-    #echo 'no-tty' >> ~/.gnupg/gpg.conf
-    #echo 'default-cache-ttl 600' > ~/.gnupg/gpg-agent.conf
+    # decrypt gpg key
+    openssl version -a
+    if [ -f codesigning.asc.enc ] && [ -n "${CI_OPT_GPG_PASSPHRASE}" ]; then
+        echo decrypt private key
+        # bad decrypt
+        # 140611360391616:error:06065064:digital envelope routines:EVP_DecryptFinal_ex:bad decrypt:../crypto/evp/evp_enc.c:536:
+        # see: https://stackoverflow.com/questions/34304570/how-to-resolve-the-evp-decryptfinal-ex-bad-decrypt-during-file-decryption
+        openssl aes-256-cbc -k ${CI_OPT_GPG_PASSPHRASE} -in codesigning.asc.enc -out codesigning.asc -d -md md5
+    fi
+    if [ -f codesigning.asc.gpg ] && [ -n "${CI_OPT_GPG_PASSPHRASE}" ]; then
+        echo decrypt private key
+        LC_CTYPE="UTF-8" echo ${CI_OPT_GPG_PASSPHRASE} | ${GPG_CMD} --passphrase-fd 0 --yes --batch=true --cipher-algo AES256 -o codesigning.asc codesigning.asc.gpg
+    fi
 
-    # test key
-    # this test not working on appveyor
-    # gpg: skipped "KEYID": secret key not available
-    # gpg: signing failed: secret key not available
-    #if [ -f LICENSE ]; then
-    #    echo test private key imported
-    #    echo ${CI_OPT_GPG_PASSPHRASE} | gpg --passphrase-fd 0 --yes --batch=true -u ${CI_OPT_GPG_KEYNAME} --armor --detach-sig LICENSE
-    #fi
-    echo set default key
-    echo -e "trust\n5\ny\n" | gpg --command-fd 0 --batch=true --edit-key ${CI_OPT_GPG_KEYNAME}
+    if [ -f codesigning.pub ]; then
+        echo import public keys
+        ${GPG_CMD} --yes --batch --import codesigning.pub
 
-    # for gradle build
-    if [ -n "${CI_OPT_GPG_KEYID}" ]; then ${GPG_CMD} --batch=true --keyring secring.gpg --export-secret-key ${CI_OPT_GPG_KEYID} > secring.gpg; fi
+        echo list public keys
+        ${GPG_CMD} --batch=true --list-keys
+    fi
+    if [ -f codesigning.asc ]; then
+        echo import private keys
+        # some versions only can import public key from a keypair file, some can import key pair
+        if [ -f codesigning.pub ]; then
+            ${GPG_CMD} --yes --batch --import codesigning.asc
+        else
+            if [ -z "$(${GPG_CMD} --list-secret-keys | { grep ${CI_OPT_GPG_KEYNAME} || true; })" ]; then ${GPG_CMD} --yes --batch=true --fast-import codesigning.asc; fi
+        fi
+        echo list private keys
+        ${GPG_CMD} --batch=true --list-secret-keys
+
+        # issue: You need a passphrase to unlock the secret key
+        # no-tty cause "gpg: Sorry, no terminal at all requested - can't get input"
+        #echo 'no-tty' >> ~/.gnupg/gpg.conf
+        #echo 'default-cache-ttl 600' > ~/.gnupg/gpg-agent.conf
+
+        # test key
+        # this test not working on appveyor
+        # gpg: skipped "KEYID": secret key not available
+        # gpg: signing failed: secret key not available
+        #if [ -f LICENSE ]; then
+        #    echo test private key imported
+        #    echo ${CI_OPT_GPG_PASSPHRASE} | gpg --passphrase-fd 0 --yes --batch=true -u ${CI_OPT_GPG_KEYNAME} --armor --detach-sig LICENSE
+        #fi
+        echo set default key
+        echo -e "trust\n5\ny\n" | gpg --command-fd 0 --batch=true --edit-key ${CI_OPT_GPG_KEYNAME}
+
+        # for gradle build
+        if [ -n "${CI_OPT_GPG_KEYID}" ]; then ${GPG_CMD} --batch=true --keyring secring.gpg --export-secret-key ${CI_OPT_GPG_KEYID} > secring.gpg; fi
+    fi
+else
+    echo "[WARN] Both gpg and gpg2 are not found."
 fi
 echo -e "    <<<<<<<<<< ---------- decrypt files and handle keys ---------- <<<<<<<<<<\n"
 
@@ -853,8 +884,8 @@ fi
 CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO="$(ci_infra_opt_git_prefix)/ci-and-cd/maven-build-opts-$(ci_opt_infrastructure)/raw/master"
 if [ -z "${CI_OPT_CI_OPTS_SCRIPT}" ]; then CI_OPT_CI_OPTS_SCRIPT="src/main/ci-script/ci_opts.sh"; fi
 if [ -z "$(ci_infra_opt_git_auth_token)" ]; then
-    if [ "$(ci_opt_is_origin_repo)" == "true" ]; then
-        echo "[ERROR] CI_INFRA_OPT_GIT_AUTH_TOKEN not set and using origin repo, exit."; return 1;
+    if [ "$(ci_opt_is_origin_repo)" == "true" ] && [ "$(ci_opt_infrastructure)" != "opensource" ]; then
+        echo "[ERROR] CI_INFRA_OPT_GIT_AUTH_TOKEN not set and using origin private repo, exit."; return 1;
     else
         # For PR build on travis-ci or appveyor
         echo "[WARN] CI_INFRA_OPT_GIT_AUTH_TOKEN not set.";
@@ -874,17 +905,17 @@ echo -e "\n<<<<<<<<<< ---------- options with important variables ---------- <<<
 if [ -z "${MVN_CMD}" ]; then
     MVN_CMD="mvn"
     if [ -f mvnw ]; then MVN_CMD="./mvnw"; fi
-    echo "MVN_CMD '${MVN_CMD}'"
 fi
 if [ -f pom.xml ]; then
+    echo "MVN_CMD '${MVN_CMD}'"
     run_mvn $@
 fi
 
 if [ -z "${GRADLE_CMD}" ]; then
     GRADLE_CMD="gradle"
     if [ -f gradlew ]; then GRADLE_CMD="./gradlew"; fi
-    echo "GRADLE_CMD '${GRADLE_CMD}'"
 fi
 if [ -f build.gradle ]; then
+    echo "GRADLE_CMD '${GRADLE_CMD}'"
     run_gradle $@
 fi
