@@ -6,7 +6,7 @@
     <parent>
         <groupId>cn.home1</groupId>
         <artifactId>maven-build</artifactId>
-        <version>0.3.7</version>
+        <version>0.3.8</version>
     </parent>
 
     <artifactId>build-docker</artifactId>
@@ -280,6 +280,7 @@
                                     <target>
                                         <replace file="docker-compose-base.yml" token="@artifact.repository@" value="${private-nexus3.repository}"/>
                                         <replace file="docker-compose-base.yml" token="@build.timestamp@" value="${maven.build.timestamp}"/>
+                                        <replace file="docker-compose-base.yml" token="@docker.image.prefix@" value="${docker.image.prefix}"/>
                                         <replace file="docker-compose-base.yml" token="@docker.registry@" value="${docker.registry}"/>
                                         <replace file="docker-compose-base.yml" token="@git.branch@" value="${git.branch}"/>
                                         <replace file="docker-compose-base.yml" token="@git.commit.id@" value="${git.commit.id}"/>

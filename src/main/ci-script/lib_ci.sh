@@ -465,7 +465,7 @@ function init_docker_config() {
 
 function pull_base_image() {
     if type -p docker > /dev/null; then
-        local dockerfiles=($(find . -name '*Docker*'))
+        local dockerfiles=($(find . -name '*Docker*' | grep -Ev '.+/.+\..+' | grep -v '/target/classes/'))
         echo "Found ${#dockerfiles[@]} Dockerfiles, '${dockerfiles[@]}'"
         # maven could not resolve sibling dependencies on first build of a version
         #if [ ${#dockerfiles[@]} -gt 0 ]; then
@@ -473,7 +473,7 @@ function pull_base_image() {
         #    ${MVN_CMD} ${CI_OPT_MAVEN_SETTINGS} -e process-resources
         #fi
 
-        local base_images=($(find . -name '*Docker*' | xargs cat | { grep -E '^FROM' || true; } | awk '{print $2}' | uniq))
+        local base_images=($(find . -name '*Docker*' | grep -Ev '.+/.+\..+' | grep -v '/target/classes/' | xargs cat | { grep -E '^FROM' || true; } | awk '{print $2}' | uniq))
         echo "Found ${#base_images[@]} base images, '${base_images[@]}'"
         if [ ${#base_images[@]} -gt 0 ]; then
             for base_image in ${base_images[@]}; do docker pull ${base_image}; done
