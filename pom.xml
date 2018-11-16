@@ -419,16 +419,6 @@
                         <jvmArgs>-Xmx1024m -Xms128m -XX:MaxPermSize=512m</jvmArgs>
                         <skip>${maven.quality.skip}</skip>
                     </configuration>
-                    <executions>
-                            <execution>
-                                <id>findbugs-findbugs</id>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>findbugs</goal>
-                                    <goal>check</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                 </plugin>
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>jdepend-maven-plugin</artifactId><version>${jdepend-maven-plugin.version}</version></plugin>
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>taglist-maven-plugin</artifactId><version>${taglist-maven-plugin.version}</version></plugin>
@@ -862,6 +852,7 @@
                 <maven.javadoc.failsOnError>false</maven.javadoc.failsOnError>
                 <pmd.failOnViolation>false</pmd.failOnViolation>
                 <maven.quality.skip>true</maven.quality.skip>
+                <sonar.buildbreaker.skip>true</sonar.buildbreaker.skip>
             </properties>
         </profile>
         <profile>
@@ -1494,10 +1485,22 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>findbugs-findbugs</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>findbugs</goal>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <artifactId>maven-site-plugin</artifactId>
                         <configuration><attach>true</attach></configuration>
                     </plugin>
-
                     <plugin>
                         <artifactId>maven-checkstyle-plugin</artifactId>
                         <executions>
