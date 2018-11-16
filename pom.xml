@@ -160,7 +160,15 @@
 
         <downloadSources>true</downloadSources>
 
+        <!-- findbugs.effort: Min, Default, Max -->
+        <findbugs.effort>Default</findbugs.effort>
         <findbugs.failOnError>false</findbugs.failOnError>
+        <findbugs.fork>true</findbugs.fork>
+        <findbugs.includeTests>false</findbugs.includeTests>
+        <findbugs.jvmArgs>-Xmx1024m -Xms128m -XX:MaxMetaspaceSize=512m</findbugs.jvmArgs>
+        <findbugs.relaxed>false</findbugs.relaxed>
+        <!-- findbugs.threshold: High, Default, Low, Ignore -->
+        <findbugs.threshold>Default</findbugs.threshold>
 
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
@@ -414,12 +422,16 @@
                     <groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId><version>${findbugs-maven-plugin.version}</version>
                     <configuration>
                         <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
+                        <effort>${findbugs.effort}</effort>
                         <!--<excludeFilterFile>file:///${project.basedir}/${relative.parent.dir}/rulesets/findbugs-exclude-rules.xml</excludeFilterFile>-->
                         <failOnError>${findbugs.failOnError}</failOnError>
-                        <fork>true</fork>
+                        <fork>${findbugs.fork}</fork>
                         <!--<includeFilterFile>file:///${project.basedir}/${relative.parent.dir}/rulesets/findbugs-rules.xml</includeFilterFile>-->
-                        <jvmArgs>-Xmx1024m -Xms128m -XX:MaxMetaspaceSize=512m</jvmArgs>
+                        <includeTests>${findbugs.includeTests}</includeTests>
+                        <jvmArgs>${findbugs.jvmArgs}</jvmArgs>
+                        <relaxed>${findbugs.relaxed}</relaxed>
                         <skip>${maven.quality.skip}</skip>
+                        <threshold>${findbugs.threshold}</threshold>
                     </configuration>
                 </plugin>
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>jdepend-maven-plugin</artifactId><version>${jdepend-maven-plugin.version}</version></plugin>
