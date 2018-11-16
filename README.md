@@ -300,3 +300,9 @@ And add this to ~/.gnupg/gpg-agent.conf, creating the file if it doesn't already
 ```
 allow-loopback-pinentry
 ```
+
+### References
+see: https://github.com/APNIC-net/repositoryd/blob/master/pom.xml
+
+see: https://github.com/stevespringett/dependency-check-sonar-plugin/tree/SonarQube_6.x
+see: https://docs.sonarqube.org/display/PLUG/JaCoCo+Plugin
