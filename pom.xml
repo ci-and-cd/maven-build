@@ -176,6 +176,20 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+        <!--
+        sonar.analysis.mode Deprecated since SQ 6.6
+        This parameter is set to preview as part of non-Developer Edition PR decoration.
+        https://github.com/SonarQubeCommunity/sonar-build-breaker
+        This build breaker is only available in preview modes (sonar.analysis.mode=preview or sonar.analysis.mode=issues).
+        In publish mode, issue severity data is not available to post-job checkers.
+        -->
+        <sonar.analysis.mode>preview</sonar.analysis.mode>
+        <!-- Disabled, INFO, MINOR, MAJOR, CRITICAL, BLOCKER -->
+        <sonar.buildbreaker.preview.issuesSeverity>MAJOR</sonar.buildbreaker.preview.issuesSeverity>
+        <sonar.buildbreaker.queryInterval>10000</sonar.buildbreaker.queryInterval>
+        <sonar.buildbreaker.queryMaxAttempts>30</sonar.buildbreaker.queryMaxAttempts>
+        <sonar.buildbreaker.skip>true</sonar.buildbreaker.skip>
+
         <surefire.fork.count>1</surefire.fork.count>
         <surefire.fork.reuse>false</surefire.fork.reuse>
 
