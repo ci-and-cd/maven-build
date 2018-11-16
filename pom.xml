@@ -416,7 +416,7 @@
                         <failOnError>${findbugs.failOnError}</failOnError>
                         <fork>true</fork>
                         <!--<includeFilterFile>file:///${project.basedir}/${relative.parent.dir}/rulesets/findbugs-rules.xml</includeFilterFile>-->
-                        <jvmArgs>-Xmx1024m -Xms128m -XX:MaxPermSize=512m</jvmArgs>
+                        <jvmArgs>-Xmx1024m -Xms128m -XX:MaxMetaspaceSize=512m</jvmArgs>
                         <skip>${maven.quality.skip}</skip>
                     </configuration>
                 </plugin>
