@@ -155,7 +155,7 @@
         <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
         <checkstyle.failsOnError>false</checkstyle.failsOnError>
         <checkstyle.logViolationsToConsole>true</checkstyle.logViolationsToConsole>
-        <checkstyle.maxAllowedViolations>5</checkstyle.maxAllowedViolations>
+        <checkstyle.maxAllowedViolations>10</checkstyle.maxAllowedViolations>
         <checkstyle.violationSeverity>warning</checkstyle.violationSeverity>
 
         <downloadSources>true</downloadSources>
@@ -170,6 +170,8 @@
         <maven.source.skip>false</maven.source.skip>
 
         <pmd.failOnViolation>false</pmd.failOnViolation>
+        <pmd.failurePriority>5</pmd.failurePriority>
+        <pmd.maxAllowedViolations>10</pmd.maxAllowedViolations>
         <pmd.printFailingErrors>true</pmd.printFailingErrors>
         <pmd.verbose>false</pmd.verbose>
 
