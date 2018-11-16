@@ -287,7 +287,7 @@ function ci_opt_ref_name() {
         echo "${CI_REF_NAME}"
     elif [[ -n "${CI_COMMIT_REF_NAME}" ]]; then
         echo "${CI_COMMIT_REF_NAME}"
-    elif [[ -d .git ] || [ -f .git ]]; then
+    elif [[ -d .git ]] || [[ -f .git ]]; then
         # .git is a file in git submodule
         echo "$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match)"
     else
@@ -554,7 +554,7 @@ function pull_base_image() {
         local dockerfiles=($(find . -name '*Docker*' | grep -Ev '.+/.+\..+' | grep -v '/target/classes/'))
         echo "Found ${#dockerfiles[@]} Dockerfiles, '${dockerfiles[@]}'"
         # maven could not resolve sibling dependencies on first build of a version
-        #if [ ${#dockerfiles[@]} -gt 0 ]; then
+        #if [[ ${#dockerfiles[@]} -gt 0 ]]; then
         #    echo ${MVN_CMD} ${CI_OPT_MAVEN_SETTINGS} -e process-resources
         #    ${MVN_CMD} ${CI_OPT_MAVEN_SETTINGS} -e process-resources
         #fi
