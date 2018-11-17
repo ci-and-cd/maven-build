@@ -1,91 +1,289 @@
 # no shebang line here
 
-if [[ -z "${CI_INFRA_OPT_DOCKER_REGISTRY}" ]]; then CI_INFRA_OPT_DOCKER_REGISTRY=""; fi
-if [[ -z "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" ]]; then CI_INFRA_OPT_DOCKER_REGISTRY_URL=""; fi
-if [[ -z "${CI_INFRA_OPT_GIT_AUTH_TOKEN}" ]]; then CI_INFRA_OPT_GIT_AUTH_TOKEN=""; fi
-if [[ -z "${CI_INFRA_OPT_GIT_PREFIX}" ]]; then CI_INFRA_OPT_GIT_PREFIX=""; fi
-if [[ -z "${CI_INFRA_OPT_NEXUS3}" ]]; then CI_INFRA_OPT_NEXUS3=""; fi
-if [[ -z "${CI_INFRA_OPT_OPENSOURCE_GIT_PREFIX}" ]]; then CI_INFRA_OPT_OPENSOURCE_GIT_PREFIX=""; fi
-if [[ -z "${CI_INFRA_OPT_SONAR_HOST_URL}" ]]; then CI_INFRA_OPT_SONAR_HOST_URL=""; fi
-if [[ -z "${CI_INFRA_OPT_PRIVATE_GIT_PREFIX}" ]]; then CI_INFRA_OPT_PRIVATE_GIT_PREFIX=""; fi
 
-if [[ -z "${CI_OPT_CACHE_DIRECTORY}" ]]; then CI_OPT_CACHE_DIRECTORY=""; fi
-if [[ -z "${CI_OPT_CHECKSTYLE_CONFIG_LOCATION}" ]]; then CI_OPT_CHECKSTYLE_CONFIG_LOCATION=""; fi
-if [[ -z "${CI_OPT_CI_SCRIPT}" ]]; then CI_OPT_CI_SCRIPT=""; fi
-if [[ -z "${CI_OPT_CLEAN_SKIP}" ]]; then CI_OPT_CLEAN_SKIP=""; fi
-if [[ -z "${CI_OPT_DEPENDENCY_CHECK}" ]]; then CI_OPT_DEPENDENCY_CHECK=""; fi
-if [[ -z "${CI_OPT_DOCKER_IMAGE_PREFIX}" ]]; then CI_OPT_DOCKER_IMAGE_PREFIX=""; fi
-if [[ -z "${CI_OPT_DOCKER_REGISTRY_PASS}" ]]; then CI_OPT_DOCKER_REGISTRY_PASS=""; fi
-if [[ -z "${CI_OPT_DOCKER_REGISTRY_USER}" ]]; then CI_OPT_DOCKER_REGISTRY_USER=""; fi
-if [[ -z "${CI_OPT_DRYRUN}" ]]; then CI_OPT_DRYRUN=""; fi
-if [[ -z "${CI_OPT_EXTRA_MAVEN_OPTS}" ]]; then CI_OPT_EXTRA_MAVEN_OPTS=""; fi
-if [[ -z "${CI_OPT_FRONTEND_NODEDOWNLOADROOT}" ]]; then CI_OPT_FRONTEND_NODEDOWNLOADROOT=""; fi
-if [[ -z "${CI_OPT_FRONTEND_NPMDOWNLOADROOT}" ]]; then CI_OPT_FRONTEND_NPMDOWNLOADROOT=""; fi
-if [[ -z "${CI_OPT_GIT_COMMIT_ID}" ]]; then CI_OPT_GIT_COMMIT_ID=""; fi
-if [[ -z "${CI_OPT_GITHUB_SITE_PUBLISH}" ]]; then CI_OPT_GITHUB_SITE_PUBLISH=""; fi
-if [[ -z "${CI_OPT_GITHUB_SITE_REPO_NAME}" ]]; then CI_OPT_GITHUB_SITE_REPO_NAME=""; fi
-if [[ -z "${CI_OPT_GITHUB_SITE_REPO_OWNER}" ]]; then CI_OPT_GITHUB_SITE_REPO_OWNER=""; fi
-if [[ -z "${CI_OPT_GPG_KEYID}" ]]; then CI_OPT_GPG_KEYID=""; fi
-if [[ -z "${CI_OPT_GPG_KEYNAME}" ]]; then CI_OPT_GPG_KEYNAME=""; fi
-if [[ -z "${CI_OPT_GPG_PASSPHRASE}" ]]; then CI_OPT_GPG_PASSPHRASE=""; fi
-if [[ -z "${CI_OPT_GRADLE_INIT_SCRIPT}" ]]; then CI_OPT_GRADLE_INIT_SCRIPT=""; fi
-if [[ -z "${CI_OPT_GRADLE_PROPERTIES}" ]]; then CI_OPT_GRADLE_PROPERTIES=""; fi
-if [[ -z "${CI_OPT_INFRASTRUCTURE}" ]]; then CI_OPT_INFRASTRUCTURE=""; fi
-if [[ -z "${CI_OPT_INTEGRATION_TEST_SKIP}" ]]; then CI_OPT_INTEGRATION_TEST_SKIP=""; fi
-if [[ -z "${CI_OPT_IS_ORIGIN_REPO}" ]]; then CI_OPT_IS_ORIGIN_REPO=""; fi
-if [[ -z "${CI_OPT_MAVEN_OPTS}" ]]; then CI_OPT_MAVEN_OPTS=""; fi
-if [[ -z "${CI_OPT_JACOCO}" ]]; then CI_OPT_JACOCO=""; fi
-if [[ -z "${CI_OPT_JIRA_PASSWORD}" ]]; then CI_OPT_JIRA_PASSWORD=""; fi
-if [[ -z "${CI_OPT_JIRA_PROJECTKEY}" ]]; then CI_OPT_JIRA_PROJECTKEY=""; fi
-if [[ -z "${CI_OPT_JIRA_USER}" ]]; then CI_OPT_JIRA_USER=""; fi
-if [[ -z "${CI_OPT_MAVEN_BUILD_REPO}" ]]; then CI_OPT_MAVEN_BUILD_REPO=""; fi
-if [[ -z "${CI_OPT_MAVEN_EFFECTIVE_POM}" ]]; then CI_OPT_MAVEN_EFFECTIVE_POM=""; fi
-if [[ -z "${CI_OPT_MAVEN_EFFECTIVE_POM_FILE}" ]]; then CI_OPT_MAVEN_EFFECTIVE_POM_FILE=""; fi
-if [[ -z "${CI_OPT_MAVEN_SETTINGS}" ]]; then CI_OPT_MAVEN_SETTINGS=""; fi
-if [[ -z "${CI_OPT_MAVEN_SETTINGS_FILE}" ]]; then CI_OPT_MAVEN_SETTINGS_FILE=""; fi
-if [[ -z "${CI_OPT_MAVEN_SETTINGS_FILE_URL}" ]]; then CI_OPT_MAVEN_SETTINGS_FILE_URL=""; fi
-if [[ -z "${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE}" ]]; then CI_OPT_MAVEN_SETTINGS_SECURITY_FILE=""; fi
-if [[ -z "${CI_OPT_MAVEN_TOOLCHAINS_FILE_URL}" ]]; then CI_OPT_MAVEN_TOOLCHAINS_FILE_URL=""; fi
-if [[ -z "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" ]]; then CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION=""; fi
-if [[ -z "${CI_OPT_ORIGIN_REPO_SLUG}" ]]; then CI_OPT_ORIGIN_REPO_SLUG=""; fi
-if [[ -z "${CI_OPT_OUTPUT_MAVEN_EFFECTIVE_POM_TO_CONSOLE}" ]]; then CI_OPT_OUTPUT_MAVEN_EFFECTIVE_POM_TO_CONSOLE=""; fi
-if [[ -z "${CI_OPT_PMD_RULESET_LOCATION}" ]]; then CI_OPT_PMD_RULESET_LOCATION=""; fi
-if [[ -z "${CI_OPT_PUBLISH_CHANNEL}" ]]; then CI_OPT_PUBLISH_CHANNEL=""; fi
-if [[ -z "${CI_OPT_PUBLISH_TO_REPO}" ]]; then CI_OPT_PUBLISH_TO_REPO=""; fi
-if [[ -z "${CI_OPT_REF_NAME}" ]]; then CI_OPT_REF_NAME=""; fi
-if [[ -z "${CI_OPT_SHELL_EXIT_ON_ERROR}" ]]; then CI_OPT_SHELL_EXIT_ON_ERROR=""; fi
-if [[ -z "${CI_OPT_SHELL_PRINT_EXECUTED_COMMANDS}" ]]; then CI_OPT_SHELL_PRINT_EXECUTED_COMMANDS=""; fi
-if [[ -z "${CI_OPT_SITE}" ]]; then CI_OPT_SITE=""; fi
-if [[ -z "${CI_OPT_SITE_PATH_PREFIX}" ]]; then CI_OPT_SITE_PATH_PREFIX=""; fi
-if [[ -z "${CI_OPT_TEST_FAILURE_IGNORE}" ]]; then CI_OPT_TEST_FAILURE_IGNORE=""; fi
-if [[ -z "${CI_OPT_TEST_SKIP}" ]]; then CI_OPT_TEST_SKIP=""; fi
-if [[ -z "${CI_OPT_SONAR}" ]]; then CI_OPT_SONAR=""; fi
-if [[ -z "${CI_OPT_SONAR_LOGIN}" ]]; then CI_OPT_SONAR_LOGIN=""; fi
-if [[ -z "${CI_OPT_SONAR_LOGIN_TOKEN}" ]]; then CI_OPT_SONAR_LOGIN_TOKEN=""; fi
-if [[ -z "${CI_OPT_SONAR_ORGANIZATION}" ]]; then CI_OPT_SONAR_ORGANIZATION=""; fi
-if [[ -z "${CI_OPT_SONAR_PASSWORD}" ]]; then CI_OPT_SONAR_PASSWORD=""; fi
-if [[ -z "${CI_OPT_USE_DOCKER}" ]]; then CI_OPT_USE_DOCKER=""; fi
-if [[ -z "${CI_OPT_WAGON_SOURCE_FILEPATH}" ]]; then CI_OPT_WAGON_SOURCE_FILEPATH=""; fi
+# Check if variable is set in Bash. see: https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
+# Variables from CI context
+if [[ -z ${CI_COMMIT_REF_NAME+x} ]]; then CI_COMMIT_REF_NAME=""; fi
+if [[ -z ${CI_PROJECT_PATH+x} ]]; then CI_PROJECT_PATH=""; fi
+if [[ -z ${CI_PROJECT_URL+x} ]]; then CI_PROJECT_URL=""; fi
+if [[ -z ${CI_REF_NAME+x} ]]; then CI_REF_NAME=""; fi
+if [[ -z ${APPVEYOR_PULL_REQUEST_HEAD_REPO_NAME+x} ]]; then APPVEYOR_PULL_REQUEST_HEAD_REPO_NAME=""; fi
+if [[ -z ${APPVEYOR_REPO_BRANCH+x} ]]; then APPVEYOR_REPO_BRANCH=""; fi
+if [[ -z ${APPVEYOR_REPO_NAME+x} ]]; then APPVEYOR_REPO_NAME=""; fi
+if [[ -z ${APPVEYOR_REPO_TAG+x} ]]; then APPVEYOR_REPO_TAG=""; fi
+if [[ -z ${APPVEYOR_REPO_TAG_NAME+x} ]]; then APPVEYOR_REPO_TAG_NAME=""; fi
+if [[ -z ${TRAVIS_BRANCH+x} ]]; then TRAVIS_BRANCH=""; fi
+if [[ -z ${TRAVIS_EVENT_TYPE+x} ]]; then TRAVIS_EVENT_TYPE=""; fi
+if [[ -z ${TRAVIS_REPO_SLUG+x} ]]; then TRAVIS_REPO_SLUG=""; fi
+if [[ -z ${TRAVIS_PULL_REQUEST+x} ]]; then TRAVIS_PULL_REQUEST=""; fi
 
-if [[ -z "${CI_COMMIT_REF_NAME}" ]]; then CI_COMMIT_REF_NAME=""; fi
-if [[ -z "${CI_PROJECT_PATH}" ]]; then CI_PROJECT_PATH=""; fi
-if [[ -z "${CI_PROJECT_URL}" ]]; then CI_PROJECT_URL=""; fi
-if [[ -z "${CI_REF_NAME}" ]]; then CI_REF_NAME=""; fi
-if [[ -z "${APPVEYOR_PULL_REQUEST_HEAD_REPO_NAME}" ]]; then APPVEYOR_PULL_REQUEST_HEAD_REPO_NAME=""; fi
-if [[ -z "${APPVEYOR_REPO_BRANCH}" ]]; then APPVEYOR_REPO_BRANCH=""; fi
-if [[ -z "${APPVEYOR_REPO_NAME}" ]]; then APPVEYOR_REPO_NAME=""; fi
-if [[ -z "${APPVEYOR_REPO_TAG}" ]]; then APPVEYOR_REPO_TAG=""; fi
-if [[ -z "${APPVEYOR_REPO_TAG_NAME}" ]]; then APPVEYOR_REPO_TAG_NAME=""; fi
-if [[ -z "${TRAVIS_BRANCH}" ]]; then TRAVIS_BRANCH=""; fi
-if [[ -z "${TRAVIS_EVENT_TYPE}" ]]; then TRAVIS_EVENT_TYPE=""; fi
-if [[ -z "${TRAVIS_REPO_SLUG}" ]]; then TRAVIS_REPO_SLUG=""; fi
-if [[ -z "${TRAVIS_PULL_REQUEST}" ]]; then TRAVIS_PULL_REQUEST=""; fi
 
-if [[ -z "${GRADLE_CMD}" ]]; then GRADLE_CMD=""; fi
-if [[ -z "${JAVA_HOME}" ]]; then JAVA_HOME=""; fi
-if [[ -z "${MAVEN_OPTS}" ]]; then MAVEN_OPTS=""; fi
-if [[ -z "${MVN_CMD}" ]]; then MVN_CMD=""; fi
-if [[ -z "${ZSH_VERSION}" ]]; then ZSH_VERSION=""; fi
+# Script variables
+if [[ -z ${GRADLE_CMD+x} ]]; then
+    GRADLE_CMD="gradle"
+    if [[ -f gradlew ]]; then GRADLE_CMD="./gradlew"; fi
+fi
+if [[ -z ${JAVA_HOME+x} ]]; then JAVA_HOME=""; fi
+if [[ -z ${MAVEN_OPTS+x} ]]; then MAVEN_OPTS=""; fi
+if [[ -z ${MVN_CMD+x} ]]; then
+    MVN_CMD="mvn"
+    if [[ -f mvnw ]]; then MVN_CMD="./mvnw"; fi
+fi
+if [[ -z ${ZSH_VERSION+x} ]]; then ZSH_VERSION=""; fi
+
+
+if [[ -z ${CI_OPT_INFRASTRUCTURE+x} ]]; then CI_OPT_INFRASTRUCTURE=""; fi
+if [[ -z ${CI_INFRA_OPT_GIT_PREFIX+x} ]]; then CI_INFRA_OPT_GIT_PREFIX=""; fi
+if [[ -z ${CI_INFRA_OPT_OPENSOURCE_GIT_PREFIX+x} ]]; then CI_INFRA_OPT_OPENSOURCE_GIT_PREFIX=""; fi
+if [[ -z ${CI_INFRA_OPT_PRIVATE_GIT_PREFIX+x} ]]; then CI_INFRA_OPT_PRIVATE_GIT_PREFIX=""; fi
+
+
+# auto detect infrastructure using for this build.
+# example of gitlab-ci's CI_PROJECT_URL: "https://example.com/gitlab-org/gitlab-ce"
+# returns: opensource, private or customized infrastructure name
+function ci_opt_infrastructure() {
+    if [[ -n "${CI_OPT_INFRASTRUCTURE}" ]]; then
+        echo ${CI_OPT_INFRASTRUCTURE}
+    elif [[ -n "${TRAVIS_REPO_SLUG}" ]]; then
+        echo "opensource"
+    elif [[ -n "${CI_PROJECT_URL}" ]] && [[ "${CI_PROJECT_URL}" == ${CI_INFRA_OPT_PRIVATE_GIT_PREFIX}* ]]; then
+        echo "private"
+    else
+        echo "private"
+    fi
+}
+
+# arguments: default_value
+function find_git_prefix_from_ci_script() {
+    (>&2 echo "find CI_INFRA_OPT_GIT_PREFIX from CI_OPT_CI_SCRIPT: ${CI_OPT_CI_SCRIPT}, default_value: $1")
+    if [[ "${CI_OPT_CI_SCRIPT}" == http* ]]; then
+        echo $(echo ${CI_OPT_CI_SCRIPT} | sed -E 's#/[^/]+/[^/]+/raw/[^/]+/.+##')
+    else
+        echo "$1"
+    fi
+}
+
+# auto determine CI_INFRA_OPT_GIT_PREFIX by infrastructure for further download.
+# returns: prefix of git service url (infrastructure specific), i.e. https://github.com
+function ci_infra_opt_git_prefix() {
+    (>&2 echo "ci_infra_opt_git_prefix infrastructure: $(ci_opt_infrastructure), CI_OPT_CI_SCRIPT: ${CI_OPT_CI_SCRIPT}")
+    if [[ -n "${CI_INFRA_OPT_GIT_PREFIX}" ]]; then
+        echo "${CI_INFRA_OPT_GIT_PREFIX}"
+    else
+        local infrastructure="$(ci_opt_infrastructure)"
+        local default_value=""
+        if [[ "opensource" == "${infrastructure}" ]]; then
+            default_value="https://github.com"
+            CI_INFRA_OPT_GIT_PREFIX="${CI_INFRA_OPT_OPENSOURCE_GIT_PREFIX}"
+        elif [[ "private" == "${infrastructure}" ]] || [[ -z "${infrastructure}" ]]; then
+            default_value="http://gitlab"
+            CI_INFRA_OPT_GIT_PREFIX="${CI_INFRA_OPT_PRIVATE_GIT_PREFIX}"
+        fi
+
+        if [[ -z "${CI_INFRA_OPT_GIT_PREFIX}" ]]; then
+            CI_INFRA_OPT_GIT_PREFIX=$(find_git_prefix_from_ci_script "${default_value}")
+        elif [[ -n "${CI_PROJECT_URL}" ]]; then
+            CI_INFRA_OPT_GIT_PREFIX=$(echo "${CI_PROJECT_URL}" | sed 's,/*[^/]\+/*$,,' | sed 's,/*[^/]\+/*$,,')
+        fi
+        echo ${CI_INFRA_OPT_GIT_PREFIX}
+    fi
+}
+
+
+if [[ -z ${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO+x} ]]; then CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO="$(ci_infra_opt_git_prefix)/ci-and-cd/maven-build-opts-$(ci_opt_infrastructure)/raw/master"; fi
+if [[ -z ${CI_OPT_MAVEN_SETTINGS_FILE_URL+x} ]]; then CI_OPT_MAVEN_SETTINGS_FILE_URL="${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/maven/settings.xml"; fi
+
+if [[ -z ${CI_OPT_ORIGIN_REPO_SLUG+x} ]]; then CI_OPT_ORIGIN_REPO_SLUG=""; fi
+if [[ -z ${CI_INFRA_OPT_DOCKER_REGISTRY+x} ]]; then CI_INFRA_OPT_DOCKER_REGISTRY=""; fi
+if [[ -z ${CI_INFRA_OPT_DOCKER_REGISTRY_URL+x} ]]; then CI_INFRA_OPT_DOCKER_REGISTRY_URL=""; fi
+if [[ -z ${CI_INFRA_OPT_GIT_AUTH_TOKEN+x} ]]; then CI_INFRA_OPT_GIT_AUTH_TOKEN=""; fi
+if [[ -z ${CI_INFRA_OPT_NEXUS3+x} ]]; then CI_INFRA_OPT_NEXUS3=""; fi
+if [[ -z ${CI_INFRA_OPT_SONAR_HOST_URL+x} ]]; then CI_INFRA_OPT_SONAR_HOST_URL=""; fi
+if [[ -z ${CI_OPT_MAVEN_EFFECTIVE_POM+x} ]]; then CI_OPT_MAVEN_EFFECTIVE_POM=""; fi
+if [[ -z ${CI_OPT_MAVEN_EFFECTIVE_POM_FILE+x} ]]; then CI_OPT_MAVEN_EFFECTIVE_POM_FILE=""; fi
+# Mandatory: false; Default: blank; Value: -s /path/to/settings.xml
+if [[ -z ${CI_OPT_MAVEN_SETTINGS+x} ]]; then CI_OPT_MAVEN_SETTINGS=""; fi
+# Mandatory: false; Default: an auto generated /cache/directory/settings.xml if src/main/maven/settings.xml absent;
+if [[ -z ${CI_OPT_MAVEN_SETTINGS_FILE+x} ]]; then CI_OPT_MAVEN_SETTINGS_FILE=""; fi
+
+if [[ -z ${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE+x} ]]; then CI_OPT_MAVEN_SETTINGS_SECURITY_FILE=""; fi
+if [[ -z ${CI_OPT_MAVEN_TOOLCHAINS_FILE_URL+x} ]]; then CI_OPT_MAVEN_TOOLCHAINS_FILE_URL=""; fi
+
+if [[ -z ${CI_OPT_CI_SCRIPT+x} ]]; then CI_OPT_CI_SCRIPT=""; fi
+if [[ -z ${CI_OPT_MAVEN_BUILD_REPO+x} ]]; then CI_OPT_MAVEN_BUILD_REPO=""; fi
+if [[ -z ${CI_OPT_CI_OPTS_SCRIPT+x} ]]; then CI_OPT_CI_OPTS_SCRIPT="src/main/ci-script/ci_opts.sh"; fi
+
+if [[ -z ${CI_OPT_DRYRUN+x} ]]; then CI_OPT_DRYRUN=""; fi
+if [[ -z ${CI_OPT_OUTPUT_MAVEN_EFFECTIVE_POM_TO_CONSOLE+x} ]]; then CI_OPT_OUTPUT_MAVEN_EFFECTIVE_POM_TO_CONSOLE="false"; fi
+if [[ -z ${CI_OPT_SHELL_EXIT_ON_ERROR+x} ]]; then CI_OPT_SHELL_EXIT_ON_ERROR="true"; fi
+if [[ -z ${CI_OPT_SHELL_PRINT_EXECUTED_COMMANDS+x} ]]; then CI_OPT_SHELL_PRINT_EXECUTED_COMMANDS="false"; fi
+
+if [[ -z ${CI_OPT_DOCKER_REGISTRY_PASS+x} ]]; then CI_OPT_DOCKER_REGISTRY_PASS=""; fi
+if [[ -z ${CI_OPT_DOCKER_REGISTRY_USER+x} ]]; then CI_OPT_DOCKER_REGISTRY_USER=""; fi
+
+
+# Maven options used in maven-build/pom.xml or build-docker/pom.xml
+if [[ -z ${CI_OPT_CHECKSTYLE_CONFIG_LOCATION+x} ]]; then CI_OPT_CHECKSTYLE_CONFIG_LOCATION=""; fi
+if [[ -z ${CI_OPT_CLEAN_SKIP+x} ]]; then CI_OPT_CLEAN_SKIP="false"; fi
+if [[ -z ${CI_OPT_DEPENDENCY_CHECK+x} ]]; then CI_OPT_DEPENDENCY_CHECK="true"; fi
+if [[ -z ${CI_OPT_DOCKER_IMAGE_PREFIX+x} ]]; then CI_OPT_DOCKER_IMAGE_PREFIX=""; fi
+if [[ -z ${CI_OPT_EXTRA_MAVEN_OPTS+x} ]]; then CI_OPT_EXTRA_MAVEN_OPTS=""; fi
+if [[ -z ${CI_OPT_FRONTEND_NODEDOWNLOADROOT+x} ]]; then CI_OPT_FRONTEND_NODEDOWNLOADROOT=""; fi
+if [[ -z ${CI_OPT_FRONTEND_NPMDOWNLOADROOT+x} ]]; then CI_OPT_FRONTEND_NPMDOWNLOADROOT=""; fi
+if [[ -z ${CI_OPT_GITHUB_SITE_PUBLISH+x} ]]; then CI_OPT_GITHUB_SITE_PUBLISH=""; fi
+if [[ -z ${CI_OPT_GITHUB_SITE_REPO_NAME+x} ]]; then CI_OPT_GITHUB_SITE_REPO_NAME=""; fi
+if [[ -z ${CI_OPT_GITHUB_SITE_REPO_OWNER+x} ]]; then CI_OPT_GITHUB_SITE_REPO_OWNER=""; fi
+if [[ -z ${CI_OPT_INTEGRATION_TEST_SKIP+x} ]]; then CI_OPT_INTEGRATION_TEST_SKIP=""; fi
+if [[ -z ${CI_OPT_JACOCO+x} ]]; then CI_OPT_JACOCO="true"; fi
+if [[ -z ${CI_OPT_JIRA_PASSWORD+x} ]]; then CI_OPT_JIRA_PASSWORD=""; fi
+if [[ -z ${CI_OPT_JIRA_PROJECTKEY+x} ]]; then CI_OPT_JIRA_PROJECTKEY=""; fi
+if [[ -z ${CI_OPT_JIRA_USER+x} ]]; then CI_OPT_JIRA_USER=""; fi
+if [[ -z ${CI_OPT_MAVEN_OPTS+x} ]]; then CI_OPT_MAVEN_OPTS=""; fi
+if [[ -z ${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION+x} ]]; then CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION=""; fi
+if [[ -z ${CI_OPT_PMD_RULESET_LOCATION+x} ]]; then CI_OPT_PMD_RULESET_LOCATION=""; fi
+if [[ -z ${CI_OPT_SITE+x} ]]; then CI_OPT_SITE="true"; fi
+if [[ -z ${CI_OPT_SITE_PATH_PREFIX+x} ]]; then CI_OPT_SITE_PATH_PREFIX=""; fi
+if [[ -z ${CI_OPT_SONAR+x} ]]; then CI_OPT_SONAR=""; fi
+if [[ -z ${CI_OPT_SONAR_LOGIN+x} ]]; then CI_OPT_SONAR_LOGIN=""; fi
+if [[ -z ${CI_OPT_SONAR_LOGIN_TOKEN+x} ]]; then CI_OPT_SONAR_LOGIN_TOKEN=""; fi
+if [[ -z ${CI_OPT_SONAR_ORGANIZATION+x} ]]; then CI_OPT_SONAR_ORGANIZATION=""; fi
+if [[ -z ${CI_OPT_SONAR_PASSWORD+x} ]]; then CI_OPT_SONAR_PASSWORD=""; fi
+if [[ -z ${CI_OPT_TEST_FAILURE_IGNORE+x} ]]; then CI_OPT_TEST_FAILURE_IGNORE=""; fi
+if [[ -z ${CI_OPT_TEST_SKIP+x} ]]; then CI_OPT_TEST_SKIP=""; fi
+
+# Variables that usually do not need to be set
+if [[ -z ${CI_OPT_CACHE_DIRECTORY+x} ]]; then CI_OPT_CACHE_DIRECTORY=""; fi
+if [[ -z ${CI_OPT_GIT_COMMIT_ID+x} ]]; then CI_OPT_GIT_COMMIT_ID=""; fi
+if [[ -z ${CI_OPT_IS_ORIGIN_REPO+x} ]]; then CI_OPT_IS_ORIGIN_REPO=""; fi
+if [[ -z ${CI_OPT_PUBLISH_CHANNEL+x} ]]; then CI_OPT_PUBLISH_CHANNEL=""; fi
+if [[ -z ${CI_OPT_PUBLISH_TO_REPO+x} ]]; then CI_OPT_PUBLISH_TO_REPO=""; fi
+if [[ -z ${CI_OPT_REF_NAME+x} ]]; then CI_OPT_REF_NAME=""; fi
+if [[ -z ${CI_OPT_USE_DOCKER+x} ]]; then CI_OPT_USE_DOCKER=""; fi
+if [[ -z ${CI_OPT_WAGON_SOURCE_FILEPATH+x} ]]; then CI_OPT_WAGON_SOURCE_FILEPATH=""; fi
+
+if [[ -z ${CI_OPT_GRADLE_INIT_SCRIPT+x} ]]; then CI_OPT_GRADLE_INIT_SCRIPT=""; fi
+if [[ -z ${CI_OPT_GRADLE_PROPERTIES+x} ]]; then CI_OPT_GRADLE_PROPERTIES=""; fi
+
+
+# GPG options
+if which gpg2 > /dev/null; then GPG_EXECUTABLE="gpg2"; elif which gpg > /dev/null; then GPG_EXECUTABLE="gpg"; else GPG_EXECUTABLE=""; fi
+if [[ -z ${CI_OPT_GPG_KEYID+x} ]]; then CI_OPT_GPG_KEYID=""; fi
+if [[ -z ${CI_OPT_GPG_KEYNAME+x} ]]; then CI_OPT_GPG_KEYNAME=""; fi
+if [[ -z ${CI_OPT_GPG_PASSPHRASE+x} ]]; then CI_OPT_GPG_PASSPHRASE=""; fi
+
+
+function filter_secret_variables() {
+    while read line; do
+      printf "%s\n" "$line" \
+        | sed -E 's#KEYNAME=.+#KEYNAME=<secret>#g' \
+        | sed -E 's#ORGANIZATION=.+#ORGANIZATION=<secret>#g'\
+        | sed -E 's#PASS=.+#PASS=<secret>#g' \
+        | sed -E 's#PASSWORD=.+#PASSWORD=<secret>#g' \
+        | sed -E 's#PASSPHRASE=.+#PASSPHRASE=<secret>#g' \
+        | sed -E 's#TOKEN=.+#TOKEN=<secret>#g' \
+        | sed -E 's#USER=.+#USER=<secret>#g' \
+        | sed -E 's#USERNAME=.+#USERNAME=<secret>#g'
+    done
+}
+
+function decrypt_files() {
+    echo -e "\n    >>>>>>>>>> ---------- decrypt files and handle keys ---------- >>>>>>>>>>"
+    local gpg_cmd=""
+    echo determine gpg or gpg2 to use
+    # invalid option --pinentry-mode loopback
+    if which gpg2 > /dev/null; then
+        gpg_cmd="gpg2 --use-agent"
+    elif which gpg > /dev/null; then
+        gpg_cmd="gpg"
+    fi
+    if [[ -n "${GPG_EXECUTABLE}" ]]; then
+        echo "using ${GPG_EXECUTABLE}"
+        GPG_TTY=$(tty || echo "")
+        if [[ -z "${GPG_TTY}" ]]; then unset GPG_TTY; fi
+        echo "gpg tty '${GPG_TTY}'"
+
+        # use --batch=true to avoid 'gpg tty not a tty' error
+        ${gpg_cmd} --batch=true --version
+
+        # config gpg (version >= 2.2)
+        if version_gt $(${GPG_EXECUTABLE} --batch=true --version | { grep -E '[0-9]+\.[0-9]+\.[0-9]+' || true; } | head -n1 | awk '{print $NF}') "2.1"; then
+            echo "gpg version greater than 2.1"
+            mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
+            touch ~/.gnupg/gpg.conf
+            echo "add 'use-agent' to '~/.gnupg/gpg.conf'"
+            echo 'use-agent' > ~/.gnupg/gpg.conf
+            # on gpg-2.1.11 'pinentry-mode loopback' is invalid option
+            #echo "add 'pinentry-mode loopback' to '~/.gnupg/gpg.conf'"
+            #echo 'pinentry-mode loopback' >> ~/.gnupg/gpg.conf
+            cat ~/.gnupg/gpg.conf
+            #gpg_cmd="${gpg_cmd} --pinentry-mode loopback"
+            #export GPG_OPTS='--pinentry-mode loopback'
+            #echo GPG_OPTS: ${GPG_OPTS}
+            echo "add 'allow-loopback-pinentry' to '~/.gnupg/gpg-agent.conf'"
+            touch ~/.gnupg/gpg-agent.conf
+            echo 'allow-loopback-pinentry' > ~/.gnupg/gpg-agent.conf
+            cat ~/.gnupg/gpg-agent.conf
+            echo restart the agent
+            echo RELOADAGENT | gpg-connect-agent
+        fi
+
+        # decrypt gpg key
+        openssl version -a
+        if [[ -f codesigning.asc.enc ]] && [[ -n "${CI_OPT_GPG_PASSPHRASE}" ]]; then
+            echo decrypt private key
+            # bad decrypt
+            # 140611360391616:error:06065064:digital envelope routines:EVP_DecryptFinal_ex:bad decrypt:../crypto/evp/evp_enc.c:536:
+            # see: https://stackoverflow.com/questions/34304570/how-to-resolve-the-evp-decryptfinal-ex-bad-decrypt-during-file-decryption
+            openssl aes-256-cbc -k ${CI_OPT_GPG_PASSPHRASE} -in codesigning.asc.enc -out codesigning.asc -d -md md5
+        fi
+        if [[ -f codesigning.asc.gpg ]] && [[ -n "${CI_OPT_GPG_PASSPHRASE}" ]]; then
+            echo decrypt private key
+            LC_CTYPE="UTF-8" echo ${CI_OPT_GPG_PASSPHRASE} | ${gpg_cmd} --passphrase-fd 0 --yes --batch=true --cipher-algo AES256 -o codesigning.asc codesigning.asc.gpg
+        fi
+
+        if [[ -f codesigning.pub ]]; then
+            echo import public keys
+            ${gpg_cmd} --yes --batch --import codesigning.pub
+
+            echo list public keys
+            ${gpg_cmd} --batch=true --list-keys
+        fi
+        if [[ -f codesigning.asc ]]; then
+            echo import private keys
+            # some versions only can import public key from a keypair file, some can import key pair
+            if [[ -f codesigning.pub ]]; then
+                ${gpg_cmd} --yes --batch --import codesigning.asc
+            else
+                if [[ -z "$(${gpg_cmd} --list-secret-keys | { grep ${CI_OPT_GPG_KEYNAME} || true; })" ]]; then ${gpg_cmd} --yes --batch=true --fast-import codesigning.asc; fi
+            fi
+            echo list private keys
+            ${gpg_cmd} --batch=true --list-secret-keys
+
+            # issue: You need a passphrase to unlock the secret key
+            # no-tty cause "gpg: Sorry, no terminal at all requested - can't get input"
+            #echo 'no-tty' >> ~/.gnupg/gpg.conf
+            #echo 'default-cache-ttl 600' > ~/.gnupg/gpg-agent.conf
+
+            # test key
+            # this test not working on appveyor
+            # gpg: skipped "KEYID": secret key not available
+            # gpg: signing failed: secret key not available
+            #if [[ -f LICENSE ]]; then
+            #    echo test private key imported
+            #    echo ${CI_OPT_GPG_PASSPHRASE} | gpg --passphrase-fd 0 --yes --batch=true -u ${CI_OPT_GPG_KEYNAME} --armor --detach-sig LICENSE
+            #fi
+            echo set default key
+            echo -e "trust\n5\ny\n" | gpg --command-fd 0 --batch=true --edit-key ${CI_OPT_GPG_KEYNAME}
+
+            # for gradle build
+            if [[ -n "${CI_OPT_GPG_KEYID}" ]]; then ${gpg_cmd} --batch=true --keyring secring.gpg --export-secret-key ${CI_OPT_GPG_KEYID} > secring.gpg; fi
+        fi
+    else
+        echo "[WARN] Both gpg and gpg2 are not found."
+    fi
+    echo -e "    <<<<<<<<<< ---------- decrypt files and handle keys ---------- <<<<<<<<<<\n"
+}
+
 
 # download a file by curl
 # arguments: curl_source, curl_target, curl_option
@@ -111,20 +309,6 @@ function download_if_exists() {
     if [[ "$(is_remote_resource_exists "$1" "$3")" == "true" ]]; then
         download "$1" "$2" "$3"
     fi
-}
-
-function filter_secret_variables() {
-    while read line; do
-      printf "%s\n" "$line" \
-        | sed -E 's#KEYNAME=.+#KEYNAME=<secret>#g' \
-        | sed -E 's#ORGANIZATION=.+#ORGANIZATION=<secret>#g'\
-        | sed -E 's#PASS=.+#PASS=<secret>#g' \
-        | sed -E 's#PASSWORD=.+#PASSWORD=<secret>#g' \
-        | sed -E 's#PASSPHRASE=.+#PASSPHRASE=<secret>#g' \
-        | sed -E 's#TOKEN=.+#TOKEN=<secret>#g' \
-        | sed -E 's#USER=.+#USER=<secret>#g' \
-        | sed -E 's#USERNAME=.+#USERNAME=<secret>#g'
-    done
 }
 
 # arguments: curl_source, curl_option
@@ -197,8 +381,8 @@ function version_gt() {
     fi
 }
 
-# >>>>>>>>>> ---------- CI option functions ---------- >>>>>>>>>>
 
+# >>>>>>>>>> ---------- CI option functions ---------- >>>>>>>>>>
 # returns: true or false
 function ci_opt_user_docker() {
     if [[ -n "${CI_OPT_USE_DOCKER}" ]]; then
@@ -243,21 +427,6 @@ function ci_opt_is_origin_repo() {
         else
             echo "false";
         fi
-    fi
-}
-
-# auto detect infrastructure using for this build.
-# example of gitlab-ci's CI_PROJECT_URL: "https://example.com/gitlab-org/gitlab-ce"
-# returns: opensource, private or customized infrastructure name
-function ci_opt_infrastructure() {
-    if [[ -n "${CI_OPT_INFRASTRUCTURE}" ]]; then
-        echo ${CI_OPT_INFRASTRUCTURE}
-    elif [[ -n "${TRAVIS_REPO_SLUG}" ]]; then
-        echo "opensource"
-    elif [[ -n "${CI_PROJECT_URL}" ]] && [[ "${CI_PROJECT_URL}" == ${CI_INFRA_OPT_PRIVATE_GIT_PREFIX}* ]]; then
-        echo "private"
-    else
-        echo "private"
     fi
 }
 
@@ -391,43 +560,6 @@ function ci_opt_site_path_prefix() {
 # <<<<<<<<<< ---------- CI option functions ---------- <<<<<<<<<<
 
 
-# >>>>>>>>>> ---------- CI option functions about infrastructures ---------- >>>>>>>>>>
-# arguments: default_value
-function find_git_prefix_from_ci_script() {
-    (>&2 echo "find CI_INFRA_OPT_GIT_PREFIX from CI_OPT_CI_SCRIPT: ${CI_OPT_CI_SCRIPT}, default_value: $1")
-    if [[ "${CI_OPT_CI_SCRIPT}" == http* ]]; then
-        echo $(echo ${CI_OPT_CI_SCRIPT} | sed -E 's#/[^/]+/[^/]+/raw/[^/]+/.+##')
-    else
-        echo "$1"
-    fi
-}
-
-# auto determine CI_INFRA_OPT_GIT_PREFIX by infrastructure for further download.
-# returns: prefix of git service url (infrastructure specific), i.e. https://github.com
-function ci_infra_opt_git_prefix() {
-    (>&2 echo "ci_infra_opt_git_prefix infrastructure: $(ci_opt_infrastructure), CI_OPT_CI_SCRIPT: ${CI_OPT_CI_SCRIPT}")
-    if [[ -n "${CI_INFRA_OPT_GIT_PREFIX}" ]]; then
-        echo "${CI_INFRA_OPT_GIT_PREFIX}"
-    else
-        local infrastructure="$(ci_opt_infrastructure)"
-        local default_value=""
-        if [[ "opensource" == "${infrastructure}" ]]; then
-            default_value="https://github.com"
-            CI_INFRA_OPT_GIT_PREFIX="${CI_INFRA_OPT_OPENSOURCE_GIT_PREFIX}"
-        elif [[ "private" == "${infrastructure}" ]] || [[ -z "${infrastructure}" ]]; then
-            default_value="http://gitlab"
-            CI_INFRA_OPT_GIT_PREFIX="${CI_INFRA_OPT_PRIVATE_GIT_PREFIX}"
-        fi
-
-        if [[ -z "${CI_INFRA_OPT_GIT_PREFIX}" ]]; then
-            CI_INFRA_OPT_GIT_PREFIX=$(find_git_prefix_from_ci_script "${default_value}")
-        elif [[ -n "${CI_PROJECT_URL}" ]]; then
-            CI_INFRA_OPT_GIT_PREFIX=$(echo "${CI_PROJECT_URL}" | sed 's,/*[^/]\+/*$,,' | sed 's,/*[^/]\+/*$,,')
-        fi
-        echo ${CI_INFRA_OPT_GIT_PREFIX}
-    fi
-}
-
 function ci_infra_opt_git_auth_token() {
     if [[ -n "${CI_INFRA_OPT_GIT_AUTH_TOKEN}" ]]; then
         echo "${CI_INFRA_OPT_GIT_AUTH_TOKEN}"
@@ -446,7 +578,6 @@ function ci_infra_opt_git_auth_token() {
         fi
     fi
 }
-# <<<<<<<<<< ---------- CI option functions about infrastructures ---------- <<<<<<<<<<
 
 
 # Build MAVEN_OPTS by variables from CI_OPT_CI_OPTS_SCRIPT and CI_OPT_*
@@ -650,7 +781,6 @@ function run_mvn() {
     if [[ -z "${CI_OPT_MAVEN_SETTINGS}" ]]; then
         if [[ -z "${CI_OPT_MAVEN_SETTINGS_FILE}" ]]; then CI_OPT_MAVEN_SETTINGS_FILE="$(pwd)/src/main/maven/settings.xml"; fi
         if [[ ! -f ${CI_OPT_MAVEN_SETTINGS_FILE} ]]; then
-            if [[ -z "${CI_OPT_MAVEN_SETTINGS_FILE_URL}" ]]; then CI_OPT_MAVEN_SETTINGS_FILE_URL="${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/maven/settings.xml"; fi
             CI_OPT_MAVEN_SETTINGS_FILE="$(ci_opt_cache_directory)/settings-$(ci_opt_infrastructure).xml"
             if [[ "$(is_remote_resource_exists "${CI_OPT_MAVEN_SETTINGS_FILE_URL}" "${curl_options}")" == "true" ]]; then
                 download "${CI_OPT_MAVEN_SETTINGS_FILE_URL}" "${CI_OPT_MAVEN_SETTINGS_FILE}" "${curl_options}"
@@ -829,6 +959,7 @@ function is_config_repository() {
     false
 }
 
+
 # see: https://qiita.com/narumi_888/items/e425f29b84da6b72ad62
 if sed --version 2>/dev/null | grep -q GNU; then
     alias sedi='sed -i '
@@ -843,129 +974,23 @@ else
     fi
 fi
 
-
-if [[ -z "${CI_OPT_SHELL_PRINT_EXECUTED_COMMANDS}" ]]; then CI_OPT_SHELL_PRINT_EXECUTED_COMMANDS="false"; fi
 if [[ "${CI_OPT_SHELL_PRINT_EXECUTED_COMMANDS}" == "true" ]]; then set -x; fi
-
 # key line to make whole build process file when command using pipelines fails
-if [[ -z "${CI_OPT_SHELL_EXIT_ON_ERROR}" ]]; then CI_OPT_SHELL_EXIT_ON_ERROR="true"; fi
 if [[ "${CI_OPT_SHELL_EXIT_ON_ERROR}" == "true" ]]; then set -e -o pipefail; fi
-
 
 echo -e "\n>>>>>>>>>> ---------- init options ---------- >>>>>>>>>>"
 set | grep -E '^CI_INFRA_OPT_' | filter_secret_variables || echo "no any CI_INFRA_OPT_* present"
 set | grep -E '^CI_OPT_' | filter_secret_variables || echo "no any CI_OPT_* present"
 echo -e "\n<<<<<<<<<< ---------- init options ---------- <<<<<<<<<<\n"
 
-
 echo -e "\n>>>>>>>>>> ---------- build context info ---------- >>>>>>>>>>"
 echo "gitlab-ci variables: CI_REF_NAME: ${CI_REF_NAME}, CI_COMMIT_REF_NAME: ${CI_COMMIT_REF_NAME}, CI_PROJECT_URL: ${CI_PROJECT_URL}"
 echo "travis-ci variables: TRAVIS_BRANCH: ${TRAVIS_BRANCH}, TRAVIS_EVENT_TYPE: ${TRAVIS_EVENT_TYPE}, TRAVIS_REPO_SLUG: ${TRAVIS_REPO_SLUG}, TRAVIS_PULL_REQUEST: ${TRAVIS_PULL_REQUEST}"
-
-echo -e "\n    >>>>>>>>>> ---------- decrypt files and handle keys ---------- >>>>>>>>>>"
-GPG_CMD=""
-GPG_EXECUTABLE=""
-echo determine gpg or gpg2 to use
-# invalid option --pinentry-mode loopback
-if which gpg2 > /dev/null; then
-    GPG_CMD="gpg2 --use-agent"
-    GPG_EXECUTABLE="gpg2"
-elif which gpg > /dev/null; then
-    GPG_CMD="gpg"
-    GPG_EXECUTABLE="gpg"
-fi
-if [[ -n "${GPG_EXECUTABLE}" ]]; then
-    echo "using ${GPG_EXECUTABLE}"
-    GPG_TTY=$(tty || echo "")
-    if [[ -z "${GPG_TTY}" ]]; then unset GPG_TTY; fi
-    echo "gpg tty '${GPG_TTY}'"
-
-    # use --batch=true to avoid 'gpg tty not a tty' error
-    ${GPG_CMD} --batch=true --version
-
-    # config gpg (version >= 2.2)
-    if version_gt $(${GPG_EXECUTABLE} --batch=true --version | { grep -E '[0-9]+\.[0-9]+\.[0-9]+' || true; } | head -n1 | awk '{print $NF}') "2.1"; then
-        echo "gpg version greater than 2.1"
-        mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
-        touch ~/.gnupg/gpg.conf
-        echo "add 'use-agent' to '~/.gnupg/gpg.conf'"
-        echo 'use-agent' > ~/.gnupg/gpg.conf
-        # on gpg-2.1.11 'pinentry-mode loopback' is invalid option
-        #echo "add 'pinentry-mode loopback' to '~/.gnupg/gpg.conf'"
-        #echo 'pinentry-mode loopback' >> ~/.gnupg/gpg.conf
-        cat ~/.gnupg/gpg.conf
-        #GPG_CMD="${GPG_CMD} --pinentry-mode loopback"
-        #export GPG_OPTS='--pinentry-mode loopback'
-        #echo GPG_OPTS: ${GPG_OPTS}
-        echo "add 'allow-loopback-pinentry' to '~/.gnupg/gpg-agent.conf'"
-        touch ~/.gnupg/gpg-agent.conf
-        echo 'allow-loopback-pinentry' > ~/.gnupg/gpg-agent.conf
-        cat ~/.gnupg/gpg-agent.conf
-        echo restart the agent
-        echo RELOADAGENT | gpg-connect-agent
-    fi
-
-    # decrypt gpg key
-    openssl version -a
-    if [[ -f codesigning.asc.enc ]] && [[ -n "${CI_OPT_GPG_PASSPHRASE}" ]]; then
-        echo decrypt private key
-        # bad decrypt
-        # 140611360391616:error:06065064:digital envelope routines:EVP_DecryptFinal_ex:bad decrypt:../crypto/evp/evp_enc.c:536:
-        # see: https://stackoverflow.com/questions/34304570/how-to-resolve-the-evp-decryptfinal-ex-bad-decrypt-during-file-decryption
-        openssl aes-256-cbc -k ${CI_OPT_GPG_PASSPHRASE} -in codesigning.asc.enc -out codesigning.asc -d -md md5
-    fi
-    if [[ -f codesigning.asc.gpg ]] && [[ -n "${CI_OPT_GPG_PASSPHRASE}" ]]; then
-        echo decrypt private key
-        LC_CTYPE="UTF-8" echo ${CI_OPT_GPG_PASSPHRASE} | ${GPG_CMD} --passphrase-fd 0 --yes --batch=true --cipher-algo AES256 -o codesigning.asc codesigning.asc.gpg
-    fi
-
-    if [[ -f codesigning.pub ]]; then
-        echo import public keys
-        ${GPG_CMD} --yes --batch --import codesigning.pub
-
-        echo list public keys
-        ${GPG_CMD} --batch=true --list-keys
-    fi
-    if [[ -f codesigning.asc ]]; then
-        echo import private keys
-        # some versions only can import public key from a keypair file, some can import key pair
-        if [[ -f codesigning.pub ]]; then
-            ${GPG_CMD} --yes --batch --import codesigning.asc
-        else
-            if [[ -z "$(${GPG_CMD} --list-secret-keys | { grep ${CI_OPT_GPG_KEYNAME} || true; })" ]]; then ${GPG_CMD} --yes --batch=true --fast-import codesigning.asc; fi
-        fi
-        echo list private keys
-        ${GPG_CMD} --batch=true --list-secret-keys
-
-        # issue: You need a passphrase to unlock the secret key
-        # no-tty cause "gpg: Sorry, no terminal at all requested - can't get input"
-        #echo 'no-tty' >> ~/.gnupg/gpg.conf
-        #echo 'default-cache-ttl 600' > ~/.gnupg/gpg-agent.conf
-
-        # test key
-        # this test not working on appveyor
-        # gpg: skipped "KEYID": secret key not available
-        # gpg: signing failed: secret key not available
-        #if [[ -f LICENSE ]]; then
-        #    echo test private key imported
-        #    echo ${CI_OPT_GPG_PASSPHRASE} | gpg --passphrase-fd 0 --yes --batch=true -u ${CI_OPT_GPG_KEYNAME} --armor --detach-sig LICENSE
-        #fi
-        echo set default key
-        echo -e "trust\n5\ny\n" | gpg --command-fd 0 --batch=true --edit-key ${CI_OPT_GPG_KEYNAME}
-
-        # for gradle build
-        if [[ -n "${CI_OPT_GPG_KEYID}" ]]; then ${GPG_CMD} --batch=true --keyring secring.gpg --export-secret-key ${CI_OPT_GPG_KEYID} > secring.gpg; fi
-    fi
-else
-    echo "[WARN] Both gpg and gpg2 are not found."
-fi
-echo -e "    <<<<<<<<<< ---------- decrypt files and handle keys ---------- <<<<<<<<<<\n"
-
+decrypt_files
 if [[ -f "${HOME}/.bashrc" ]]; then source "${HOME}/.bashrc"; fi
 echo "PWD: $(pwd)"
 echo "USER: $(whoami)"
 echo -e "<<<<<<<<<< ---------- build context info ---------- <<<<<<<<<<\n"
-
 
 echo -e "\n>>>>>>>>>> ---------- important variables ---------- >>>>>>>>>>"
 if [[ -z "${CI_OPT_MAVEN_BUILD_REPO}" ]]; then
@@ -987,8 +1012,6 @@ if [[ -z "${CI_OPT_MAVEN_BUILD_REPO}" ]]; then
         return 1
     fi
 fi
-CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO="$(ci_infra_opt_git_prefix)/ci-and-cd/maven-build-opts-$(ci_opt_infrastructure)/raw/master"
-if [[ -z "${CI_OPT_CI_OPTS_SCRIPT}" ]]; then CI_OPT_CI_OPTS_SCRIPT="src/main/ci-script/ci_opts.sh"; fi
 if [[ -z "$(ci_infra_opt_git_auth_token)" ]]; then
     if [[ "$(ci_opt_is_origin_repo)" == "true" ]] && [[ "$(ci_opt_infrastructure)" != "opensource" ]]; then
         echo "[ERROR] CI_INFRA_OPT_GIT_AUTH_TOKEN not set and using origin private repo, exit."; return 1;
@@ -999,27 +1022,16 @@ if [[ -z "$(ci_infra_opt_git_auth_token)" ]]; then
 fi
 echo -e "<<<<<<<<<< ---------- important variables ---------- <<<<<<<<<<\n"
 
-
 echo -e "\n>>>>>>>>>> ---------- options with important variables ---------- >>>>>>>>>>"
 set | grep -E '^CI_INFRA_OPT_' | filter_secret_variables || echo "no any CI_INFRA_OPT_* present"
 set | grep -E '^CI_OPT_' | filter_secret_variables || echo "no any CI_OPT_* present"
 echo -e "\n<<<<<<<<<< ---------- options with important variables ---------- <<<<<<<<<<\n"
 
-
 # Load remote script library here
 
-if [[ -z "${MVN_CMD}" ]]; then
-    MVN_CMD="mvn"
-    if [[ -f mvnw ]]; then MVN_CMD="./mvnw"; fi
-fi
 if [[ -f pom.xml ]]; then
     echo "MVN_CMD '${MVN_CMD}'"
     run_mvn $@
-fi
-
-if [[ -z "${GRADLE_CMD}" ]]; then
-    GRADLE_CMD="gradle"
-    if [[ -f gradlew ]]; then GRADLE_CMD="./gradlew"; fi
 fi
 if [[ -f build.gradle ]]; then
     echo "GRADLE_CMD '${GRADLE_CMD}'"
