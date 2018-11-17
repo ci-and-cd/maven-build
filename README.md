@@ -124,6 +124,18 @@ Need these properties only when deploy site to github.com.
 - CI_OPT_GPG_PASSPHRASE
 > default: N/A (blank)
 
+If you see 'gpg: signing failed: Inappropriate ioctl for device' on OSX with gpg (2.2.x) installed by homebrew
+Edit config files:
+~/.gnupg/gpg-agent.conf
+```text
+allow-loopback-pinentry
+```
+~/.gnupg/gpg.conf
+```text
+use-agent
+pinentry-mode loopback
+```
+
 Need these properties only when deploy artifacts into maven central repository.
 
 ### 7. maven central

@@ -311,6 +311,7 @@
         <sonar-maven-plugin.version>3.5.0.1254</sonar-maven-plugin.version>
 
         <taglist-maven-plugin.version>2.4</taglist-maven-plugin.version>
+        <umlgraph.version>5.6.6</umlgraph.version>
         <versions-maven-plugin.version>2.5</versions-maven-plugin.version>
         <!-- Why org.codehaus.mojo:wagon-maven-plugin:wagon-maven-plugin-2.0.1-snapshot-chshawkn-1.6?
             see: https://www.mail-archive.com/users@maven.apache.org/msg129243.html -->
@@ -784,8 +785,6 @@
                 <executions>
                     <execution><id>attach-javadocs</id><goals><goal>jar</goal></goals><phase>prepare-package</phase></execution>
                     <execution><id>attach-test-javadocs</id><goals><goal>test-jar</goal></goals><phase>prepare-package</phase></execution>
-                    <execution><id>aggregate</id><goals><goal>aggregate</goal></goals><phase>site</phase></execution>
-                    <execution><id>test-aggregate</id><goals><goal>test-aggregate</goal></goals><phase>site</phase></execution>
                 </executions>
             </plugin>
             <!-- https://maven.apache.org/plugins/maven-source-plugin/test-jar-no-fork-mojo.html -->
@@ -1495,9 +1494,6 @@
         <profile>
             <id>reports-for-site</id>
             <activation><property><name>site</name><value>true</value></property></activation>
-            <properties>
-                <umlgraph.version>5.6.6</umlgraph.version>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -1511,6 +1507,13 @@
                                     <goal>check</goal>
                                 </goals>
                             </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution><id>aggregate</id><goals><goal>aggregate</goal></goals><phase>site</phase></execution>
+                            <execution><id>test-aggregate</id><goals><goal>test-aggregate</goal></goals><phase>site</phase></execution>
                         </executions>
                     </plugin>
                     <plugin>
