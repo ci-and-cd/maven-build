@@ -205,16 +205,18 @@ function decrypt_files() {
         # use --batch=true to avoid 'gpg tty not a tty' error
         ${gpg_cmd} --batch=true --version
 
-        # config gpg (version >= 2.2)
+        # config gpg (version >= 2.1)
         if version_gt $(${GPG_EXECUTABLE} --batch=true --version | { grep -E '[0-9]+\.[0-9]+\.[0-9]+' || true; } | head -n1 | awk '{print $NF}') "2.1"; then
             echo "gpg version greater than 2.1"
             mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
             touch ~/.gnupg/gpg.conf
             echo "add 'use-agent' to '~/.gnupg/gpg.conf'"
             echo 'use-agent' > ~/.gnupg/gpg.conf
-            # on gpg-2.1.11 'pinentry-mode loopback' is invalid option
-            #echo "add 'pinentry-mode loopback' to '~/.gnupg/gpg.conf'"
-            #echo 'pinentry-mode loopback' >> ~/.gnupg/gpg.conf
+            if version_gt $(${GPG_EXECUTABLE} --batch=true --version | { grep -E '[0-9]+\.[0-9]+\.[0-9]+' || true; } | head -n1 | awk '{print $NF}') "2.2"; then
+                # on gpg-2.1.11 'pinentry-mode loopback' is invalid option
+                echo "add 'pinentry-mode loopback' to '~/.gnupg/gpg.conf'"
+                echo 'pinentry-mode loopback' >> ~/.gnupg/gpg.conf
+            fi
             cat ~/.gnupg/gpg.conf
             #gpg_cmd="${gpg_cmd} --pinentry-mode loopback"
             #export GPG_OPTS='--pinentry-mode loopback'

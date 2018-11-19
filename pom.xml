@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <modules>
         <module>build-docker</module>
@@ -156,6 +156,10 @@
         <checkstyle.failsOnError>false</checkstyle.failsOnError>
         <checkstyle.logViolationsToConsole>true</checkstyle.logViolationsToConsole>
         <checkstyle.maxAllowedViolations>10</checkstyle.maxAllowedViolations>
+        <!-- Violations to ignore. This is a comma-separated list, each value being either a rule name, a rule category or a java package name of rule class. -->
+        <!-- see: https://issues.apache.org/jira/browse/MCHECKSTYLE-347?page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel&focusedCommentId=16314555#comment-16314555 -->
+        <checkstyle.violation.ignore>foo,bar</checkstyle.violation.ignore>
+        <!-- Valid values are "error", "warning" and "info" -->
         <checkstyle.violationSeverity>warning</checkstyle.violationSeverity>
 
         <downloadSources>true</downloadSources>
@@ -228,7 +232,7 @@
         <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
 
         <!--<checkstyle.version>6.19</checkstyle.version>-->
-        <checkstyle.version>8.10</checkstyle.version>
+        <checkstyle.version>8.14</checkstyle.version>
         <clirr-maven-plugin.version>2.8</clirr-maven-plugin.version>
         <!--<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>-->
         <com.google.errorprone_error_prone_core.version>2.3.1</com.google.errorprone_error_prone_core.version>
@@ -446,16 +450,12 @@
                         <consoleOutput>${checkstyle.consoleOutput}</consoleOutput>
                         <encoding>${project.reporting.outputEncoding}</encoding>
                         <excludes>${src.generated.dir}</excludes>
-                        <failOnViolation>${checkstyle.failOnViolation}</failOnViolation>
                         <failsOnError>${checkstyle.failsOnError}</failsOnError>
-                        <linkXRef>${linkXRef}</linkXRef>
-                        <logViolationsToConsole>${checkstyle.logViolationsToConsole}</logViolationsToConsole>
                         <maxAllowedViolations>${checkstyle.maxAllowedViolations}</maxAllowedViolations>
                         <skip>${maven.quality.skip}</skip>
                         <sourceDirectories>
                             <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
                         </sourceDirectories>
-                        <violationSeverity>${checkstyle.violationSeverity}</violationSeverity>
                     </configuration>
                     <dependencies>
                         <dependency><groupId>com.puppycrawl.tools</groupId><artifactId>checkstyle</artifactId><version>${checkstyle.version}</version></dependency>
@@ -1523,7 +1523,15 @@
                     <plugin>
                         <artifactId>maven-checkstyle-plugin</artifactId>
                         <executions>
-                            <execution><id>check</id><phase>process-sources</phase><goals><goal>check</goal></goals></execution>
+                            <execution>
+                                <configuration>
+                                    <failOnViolation>${checkstyle.failOnViolation}</failOnViolation>
+                                    <logViolationsToConsole>${checkstyle.logViolationsToConsole}</logViolationsToConsole>
+                                    <violationIgnore>${checkstyle.violation.ignore}</violationIgnore>
+                                    <violationSeverity>${checkstyle.violationSeverity}</violationSeverity>
+                                </configuration>
+                                <id>check</id><phase>process-sources</phase><goals><goal>check</goal></goals>
+                            </execution>
                         </executions>
                     </plugin>
                     <!-- see: http://maven.apache.org/plugins/maven-pmd-plugin/examples/multi-module-config.html -->
@@ -1615,19 +1623,10 @@
                             <reportSet>
                                 <configuration>
                                     <configLocation>${checkstyle.config.location}</configLocation>
-                                    <consoleOutput>${checkstyle.consoleOutput}</consoleOutput>
+                                    <consoleOutput>false</consoleOutput>
                                     <encoding>${project.reporting.outputEncoding}</encoding>
-                                    <excludes>${src.generated.dir}</excludes>
-                                    <failOnViolation>${checkstyle.failOnViolation}</failOnViolation>
-                                    <failsOnError>${checkstyle.failsOnError}</failsOnError>
+                                    <failsOnError>false</failsOnError>
                                     <linkXRef>${linkXRef}</linkXRef>
-                                    <logViolationsToConsole>${checkstyle.logViolationsToConsole}</logViolationsToConsole>
-                                    <maxAllowedViolations>${checkstyle.maxAllowedViolations}</maxAllowedViolations>
-                                    <skip>${maven.quality.skip}</skip>
-                                    <sourceDirectories>
-                                        <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
-                                    </sourceDirectories>
-                                    <violationSeverity>${checkstyle.violationSeverity}</violationSeverity>
                                 </configuration>
                                 <reports><report>checkstyle</report></reports>
                             </reportSet>
@@ -1729,6 +1728,20 @@
         <profile>
             <id>dependency-check</id>
             <activation><property><name>dependency-check</name><value>true</value></property></activation>
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId>
+                        <reportSets>
+                            <reportSet><reports><report>aggregate</report></reports></reportSet>
+                        </reportSets>
+                    </plugin>
+                </plugins>
+            </reporting>
+        </profile>
+        <profile>
+            <id>updates-report</id>
+            <activation><property><name>updates-report</name><value>true</value></property></activation>
             <build>
                 <plugins>
                     <plugin><groupId>org.codehaus.mojo</groupId><artifactId>versions-maven-plugin</artifactId></plugin>
@@ -1742,12 +1755,6 @@
                             <reportSet>
                                 <reports><report>dependency-updates-report</report><report>plugin-updates-report</report></reports>
                             </reportSet>
-                        </reportSets>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId>
-                        <reportSets>
-                            <reportSet><reports><report>aggregate</report></reports></reportSet>
                         </reportSets>
                     </plugin>
                 </plugins>

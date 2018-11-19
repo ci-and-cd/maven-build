@@ -42,7 +42,7 @@
             <property name="allowNonPrintableEscapes" value="true"/>
         </module>
         <module name="LineLength">
-            <property name="max" value="120"/>
+            <property name="max" value="160"/>
             <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
         </module>
         <module name="AvoidStarImport"/>
@@ -56,10 +56,9 @@
         <module name="NeedBraces"/>
         <module name="LeftCurly"/>
         <module name="RightCurly">
-            <property name="id" value="RightCurlySame"/>
-            <property name="tokens"
-                      value="LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE,
-                    LITERAL_DO"/>
+            <!-- see: https://stackoverflow.com/questions/53052187/fail-to-execute-goal-when-using-checkstyle-maven-plugin -->
+            <!--<property name="id" value="RightCurlySame"/>-->
+            <property name="tokens" value="LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_DO"/>
         </module>
         <module name="RightCurly">
             <property name="id" value="RightCurlyAlone"/>
@@ -174,10 +173,10 @@
         <module name="Indentation">
             <property name="basicOffset" value="4"/>
             <property name="braceAdjustment" value="0"/>
-            <property name="caseIndent" value="2"/>
+            <property name="caseIndent" value="4"/>
             <property name="throwsIndent" value="4"/>
             <property name="lineWrappingIndentation" value="4"/>
-            <property name="arrayInitIndent" value="2"/>
+            <property name="arrayInitIndent" value="4"/>
         </module>
         <module name="AbbreviationAsWordInName">
             <property name="ignoreFinal" value="false"/>
