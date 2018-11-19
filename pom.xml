@@ -232,7 +232,7 @@
         <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
 
         <!--<checkstyle.version>6.19</checkstyle.version>-->
-        <checkstyle.version>8.10</checkstyle.version>
+        <checkstyle.version>8.14</checkstyle.version>
         <clirr-maven-plugin.version>2.8</clirr-maven-plugin.version>
         <!--<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>-->
         <com.google.errorprone_error_prone_core.version>2.3.1</com.google.errorprone_error_prone_core.version>
@@ -1622,6 +1622,10 @@
                         <reportSets>
                             <reportSet>
                                 <configuration>
+                                    <configLocation>${checkstyle.config.location}</configLocation>
+                                    <consoleOutput>false</consoleOutput>
+                                    <encoding>${project.reporting.outputEncoding}</encoding>
+                                    <failsOnError>false</failsOnError>
                                     <linkXRef>${linkXRef}</linkXRef>
                                 </configuration>
                                 <reports><report>checkstyle</report></reports>
