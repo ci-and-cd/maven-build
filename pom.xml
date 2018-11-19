@@ -1728,6 +1728,20 @@
         <profile>
             <id>dependency-check</id>
             <activation><property><name>dependency-check</name><value>true</value></property></activation>
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId>
+                        <reportSets>
+                            <reportSet><reports><report>aggregate</report></reports></reportSet>
+                        </reportSets>
+                    </plugin>
+                </plugins>
+            </reporting>
+        </profile>
+        <profile>
+            <id>updates-report</id>
+            <activation><property><name>updates-report</name><value>true</value></property></activation>
             <build>
                 <plugins>
                     <plugin><groupId>org.codehaus.mojo</groupId><artifactId>versions-maven-plugin</artifactId></plugin>
@@ -1741,12 +1755,6 @@
                             <reportSet>
                                 <reports><report>dependency-updates-report</report><report>plugin-updates-report</report></reports>
                             </reportSet>
-                        </reportSets>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId>
-                        <reportSets>
-                            <reportSet><reports><report>aggregate</report></reports></reportSet>
                         </reportSets>
                     </plugin>
                 </plugins>
