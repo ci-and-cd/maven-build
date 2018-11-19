@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
 
     <modules>
         <module>build-docker</module>
