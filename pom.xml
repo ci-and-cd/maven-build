@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>0.3.8</version>
+    <version>1.0.0</version>
 
     <modules>
         <module>build-docker</module>
@@ -151,14 +151,102 @@
     </pluginRepositories>
 
     <properties>
-        <com.google.errorprone_error_prone_core.version>2.3.1</com.google.errorprone_error_prone_core.version>
+        <checkstyle.consoleOutput>true</checkstyle.consoleOutput>
+        <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
+        <checkstyle.failsOnError>false</checkstyle.failsOnError>
+        <checkstyle.logViolationsToConsole>true</checkstyle.logViolationsToConsole>
+        <checkstyle.maxAllowedViolations>10</checkstyle.maxAllowedViolations>
+        <checkstyle.violationSeverity>warning</checkstyle.violationSeverity>
+
         <downloadSources>true</downloadSources>
+
+        <!-- findbugs.effort: Min, Default, Max -->
+        <findbugs.effort>Default</findbugs.effort>
+        <findbugs.failOnError>false</findbugs.failOnError>
+        <findbugs.fork>true</findbugs.fork>
+        <findbugs.includeTests>false</findbugs.includeTests>
+        <findbugs.jvmArgs>-Xmx1024m -Xms128m -XX:MaxMetaspaceSize=512m</findbugs.jvmArgs>
+        <findbugs.relaxed>false</findbugs.relaxed>
+        <!-- findbugs.threshold: High, Default, Low, Ignore -->
+        <findbugs.threshold>Default</findbugs.threshold>
+
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
+        <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
+        <maven.javadoc.failsOnError>false</maven.javadoc.failsOnError>
+        <maven.javadoc.skip>false</maven.javadoc.skip>
+        <maven.source.skip>false</maven.source.skip>
+
+        <pmd.failOnViolation>false</pmd.failOnViolation>
+        <pmd.failurePriority>5</pmd.failurePriority>
+        <pmd.maxAllowedViolations>10</pmd.maxAllowedViolations>
+        <pmd.printFailingErrors>true</pmd.printFailingErrors>
+        <pmd.verbose>false</pmd.verbose>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!--
+        sonar.analysis.mode Deprecated since SQ 6.6
+        This parameter is set to preview as part of non-Developer Edition PR decoration.
+        https://github.com/SonarQubeCommunity/sonar-build-breaker
+        This build breaker is only available in preview modes (sonar.analysis.mode=preview or sonar.analysis.mode=issues).
+        In publish mode, issue severity data is not available to post-job checkers.
+        -->
+        <sonar.analysis.mode>preview</sonar.analysis.mode>
+        <!-- Disabled, INFO, MINOR, MAJOR, CRITICAL, BLOCKER -->
+        <sonar.buildbreaker.preview.issuesSeverity>MAJOR</sonar.buildbreaker.preview.issuesSeverity>
+        <sonar.buildbreaker.queryInterval>10000</sonar.buildbreaker.queryInterval>
+        <sonar.buildbreaker.queryMaxAttempts>30</sonar.buildbreaker.queryMaxAttempts>
+        <sonar.buildbreaker.skip>true</sonar.buildbreaker.skip>
 
         <surefire.fork.count>1</surefire.fork.count>
         <surefire.fork.reuse>false</surefire.fork.reuse>
 
+        <!-- custom properties -->
         <git-commit-id.skip>false</git-commit-id.skip>
 
+        <jacoco.reportPath>${project.build.directory}/jacoco.exec</jacoco.reportPath>
+        <jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</jacoco.itReportPath>
+
+        <linkXRef>true</linkXRef>
+        <local.deploy.model.path>${project.groupId}/${project.artifactId}</local.deploy.model.path>
+        <maven.quality.skip>false</maven.quality.skip>
+
+        <relative.parent.dir>.</relative.parent.dir>
+        <repositories.releases.updatePolicy>always</repositories.releases.updatePolicy>
+        <repositories.snapshots.updatePolicy>always</repositories.snapshots.updatePolicy>
+
+        <site-maven-plugin.version>0.13.0.OSS-M1</site-maven-plugin.version>
+        <src.generated.dir>**/generated/**</src.generated.dir>
+
+        <!-- versions -->
+        <animal-sniffer-maven-plugin.version>1.16</animal-sniffer-maven-plugin.version>
+        <ant-contrib.version>20020829</ant-contrib.version>
+        <apt-maven-plugin.version>1.1.3</apt-maven-plugin.version>
+        <asciidoctor-maven-plugin.version>1.5.6</asciidoctor-maven-plugin.version>
+        <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
+
+        <!--<checkstyle.version>6.19</checkstyle.version>-->
+        <checkstyle.version>8.10</checkstyle.version>
+        <clirr-maven-plugin.version>2.8</clirr-maven-plugin.version>
+        <!--<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>-->
+        <com.google.errorprone_error_prone_core.version>2.3.1</com.google.errorprone_error_prone_core.version>
+
+        <dependency-check-maven.version>3.3.4</dependency-check-maven.version>
+        <doxia-module-markdown.version>1.8</doxia-module-markdown.version>
+
+        <echo-maven-plugin.version>0.3.0</echo-maven-plugin.version>
+        <findbugs-annotations.version>1.0.0</findbugs-annotations.version>
+        <findbugs-maven-plugin.version>3.0.5</findbugs-maven-plugin.version>
+        <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
+
+        <git-commit-id-plugin.version>2.2.4</git-commit-id-plugin.version>
+        <gitflow-maven-plugin.version>1.9.0</gitflow-maven-plugin.version>
+
+        <!--<gmaven-plugin.version>1.0</gmaven-plugin.version>-->
+
+        <groovy-maven-plugin.version>2.1</groovy-maven-plugin.version>
         <groovy.version>2.4.15</groovy.version>
         <!--<groovy-eclipse-compiler.version>2.9.2-02</groovy-eclipse-compiler.version>-->
         <!--<groovy-eclipse-batch.version>2.4.12-03</groovy-eclipse-batch.version>-->
@@ -167,93 +255,154 @@
         <!--<groovy-eclipse-compiler.version>3.0.0-01</groovy-eclipse-compiler.version>-->
         <!--<groovy-eclipse-batch.version>2.5.1-02</groovy-eclipse-batch.version>-->
 
-        <jacoco.reportPath>${project.build.directory}/jacoco.exec</jacoco.reportPath>
-        <jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</jacoco.itReportPath>
+        <java10-javax.activation.version>1.1.1</java10-javax.activation.version>
+        <java18.version>1.0</java18.version>
+        <java9-javax.activation.version>1.1.1</java9-javax.activation.version>
+        <jdepend-maven-plugin.version>2.0</jdepend-maven-plugin.version>
+        <jsch.version>0.1.54</jsch.version>
 
         <!--<kotlin.version>1.1.2-2</kotlin.version>-->
         <!--<kotlin.version>1.2.51</kotlin.version>-->
         <kotlin.version>1.2.60</kotlin.version>
         <lombok.version>1.18.2</lombok.version>
 
-        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
+        <maven-changes-plugin.version>2.12.1</maven-changes-plugin.version>
+        <maven-checkstyle-plugin.version>3.0.0</maven-checkstyle-plugin.version>
+        <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
+        <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
+        <maven-dependency-plugin.version>3.1.0</maven-dependency-plugin.version>
+        <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
+        <maven-enforcer-plugin.version>3.0.0-M1</maven-enforcer-plugin.version>
+        <maven-failsafe-plugin.version>2.21.0</maven-failsafe-plugin.version>
+        <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+        <maven-install-plugin.version>2.5.2</maven-install-plugin.version>
+        <maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
+        <maven-javadoc-plugin.version>3.0.0</maven-javadoc-plugin.version>
+        <maven-jxr-plugin.version>2.5</maven-jxr-plugin.version>
+        <!-- maven-pmd-plugin:3.6   depends on net.sourceforge.pmd:pmd:5.3.5 -->
+        <!-- maven-pmd-plugin:3.7   depends on net.sourceforge.pmd:pmd:5.5.1 -->
+        <!-- maven-pmd-plugin:3.9.0 depends on net.sourceforge.pmd:pmd:6.4.0 -->
+        <!-- maven-pmd-plugin:3.10.0 depends on net.sourceforge.pmd:pmd:6.4.0 -->
+        <maven-pmd-plugin.version>3.10.0</maven-pmd-plugin.version>
+        <maven-project-info-reports-plugin.version>3.0.0</maven-project-info-reports-plugin.version>
+        <maven-resources-plugin.version>3.0.1</maven-resources-plugin.version>
+        <maven-site-plugin.version>3.7.1</maven-site-plugin.version>
+        <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
+        <maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
+        <maven-surefire-report-plugin.version>2.21.0</maven-surefire-report-plugin.version>
+        <maven-toolchains-plugin.version>1.1</maven-toolchains-plugin.version>
 
-        <org.codehaus.plexus_plexus-compiler-javac-errorprone>2.8.4</org.codehaus.plexus_plexus-compiler-javac-errorprone>
-        <org.jacoco_jacoco.version>0.8.1</org.jacoco_jacoco.version>
-        <org.sonarsource.java_sonar-jacoco-listeners.version>5.3.0.13828</org.sonarsource.java_sonar-jacoco-listeners.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
 
-        <repositories.releases.updatePolicy>always</repositories.releases.updatePolicy>
-        <repositories.snapshots.updatePolicy>always</repositories.snapshots.updatePolicy>
+        <org.codehaus.plexus_plexus-compiler-javac-errorprone.version>2.8.5</org.codehaus.plexus_plexus-compiler-javac-errorprone.version>
+        <org.jacoco_jacoco.version>0.8.2</org.jacoco_jacoco.version>
+        <!--<org.sonarsource.java_sonar-jacoco-listeners.version>5.3.0.13828</org.sonarsource.java_sonar-jacoco-listeners.version>-->
+        <org.sonarsource.java_sonar-jacoco-listeners.version>5.9.1.16423</org.sonarsource.java_sonar-jacoco-listeners.version>
+
+        <pegdown.version>1.6.0</pegdown.version>
+        <properties-maven-plugin.version>1.0.0</properties-maven-plugin.version>
+        <qualinsight-mojo-cobertura-core.version>2.0.0</qualinsight-mojo-cobertura-core.version>
 
         <scala.version>2.12.6</scala.version>
+        <scala-maven-plugin.version>3.4.2</scala-maven-plugin.version>
+
+        <!--<sonar-maven-plugin.version>3.4.1.1168</sonar-maven-plugin.version>-->
+        <sonar-maven-plugin.version>3.5.0.1254</sonar-maven-plugin.version>
+
+        <taglist-maven-plugin.version>2.4</taglist-maven-plugin.version>
+        <umlgraph.version>5.6.6</umlgraph.version>
+        <versions-maven-plugin.version>2.5</versions-maven-plugin.version>
+        <!-- Why org.codehaus.mojo:wagon-maven-plugin:wagon-maven-plugin-2.0.1-snapshot-chshawkn-1.6?
+            see: https://www.mail-archive.com/users@maven.apache.org/msg129243.html -->
+        <!--http://www.mojohaus.org/wagon-maven-plugin/usage.html-->
+        <!--http://www.mojohaus.org/wagon-maven-plugin/-->
+        <wagon-maven-plugin.version>wagon-maven-plugin-2.0.1-snapshot-chshawkn-1.6</wagon-maven-plugin.version>
+        <wagon-ssh.version>3.0.0</wagon-ssh.version>
+        <wagon-webdav-jackrabbit.version>3.0.0</wagon-webdav-jackrabbit.version>
+        <!--<wrapper-maven-plugin.version>0.0.4</wrapper-maven-plugin.version>-->
     </properties>
 
     <build>
         <pluginManagement>
             <plugins>
                 <!-- @formatter:off -->
-                <plugin><groupId>com.amashchenko.maven.plugin</groupId><artifactId>gitflow-maven-plugin</artifactId><version>1.9.0</version></plugin>
-                <plugin><groupId>com.mysema.maven</groupId><artifactId>apt-maven-plugin</artifactId><version>1.1.3</version></plugin>
-                <plugin><groupId>com.soebes.maven.plugins</groupId><artifactId>echo-maven-plugin</artifactId><version>0.3.0</version></plugin>
+                <plugin><groupId>com.amashchenko.maven.plugin</groupId><artifactId>gitflow-maven-plugin</artifactId><version>${gitflow-maven-plugin.version}</version></plugin>
+                <plugin><groupId>com.mysema.maven</groupId><artifactId>apt-maven-plugin</artifactId><version>${apt-maven-plugin.version}</version></plugin>
+                <plugin><groupId>com.soebes.maven.plugins</groupId><artifactId>echo-maven-plugin</artifactId><version>${echo-maven-plugin.version}</version></plugin>
                 <!-- TODO find a newer plugin for groovy scripts to replace gmaven-plugin -->
-                <!--<plugin><groupId>org.codehaus.groovy.maven</groupId><artifactId>gmaven-plugin</artifactId><version>1.0</version></plugin>-->
+                <!--<plugin><groupId>org.codehaus.groovy.maven</groupId><artifactId>gmaven-plugin</artifactId><version>${gmaven-plugin.version}</version></plugin>-->
                 <plugin>
-                    <groupId>org.codehaus.gmaven</groupId><artifactId>groovy-maven-plugin</artifactId><version>2.1</version>
+                    <groupId>org.codehaus.gmaven</groupId><artifactId>groovy-maven-plugin</artifactId><version>${groovy-maven-plugin.version}</version>
                     <dependencies><dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId><version>${groovy.version}</version></dependency></dependencies>
                 </plugin>
-                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.0.0</version></plugin>
-                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>properties-maven-plugin</artifactId><version>1.0.0</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>${build-helper-maven-plugin.version}</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>properties-maven-plugin</artifactId><version>${properties-maven-plugin.version}</version></plugin>
                 <plugin>
                     <artifactId>maven-antrun-plugin</artifactId>
-                    <version>1.8</version>
+                    <version>${maven-antrun-plugin.version}</version>
                     <dependencies>
-                        <dependency><groupId>ant-contrib</groupId><artifactId>ant-contrib</artifactId><version>20020829</version></dependency>
+                        <dependency><groupId>ant-contrib</groupId><artifactId>ant-contrib</artifactId><version>${ant-contrib.version}</version></dependency>
                     </dependencies>
                 </plugin>
-                <plugin><artifactId>maven-clean-plugin</artifactId><version>3.1.0</version></plugin>
-                <plugin><artifactId>maven-compiler-plugin</artifactId><version>3.8.0</version></plugin>
-                <plugin><artifactId>maven-dependency-plugin</artifactId><version>3.1.0</version></plugin>
-                <plugin><artifactId>maven-deploy-plugin</artifactId><version>2.8.2</version></plugin>
-                <plugin><artifactId>maven-enforcer-plugin</artifactId><version>3.0.0-M1</version></plugin>
-                <plugin><artifactId>maven-failsafe-plugin</artifactId><version>2.21.0</version></plugin>
-                <plugin><artifactId>maven-gpg-plugin</artifactId><version>1.6</version></plugin>
-                <plugin><artifactId>maven-install-plugin</artifactId><version>2.5.2</version></plugin>
-                <plugin><artifactId>maven-jar-plugin</artifactId><version>3.1.0</version></plugin>
-                <plugin><artifactId>maven-javadoc-plugin</artifactId><version>3.0.0</version></plugin>
-                <plugin><artifactId>maven-source-plugin</artifactId><version>3.0.1</version></plugin>
-                <plugin><artifactId>maven-resources-plugin</artifactId><version>3.0.1</version></plugin>
-                <plugin><artifactId>maven-surefire-plugin</artifactId><version>2.21.0</version></plugin>
-                <plugin><artifactId>maven-toolchains-plugin</artifactId><version>1.1</version></plugin>
+                <plugin><artifactId>maven-changes-plugin</artifactId><version>${maven-changes-plugin.version}</version></plugin>
+                <plugin><artifactId>maven-clean-plugin</artifactId><version>${maven-clean-plugin.version}</version></plugin>
+                <plugin><artifactId>maven-compiler-plugin</artifactId><version>${maven-compiler-plugin.version}</version></plugin>
+                <plugin><artifactId>maven-dependency-plugin</artifactId><version>${maven-dependency-plugin.version}</version></plugin>
+                <plugin><artifactId>maven-deploy-plugin</artifactId><version>${maven-deploy-plugin.version}</version></plugin>
+                <plugin><artifactId>maven-enforcer-plugin</artifactId><version>${maven-enforcer-plugin.version}</version></plugin>
+                <plugin><artifactId>maven-failsafe-plugin</artifactId><version>${maven-failsafe-plugin.version}</version></plugin>
+                <plugin><artifactId>maven-gpg-plugin</artifactId><version>${maven-gpg-plugin.version}</version></plugin>
+                <plugin><artifactId>maven-install-plugin</artifactId><version>${maven-install-plugin.version}</version></plugin>
+                <plugin><artifactId>maven-jar-plugin</artifactId><version>${maven-jar-plugin.version}</version></plugin>
+                <plugin>
+                    <artifactId>maven-javadoc-plugin</artifactId><version>${maven-javadoc-plugin.version}</version>
+                    <configuration>
+                        <additionalJOption>-J-Duser.language=en</additionalJOption>
+                        <additionalOptions>-views -all</additionalOptions>
+                        <charset>${project.build.sourceEncoding}</charset>
+                        <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
+                        <!-- UML Graph needs to match HTML tag to insert images into javadoc -->
+                        <docletArtifact><groupId>org.umlgraph</groupId><artifactId>umlgraph</artifactId><version>${umlgraph.version}</version></docletArtifact>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                        <failOnError>${maven.javadoc.failsOnError}</failOnError>
+                        <skip>${maven.javadoc.skip}</skip>
+                        <useStandardDocletOptions>true</useStandardDocletOptions>
+                    </configuration>
+                </plugin>
+                <plugin><artifactId>maven-source-plugin</artifactId><version>${maven-source-plugin.version}</version></plugin>
+                <plugin><artifactId>maven-resources-plugin</artifactId><version>${maven-resources-plugin.version}</version></plugin>
+                <plugin><artifactId>maven-surefire-plugin</artifactId><version>${maven-surefire-plugin.version}</version></plugin>
+                <plugin><artifactId>maven-toolchains-plugin</artifactId><version>${maven-toolchains-plugin.version}</version></plugin>
 
-                <plugin><artifactId>maven-project-info-reports-plugin</artifactId><version>3.0.0</version></plugin>
+                <plugin><artifactId>maven-project-info-reports-plugin</artifactId><version>${maven-project-info-reports-plugin.version}</version></plugin>
                 <!-- @formatter:on -->
 
                 <!-- @formatter:off -->
                 <plugin>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.7.1</version>
+                    <version>${maven-site-plugin.version}</version>
                     <dependencies>
-                        <dependency><groupId>org.apache.maven.doxia</groupId><artifactId>doxia-module-markdown</artifactId><version>1.8</version></dependency>
-                        <dependency><groupId>org.pegdown</groupId><artifactId>pegdown</artifactId><version>1.6.0</version></dependency>
-                        <dependency><groupId>org.apache.maven.wagon</groupId><artifactId>wagon-webdav-jackrabbit</artifactId><version>3.0.0</version></dependency>
+                        <dependency><groupId>org.apache.maven.doxia</groupId><artifactId>doxia-module-markdown</artifactId><version>${doxia-module-markdown.version}</version></dependency>
+                        <dependency><groupId>org.pegdown</groupId><artifactId>pegdown</artifactId><version>${pegdown.version}</version></dependency>
+                        <dependency><groupId>org.apache.maven.wagon</groupId><artifactId>wagon-webdav-jackrabbit</artifactId><version>${wagon-webdav-jackrabbit.version}</version></dependency>
                         <!-- org.apache.maven.wagon:wagon-ssh support ssh/scp and password only -->
                         <dependency>
                             <groupId>org.apache.maven.wagon</groupId>
                             <artifactId>wagon-ssh</artifactId>
-                            <version>3.0.0</version>
+                            <version>${wagon-ssh.version}</version>
                             <exclusions>
                                 <exclusion><groupId>com.jcraft</groupId><artifactId>jsch</artifactId></exclusion>
                             </exclusions>
                         </dependency>
-                        <dependency><groupId>com.jcraft</groupId><artifactId>jsch</artifactId><version>0.1.54</version></dependency>
+                        <dependency><groupId>com.jcraft</groupId><artifactId>jsch</artifactId><version>${jsch.version}</version></dependency>
                         <!-- support for sshexe/scpexe and privateKey -->
-                        <dependency><groupId>org.apache.maven.wagon</groupId><artifactId>wagon-ssh-external</artifactId><version>3.0.0</version></dependency>
+                        <dependency><groupId>org.apache.maven.wagon</groupId><artifactId>wagon-ssh-external</artifactId><version>${wagon-ssh.version}</version></dependency>
                         <!-- provide org.apache.maven.wagon.providers.ssh.knownhost.NullKnownHostProvider -->
                         <dependency>
                             <groupId>org.apache.maven.wagon</groupId>
                             <artifactId>wagon-ssh-common</artifactId>
-                            <version>3.0.0</version>
+                            <version>${wagon-ssh.version}</version>
                             <exclusions>
                                 <exclusion><groupId>org.codehaus.plexus</groupId><artifactId>plexus-utils</artifactId></exclusion>
                             </exclusions>
@@ -267,33 +416,73 @@
                 <!-- @formatter:on -->
 
                 <!-- @formatter:off -->
-                <plugin><groupId>org.asciidoctor</groupId><artifactId>asciidoctor-maven-plugin</artifactId><version>1.5.6</version></plugin>
-                <plugin><groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId><version>3.1.2</version></plugin>
-                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>animal-sniffer-maven-plugin</artifactId><version>1.16</version></plugin>
-                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId><version>3.0.5</version></plugin>
-                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>jdepend-maven-plugin</artifactId><version>2.0</version></plugin>
-                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>taglist-maven-plugin</artifactId><version>2.4</version></plugin>
-                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>versions-maven-plugin</artifactId><version>2.5</version></plugin>
+                <plugin><groupId>org.asciidoctor</groupId><artifactId>asciidoctor-maven-plugin</artifactId><version>${asciidoctor-maven-plugin.version}</version></plugin>
+                <plugin><groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId><version>${dependency-check-maven.version}</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>animal-sniffer-maven-plugin</artifactId><version>${animal-sniffer-maven-plugin.version}</version></plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId><version>${findbugs-maven-plugin.version}</version>
+                    <configuration>
+                        <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
+                        <effort>${findbugs.effort}</effort>
+                        <!--<excludeFilterFile>file:///${project.basedir}/${relative.parent.dir}/rulesets/findbugs-exclude-rules.xml</excludeFilterFile>-->
+                        <failOnError>${findbugs.failOnError}</failOnError>
+                        <fork>${findbugs.fork}</fork>
+                        <!--<includeFilterFile>file:///${project.basedir}/${relative.parent.dir}/rulesets/findbugs-rules.xml</includeFilterFile>-->
+                        <includeTests>${findbugs.includeTests}</includeTests>
+                        <jvmArgs>${findbugs.jvmArgs}</jvmArgs>
+                        <relaxed>${findbugs.relaxed}</relaxed>
+                        <skip>${maven.quality.skip}</skip>
+                        <threshold>${findbugs.threshold}</threshold>
+                    </configuration>
+                </plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>jdepend-maven-plugin</artifactId><version>${jdepend-maven-plugin.version}</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>taglist-maven-plugin</artifactId><version>${taglist-maven-plugin.version}</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>versions-maven-plugin</artifactId><version>${versions-maven-plugin.version}</version></plugin>
                 <plugin>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>${maven-checkstyle-plugin.version}</version>
+                    <configuration>
+                        <configLocation>${checkstyle.config.location}</configLocation>
+                        <consoleOutput>${checkstyle.consoleOutput}</consoleOutput>
+                        <encoding>${project.reporting.outputEncoding}</encoding>
+                        <excludes>${src.generated.dir}</excludes>
+                        <failOnViolation>${checkstyle.failOnViolation}</failOnViolation>
+                        <failsOnError>${checkstyle.failsOnError}</failsOnError>
+                        <linkXRef>${linkXRef}</linkXRef>
+                        <logViolationsToConsole>${checkstyle.logViolationsToConsole}</logViolationsToConsole>
+                        <maxAllowedViolations>${checkstyle.maxAllowedViolations}</maxAllowedViolations>
+                        <skip>${maven.quality.skip}</skip>
+                        <sourceDirectories>
+                            <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+                        </sourceDirectories>
+                        <violationSeverity>${checkstyle.violationSeverity}</violationSeverity>
+                    </configuration>
                     <dependencies>
-                        <!--<dependency><groupId>com.puppycrawl.tools</groupId><artifactId>checkstyle</artifactId><version>6.19</version></dependency>-->
-                        <dependency><groupId>com.puppycrawl.tools</groupId><artifactId>checkstyle</artifactId><version>8.10</version></dependency>
+                        <dependency><groupId>com.puppycrawl.tools</groupId><artifactId>checkstyle</artifactId><version>${checkstyle.version}</version></dependency>
                     </dependencies>
                 </plugin>
-                <plugin><artifactId>maven-jxr-plugin</artifactId><version>2.5</version></plugin>
-                <!-- maven-pmd-plugin:3.6   depends on net.sourceforge.pmd:pmd:5.3.5 -->
-                <!-- maven-pmd-plugin:3.7   depends on net.sourceforge.pmd:pmd:5.5.1 -->
-                <!-- maven-pmd-plugin:3.9.0 depends on net.sourceforge.pmd:pmd:6.4.0 -->
-                <!-- maven-pmd-plugin:3.10.0 depends on net.sourceforge.pmd:pmd:6.4.0 -->
-                <plugin><artifactId>maven-pmd-plugin</artifactId><version>3.10.0</version></plugin>
-                <plugin><artifactId>maven-surefire-report-plugin</artifactId><version>2.21.0</version></plugin>
+                <plugin><artifactId>maven-jxr-plugin</artifactId><version>${maven-jxr-plugin.version}</version></plugin>
+                <plugin>
+                    <artifactId>maven-pmd-plugin</artifactId><version>${maven-pmd-plugin.version}</version>
+                    <configuration>
+                        <!-- Dont include clover instrumented src, when pmd  -->
+                        <excludeRoots><excludeRoot>${project.build.directory}/clover/src</excludeRoot></excludeRoots>
+                        <excludes><exclude>${src.generated.dir}</exclude></excludes>
+                        <failOnViolation>${pmd.failOnViolation}</failOnViolation>
+                        <linkXRef>${linkXRef}</linkXRef>
+                        <printFailingErrors>${pmd.printFailingErrors}</printFailingErrors>
+                        <rulesets><ruleset>${pmd.ruleset.location}</ruleset></rulesets>
+                        <skip>${maven.quality.skip}</skip>
+                        <targetJdk>${java.version}</targetJdk>
+                        <verbose>${pmd.verbose}</verbose>
+                    </configuration>
+                </plugin>
+                <plugin><artifactId>maven-surefire-report-plugin</artifactId><version>${maven-surefire-report-plugin.version}</version></plugin>
 
                 <plugin>
                     <groupId>pl.project13.maven</groupId>
                     <artifactId>git-commit-id-plugin</artifactId>
-                    <version>2.2.4</version>
+                    <version>${git-commit-id-plugin.version}</version>
                     <executions>
                         <execution>
                             <id>get-the-git-infos</id>
@@ -512,7 +701,7 @@
                     <!--<forceJavacCompilerUse>true</forceJavacCompilerUse>-->
                 </configuration>
                 <dependencies>
-                    <dependency><groupId>org.codehaus.plexus</groupId><artifactId>plexus-compiler-javac-errorprone</artifactId><version>${org.codehaus.plexus_plexus-compiler-javac-errorprone}</version></dependency>
+                    <dependency><groupId>org.codehaus.plexus</groupId><artifactId>plexus-compiler-javac-errorprone</artifactId><version>${org.codehaus.plexus_plexus-compiler-javac-errorprone.version}</version></dependency>
                     <dependency><groupId>com.google.errorprone</groupId><artifactId>error_prone_core</artifactId><version>${com.google.errorprone_error_prone_core.version}</version></dependency>
                 </dependencies>
             </plugin>
@@ -593,22 +782,24 @@
             </plugin>
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <failOnError>false</failOnError><charset>${project.build.sourceEncoding}</charset><encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
                 <executions>
-                    <execution><id>attach-javadocs</id><goals><goal>jar</goal></goals></execution>
-                    <execution><id>attach-test-javadocs</id><goals><goal>test-jar</goal></goals></execution>
-                    <execution><id>aggregate</id><goals><goal>aggregate</goal></goals><phase>site</phase></execution>
-                    <execution><id>test-aggregate</id><goals><goal>test-aggregate</goal></goals><phase>site</phase></execution>
+                    <execution><id>attach-javadocs</id><goals><goal>jar</goal></goals><phase>prepare-package</phase></execution>
+                    <execution><id>attach-test-javadocs</id><goals><goal>test-jar</goal></goals><phase>prepare-package</phase></execution>
                 </executions>
             </plugin>
             <!-- https://maven.apache.org/plugins/maven-source-plugin/test-jar-no-fork-mojo.html -->
             <!-- Use 'jar-no-fork' not 'jar' to avoid trigger default lifecycle binding of @Execute( phase = LifecyclePhase.GENERATE_SOURCES ) -->
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
+                <configuration>
+                    <skipSource>${maven.source.skip}</skipSource>
+                </configuration>
                 <executions>
-                    <execution><id>attach-sources</id><goals><goal>jar-no-fork</goal></goals></execution>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>prepare-package</phase>
+                        <goals><goal>jar-no-fork</goal></goals>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -619,7 +810,7 @@
                     <execution>
                         <goals><goal>execute</goal></goals>
                         <phase>initialize</phase>
-                        <configuration><source>System.setProperty("local.deploy.model.path", "${project.groupId}".replace('.', '/')+"/${project.artifactId}")</source></configuration>
+                        <configuration><source>System.setProperty("local.deploy.model.path", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
                     </execution>
                 </executions>
             </plugin>-->
@@ -630,7 +821,7 @@
                     <execution>
                         <goals><goal>execute</goal></goals>
                         <phase>initialize</phase>
-                        <configuration><source>System.setProperty("local.deploy.model.path", "${project.groupId}".replace('.', '/')+"/${project.artifactId}")</source></configuration>
+                        <configuration><source>System.setProperty("local.deploy.model.path", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -639,7 +830,7 @@
             <!-- use mvn -N io.takari:maven:wrapper instead of mvn wrapper:wrapper -->
             <!-- mvn wrapper:wrapper -->
             <!--<plugin>
-                <groupId>com.rimerosolutions.maven.plugins</groupId><artifactId>wrapper-maven-plugin</artifactId><version>0.0.4</version>
+                <groupId>com.rimerosolutions.maven.plugins</groupId><artifactId>wrapper-maven-plugin</artifactId><version>${wrapper-maven-plugin.version}</version>
                 <configuration><mavenVersion>3.5.4</mavenVersion></configuration>
             </plugin>-->
         </plugins>
@@ -648,8 +839,46 @@
         </extensions-->
     </build>
 
+    <dependencyManagement>
+        <!-- @formatter:off -->
+        <dependencies>
+            <dependency><groupId>findbugs</groupId><artifactId>annotations</artifactId><version>${findbugs-annotations.version}</version><scope>provided</scope></dependency>
+        </dependencies>
+        <!-- @formatter:on -->
+    </dependencyManagement>
+
     <profiles>
         <!-- @formatter:off -->
+        <profile>
+            <id>skip-artifacts</id>
+            <activation><property><name>skip-artifacts</name><value>true</value></property><activeByDefault>false</activeByDefault></activation>
+            <properties>
+                <maven.javadoc.skip>true</maven.javadoc.skip>
+                <maven.source.skip>true</maven.source.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>skip-quality</id>
+            <activation><property><name>skip-quality</name><value>true</value></property><activeByDefault>false</activeByDefault></activation>
+            <properties>
+                <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
+                <checkstyle.failsOnError>false</checkstyle.failsOnError>
+                <findbugs.failOnError>false</findbugs.failOnError>
+                <maven.javadoc.failsOnError>false</maven.javadoc.failsOnError>
+                <pmd.failOnViolation>false</pmd.failOnViolation>
+                <maven.quality.skip>true</maven.quality.skip>
+                <sonar.buildbreaker.skip>true</sonar.buildbreaker.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>skip-tests</id>
+            <activation><property><name>skip-tests</name><value>true</value></property><activeByDefault>false</activeByDefault></activation>
+            <properties>
+                <maven.test.skip>true</maven.test.skip>
+                <maven.integration-test.skip>true</maven.integration-test.skip>
+            </properties>
+        </profile>
+
         <profile>
             <id>default-private-nexus3.repository</id>
             <activation><property><name>!private-nexus3.repository</name></property></activation>
@@ -719,13 +948,12 @@
                 <pluginManagement>
                     <plugins>
                         <!-- see: https://github.com/SonarSource/sonar-scanner-maven -->
-                        <plugin><groupId>org.sonarsource.scanner.maven</groupId><artifactId>sonar-maven-plugin</artifactId><version>3.4.1.1168</version></plugin>
+                        <plugin><groupId>org.sonarsource.scanner.maven</groupId><artifactId>sonar-maven-plugin</artifactId><version>${sonar-maven-plugin.version}</version></plugin>
                     </plugins>
                 </pluginManagement>
                 <plugins>
                     <!-- see: https://dzone.com/articles/integration-jenkins-jacoco-and-sonarqube -->
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <!-- Specific to generate mapping between tests and covered code -->
@@ -870,8 +1098,8 @@
             <build>
                 <pluginManagement>
                     <plugins>
-                        <plugin><groupId>com.qualinsight.mojo.cobertura</groupId><artifactId>qualinsight-mojo-cobertura-core</artifactId><version>2.0.0</version></plugin>
-                        <!--<plugin><groupId>org.codehaus.mojo</groupId><artifactId>cobertura-maven-plugin</artifactId><version>2.7</version></plugin>-->
+                        <plugin><groupId>com.qualinsight.mojo.cobertura</groupId><artifactId>qualinsight-mojo-cobertura-core</artifactId><version>${qualinsight-mojo-cobertura-core.version}</version></plugin>
+                        <!--<plugin><groupId>org.codehaus.mojo</groupId><artifactId>cobertura-maven-plugin</artifactId><version>${cobertura-maven-plugin.version}</version></plugin>-->
                     </plugins>
                 </pluginManagement>
                 <plugins>
@@ -960,7 +1188,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.8</version>
+                        <version>${nexus-staging-maven-plugin.version}</version>
                         <extensions>true</extensions>
                         <configuration>
                             <autoReleaseAfterClose>false</autoReleaseAfterClose>
@@ -1054,10 +1282,6 @@
             <activation><property><name>!wagon.merge-maven-repos.targetId</name></property><activeByDefault>false</activeByDefault></activation>
             <properties><wagon.merge-maven-repos.targetId>private-nexus3-${build.publish.channel}s</wagon.merge-maven-repos.targetId></properties>
         </profile>
-        <!-- Why org.codehaus.mojo:wagon-maven-plugin:wagon-maven-plugin-2.0.1-snapshot-chshawkn-1.6?
-            see: https://www.mail-archive.com/users@maven.apache.org/msg129243.html -->
-        <!--http://www.mojohaus.org/wagon-maven-plugin/usage.html-->
-        <!--http://www.mojohaus.org/wagon-maven-plugin/-->
         <profile>
             <id>mvn-deploy-publish-segregation-by-wagon</id>
             <activation><property><name>mvn_deploy_publish_segregation</name><value>true</value></property><activeByDefault>false</activeByDefault></activation>
@@ -1074,7 +1298,7 @@
             <build>
                 <pluginManagement>
                     <plugins>
-                        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>wagon-maven-plugin</artifactId><version>wagon-maven-plugin-2.0.1-snapshot-chshawkn-1.6</version></plugin>
+                        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>wagon-maven-plugin</artifactId><version>${wagon-maven-plugin.version}</version></plugin>
                     </plugins>
                 </pluginManagement>
                 <plugins>
@@ -1123,7 +1347,7 @@
                 <pluginManagement>
                     <plugins>
                         <plugin>
-                            <groupId>com.github.github</groupId><artifactId>site-maven-plugin</artifactId><version>0.13.0.OSS-M1</version>
+                            <groupId>com.github.github</groupId><artifactId>site-maven-plugin</artifactId><version>${site-maven-plugin.version}</version>
                         </plugin>
                     </plugins>
                 </pluginManagement>
@@ -1210,7 +1434,7 @@
 
         <!-- set property checkstyle.config.location in MAVEN_OPTS, pom.xml or settings.xml. -->
         <profile>
-            <id>default-checkstyle-config</id>
+            <id>default-checkstyle-configLocation</id>
             <activation><property><name>!checkstyle.config.location</name></property></activation>
             <properties><checkstyle.config.location>https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/checkstyle/google_checks_8.10.xml</checkstyle.config.location></properties>
         </profile>
@@ -1270,43 +1494,58 @@
         <profile>
             <id>reports-for-site</id>
             <activation><property><name>site</name><value>true</value></property></activation>
-            <properties>
-                <umlgraph.version>5.6.6</umlgraph.version>
-            </properties>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>findbugs-findbugs</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>findbugs</goal>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution><id>aggregate</id><goals><goal>aggregate</goal></goals><phase>site</phase></execution>
+                            <execution><id>test-aggregate</id><goals><goal>test-aggregate</goal></goals><phase>site</phase></execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <artifactId>maven-site-plugin</artifactId>
                         <configuration><attach>true</attach></configuration>
                     </plugin>
-
                     <plugin>
                         <artifactId>maven-checkstyle-plugin</artifactId>
-                        <configuration>
-                            <configLocation>${checkstyle.config.location}</configLocation>
-                            <encoding>${project.reporting.outputEncoding}</encoding>
-                            <consoleOutput>true</consoleOutput>
-                            <failsOnError>false</failsOnError>
-                        </configuration>
                         <executions>
-                            <execution><id>validate</id><phase>validate</phase><goals><goal>check</goal></goals></execution>
+                            <execution><id>check</id><phase>process-sources</phase><goals><goal>check</goal></goals></execution>
                         </executions>
                     </plugin>
                     <!-- see: http://maven.apache.org/plugins/maven-pmd-plugin/examples/multi-module-config.html -->
                     <plugin>
                         <artifactId>maven-pmd-plugin</artifactId>
-                        <configuration>
-                            <failOnViolation>false</failOnViolation><printFailingErrors>true</printFailingErrors><rulesets><ruleset>${pmd.ruleset.location}</ruleset></rulesets>
-                        </configuration>
                         <executions>
-                            <execution><goals><goal>check</goal><goal>cpd-check</goal></goals></execution>
+                            <execution>
+                                <id>pmd-check</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>pmd</goal>
+                                    <goal>check</goal>
+                                    <goal>cpd-check</goal>
+                                </goals>
+                            </execution>
                         </executions>
                     </plugin>
 
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId><artifactId>animal-sniffer-maven-plugin</artifactId>
                         <configuration>
-                            <signature><groupId>org.codehaus.mojo.signature</groupId><artifactId>java18</artifactId><version>1.0</version></signature>
+                            <signature><groupId>org.codehaus.mojo.signature</groupId><artifactId>java18</artifactId><version>${java18.version}</version></signature>
                         </configuration>
                     </plugin>
                     <!--<plugin>
@@ -1326,14 +1565,15 @@
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <configuration>
-                            <failOnError>false</failOnError>
-                            <charset>${project.build.sourceEncoding}</charset>
-                            <encoding>${project.build.sourceEncoding}</encoding>
-                            <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
-                            <docletArtifact><groupId>org.umlgraph</groupId><artifactId>umlgraph</artifactId><version>${umlgraph.version}</version></docletArtifact>
-                            <additionalOptions>-views -all</additionalOptions>
-                            <!-- UML Graph needs to match HTML tag to insert images into javadoc -->
                             <additionalJOption>-J-Duser.language=en</additionalJOption>
+                            <additionalOptions>-views -all</additionalOptions>
+                            <charset>${project.build.sourceEncoding}</charset>
+                            <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
+                            <!-- UML Graph needs to match HTML tag to insert images into javadoc -->
+                            <docletArtifact><groupId>org.umlgraph</groupId><artifactId>umlgraph</artifactId><version>${umlgraph.version}</version></docletArtifact>
+                            <encoding>${project.build.sourceEncoding}</encoding>
+                            <failOnError>${maven.javadoc.failsOnError}</failOnError>
+                            <skip>${maven.javadoc.skip}</skip>
                             <useStandardDocletOptions>true</useStandardDocletOptions>
                         </configuration>
                         <reportSets>
@@ -1352,7 +1592,7 @@
                         <artifactId>maven-surefire-report-plugin</artifactId>
                         <configuration>
                             <aggregate>true</aggregate>
-                            <linkXRef>true</linkXRef>
+                            <linkXRef>${linkXRef}</linkXRef>
                         </configuration>
                         <reportSets>
                             <reportSet>
@@ -1375,10 +1615,19 @@
                             <reportSet>
                                 <configuration>
                                     <configLocation>${checkstyle.config.location}</configLocation>
+                                    <consoleOutput>${checkstyle.consoleOutput}</consoleOutput>
                                     <encoding>${project.reporting.outputEncoding}</encoding>
-                                    <consoleOutput>false</consoleOutput>
-                                    <failsOnError>false</failsOnError>
-                                    <linkXRef>true</linkXRef>
+                                    <excludes>${src.generated.dir}</excludes>
+                                    <failOnViolation>${checkstyle.failOnViolation}</failOnViolation>
+                                    <failsOnError>${checkstyle.failsOnError}</failsOnError>
+                                    <linkXRef>${linkXRef}</linkXRef>
+                                    <logViolationsToConsole>${checkstyle.logViolationsToConsole}</logViolationsToConsole>
+                                    <maxAllowedViolations>${checkstyle.maxAllowedViolations}</maxAllowedViolations>
+                                    <skip>${maven.quality.skip}</skip>
+                                    <sourceDirectories>
+                                        <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+                                    </sourceDirectories>
+                                    <violationSeverity>${checkstyle.violationSeverity}</violationSeverity>
                                 </configuration>
                                 <reports><report>checkstyle</report></reports>
                             </reportSet>
@@ -1412,7 +1661,7 @@
                         <artifactId>maven-pmd-plugin</artifactId>
                         <configuration>
                             <aggregate>true</aggregate>
-                            <linkXRef>true</linkXRef>
+                            <linkXRef>${linkXRef}</linkXRef>
                             <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
                             <minimumTokens>100</minimumTokens>
                             <rulesets><ruleset>${pmd.ruleset.location}</ruleset></rulesets>
@@ -1527,7 +1776,7 @@
                         <plugin>
                             <groupId>com.github.eirslett</groupId>
                             <artifactId>frontend-maven-plugin</artifactId>
-                            <version>1.6</version>
+                            <version>${frontend-maven-plugin.version}</version>
                             <configuration>
                                 <installDirectory>.mvn</installDirectory>
                                 <!-- Defaults to https://nodejs.org/dist/ -->
@@ -1589,7 +1838,7 @@
                     <plugin><artifactId>maven-failsafe-plugin</artifactId><configuration><argLine>${argLine}</argLine></configuration></plugin>
                     <plugin><artifactId>maven-surefire-plugin</artifactId><configuration><argLine>${argLine}</argLine></configuration></plugin>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId><artifactId>maven-toolchains-plugin</artifactId>
+                        <artifactId>maven-toolchains-plugin</artifactId>
                         <configuration><toolchains><jdk><version>${java.version}</version><!--<vendor>oracle</vendor>--></jdk></toolchains></configuration>
                         <executions><execution><phase>validate</phase><goals><goal>toolchain</goal></goals></execution></executions>
                     </plugin>
@@ -1600,6 +1849,12 @@
                     <plugin><artifactId>maven-pmd-plugin</artifactId><configuration><targetJdk>${java.version}</targetJdk></configuration></plugin>
                 </plugins>
             </reporting>
+        </profile>
+        <profile>
+            <!-- Java8 does not need addModules, purpose of this is to suppress warning 'Cannot resolve symbol'   -->
+            <id>default-java8-jvmArguments-addModules</id>
+            <activation><jdk>1.8</jdk><property><name>!jvmArguments.addModules</name></property></activation>
+            <properties><jvmArguments.addModules></jvmArguments.addModules></properties>
         </profile>
         <profile>
             <id>default-java9-jvmArguments-addModules</id>
@@ -1636,7 +1891,6 @@
             <activation><jdk>1.9</jdk><activeByDefault>false</activeByDefault></activation>
             <properties>
                 <!-- Runtime modules for java9 -->
-                <javax.activation.version>1.1.1</javax.activation.version>
                 <jaxb-api.version>2.3.0</jaxb-api.version>
                 <java.version>1.9</java.version>
                 <maven.compiler.release>9</maven.compiler.release>
@@ -1649,7 +1903,7 @@
                         <plugin>
                             <groupId>com.spotify</groupId><artifactId>docker-maven-plugin</artifactId>
                             <dependencies>
-                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
+                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${java9-javax.activation.version}</version></dependency>
                             </dependencies>
                         </plugin>
                     </plugins>
@@ -1690,7 +1944,7 @@
             </build>
             <dependencyManagement>
                 <dependencies>
-                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
+                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${java9-javax.activation.version}</version></dependency>
                     <!-- Hibernate java.lang.NoClassDefFoundError: javax/xml/bind/JAXBException -->
                     <dependency><groupId>javax.xml.bind</groupId><artifactId>jaxb-api</artifactId><version>${jaxb-api.version}</version></dependency>
                 </dependencies>
@@ -1736,7 +1990,6 @@
             <activation><jdk>1.10</jdk><activeByDefault>false</activeByDefault></activation>
             <properties>
                 <!-- Runtime modules for java10 -->
-                <javax.activation.version>1.1.1</javax.activation.version>
                 <jaxb-api.version>2.3.0</jaxb-api.version>
                 <java.version>1.10</java.version>
                 <maven.compiler.release>10</maven.compiler.release>
@@ -1749,7 +2002,7 @@
                         <plugin>
                             <groupId>com.spotify</groupId><artifactId>docker-maven-plugin</artifactId>
                             <dependencies>
-                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
+                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${java10-javax.activation.version}</version></dependency>
                             </dependencies>
                         </plugin>
                     </plugins>
@@ -1790,7 +2043,7 @@
             </build>
             <dependencyManagement>
                 <dependencies>
-                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
+                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${java10-javax.activation.version}</version></dependency>
                     <!-- Hibernate java.lang.NoClassDefFoundError: javax/xml/bind/JAXBException -->
                     <dependency><groupId>javax.xml.bind</groupId><artifactId>jaxb-api</artifactId><version>${jaxb-api.version}</version></dependency>
                 </dependencies>
@@ -1872,7 +2125,7 @@
                 <pluginManagement>
                     <plugins>
                         <plugin>
-                            <groupId>net.alchim31.maven</groupId><artifactId>scala-maven-plugin</artifactId><version>3.4.2</version>
+                            <groupId>net.alchim31.maven</groupId><artifactId>scala-maven-plugin</artifactId><version>${scala-maven-plugin.version}</version>
                         </plugin>
                     </plugins>
                 </pluginManagement>
@@ -1955,7 +2208,7 @@
             <build>
                 <pluginManagement>
                     <plugins>
-                        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>clirr-maven-plugin</artifactId><version>2.8</version></plugin>
+                        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>clirr-maven-plugin</artifactId><version>${clirr-maven-plugin.version}</version></plugin>
                     </plugins>
                 </pluginManagement>
                 <plugins>
@@ -1969,21 +2222,19 @@
             </reporting>
         </profile>
 
-
         <profile>
             <id>jira_project</id>
             <activation><property><name>jira.projectKey</name></property><activeByDefault>false</activeByDefault></activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-changes-plugin</artifactId><version>2.12.1</version></plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
+            <properties>
+                <jira.user>admin</jira.user>
+                <jira.password>admin_pass</jira.password>
+            </properties>
             <reporting>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId><artifactId>maven-changes-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-changes-plugin</artifactId>
+                        <version>${maven-changes-plugin.version}</version>
                         <configuration>
                             <!-- if jira version > 5.1, set 'useJql' to true -->
                             <useJql>true</useJql>
@@ -1996,7 +2247,12 @@
                             <statusIds>关闭</statusIds>
                         </configuration>
                         <reportSets>
-                            <reportSet><reports><report>jira-report</report><!--<report>changes-report</report>--></reports></reportSet>
+                            <reportSet>
+                                <reports>
+                                    <report>jira-report</report>
+                                    <!--<report>changes-report</report>-->
+                                </reports>
+                            </reportSet>
                         </reportSets>
                     </plugin>
                 </plugins>
