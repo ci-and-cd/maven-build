@@ -156,6 +156,10 @@
         <checkstyle.failsOnError>false</checkstyle.failsOnError>
         <checkstyle.logViolationsToConsole>true</checkstyle.logViolationsToConsole>
         <checkstyle.maxAllowedViolations>10</checkstyle.maxAllowedViolations>
+        <!-- Violations to ignore. This is a comma-separated list, each value being either a rule name, a rule category or a java package name of rule class. -->
+        <!-- see: https://issues.apache.org/jira/browse/MCHECKSTYLE-347?page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel&focusedCommentId=16314555#comment-16314555 -->
+        <checkstyle.violation.ignore>foo,bar</checkstyle.violation.ignore>
+        <!-- Valid values are "error", "warning" and "info" -->
         <checkstyle.violationSeverity>warning</checkstyle.violationSeverity>
 
         <downloadSources>true</downloadSources>
@@ -446,16 +450,12 @@
                         <consoleOutput>${checkstyle.consoleOutput}</consoleOutput>
                         <encoding>${project.reporting.outputEncoding}</encoding>
                         <excludes>${src.generated.dir}</excludes>
-                        <failOnViolation>${checkstyle.failOnViolation}</failOnViolation>
                         <failsOnError>${checkstyle.failsOnError}</failsOnError>
-                        <linkXRef>${linkXRef}</linkXRef>
-                        <logViolationsToConsole>${checkstyle.logViolationsToConsole}</logViolationsToConsole>
                         <maxAllowedViolations>${checkstyle.maxAllowedViolations}</maxAllowedViolations>
                         <skip>${maven.quality.skip}</skip>
                         <sourceDirectories>
                             <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
                         </sourceDirectories>
-                        <violationSeverity>${checkstyle.violationSeverity}</violationSeverity>
                     </configuration>
                     <dependencies>
                         <dependency><groupId>com.puppycrawl.tools</groupId><artifactId>checkstyle</artifactId><version>${checkstyle.version}</version></dependency>
@@ -1523,7 +1523,15 @@
                     <plugin>
                         <artifactId>maven-checkstyle-plugin</artifactId>
                         <executions>
-                            <execution><id>check</id><phase>process-sources</phase><goals><goal>check</goal></goals></execution>
+                            <execution>
+                                <configuration>
+                                    <failOnViolation>${checkstyle.failOnViolation}</failOnViolation>
+                                    <logViolationsToConsole>${checkstyle.logViolationsToConsole}</logViolationsToConsole>
+                                    <violationIgnore>${checkstyle.violation.ignore}</violationIgnore>
+                                    <violationSeverity>${checkstyle.violationSeverity}</violationSeverity>
+                                </configuration>
+                                <id>check</id><phase>process-sources</phase><goals><goal>check</goal></goals>
+                            </execution>
                         </executions>
                     </plugin>
                     <!-- see: http://maven.apache.org/plugins/maven-pmd-plugin/examples/multi-module-config.html -->
@@ -1614,20 +1622,7 @@
                         <reportSets>
                             <reportSet>
                                 <configuration>
-                                    <configLocation>${checkstyle.config.location}</configLocation>
-                                    <consoleOutput>${checkstyle.consoleOutput}</consoleOutput>
-                                    <encoding>${project.reporting.outputEncoding}</encoding>
-                                    <excludes>${src.generated.dir}</excludes>
-                                    <failOnViolation>${checkstyle.failOnViolation}</failOnViolation>
-                                    <failsOnError>${checkstyle.failsOnError}</failsOnError>
                                     <linkXRef>${linkXRef}</linkXRef>
-                                    <logViolationsToConsole>${checkstyle.logViolationsToConsole}</logViolationsToConsole>
-                                    <maxAllowedViolations>${checkstyle.maxAllowedViolations}</maxAllowedViolations>
-                                    <skip>${maven.quality.skip}</skip>
-                                    <sourceDirectories>
-                                        <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
-                                    </sourceDirectories>
-                                    <violationSeverity>${checkstyle.violationSeverity}</violationSeverity>
                                 </configuration>
                                 <reports><report>checkstyle</report></reports>
                             </reportSet>
