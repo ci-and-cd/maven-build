@@ -17,6 +17,8 @@
         <emptyLine />
         <package name="antlr" withSubpackages="true" static="false" />
         <emptyLine />
+        <package name="ai" withSubpackages="true" static="false" />
+        <emptyLine />
         <package name="ar" withSubpackages="true" static="false" />
         <emptyLine />
         <package name="asposewobfuscated" withSubpackages="true" static="false" />
@@ -123,11 +125,15 @@
         <emptyLine />
         <package name="jasmin" withSubpackages="true" static="false" />
         <emptyLine />
+        <package name="java" withSubpackages="true" static="false" />
+        <emptyLine />
         <package name="javancss" withSubpackages="true" static="false" />
         <emptyLine />
         <package name="javanet" withSubpackages="true" static="false" />
         <emptyLine />
         <package name="javassist" withSubpackages="true" static="false" />
+        <emptyLine />
+        <package name="javax" withSubpackages="true" static="false" />
         <emptyLine />
         <package name="javazoom" withSubpackages="true" static="false" />
         <emptyLine />
@@ -250,10 +256,6 @@
         <package name="woolfel" withSubpackages="true" static="false" />
         <emptyLine />
         <package name="wowza" withSubpackages="true" static="false" />
-        <emptyLine />
-        <package name="java" withSubpackages="true" static="false" />
-        <emptyLine />
-        <package name="javax" withSubpackages="true" static="false" />
         <emptyLine />
         <package name="" withSubpackages="true" static="false" />
       </value>
