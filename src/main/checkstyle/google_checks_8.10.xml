@@ -57,6 +57,7 @@
         <module name="LeftCurly"/>
         <module name="RightCurly">
             <!-- see: https://stackoverflow.com/questions/53052187/fail-to-execute-goal-when-using-checkstyle-maven-plugin -->
+            <!-- java.lang.StringIndexOutOfBoundsException: String index out of range: -1 -->
             <!--<property name="id" value="RightCurlySame"/>-->
             <property name="tokens" value="LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_DO"/>
         </module>
@@ -87,11 +88,14 @@
         <module name="EmptyLineSeparator">
             <property name="allowNoEmptyLineBetweenFields" value="true"/>
         </module>
+        <!-- java.lang.StringIndexOutOfBoundsException: String index out of range: -1 -->
+        <!--
         <module name="SeparatorWrap">
             <property name="id" value="SeparatorWrapDot"/>
             <property name="tokens" value="DOT"/>
             <property name="option" value="nl"/>
         </module>
+        -->
         <module name="SeparatorWrap">
             <property name="id" value="SeparatorWrapComma"/>
             <property name="tokens" value="COMMA"/>
@@ -202,11 +206,14 @@
                       value="BAND, BOR, BSR, BXOR, DIV, EQUAL, GE, GT, LAND, LE, LITERAL_INSTANCEOF, LOR,
                     LT, MINUS, MOD, NOT_EQUAL, PLUS, QUESTION, SL, SR, STAR, METHOD_REF "/>
         </module>
+        <!-- java.lang.StringIndexOutOfBoundsException: String index out of range: -1 -->
+        <!--
         <module name="AnnotationLocation">
             <property name="id" value="AnnotationLocationMostCases"/>
             <property name="tokens"
                       value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, METHOD_DEF, CTOR_DEF"/>
         </module>
+        -->
         <module name="AnnotationLocation">
             <property name="id" value="AnnotationLocationVariables"/>
             <property name="tokens" value="VARIABLE_DEF"/>
