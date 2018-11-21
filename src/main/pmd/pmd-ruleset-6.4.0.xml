@@ -34,11 +34,13 @@
         <exclude name="AbstractNaming"/>
         <exclude name="AtLeastOneConstructor"/>
         <exclude name="AvoidFinalLocalVariable"/>
+        <exclude name="CommentDefaultAccessModifier"/>
         <exclude name="ConfusingTernary"/>
         <exclude name="DefaultPackage"/>
         <exclude name="EmptyMethodInAbstractClassShouldBeAbstract"/>
         <exclude name="ShortVariable"/>
     </rule>
+    <!--<rule ref="category/java/codestyle.xml/CommentDefaultAccessModifier"/>-->
     <rule ref="category/java/codestyle.xml/LongVariable">
         <properties>
             <property name="minimum" value="56"/>
