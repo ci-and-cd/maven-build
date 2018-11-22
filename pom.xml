@@ -266,6 +266,7 @@
         <java18.version>1.0</java18.version>
         <java9-javax.activation.version>1.1.1</java9-javax.activation.version>
         <jdepend-maven-plugin.version>2.0</jdepend-maven-plugin.version>
+        <jetbrains-annotations.version>16.0.3</jetbrains-annotations.version>
         <jsch.version>0.1.54</jsch.version>
 
         <!--<kotlin.version>1.1.2-2</kotlin.version>-->
@@ -846,6 +847,7 @@
         <!-- @formatter:off -->
         <dependencies>
             <dependency><groupId>com.google.code.findbugs</groupId><artifactId>annotations</artifactId><version>${findbugs-annotations.version}</version></dependency>
+            <dependency><groupId>org.jetbrains</groupId><artifactId>annotations</artifactId><version>${jetbrains-annotations.version}</version></dependency>
         </dependencies>
         <!-- @formatter:on -->
     </dependencyManagement>
