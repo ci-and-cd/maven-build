@@ -244,7 +244,7 @@
         <doxia-module-markdown.version>1.8</doxia-module-markdown.version>
 
         <echo-maven-plugin.version>0.3.0</echo-maven-plugin.version>
-        <findbugs-annotations.version>1.0.0</findbugs-annotations.version>
+        <findbugs-annotations.version>3.0.1u2</findbugs-annotations.version>
         <findbugs-maven-plugin.version>3.0.5</findbugs-maven-plugin.version>
         <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
 
@@ -845,7 +845,7 @@
     <dependencyManagement>
         <!-- @formatter:off -->
         <dependencies>
-            <dependency><groupId>findbugs</groupId><artifactId>annotations</artifactId><version>${findbugs-annotations.version}</version><scope>provided</scope></dependency>
+            <dependency><groupId>com.google.code.findbugs</groupId><artifactId>annotations</artifactId><version>${findbugs-annotations.version}</version></dependency>
         </dependencies>
         <!-- @formatter:on -->
     </dependencyManagement>
