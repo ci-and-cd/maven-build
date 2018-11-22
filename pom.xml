@@ -240,7 +240,7 @@
         <!--<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>-->
         <com.google.errorprone_error_prone_core.version>2.3.1</com.google.errorprone_error_prone_core.version>
 
-        <dependency-check-maven.version>3.3.4</dependency-check-maven.version>
+        <dependency-check-maven.version>4.0.0</dependency-check-maven.version>
         <doxia-module-markdown.version>1.8</doxia-module-markdown.version>
 
         <echo-maven-plugin.version>0.3.0</echo-maven-plugin.version>
@@ -1750,6 +1750,20 @@
         <profile>
             <id>dependency-check</id>
             <activation><property><name>dependency-check</name><value>true</value></property></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
             <reporting>
                 <plugins>
                     <plugin>
