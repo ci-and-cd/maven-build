@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 
     <modules>
         <module>build-docker</module>
@@ -171,7 +171,7 @@
         <findbugs.includeTests>false</findbugs.includeTests>
         <findbugs.jvmArgs>-Xmx1024m -Xms128m -XX:MaxMetaspaceSize=512m</findbugs.jvmArgs>
         <findbugs.relaxed>false</findbugs.relaxed>
-        <!-- findbugs.threshold: High, Default, Low, Ignore -->
+        <!-- findbugs.threshold: High, Default, Low, Ignore, If set to "High", only high confidence bugs are reported -->
         <findbugs.threshold>Default</findbugs.threshold>
 
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
@@ -240,7 +240,7 @@
         <!--<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>-->
         <com.google.errorprone_error_prone_core.version>2.3.1</com.google.errorprone_error_prone_core.version>
 
-        <dependency-check-maven.version>3.3.4</dependency-check-maven.version>
+        <dependency-check-maven.version>4.0.0</dependency-check-maven.version>
         <doxia-module-markdown.version>1.8</doxia-module-markdown.version>
 
         <echo-maven-plugin.version>0.3.0</echo-maven-plugin.version>
@@ -266,6 +266,7 @@
         <java18.version>1.0</java18.version>
         <java9-javax.activation.version>1.1.1</java9-javax.activation.version>
         <jdepend-maven-plugin.version>2.0</jdepend-maven-plugin.version>
+        <jetbrains-annotations.version>16.0.3</jetbrains-annotations.version>
         <jsch.version>0.1.54</jsch.version>
 
         <!--<kotlin.version>1.1.2-2</kotlin.version>-->
@@ -846,6 +847,7 @@
         <!-- @formatter:off -->
         <dependencies>
             <dependency><groupId>com.google.code.findbugs</groupId><artifactId>annotations</artifactId><version>${findbugs-annotations.version}</version></dependency>
+            <dependency><groupId>org.jetbrains</groupId><artifactId>annotations</artifactId><version>${jetbrains-annotations.version}</version></dependency>
         </dependencies>
         <!-- @formatter:on -->
     </dependencyManagement>
@@ -872,6 +874,23 @@
                 <maven.quality.skip>true</maven.quality.skip>
                 <sonar.buildbreaker.skip>true</sonar.buildbreaker.skip>
             </properties>
+        </profile>
+        <profile>
+            <id>enable-findbugs-exclude-filter</id>
+            <activation><file><exists>${basedir}/findbugs-exclude-filter.xml</exists></file><activeByDefault>false</activeByDefault></activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>findbugs-maven-plugin</artifactId>
+                            <configuration>
+                                <excludeFilterFile>${basedir}/findbugs-exclude-filter.xml</excludeFilterFile>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
         </profile>
         <profile>
             <id>skip-tests</id>
@@ -1731,6 +1750,20 @@
         <profile>
             <id>dependency-check</id>
             <activation><property><name>dependency-check</name><value>true</value></property></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
             <reporting>
                 <plugins>
                     <plugin>
@@ -1847,11 +1880,6 @@
                     </plugin>
                     <plugin><artifactId>maven-failsafe-plugin</artifactId><configuration><argLine>${argLine}</argLine></configuration></plugin>
                     <plugin><artifactId>maven-surefire-plugin</artifactId><configuration><argLine>${argLine}</argLine></configuration></plugin>
-                    <plugin>
-                        <artifactId>maven-toolchains-plugin</artifactId>
-                        <configuration><toolchains><jdk><version>${java.version}</version><!--<vendor>oracle</vendor>--></jdk></toolchains></configuration>
-                        <executions><execution><phase>validate</phase><goals><goal>toolchain</goal></goals></execution></executions>
-                    </plugin>
                 </plugins>
             </build>
             <reporting>
@@ -1945,11 +1973,6 @@
                     </plugin>
                     <plugin><artifactId>maven-failsafe-plugin</artifactId><configuration><argLine>--add-modules ${jvmArguments.addModules} ${argLine}</argLine></configuration></plugin>
                     <plugin><artifactId>maven-surefire-plugin</artifactId><configuration><argLine>--add-modules ${jvmArguments.addModules} ${argLine}</argLine></configuration></plugin>
-                    <plugin>
-                        <artifactId>maven-toolchains-plugin</artifactId>
-                        <configuration><toolchains><jdk><version>${java.version}</version><!--<vendor>oracle</vendor>--></jdk></toolchains></configuration>
-                        <executions><execution><phase>validate</phase><goals><goal>toolchain</goal></goals></execution></executions>
-                    </plugin>
                 </plugins>
             </build>
             <dependencyManagement>
@@ -2044,11 +2067,6 @@
                     </plugin>
                     <plugin><artifactId>maven-failsafe-plugin</artifactId><configuration><argLine>--add-modules ${jvmArguments.addModules} ${argLine}</argLine></configuration></plugin>
                     <plugin><artifactId>maven-surefire-plugin</artifactId><configuration><argLine>--add-modules ${jvmArguments.addModules} ${argLine}</argLine></configuration></plugin>
-                    <plugin>
-                        <artifactId>maven-toolchains-plugin</artifactId>
-                        <configuration><toolchains><jdk><version>${java.version}</version><!--<vendor>oracle</vendor>--></jdk></toolchains></configuration>
-                        <executions><execution><phase>validate</phase><goals><goal>toolchain</goal></goals></execution></executions>
-                    </plugin>
                 </plugins>
             </build>
             <dependencyManagement>
@@ -2063,6 +2081,19 @@
                     <plugin><artifactId>maven-pmd-plugin</artifactId><configuration><targetJdk>${java.version}</targetJdk></configuration></plugin>
                 </plugins>
             </reporting>
+        </profile>
+        <profile>
+            <id>java-toolchains</id>
+            <activation><file><exists>${user.home}/.m2/toolchains.xml</exists></file><activeByDefault>false</activeByDefault></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-toolchains-plugin</artifactId>
+                        <configuration><toolchains><jdk><version>${java.version}</version><!--<vendor>oracle</vendor>--></jdk></toolchains></configuration>
+                        <executions><execution><phase>validate</phase><goals><goal>toolchain</goal></goals></execution></executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <!-- see: https://github.com/groovy/groovy-eclipse/wiki/Groovy-Eclipse-Maven-plugin -->
