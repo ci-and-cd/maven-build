@@ -171,7 +171,7 @@
         <findbugs.includeTests>false</findbugs.includeTests>
         <findbugs.jvmArgs>-Xmx1024m -Xms128m -XX:MaxMetaspaceSize=512m</findbugs.jvmArgs>
         <findbugs.relaxed>false</findbugs.relaxed>
-        <!-- findbugs.threshold: High, Default, Low, Ignore -->
+        <!-- findbugs.threshold: High, Default, Low, Ignore, If set to "High", only high confidence bugs are reported -->
         <findbugs.threshold>Default</findbugs.threshold>
 
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
@@ -872,6 +872,23 @@
                 <maven.quality.skip>true</maven.quality.skip>
                 <sonar.buildbreaker.skip>true</sonar.buildbreaker.skip>
             </properties>
+        </profile>
+        <profile>
+            <id>enable-findbugs-exclude-filter</id>
+            <activation><file><exists>${basedir}/findbugs-exclude-filter.xml</exists></file><activeByDefault>false</activeByDefault></activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>findbugs-maven-plugin</artifactId>
+                            <configuration>
+                                <excludeFilterFile>${basedir}/findbugs-exclude-filter.xml</excludeFilterFile>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
         </profile>
         <profile>
             <id>skip-tests</id>
