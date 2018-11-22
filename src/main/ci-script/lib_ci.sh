@@ -909,15 +909,18 @@ function run_mvn() {
     local project_version=$(${MVN_CMD} ${CI_OPT_MAVEN_SETTINGS} help:evaluate -Dexpression=project.version | grep -Ev '(^\[|Download.+)')
     if [[ "$(ci_opt_publish_channel)" == "snapshot" ]]; then
         if [[ "${project_version}" != *-SNAPSHOT ]]; then
-            echo "invalid version ${project_version} for ref $(ci_opt_ref_name)"
+            echo "Invalid version ${project_version} for ref $(ci_opt_ref_name)"
+            echo "You should use versions like 1.0.0-SNAPSHOT with '-SNAPSHOT' suffix on develop branch or feature branches"
             exit 1
         elif [[ "$(ci_opt_ref_name)" != "develop" ]] && [[ "${project_version}" =~ ^([0-9]+\.){0,2}[0-9]+-SNAPSHOT$ ]]; then
-            echo "invalid version ${project_version} for ref $(ci_opt_ref_name)"
+            echo "Invalid version ${project_version} for ref $(ci_opt_ref_name)"
+            echo "You should use versions like 1.0.0-feature_name-SNAPSHOT or 1.0.0-branch_name-SNAPSHOT on feature branches"
             exit 1
         fi
     else
         if [[ "${project_version}" == *-SNAPSHOT ]]; then
-            echo "invalid version ${project_version} for ref $(ci_opt_ref_name)"
+            echo "Invalid version ${project_version} for ref $(ci_opt_ref_name)"
+            echo "You should use version like 1.0.0-SNAPSHOT without '-SNAPSHOT' suffix on releases"
             exit 1
         fi
     fi

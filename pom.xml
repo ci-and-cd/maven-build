@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 
     <modules>
         <module>build-docker</module>
@@ -182,7 +182,8 @@
         <maven.source.skip>false</maven.source.skip>
 
         <pmd.failOnViolation>false</pmd.failOnViolation>
-        <pmd.failurePriority>5</pmd.failurePriority>
+        <!-- Minimum Priority = 5 Maximum Priority = 0 Default value is: 5. -->
+        <pmd.failurePriority>4</pmd.failurePriority>
         <pmd.maxAllowedViolations>10</pmd.maxAllowedViolations>
         <pmd.printFailingErrors>true</pmd.printFailingErrors>
         <pmd.verbose>false</pmd.verbose>
@@ -191,18 +192,20 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!--
+        publish, preview, issue .
         sonar.analysis.mode Deprecated since SQ 6.6
         This parameter is set to preview as part of non-Developer Edition PR decoration.
         https://github.com/SonarQubeCommunity/sonar-build-breaker
         This build breaker is only available in preview modes (sonar.analysis.mode=preview or sonar.analysis.mode=issues).
         In publish mode, issue severity data is not available to post-job checkers.
         -->
-        <sonar.analysis.mode>preview</sonar.analysis.mode>
+        <sonar.analysis.mode>publish</sonar.analysis.mode>
         <!-- Disabled, INFO, MINOR, MAJOR, CRITICAL, BLOCKER -->
         <sonar.buildbreaker.preview.issuesSeverity>MAJOR</sonar.buildbreaker.preview.issuesSeverity>
         <sonar.buildbreaker.queryInterval>10000</sonar.buildbreaker.queryInterval>
         <sonar.buildbreaker.queryMaxAttempts>30</sonar.buildbreaker.queryMaxAttempts>
         <sonar.buildbreaker.skip>true</sonar.buildbreaker.skip>
+        <sonar.exclusions>**/git.properties</sonar.exclusions>
 
         <surefire.fork.count>1</surefire.fork.count>
         <surefire.fork.reuse>false</surefire.fork.reuse>
@@ -241,7 +244,7 @@
         <doxia-module-markdown.version>1.8</doxia-module-markdown.version>
 
         <echo-maven-plugin.version>0.3.0</echo-maven-plugin.version>
-        <findbugs-annotations.version>1.0.0</findbugs-annotations.version>
+        <findbugs-annotations.version>3.0.1u2</findbugs-annotations.version>
         <findbugs-maven-plugin.version>3.0.5</findbugs-maven-plugin.version>
         <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
 
@@ -842,7 +845,7 @@
     <dependencyManagement>
         <!-- @formatter:off -->
         <dependencies>
-            <dependency><groupId>findbugs</groupId><artifactId>annotations</artifactId><version>${findbugs-annotations.version}</version><scope>provided</scope></dependency>
+            <dependency><groupId>com.google.code.findbugs</groupId><artifactId>annotations</artifactId><version>${findbugs-annotations.version}</version></dependency>
         </dependencies>
         <!-- @formatter:on -->
     </dependencyManagement>
