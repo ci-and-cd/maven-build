@@ -390,7 +390,13 @@ function ci_opt_user_docker() {
     if [[ -n "${CI_OPT_USE_DOCKER}" ]]; then
         echo "${CI_OPT_USE_DOCKER}"
     else
-        if [[ -n "$(find . -name '*Docker*')" ]] || [[ -n "$(find . -name '*docker-compose*.yml')" ]]; then
+        # TODO Support named pipe (for windows).
+        # Unix sock file
+        if [[ -f /var/run/docker.sock ]] || [[ -L /var/run/docker.sock ]]; then docker_sock_file_present="true"; fi
+        # TCP
+        if [[ -n "${DOCKER_HOST}" ]]; then docker_host_var_present="true"; fi
+        if [[ -n "$(find . -name '*Docker*')" ]] || [[ -n "$(find . -name '*docker-compose*.yml')" ]]; then docker_files_found="true"; fi
+        if ([[ "${docker_sock_file_present}" == "true" ]] || [[ "${docker_host_var_present}" == "true" ]]) && [[ "${docker_host_var_present}" == "true" ]]; then
             echo "true"
         else
             echo "false"
