@@ -38,14 +38,15 @@
     <toolchain>
         <type>jdk</type>
         <provides>
-            <version>10</version>
+            <version>1.11</version>
             <vendor>oracle</vendor>
-            <id>jdk10</id>
+            <id>jdk11</id>
         </provides>
         <configuration>
-            <!-- OSX style: /Library/Java/JavaVirtualMachines/jdk-10.0.1.jdk/Contents/Home -->
-            <!-- travis-ci style: /usr/lib/jvm/java-10-oracle -->
-            <jdkHome>/usr/lib/jvm/java-10-oracle</jdkHome>
+            <!-- OSX style: /Library/Java/JavaVirtualMachines/openjdk-11.0.2.jdk/Contents/Home -->
+            <!--            /Library/Java/JavaVirtualMachines/zulu-11.jdk/Contents/Home -->
+            <!-- travis-ci style: /usr/lib/jvm/java-11-openjdk -->
+            <jdkHome>/usr/lib/jvm/java-11-openjdk</jdkHome>
         </configuration>
     </toolchain>
 </toolchains>

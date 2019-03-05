@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
 
     <modules>
         <module>build-docker</module>
@@ -262,7 +262,7 @@
         <!--<groovy-eclipse-compiler.version>3.0.0-01</groovy-eclipse-compiler.version>-->
         <!--<groovy-eclipse-batch.version>2.5.1-02</groovy-eclipse-batch.version>-->
 
-        <java10-javax.activation.version>1.1.1</java10-javax.activation.version>
+        <java11-javax.activation.version>1.1.1</java11-javax.activation.version>
         <java18.version>1.0</java18.version>
         <java9-javax.activation.version>1.1.1</java9-javax.activation.version>
         <jdepend-maven-plugin.version>2.0</jdepend-maven-plugin.version>
@@ -835,7 +835,7 @@
             <!-- mvn wrapper:wrapper -->
             <!--<plugin>
                 <groupId>com.rimerosolutions.maven.plugins</groupId><artifactId>wrapper-maven-plugin</artifactId><version>${wrapper-maven-plugin.version}</version>
-                <configuration><mavenVersion>3.5.4</mavenVersion></configuration>
+                <configuration><mavenVersion>3.6.0</mavenVersion></configuration>
             </plugin>-->
         </plugins>
 
@@ -1989,14 +1989,14 @@
             </reporting>
         </profile>
         <profile>
-            <id>default-java10-jvmArguments-addModules</id>
-            <activation><jdk>1.10</jdk><property><name>!jvmArguments.addModules</name></property></activation>
+            <id>default-java11-jvmArguments-addModules</id>
+            <activation><jdk>11</jdk><property><name>!jvmArguments.addModules</name></property></activation>
             <properties><jvmArguments.addModules>java.xml.bind,java.xml.ws,java.xml.ws.annotation</jvmArguments.addModules></properties>
         </profile>
         <profile>
-            <id>java10-without-groovy</id>
-            <activation><jdk>1.10</jdk><file><missing>${basedir}/src/main/groovy</missing></file><activeByDefault>false</activeByDefault></activation>
-            <properties><java.version>1.10</java.version></properties>
+            <id>java11-without-groovy</id>
+            <activation><jdk>11</jdk><file><missing>${basedir}/src/main/groovy</missing></file><activeByDefault>false</activeByDefault></activation>
+            <properties><java.version>11</java.version></properties>
             <build>
                 <plugins>
                     <plugin>
@@ -2007,8 +2007,8 @@
             </build>
         </profile>
         <profile>
-            <id>java10-with-groovy</id>
-            <activation><jdk>1.10</jdk><file><exists>${basedir}/src/main/groovy</exists></file><activeByDefault>false</activeByDefault></activation>
+            <id>java11-with-groovy</id>
+            <activation><jdk>11</jdk><file><exists>${basedir}/src/main/groovy</exists></file><activeByDefault>false</activeByDefault></activation>
             <build>
                 <plugins>
                     <plugin>
@@ -2019,15 +2019,15 @@
             </build>
         </profile>
         <profile>
-            <id>java10</id>
-            <activation><jdk>1.10</jdk><activeByDefault>false</activeByDefault></activation>
+            <id>java11</id>
+            <activation><jdk>11</jdk><activeByDefault>false</activeByDefault></activation>
             <properties>
-                <!-- Runtime modules for java10 -->
+                <!-- Runtime modules for java11 -->
                 <jaxb-api.version>2.3.0</jaxb-api.version>
-                <java.version>1.10</java.version>
-                <maven.compiler.release>10</maven.compiler.release>
-                <maven.compiler.source>1.10</maven.compiler.source>
-                <maven.compiler.target>1.10</maven.compiler.target>
+                <java.version>11</java.version>
+                <maven.compiler.release>11</maven.compiler.release>
+                <maven.compiler.source>11</maven.compiler.source>
+                <maven.compiler.target>11</maven.compiler.target>
             </properties>
             <build>
                 <pluginManagement>
@@ -2035,7 +2035,7 @@
                         <plugin>
                             <groupId>com.spotify</groupId><artifactId>docker-maven-plugin</artifactId>
                             <dependencies>
-                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${java10-javax.activation.version}</version></dependency>
+                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${java11-javax.activation.version}</version></dependency>
                             </dependencies>
                         </plugin>
                     </plugins>
@@ -2045,7 +2045,7 @@
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>echo-argLine</id><phase>test</phase><goals><goal>run</goal></goals><configuration><target><echo message="java10 argLine: ${argLine}"/></target></configuration>
+                                <id>echo-argLine</id><phase>test</phase><goals><goal>run</goal></goals><configuration><target><echo message="java11 argLine: ${argLine}"/></target></configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -2071,7 +2071,7 @@
             </build>
             <dependencyManagement>
                 <dependencies>
-                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${java10-javax.activation.version}</version></dependency>
+                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${java11-javax.activation.version}</version></dependency>
                     <!-- Hibernate java.lang.NoClassDefFoundError: javax/xml/bind/JAXBException -->
                     <dependency><groupId>javax.xml.bind</groupId><artifactId>jaxb-api</artifactId><version>${jaxb-api.version}</version></dependency>
                 </dependencies>
