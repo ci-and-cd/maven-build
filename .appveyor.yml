@@ -14,6 +14,7 @@ image: ubuntu
 environment:
   APPVEYOR_ENABLED: true
 
+  CI_INFRA_OPT_GIT_PREFIX: https://github.com
   CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN:
     secure: b8+kCKw7dSSIWSmdlsRzDKz9m5xU3BO1uBzd4voLqDmbGn+pVQxOQzpEzqNqw0xq
   CI_INFRA_OPT_OPENSOURCE_MVNSITE_PASSWORD:
