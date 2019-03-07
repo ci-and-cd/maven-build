@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<ruleset xmlns="http://pmd.sourceforge.net/ruleset/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Custom ruleset" xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+
+    <!-- pmd-6.3.0 rules -->
+    <!-- see: https://pmd.github.io/pmd-6.3.0/pmd_rules_java.html -->
+    <!-- see: https://github.com/pmd/pmd -->
+    <!-- see: https://github.com/pmd/pmd/tree/master/pmd-java/src/main/resources/rulesets/java -->
+
+    <!-- make ruleset -->
+    <!-- see: https://pmd.github.io/pmd-6.3.0/pmd_userdocs_making_rulesets.html -->
+
+    <!-- maven plugin -->
+    <!-- see: https://pmd.github.io/pmd-6.3.0/pmd_userdocs_tools_maven.html -->
+    <!-- see: https://maven.apache.org/plugins/maven-pmd-plugin/examples/usingRuleSets.html -->
+
+    <!-- pmd-migration-tool -->
+    <!-- see: https://github.com/checkstyle/checkstyle/issues/5603 -->
+    <!-- https://github.com/asarkar/pmd-migration-tool -->
+
+    <description>This ruleset checks my code for bad stuff</description>
+
+    <rule deprecated="false" ref="category/java/bestpractices.xml" typeResolution="false">
+        <exclude name="ConstantsInInterface"/>
+        <exclude name="GuardLogStatement"/>
+        <exclude name="JUnitAssertionsShouldIncludeMessage"/>
+        <exclude name="SystemPrintln"/>
+    </rule>
+    <rule ref="category/java/bestpractices.xml/JUnitTestContainsTooManyAsserts">
+        <properties>
+            <property name="maximumAsserts" value="16"/>
+        </properties>
+    </rule>
+    <rule deprecated="false" ref="category/java/codestyle.xml" typeResolution="false">
+        <exclude name="AbstractNaming"/>
+        <exclude name="AtLeastOneConstructor"/>
+        <exclude name="AvoidFinalLocalVariable"/>
+        <exclude name="CommentDefaultAccessModifier"/>
+        <exclude name="ConfusingTernary"/>
+        <exclude name="DefaultPackage"/>
+        <exclude name="EmptyMethodInAbstractClassShouldBeAbstract"/>
+        <exclude name="ShortVariable"/>
+    </rule>
+    <!--<rule ref="category/java/codestyle.xml/CommentDefaultAccessModifier"/>-->
+    <rule ref="category/java/codestyle.xml/LongVariable">
+        <properties>
+            <property name="minimum" value="56"/>
+        </properties>
+    </rule>
+    <rule ref="category/java/codestyle.xml/MethodNamingConventions">
+        <properties>
+            <property name="violationSuppressRegex" value=".+underscores"/>
+        </properties>
+    </rule>
+    <rule ref="category/java/codestyle.xml/ShortClassName">
+        <properties>
+            <property name="minimum" value="2"/>
+        </properties>
+    </rule>
+    <rule ref="category/java/codestyle.xml/TooManyStaticImports">
+        <properties>
+            <property name="maximumStaticImports" value="32"/>
+        </properties>
+    </rule>
+    <rule ref="rulesets/java/controversial.xml/AvoidLiteralsInIfCondition">
+        <properties>
+            <property name="ignoreMagicNumbers" value="-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10, -1.0,-0.1,0.0,0.1,1.0"/>
+        </properties>
+    </rule>
+    <rule deprecated="false" ref="category/java/design.xml" typeResolution="false">
+        <exclude name="AvoidCatchingGenericException"/>
+        <exclude name="ClassWithOnlyPrivateConstructorsShouldBeFinal"/>
+        <exclude name="ImmutableField"/>
+        <exclude name="LawOfDemeter"/>
+        <exclude name="LoosePackageCoupling"/>
+        <exclude name="SignatureDeclareThrowsException"/>
+        <exclude name="UseUtilityClass"/>
+    </rule>
+    <rule ref="category/java/design.xml/ExcessiveImports">
+        <properties>
+            <property name="minimum" value="64"/>
+        </properties>
+    </rule>
+    <rule ref="category/java/design.xml/TooManyMethods">
+        <properties>
+            <property name="maxmethods" value="16"/>
+        </properties>
+    </rule>
+    <rule deprecated="false" ref="category/java/documentation.xml" typeResolution="false">
+        <exclude name="CommentRequired"/>
+    </rule>
+    <rule ref="category/java/documentation.xml/CommentSize">
+        <properties>
+            <property name="maxLineLength" value="120"/>
+            <property name="maxLines" value="64"/>
+        </properties>
+    </rule>
+    <rule deprecated="false" ref="category/java/errorprone.xml" typeResolution="false">
+        <exclude name="BeanMembersShouldSerialize"/>
+        <exclude name="DataflowAnomalyAnalysis"/>
+        <exclude name="NullAssignment"/>
+    </rule>
+    <rule ref="category/java/errorprone.xml/EmptyCatchBlock">
+        <properties>
+            <property name="allowCommentedBlocks" value="true"/>
+        </properties>
+    </rule>
+    <rule deprecated="false" ref="category/java/multithreading.xml" typeResolution="false">
+        <exclude name="DoNotUseThreads"/>
+        <exclude name="UseConcurrentHashMap"/>
+    </rule>
+    <rule deprecated="false" ref="category/java/performance.xml" typeResolution="false">
+        <exclude name="AvoidInstantiatingObjectsInLoops"/>
+    </rule>
+</ruleset>

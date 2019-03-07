@@ -16,7 +16,7 @@
             # see: https://apple.stackexchange.com/questions/208764/cant-write-to-usr-lib
             # Boot by Recovery OS and run `csrutil disable` in Terminal.app
             mkdir -p /usr/lib/jvm
-            ln -s /Library/Java/JavaVirtualMachines/openjdk-1.8.0_181.jdk/Contents/Home /usr/lib/jvm/java-8-openjdk
+            ln -s /Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home /usr/lib/jvm/java-8-openjdk
             # run `csrutil enable` in Terminal.app (Recovery OS)
             -->
             <jdkHome>/usr/lib/jvm/java-8-openjdk</jdkHome>
@@ -25,7 +25,7 @@
     <toolchain>
         <type>jdk</type>
         <provides>
-            <version>1.11</version>
+            <version>11</version>
             <!--<vendor>openjdk</vendor>-->
             <id>jdk11</id>
         </provides>
