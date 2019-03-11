@@ -8,11 +8,15 @@
 
 
 echo -e "\n>>>>>>>>>> ---------- default options ---------- >>>>>>>>>>"
-if [[ -z ${CI_INFRA_OPT_GIT_PREFIX+x} ]]; then CI_INFRA_OPT_GIT_PREFIX="https://gitlab.com"; fi
+if [[ -z ${CI_INFRA_OPT_GIT_PREFIX+x} ]]; then CI_INFRA_OPT_GIT_PREFIX="https://github.com"; fi
 
-if [[ -z ${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO+x} ]] && [[ -n "${TRAVIS}" ]]; then CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO="${CI_INFRA_OPT_GIT_PREFIX}/ci-and-cd/maven-build-opts-opensource/raw/${TRAVIS_BRANCH:-develop}"; fi
-if [[ -z ${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO+x} ]] && [[ -n "${APPVEYOR}" ]]; then CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO="${CI_INFRA_OPT_GIT_PREFIX}/ci-and-cd/maven-build-opts-opensource/raw/${APPVEYOR_REPO_BRANCH:-develop}"; fi
-if [[ -z ${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO+x} ]]; then CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO="${CI_INFRA_OPT_GIT_PREFIX}/ci-and-cd/maven-build-opts-opensource/raw/master"; fi
+if [[ -z ${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO+x} ]] && [[ -n "${TRAVIS}" ]]; then CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO="${CI_INFRA_OPT_GIT_PREFIX}/ci-and-cd/maven-build-opts-opensource"; fi
+if [[ -z ${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO+x} ]] && [[ -n "${APPVEYOR}" ]]; then CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO="${CI_INFRA_OPT_GIT_PREFIX}/ci-and-cd/maven-build-opts-opensource"; fi
+if [[ -z ${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO+x} ]]; then CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO="${CI_INFRA_OPT_GIT_PREFIX}/ci-and-cd/maven-build-opts-opensource"; fi
+
+if [[ -z ${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO_REF+x} ]] && [[ -n "${TRAVIS}" ]]; then CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO_REF="${TRAVIS_BRANCH:-develop}"; fi
+if [[ -z ${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO_REF+x} ]] && [[ -n "${APPVEYOR}" ]]; then CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO_REF="${APPVEYOR_REPO_BRANCH:-develop}"; fi
+if [[ -z ${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO_REF+x} ]]; then CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO_REF="master"; fi
 
 if [[ -z ${CI_OPT_CI_SCRIPT+x} ]] && [[ -n "${TRAVIS}" ]]; then CI_OPT_CI_SCRIPT="${CI_INFRA_OPT_GIT_PREFIX}/${TRAVIS_REPO_SLUG:-ci-and-cd/maven-build}/raw/${TRAVIS_BRANCH:-develop}/src/main/ci-script/lib_ci.sh"; fi
 if [[ -z ${CI_OPT_CI_SCRIPT+x} ]] && [[ -n "${APPVEYOR}" ]]; then CI_OPT_CI_SCRIPT="${CI_INFRA_OPT_GIT_PREFIX}/${APPVEYOR_REPO_NAME:-ci-and-cd/maven-build}/raw/${APPVEYOR_REPO_BRANCH:-develop}/src/main/ci-script/lib_ci.sh"; fi
