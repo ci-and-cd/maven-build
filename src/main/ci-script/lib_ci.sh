@@ -793,12 +793,16 @@ function alter_mvn() {
 
 function run_mvn() {
     echo -e "\n>>>>>>>>>> ---------- run_mvn toolchains.xml ---------- >>>>>>>>>>"
-    # always down toolchains.xml on travis-ci build
-    if [[ ! -f "${HOME}/.m2/toolchains.xml" ]] || [[ -n "${TRAVIS_EVENT_TYPE}" ]]; then
-        download_from_git_repo "src/main/maven/toolchains.xml" "${HOME}/.m2/toolchains.xml"
-    else
-        echo "Found ${HOME}/.m2/toolchains.xml"
-        cat ${HOME}/.m2/toolchains.xml
+#    # always down toolchains.xml on travis-ci build
+#    if [[ ! -f "${HOME}/.m2/toolchains.xml" ]] || [[ -n "${TRAVIS_EVENT_TYPE}" ]]; then
+#        download_from_git_repo "src/main/maven/toolchains.xml" "${HOME}/.m2/toolchains.xml"
+#    else
+#        echo "Found ${HOME}/.m2/toolchains.xml"
+#        cat ${HOME}/.m2/toolchains.xml
+#    fi
+    if [[ ! $(download_from_git_repo "src/main/maven/toolchains.xml" "${HOME}/.m2/toolchains.xml") ]]; then
+        echo "[ERROR] can not download src/main/maven/toolchains.xml"
+        return 1
     fi
     echo -e "<<<<<<<<<< ---------- run_mvn toolchains.xml ---------- <<<<<<<<<<\n"
 
