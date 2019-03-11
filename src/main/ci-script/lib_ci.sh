@@ -296,13 +296,13 @@ function download() {
     local curl_option="$3 ${curl_default_options}"
     local curl_secret="$(echo $3 | sed -E "s#: [^ ]+#: <secret>'#g") ${curl_default_options}"
     (>&2 echo "test contents between ${curl_target} and ${curl_source}")
-    if [[ -f ${curl_target} ]] && [[ -z "$(diff ${curl_target} <(sh -c "set -e; curl ${curl_option} ${curl_source} 2>&1"))" ]]; then
+    if [[ -f ${curl_target} ]] && [[ -z "$(diff ${curl_target} <(sh -c "set -e; curl ${curl_option} '${curl_source}' 2>&1"))" ]]; then
         (>&2 echo "contents identical, skip download")
         return 0
     else
         if [[ ! -d $(dirname ${curl_target}) ]]; then mkdir -p $(dirname ${curl_target}); fi
-        (>&2 echo "curl ${curl_secret} -o ${curl_target} ${curl_source} 2>/dev/null")
-        sh -c "set -e; curl ${curl_option} -o ${curl_target} ${curl_source} 2>/dev/null"
+        (>&2 echo "curl ${curl_secret} -o ${curl_target} '${curl_source}' 2>/dev/null")
+        sh -c "set -e; curl ${curl_option} -o ${curl_target} '${curl_source}' 2>/dev/null"
         return $?
     fi
 }
@@ -323,8 +323,8 @@ function is_remote_resource_exists() {
     local curl_default_options="-H \"Cache-Control: no-cache\" -L -s -t utf-8"
     local curl_option="$2 ${curl_default_options}"
     local curl_secret="$(echo $2 | sed -E "s#: [^ ]+#: <secret>'#g") ${curl_default_options}"
-    (>&2 echo "Test whether remote file exists: curl -I -o /dev/null -w \"%{http_code}\" ${curl_secret} ${curl_source} | tail -n1")
-    local status_code=$(sh -c "curl -I -o /dev/null -w \"%{http_code}\" ${curl_option} ${curl_source} | tail -n1 || echo -n 500")
+    (>&2 echo "Test whether remote file exists: curl -I -o /dev/null -w \"%{http_code}\" ${curl_secret} '${curl_source}' | tail -n1")
+    local status_code=$(sh -c "curl -I -o /dev/null -w \"%{http_code}\" ${curl_option} '${curl_source}' | tail -n1 || echo -n 500")
     (>&2 echo "status_code: ${status_code}")
     if [[ "200" == "${status_code}" ]]; then echo "true"; else echo "false"; fi
 }
@@ -713,7 +713,7 @@ function download_from_git_repo() {
     local source_file="$1"
     local target_file="$2"
 
-    local curl_options="-H \"Cache-Control: no-cache\" -H \"PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)\""
+    local curl_options="-H \"PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)\""
 
     if [[ "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}" =~ ^.+/api/v4/projects/[0-9]+/repository/.+$ ]]; then
         if [[ $(download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/$(echo ${source_file} | sed 's#/#%2F#g')?ref=master" "${target_file}.json" "${curl_options}") ]]; then
