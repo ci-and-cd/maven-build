@@ -298,10 +298,12 @@ function download() {
     (>&2 echo "test contents between ${curl_target} and ${curl_source}")
     if [[ -f ${curl_target} ]] && [[ -z "$(diff ${curl_target} <(sh -c "set -e; curl ${curl_option} ${curl_source} 2>&1"))" ]]; then
         (>&2 echo "contents identical, skip download")
+        return 0
     else
         if [[ ! -d $(dirname ${curl_target}) ]]; then mkdir -p $(dirname ${curl_target}); fi
-        echo "curl ${curl_secret} -o ${curl_target} ${curl_source} 2>/dev/null"
+        (>&2 echo "curl ${curl_secret} -o ${curl_target} ${curl_source} 2>/dev/null")
         sh -c "set -e; curl ${curl_option} -o ${curl_target} ${curl_source} 2>/dev/null"
+        return $?
     fi
 }
 
@@ -671,17 +673,17 @@ function init_docker_config() {
     if [[ "${CI_OPT_DRYRUN}" != "true" ]]; then
         if [[ -n "${CI_OPT_DOCKER_REGISTRY_PASS}" ]] && [[ -n "${CI_OPT_DOCKER_REGISTRY_USER}" ]] && [[ -n "${CI_INFRA_OPT_DOCKER_REGISTRY}" ]]; then
             if [[ "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" == https* ]]; then
-                echo "docker logging into secure registry ${CI_INFRA_OPT_DOCKER_REGISTRY} (${CI_INFRA_OPT_DOCKER_REGISTRY_URL})"
-                echo logging into secure registry ${CI_INFRA_OPT_DOCKER_REGISTRY}
+                (>&2 echo "docker logging into secure registry ${CI_INFRA_OPT_DOCKER_REGISTRY} (${CI_INFRA_OPT_DOCKER_REGISTRY_URL})")
+                (>&2 echo logging into secure registry ${CI_INFRA_OPT_DOCKER_REGISTRY})
                 echo ${CI_OPT_DOCKER_REGISTRY_PASS} | docker login --password-stdin -u="${CI_OPT_DOCKER_REGISTRY_USER}" ${CI_INFRA_OPT_DOCKER_REGISTRY}
             else
-                echo "docker logging into insecure registry ${CI_INFRA_OPT_DOCKER_REGISTRY} (${CI_INFRA_OPT_DOCKER_REGISTRY_URL})"
-                echo logging into insecure registry ${CI_INFRA_OPT_DOCKER_REGISTRY}
+                (>&2 echo "docker logging into insecure registry ${CI_INFRA_OPT_DOCKER_REGISTRY} (${CI_INFRA_OPT_DOCKER_REGISTRY_URL})")
+                (>&2 echo logging into insecure registry ${CI_INFRA_OPT_DOCKER_REGISTRY})
                 echo ${CI_OPT_DOCKER_REGISTRY_PASS} | DOCKER_OPTS="–insecure-registry ${CI_INFRA_OPT_DOCKER_REGISTRY}" docker login --password-stdin -u="${CI_OPT_DOCKER_REGISTRY_USER}" ${CI_INFRA_OPT_DOCKER_REGISTRY}
             fi
-            echo "docker login done"
+            (>&2 echo "docker login done")
         else
-            echo "skip docker login"
+            (>&2 echo "skip docker login")
         fi
     fi
 }
@@ -715,8 +717,10 @@ function download_from_git_repo() {
 
     if [[ "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}" =~ ^.+/api/v4/projects/[0-9]+/repository/.+$ ]]; then
         if [[ $(download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/$(echo ${source_file} | sed 's#/#%2F#g')?ref=master" "${target_file}.json" "${curl_options}") ]]; then
+            (>&2 echo decode ${target_file}.json)
             cat "${target_file}.json" | jq -r ".content" | base64 --decode | tee "${target_file}"
         else
+            (>&2 echo "[ERROR] can not download ${target_file}")
             return 1
         fi
     else
