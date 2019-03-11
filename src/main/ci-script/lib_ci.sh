@@ -798,6 +798,7 @@ function run_mvn() {
         download_from_git_repo "src/main/maven/toolchains.xml" "${HOME}/.m2/toolchains.xml"
     else
         echo "Found ${HOME}/.m2/toolchains.xml"
+        cat ${HOME}/.m2/toolchains.xml
     fi
     echo -e "<<<<<<<<<< ---------- run_mvn toolchains.xml ---------- <<<<<<<<<<\n"
 
