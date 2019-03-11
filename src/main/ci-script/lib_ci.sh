@@ -822,7 +822,7 @@ function run_mvn() {
     echo "CI_OPT_MAVEN_SETTINGS: ${CI_OPT_MAVEN_SETTINGS}"
 
     # Download maven's settings-security.xml if current infrastructure has this file
-    download_from_git_repo "src/main/maven/settings-security.xml" "${HOME}/.m2/settings-security.xml"
+    [[ $(download_from_git_repo "src/main/maven/settings-security.xml" "${HOME}/.m2/settings-security.xml") ]] || echo "[WARN] settings-security.xml not found or can not download."
     echo -e "<<<<<<<<<< ---------- run_mvn settings.xml and settings-security.xml ---------- <<<<<<<<<<\n"
 
     echo -e "\n>>>>>>>>>> ---------- run_mvn properties and environment variables ---------- >>>>>>>>>>"
