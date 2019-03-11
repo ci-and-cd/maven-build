@@ -295,7 +295,7 @@ function download() {
     local curl_default_options="-H \"Cache-Control: no-cache\" -L -S -s -t utf-8"
     local curl_option="$3 ${curl_default_options}"
     local curl_secret="$(echo $3 | sed -E "s#: [^ ]+#: <secret>'#g") ${curl_default_options}"
-    (>&2 echo "test contents between ${curl_target} and ${curl_source}")
+    (>&2 echo "test contents between ${curl_target} and '${curl_source}'")
     if [[ -f ${curl_target} ]] && [[ -z "$(diff ${curl_target} <(sh -c "set -e; curl ${curl_option} '${curl_source}' 2>&1"))" ]]; then
         (>&2 echo "contents identical, skip download")
         return 0
@@ -312,9 +312,12 @@ function download() {
 function download_if_exists() {
     if [[ "$(is_remote_resource_exists "$1" "$3")" == "true" ]]; then
         download "$1" "$2" "$3"
-        return 0
+        ret=$?
+        (>&2 echo "ret ${ret}, download $1 $2")
+        return ${ret}
+    else
+        return 1
     fi
-    return 1
 }
 
 # arguments: curl_source, curl_option
@@ -716,7 +719,7 @@ function download_from_git_repo() {
     local curl_options="-H \"PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)\""
 
     if [[ "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}" =~ ^.+/api/v4/projects/[0-9]+/repository/.+$ ]]; then
-        if [[ $(download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/$(echo ${source_file} | sed 's#/#%2F#g')?ref=master" "${target_file}.json" "${curl_options}") ]]; then
+        if download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/$(echo ${source_file} | sed 's#/#%2F#g')?ref=master" "${target_file}.json" "${curl_options}"; then
             (>&2 echo decode ${target_file}.json)
             cat "${target_file}.json" | jq -r ".content" | base64 --decode | tee "${target_file}"
         else
@@ -804,7 +807,7 @@ function run_mvn() {
 #        echo "Found ${HOME}/.m2/toolchains.xml"
 #        cat ${HOME}/.m2/toolchains.xml
 #    fi
-    if [[ ! $(download_from_git_repo "src/main/maven/toolchains.xml" "${HOME}/.m2/toolchains.xml") ]]; then
+    if ! download_from_git_repo "src/main/maven/toolchains.xml" "${HOME}/.m2/toolchains.xml"; then
         echo "[ERROR] can not download src/main/maven/toolchains.xml"
         return 1
     fi
@@ -816,7 +819,7 @@ function run_mvn() {
         if [[ -z "${CI_OPT_MAVEN_SETTINGS_FILE}" ]]; then CI_OPT_MAVEN_SETTINGS_FILE="$(pwd)/src/main/maven/settings.xml"; fi
         if [[ ! -f ${CI_OPT_MAVEN_SETTINGS_FILE} ]]; then
             CI_OPT_MAVEN_SETTINGS_FILE="$(ci_opt_cache_directory)/settings-$(ci_opt_infrastructure).xml"
-            if [[ $(download_from_git_repo "src/main/maven/settings.xml" "${CI_OPT_MAVEN_SETTINGS_FILE}") ]]; then
+            if download_from_git_repo "src/main/maven/settings.xml" "${CI_OPT_MAVEN_SETTINGS_FILE}"; then
                 CI_OPT_MAVEN_SETTINGS="-s ${CI_OPT_MAVEN_SETTINGS_FILE}"
             else
                 echo "[ERROR] can not download src/main/maven/settings.xml"
@@ -831,7 +834,7 @@ function run_mvn() {
     echo "CI_OPT_MAVEN_SETTINGS: ${CI_OPT_MAVEN_SETTINGS}"
 
     # Download maven's settings-security.xml if current infrastructure has this file
-    [[ $(download_from_git_repo "src/main/maven/settings-security.xml" "${HOME}/.m2/settings-security.xml") ]] || echo "[WARN] settings-security.xml not found or can not download."
+    download_from_git_repo "src/main/maven/settings-security.xml" "${HOME}/.m2/settings-security.xml" || echo "[WARN] settings-security.xml not found or can not download."
     echo -e "<<<<<<<<<< ---------- run_mvn settings.xml and settings-security.xml ---------- <<<<<<<<<<\n"
 
     echo -e "\n>>>>>>>>>> ---------- run_mvn properties and environment variables ---------- >>>>>>>>>>"
@@ -842,7 +845,7 @@ function run_mvn() {
             eval "$(cat ../maven-build-opts-$(ci_opt_infrastructure)/${CI_OPT_CI_OPTS_SCRIPT})"
         else
             # for maven-build* user
-            if [[ $(download_from_git_repo "${CI_OPT_CI_OPTS_SCRIPT}" "$(ci_opt_cache_directory)/${CI_OPT_CI_OPTS_SCRIPT}") ]]; then
+            if download_from_git_repo "${CI_OPT_CI_OPTS_SCRIPT}" "$(ci_opt_cache_directory)/${CI_OPT_CI_OPTS_SCRIPT}"; then
                 . $(ci_opt_cache_directory)/${CI_OPT_CI_OPTS_SCRIPT}
             else
                 echo "Error, can not download ${CI_OPT_CI_OPTS_SCRIPT}"
