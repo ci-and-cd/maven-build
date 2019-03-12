@@ -288,15 +288,18 @@
         <maven-checkstyle-plugin.version>3.0.0</maven-checkstyle-plugin.version>
         <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
-        <maven-dependency-plugin.version>3.1.0</maven-dependency-plugin.version>
-        <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
+        <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
+        <!--<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>-->
+        <maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
         <maven-enforcer-plugin.version>3.0.0-M1</maven-enforcer-plugin.version>
-        <maven-failsafe-plugin.version>2.21.0</maven-failsafe-plugin.version>
+        <!--<maven-failsafe-plugin.version>2.21.0</maven-failsafe-plugin.version>-->
+        <maven-failsafe-plugin.version>3.0.0-M3</maven-failsafe-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
-        <maven-install-plugin.version>2.5.2</maven-install-plugin.version>
-        <maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
-        <maven-javadoc-plugin.version>3.0.0</maven-javadoc-plugin.version>
-        <maven-jxr-plugin.version>2.5</maven-jxr-plugin.version>
+        <!--<maven-install-plugin.version>2.5.2</maven-install-plugin.version>-->
+        <maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
+        <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
+        <maven-javadoc-plugin.version>3.1.0</maven-javadoc-plugin.version>
+        <maven-jxr-plugin.version>3.0.0</maven-jxr-plugin.version>
         <!-- maven-pmd-plugin:3.6   depends on net.sourceforge.pmd:pmd:5.3.5 -->
         <!-- maven-pmd-plugin:3.7   depends on net.sourceforge.pmd:pmd:5.5.1 -->
         <!-- maven-pmd-plugin:3.9.0 depends on net.sourceforge.pmd:pmd:6.4.0 -->
@@ -304,33 +307,35 @@
         <!-- maven-pmd-plugin:3.11.0 depends on net.sourceforge.pmd:pmd:6.8.0 -->
         <maven-pmd-plugin.version>3.11.0</maven-pmd-plugin.version>
         <maven-project-info-reports-plugin.version>3.0.0</maven-project-info-reports-plugin.version>
-        <maven-resources-plugin.version>3.0.1</maven-resources-plugin.version>
+        <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
         <maven-site-plugin.version>3.7.1</maven-site-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
-        <maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
-        <maven-surefire-report-plugin.version>2.21.0</maven-surefire-report-plugin.version>
+        <!--<maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>-->
+        <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
+        <maven-surefire-report-plugin.version>3.0.0-M3</maven-surefire-report-plugin.version>
         <maven-toolchains-plugin.version>1.1</maven-toolchains-plugin.version>
 
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
 
         <org.codehaus.plexus_plexus-compiler-javac-errorprone.version>2.8.5</org.codehaus.plexus_plexus-compiler-javac-errorprone.version>
-        <org.jacoco_jacoco.version>0.8.2</org.jacoco_jacoco.version>
+        <org.jacoco_jacoco.version>0.8.3</org.jacoco_jacoco.version>
         <!--<org.sonarsource.java_sonar-jacoco-listeners.version>5.3.0.13828</org.sonarsource.java_sonar-jacoco-listeners.version>-->
-        <org.sonarsource.java_sonar-jacoco-listeners.version>5.9.1.16423</org.sonarsource.java_sonar-jacoco-listeners.version>
+        <!--<org.sonarsource.java_sonar-jacoco-listeners.version>5.9.1.16423</org.sonarsource.java_sonar-jacoco-listeners.version>-->
+        <org.sonarsource.java_sonar-jacoco-listeners.version>5.11.0.17289</org.sonarsource.java_sonar-jacoco-listeners.version>
 
         <pegdown.version>1.6.0</pegdown.version>
         <properties-maven-plugin.version>1.0.0</properties-maven-plugin.version>
         <qualinsight-mojo-cobertura-core.version>2.0.0</qualinsight-mojo-cobertura-core.version>
 
-        <scala.version>2.12.6</scala.version>
-        <scala-maven-plugin.version>3.4.2</scala-maven-plugin.version>
+        <scala.version>2.12.8</scala.version>
+        <scala-maven-plugin.version>4.0.1</scala-maven-plugin.version>
 
         <!--<sonar-maven-plugin.version>3.4.1.1168</sonar-maven-plugin.version>-->
         <sonar-maven-plugin.version>3.5.0.1254</sonar-maven-plugin.version>
 
         <taglist-maven-plugin.version>2.4</taglist-maven-plugin.version>
         <umlgraph.version>5.6.6</umlgraph.version>
-        <versions-maven-plugin.version>2.5</versions-maven-plugin.version>
+        <versions-maven-plugin.version>2.7</versions-maven-plugin.version>
         <!-- Why org.codehaus.mojo:wagon-maven-plugin:wagon-maven-plugin-2.0.1-snapshot-chshawkn-1.6?
             see: https://www.mail-archive.com/users@maven.apache.org/msg129243.html -->
         <!--http://www.mojohaus.org/wagon-maven-plugin/usage.html-->
