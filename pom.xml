@@ -382,13 +382,15 @@
                     <artifactId>maven-javadoc-plugin</artifactId><version>${maven-javadoc-plugin.version}</version>
                     <configuration>
                         <additionalJOption>-J-Duser.language=en</additionalJOption>
-                        <additionalOptions>-views -all</additionalOptions>
+                        <!--<additionalOptions>-views -all</additionalOptions>-->
                         <charset>${project.build.sourceEncoding}</charset>
-                        <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
+                        <!--<doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>-->
                         <!-- UML Graph needs to match HTML tag to insert images into javadoc -->
-                        <docletArtifact><groupId>org.umlgraph</groupId><artifactId>umlgraph</artifactId><version>${umlgraph.version}</version></docletArtifact>
+                        <!--<docletArtifact><groupId>org.umlgraph</groupId><artifactId>umlgraph</artifactId><version>${umlgraph.version}</version></docletArtifact>-->
+                        <doclint>none</doclint>
                         <encoding>${project.build.sourceEncoding}</encoding>
                         <failOnError>${maven.javadoc.failsOnError}</failOnError>
+                        <notimestamp>true</notimestamp>
                         <skip>${maven.javadoc.skip}</skip>
                         <useStandardDocletOptions>true</useStandardDocletOptions>
                     </configuration>
@@ -1621,13 +1623,12 @@
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <configuration>
                             <additionalJOption>-J-Duser.language=en</additionalJOption>
-                            <additionalOptions>-views -all</additionalOptions>
+                            <!--<additionalOptions>-views -all</additionalOptions>-->
                             <charset>${project.build.sourceEncoding}</charset>
-                            <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
-                            <!-- UML Graph needs to match HTML tag to insert images into javadoc -->
-                            <docletArtifact><groupId>org.umlgraph</groupId><artifactId>umlgraph</artifactId><version>${umlgraph.version}</version></docletArtifact>
+                            <doclint>none</doclint>
                             <encoding>${project.build.sourceEncoding}</encoding>
                             <failOnError>${maven.javadoc.failsOnError}</failOnError>
+                            <notimestamp>true</notimestamp>
                             <skip>${maven.javadoc.skip}</skip>
                             <useStandardDocletOptions>true</useStandardDocletOptions>
                         </configuration>
