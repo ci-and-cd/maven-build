@@ -332,7 +332,8 @@
         <scala-maven-plugin.version>4.0.1</scala-maven-plugin.version>
 
         <!--<sonar-maven-plugin.version>3.4.1.1168</sonar-maven-plugin.version>-->
-        <sonar-maven-plugin.version>3.5.0.1254</sonar-maven-plugin.version>
+        <!--<sonar-maven-plugin.version>3.5.0.1254</sonar-maven-plugin.version>-->
+        <sonar-maven-plugin.version>3.6.0.1398</sonar-maven-plugin.version>
 
         <taglist-maven-plugin.version>2.4</taglist-maven-plugin.version>
         <umlgraph.version>5.6.6</umlgraph.version>
