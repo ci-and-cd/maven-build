@@ -249,9 +249,10 @@
         <!--<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>-->
         <com.google.errorprone_error_prone_core.version>2.3.1</com.google.errorprone_error_prone_core.version>
 
-        <dependency-check-maven.version>5.0.0-M1</dependency-check-maven.version>
-        <!-- Fix error of multiple processes connect to same h2 in embedded mode, use mixed mode replace(AUTO_SERVER=true). -->
-        <dependency-check-maven.connectionString>jdbc:h2:file:~/.m2/repository/org/owasp/dependency-check-data/5.0/dc;MV_STORE=FALSE;AUTOCOMMIT=ON;LOG=0;CACHE_SIZE=65536;AUTO_SERVER=true;</dependency-check-maven.connectionString>
+        <dependency-check-maven.version>5.0.0-M2</dependency-check-maven.version>
+        <!-- Fix error of multiple processes connect to same h2 in embedded mode, use mixed mode replace (AUTO_SERVER=TRUE). -->
+        <!--<dependency-check-maven.connectionString>jdbc:h2:file:%s;AUTOCOMMIT=ON;LOG=0;CACHE_SIZE=65536;AUTO_SERVER=TRUE;</dependency-check-maven.connectionString>-->
+        <!--<dependency-check-maven.connectionString>jdbc:h2:file:%s;AUTOCOMMIT=ON;LOG=0;CACHE_SIZE=65536;AUTO_SERVER=TRUE;MV_STORE=FALSE;</dependency-check-maven.connectionString>-->
 
         <doxia-module-markdown.version>1.8</doxia-module-markdown.version>
 
@@ -449,9 +450,7 @@
                 <plugin><groupId>org.asciidoctor</groupId><artifactId>asciidoctor-maven-plugin</artifactId><version>${asciidoctor-maven-plugin.version}</version></plugin>
                 <plugin>
                     <groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId><version>${dependency-check-maven.version}</version>
-                    <configuration>
-                        <connectionString>${dependency-check-maven.connectionString}</connectionString>
-                    </configuration>
+                    <!--<configuration><connectionString>${dependency-check-maven.connectionString}</connectionString></configuration>-->
                 </plugin>
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>animal-sniffer-maven-plugin</artifactId><version>${animal-sniffer-maven-plugin.version}</version></plugin>
                 <plugin>
@@ -1781,11 +1780,7 @@
                     <plugin>
                         <groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId>
                         <executions>
-                            <execution>
-                                <goals>
-                                    <goal>check</goal>
-                                </goals>
-                            </execution>
+                            <execution><goals><goal>check</goal></goals></execution>
                         </executions>
                     </plugin>
                 </plugins>

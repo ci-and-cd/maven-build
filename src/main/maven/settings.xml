@@ -23,6 +23,7 @@
         <pluginGroup>org.apache.maven.plugins</pluginGroup>
         <pluginGroup>org.apache.tomcat.maven</pluginGroup>
         <pluginGroup>org.codehaus.mojo</pluginGroup>
+        <pluginGroup>org.owasp</pluginGroup>
         <pluginGroup>org.sonarsource.scanner.maven</pluginGroup>
         <pluginGroup>org.springframework.boot</pluginGroup>
     </pluginGroups>
