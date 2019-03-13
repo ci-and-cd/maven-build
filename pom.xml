@@ -990,8 +990,14 @@
                 <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
 
                 <sonar.sources>.</sonar.sources>
-                <sonar.inclusions>**/pom.xml,**/src/main/**</sonar.inclusions>
-                <sonar.test.inclusions>**/src/test/**</sonar.test.inclusions>
+                <!--
+                Warning
+                Specifying module-relative paths at project level in the property 'sonar.inclusions' is deprecated.
+                To continue matching files like 'build-docker/pom.xml',
+                update this property so that patterns refer to project-relative paths.
+                -->
+                <sonar.inclusions>pom.xml,src/main/**</sonar.inclusions>
+                <sonar.test.inclusions>src/test/**</sonar.test.inclusions>
             </properties>
             <build>
                 <pluginManagement>
