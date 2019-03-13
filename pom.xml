@@ -990,8 +990,8 @@
                 <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
 
                 <sonar.sources>.</sonar.sources>
-                <sonar.inclusions>pom.xml,src/main/**</sonar.inclusions>
-                <sonar.test.inclusions>src/test/**</sonar.test.inclusions>
+                <sonar.inclusions>**/pom.xml,**/src/main/**</sonar.inclusions>
+                <sonar.test.inclusions>**/src/test/**</sonar.test.inclusions>
             </properties>
             <build>
                 <pluginManagement>
