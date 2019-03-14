@@ -281,9 +281,8 @@
         <groovy-eclipse-compiler.version>3.3.0-01</groovy-eclipse-compiler.version>
         <groovy-eclipse-batch.version>2.5.6-01</groovy-eclipse-batch.version>
 
-        <java11-javax.activation.version>1.1.1</java11-javax.activation.version>
+        <javax.activation.version>1.1.1</javax.activation.version>
         <java18.version>1.0</java18.version>
-        <java9-javax.activation.version>1.1.1</java9-javax.activation.version>
         <jdepend-maven-plugin.version>2.0</jdepend-maven-plugin.version>
         <jetbrains-annotations.version>16.0.3</jetbrains-annotations.version>
         <jsch.version>0.1.54</jsch.version>
@@ -2004,7 +2003,7 @@
                         <plugin>
                             <groupId>com.spotify</groupId><artifactId>docker-maven-plugin</artifactId>
                             <dependencies>
-                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${java9-javax.activation.version}</version></dependency>
+                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
                             </dependencies>
                         </plugin>
                     </plugins>
@@ -2040,7 +2039,7 @@
             </build>
             <dependencyManagement>
                 <dependencies>
-                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${java9-javax.activation.version}</version></dependency>
+                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
                     <!-- Hibernate java.lang.NoClassDefFoundError: javax/xml/bind/JAXBException -->
                     <dependency><groupId>javax.xml.bind</groupId><artifactId>jaxb-api</artifactId><version>${jaxb-api.version}</version></dependency>
                 </dependencies>
@@ -2071,7 +2070,7 @@
                         <plugin>
                             <groupId>com.spotify</groupId><artifactId>docker-maven-plugin</artifactId>
                             <dependencies>
-                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${java11-javax.activation.version}</version></dependency>
+                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
                             </dependencies>
                         </plugin>
                     </plugins>
@@ -2109,7 +2108,7 @@
                 <dependencies>
                     <!-- see: https://dzone.com/articles/apis-to-be-removed-from-java-11 -->
                     <!-- java.activation -->
-                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${java11-javax.activation.version}</version></dependency>
+                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
                     <!-- java.transaction -->
                     <!--<dependency><groupId>javax.transaction</groupId><artifactId>javax.transaction-api</artifactId><version>${javax.transaction-api.version}</version></dependency>-->
                     <!-- Hibernate java.lang.NoClassDefFoundError: javax/xml/bind/JAXBException -->
