@@ -260,6 +260,7 @@
 
         <!-- Findbugs is no longer maintained, please use Spotbugs -->
         <findbugs-annotations.version>3.0.1u2</findbugs-annotations.version>
+        <findbugs-jsr305.version>3.0.2</findbugs-jsr305.version>
         <findbugs-maven-plugin.version>3.0.5</findbugs-maven-plugin.version>
 
         <spotbugs.version>3.1.12</spotbugs.version>
@@ -893,6 +894,7 @@
         <!-- @formatter:off -->
         <dependencies>
             <dependency><groupId>com.google.code.findbugs</groupId><artifactId>annotations</artifactId><version>${findbugs-annotations.version}</version></dependency>
+            <dependency><groupId>com.google.code.findbugs</groupId><artifactId>jsr305</artifactId><version>${findbugs-jsr305.version}</version></dependency>
             <dependency><groupId>org.jetbrains</groupId><artifactId>annotations</artifactId><version>${jetbrains-annotations.version}</version></dependency>
         </dependencies>
         <!-- @formatter:on -->
