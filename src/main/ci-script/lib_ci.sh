@@ -90,8 +90,8 @@ function ci_infra_opt_git_prefix() {
 }
 
 
-if [[ -z ${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO+x} ]]; then CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO="$(ci_infra_opt_git_prefix)/ci-and-cd/maven-build-opts-$(ci_opt_infrastructure)/raw/master"; fi
-if [[ -z ${CI_OPT_MAVEN_SETTINGS_FILE_URL+x} ]]; then CI_OPT_MAVEN_SETTINGS_FILE_URL="${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/maven/settings.xml"; fi
+if [[ -z ${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO+x} ]]; then CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO="$(ci_infra_opt_git_prefix)/ci-and-cd/maven-build-opts-$(ci_opt_infrastructure)"; fi
+# For gitlab >= 11.5 CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO should be $(ci_infra_opt_git_prefix)/api/v4/projects/<projectId>/repository/files
 
 if [[ -z ${CI_OPT_ORIGIN_REPO_SLUG+x} ]]; then CI_OPT_ORIGIN_REPO_SLUG=""; fi
 if [[ -z ${CI_INFRA_OPT_DOCKER_REGISTRY+x} ]]; then CI_INFRA_OPT_DOCKER_REGISTRY=""; fi
@@ -107,11 +107,11 @@ if [[ -z ${CI_OPT_MAVEN_SETTINGS+x} ]]; then CI_OPT_MAVEN_SETTINGS=""; fi
 if [[ -z ${CI_OPT_MAVEN_SETTINGS_FILE+x} ]]; then CI_OPT_MAVEN_SETTINGS_FILE=""; fi
 
 if [[ -z ${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE+x} ]]; then CI_OPT_MAVEN_SETTINGS_SECURITY_FILE=""; fi
-if [[ -z ${CI_OPT_MAVEN_TOOLCHAINS_FILE_URL+x} ]]; then CI_OPT_MAVEN_TOOLCHAINS_FILE_URL=""; fi
 
 if [[ -z ${CI_OPT_CI_SCRIPT+x} ]]; then CI_OPT_CI_SCRIPT=""; fi
 if [[ -z ${CI_OPT_MAVEN_BUILD_REPO+x} ]]; then CI_OPT_MAVEN_BUILD_REPO=""; fi
 if [[ -z ${CI_OPT_CI_OPTS_SCRIPT+x} ]]; then CI_OPT_CI_OPTS_SCRIPT="src/main/ci-script/ci_opts.sh"; fi
+# For gitlab >= 11.5 CI_OPT_CI_OPTS_SCRIPT should be src%2Fmain%2Fci-script%2Fci_opts.sh?ref=master
 
 if [[ -z ${CI_OPT_DRYRUN+x} ]]; then CI_OPT_DRYRUN=""; fi
 if [[ -z ${CI_OPT_OUTPUT_MAVEN_EFFECTIVE_POM_TO_CONSOLE+x} ]]; then CI_OPT_OUTPUT_MAVEN_EFFECTIVE_POM_TO_CONSOLE="false"; fi
@@ -295,13 +295,15 @@ function download() {
     local curl_default_options="-H \"Cache-Control: no-cache\" -L -S -s -t utf-8"
     local curl_option="$3 ${curl_default_options}"
     local curl_secret="$(echo $3 | sed -E "s#: [^ ]+#: <secret>'#g") ${curl_default_options}"
-    (>&2 echo "test contents between ${curl_target} and ${curl_source}")
-    if [[ -f ${curl_target} ]] && [[ -z "$(diff ${curl_target} <(sh -c "set -e; curl ${curl_option} ${curl_source} 2>&1"))" ]]; then
+    (>&2 echo "test contents between ${curl_target} and '${curl_source}'")
+    if [[ -f ${curl_target} ]] && [[ -z "$(diff ${curl_target} <(sh -c "set -e; curl ${curl_option} '${curl_source}' 2>&1"))" ]]; then
         (>&2 echo "contents identical, skip download")
+        return 0
     else
         if [[ ! -d $(dirname ${curl_target}) ]]; then mkdir -p $(dirname ${curl_target}); fi
-        echo "curl ${curl_secret} -o ${curl_target} ${curl_source} 2>/dev/null"
-        sh -c "set -e; curl ${curl_option} -o ${curl_target} ${curl_source} 2>/dev/null"
+        (>&2 echo "curl ${curl_secret} -o ${curl_target} '${curl_source}' 2>/dev/null")
+        sh -c "set -e; curl ${curl_option} -o ${curl_target} '${curl_source}' 2>/dev/null"
+        return $?
     fi
 }
 
@@ -310,6 +312,11 @@ function download() {
 function download_if_exists() {
     if [[ "$(is_remote_resource_exists "$1" "$3")" == "true" ]]; then
         download "$1" "$2" "$3"
+        ret=$?
+        (>&2 echo "ret ${ret}, download $1 $2")
+        return ${ret}
+    else
+        return 1
     fi
 }
 
@@ -319,8 +326,8 @@ function is_remote_resource_exists() {
     local curl_default_options="-H \"Cache-Control: no-cache\" -L -s -t utf-8"
     local curl_option="$2 ${curl_default_options}"
     local curl_secret="$(echo $2 | sed -E "s#: [^ ]+#: <secret>'#g") ${curl_default_options}"
-    (>&2 echo "Test whether remote file exists: curl -I -o /dev/null -w \"%{http_code}\" ${curl_secret} ${curl_source} | tail -n1")
-    local status_code=$(sh -c "curl -I -o /dev/null -w \"%{http_code}\" ${curl_option} ${curl_source} | tail -n1 || echo -n 500")
+    (>&2 echo "Test whether remote file exists: curl -I -o /dev/null -w \"%{http_code}\" ${curl_secret} '${curl_source}' | tail -n1")
+    local status_code=$(sh -c "curl -I -o /dev/null -w \"%{http_code}\" ${curl_option} '${curl_source}' | tail -n1 || echo -n 500")
     (>&2 echo "status_code: ${status_code}")
     if [[ "200" == "${status_code}" ]]; then echo "true"; else echo "false"; fi
 }
@@ -390,7 +397,13 @@ function ci_opt_user_docker() {
     if [[ -n "${CI_OPT_USE_DOCKER}" ]]; then
         echo "${CI_OPT_USE_DOCKER}"
     else
-        if [[ -n "$(find . -name '*Docker*')" ]] || [[ -n "$(find . -name '*docker-compose*.yml')" ]]; then
+        # TODO Support named pipe (for windows).
+        # Unix sock file
+        if [[ -f /var/run/docker.sock ]] || [[ -L /var/run/docker.sock ]]; then docker_sock_file_present="true"; fi
+        # TCP
+        if [[ -n "${DOCKER_HOST}" ]]; then docker_host_var_present="true"; fi
+        if [[ -n "$(find . -name '*Docker*')" ]] || [[ -n "$(find . -name '*docker-compose*.yml')" ]]; then docker_files_found="true"; fi
+        if ([[ "${docker_sock_file_present}" == "true" ]] || [[ "${docker_host_var_present}" == "true" ]]) && [[ "${docker_host_var_present}" == "true" ]]; then
             echo "true"
         else
             echo "false"
@@ -661,23 +674,19 @@ function init_docker_config() {
     if [[ ! -d "${HOME}/.docker/" ]]; then echo "mkdir ${HOME}/.docker/ "; mkdir -p "${HOME}/.docker/"; fi
 
     if [[ "${CI_OPT_DRYRUN}" != "true" ]]; then
-        # Download docker's config.json if current infrastructure has this file
-        #download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/docker/config.json" "${HOME}/.docker/config.json" "-H 'PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)'"
-        #download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/docker/daemon.json" "${HOME}/.docker/daemon.json" "-H 'PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)'"
-
         if [[ -n "${CI_OPT_DOCKER_REGISTRY_PASS}" ]] && [[ -n "${CI_OPT_DOCKER_REGISTRY_USER}" ]] && [[ -n "${CI_INFRA_OPT_DOCKER_REGISTRY}" ]]; then
             if [[ "${CI_INFRA_OPT_DOCKER_REGISTRY_URL}" == https* ]]; then
-                echo "docker logging into secure registry ${CI_INFRA_OPT_DOCKER_REGISTRY} (${CI_INFRA_OPT_DOCKER_REGISTRY_URL})"
-                echo logging into secure registry ${CI_INFRA_OPT_DOCKER_REGISTRY}
+                (>&2 echo "docker logging into secure registry ${CI_INFRA_OPT_DOCKER_REGISTRY} (${CI_INFRA_OPT_DOCKER_REGISTRY_URL})")
+                (>&2 echo logging into secure registry ${CI_INFRA_OPT_DOCKER_REGISTRY})
                 echo ${CI_OPT_DOCKER_REGISTRY_PASS} | docker login --password-stdin -u="${CI_OPT_DOCKER_REGISTRY_USER}" ${CI_INFRA_OPT_DOCKER_REGISTRY}
             else
-                echo "docker logging into insecure registry ${CI_INFRA_OPT_DOCKER_REGISTRY} (${CI_INFRA_OPT_DOCKER_REGISTRY_URL})"
-                echo logging into insecure registry ${CI_INFRA_OPT_DOCKER_REGISTRY}
+                (>&2 echo "docker logging into insecure registry ${CI_INFRA_OPT_DOCKER_REGISTRY} (${CI_INFRA_OPT_DOCKER_REGISTRY_URL})")
+                (>&2 echo logging into insecure registry ${CI_INFRA_OPT_DOCKER_REGISTRY})
                 echo ${CI_OPT_DOCKER_REGISTRY_PASS} | DOCKER_OPTS="–insecure-registry ${CI_INFRA_OPT_DOCKER_REGISTRY}" docker login --password-stdin -u="${CI_OPT_DOCKER_REGISTRY_USER}" ${CI_INFRA_OPT_DOCKER_REGISTRY}
             fi
-            echo "docker login done"
+            (>&2 echo "docker login done")
         else
-            echo "skip docker login"
+            (>&2 echo "skip docker login")
         fi
     fi
 }
@@ -699,6 +708,30 @@ function pull_base_image() {
         fi
     fi
 }
+
+
+# download a file by curl only when file exists
+# arguments: source_file, target_file
+function download_from_git_repo() {
+    local source_file="$1"
+    local target_file="$2"
+
+    local curl_options="-H \"PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)\""
+
+    if [[ "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}" =~ ^.+/api/v4/projects/[0-9]+/repository/.+$ ]]; then
+        if download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/$(echo ${source_file} | sed 's#/#%2F#g')?ref=master" "${target_file}.json" "${curl_options}"; then
+            (>&2 echo decode ${target_file}.json)
+            cat "${target_file}.json" | jq -r ".content" | base64 --decode | tee "${target_file}"
+        else
+            (>&2 echo "[ERROR] can not download ${target_file}")
+            return 1
+        fi
+    else
+        download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/raw/master/${source_file}" "${target_file}" "${curl_options}"
+        return $?
+    fi
+}
+
 
 function alter_mvn() {
     (>&2 echo "alter_mvn is_origin_repo: $(ci_opt_is_origin_repo), ref_name: $(ci_opt_ref_name), args: $@")
@@ -766,15 +799,17 @@ function alter_mvn() {
 }
 
 function run_mvn() {
-    local curl_options="-H \"PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)\""
-
     echo -e "\n>>>>>>>>>> ---------- run_mvn toolchains.xml ---------- >>>>>>>>>>"
-    if [[ -z "${CI_OPT_MAVEN_TOOLCHAINS_FILE_URL}" ]]; then CI_OPT_MAVEN_TOOLCHAINS_FILE_URL="${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/maven/toolchains.xml"; fi
-    # always down toolchains.xml on travis-ci build
-    if [[ ! -f "${HOME}/.m2/toolchains.xml" ]] || [[ -n "${TRAVIS_EVENT_TYPE}" ]]; then
-        download_if_exists "${CI_OPT_MAVEN_TOOLCHAINS_FILE_URL}" "${HOME}/.m2/toolchains.xml" "${curl_options}"
-    else
-        echo "Found ${HOME}/.m2/toolchains.xml"
+#    # always down toolchains.xml on travis-ci build
+#    if [[ ! -f "${HOME}/.m2/toolchains.xml" ]] || [[ -n "${TRAVIS_EVENT_TYPE}" ]]; then
+#        download_from_git_repo "src/main/maven/toolchains.xml" "${HOME}/.m2/toolchains.xml"
+#    else
+#        echo "Found ${HOME}/.m2/toolchains.xml"
+#        cat ${HOME}/.m2/toolchains.xml
+#    fi
+    if ! download_from_git_repo "src/main/maven/toolchains.xml" "${HOME}/.m2/toolchains.xml"; then
+        echo "[ERROR] can not download src/main/maven/toolchains.xml"
+        return 1
     fi
     echo -e "<<<<<<<<<< ---------- run_mvn toolchains.xml ---------- <<<<<<<<<<\n"
 
@@ -784,11 +819,10 @@ function run_mvn() {
         if [[ -z "${CI_OPT_MAVEN_SETTINGS_FILE}" ]]; then CI_OPT_MAVEN_SETTINGS_FILE="$(pwd)/src/main/maven/settings.xml"; fi
         if [[ ! -f ${CI_OPT_MAVEN_SETTINGS_FILE} ]]; then
             CI_OPT_MAVEN_SETTINGS_FILE="$(ci_opt_cache_directory)/settings-$(ci_opt_infrastructure).xml"
-            if [[ "$(is_remote_resource_exists "${CI_OPT_MAVEN_SETTINGS_FILE_URL}" "${curl_options}")" == "true" ]]; then
-                download "${CI_OPT_MAVEN_SETTINGS_FILE_URL}" "${CI_OPT_MAVEN_SETTINGS_FILE}" "${curl_options}"
+            if download_from_git_repo "src/main/maven/settings.xml" "${CI_OPT_MAVEN_SETTINGS_FILE}"; then
                 CI_OPT_MAVEN_SETTINGS="-s ${CI_OPT_MAVEN_SETTINGS_FILE}"
             else
-                echo "[ERROR] can not download ${CI_OPT_MAVEN_SETTINGS_FILE_URL}"
+                echo "[ERROR] can not download src/main/maven/settings.xml"
                 return 1
             fi
         else
@@ -800,7 +834,7 @@ function run_mvn() {
     echo "CI_OPT_MAVEN_SETTINGS: ${CI_OPT_MAVEN_SETTINGS}"
 
     # Download maven's settings-security.xml if current infrastructure has this file
-    download_if_exists "${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/src/main/maven/settings-security.xml" "${HOME}/.m2/settings-security.xml" "${curl_options}"
+    download_from_git_repo "src/main/maven/settings-security.xml" "${HOME}/.m2/settings-security.xml" || echo "[WARN] settings-security.xml not found or can not download."
     echo -e "<<<<<<<<<< ---------- run_mvn settings.xml and settings-security.xml ---------- <<<<<<<<<<\n"
 
     echo -e "\n>>>>>>>>>> ---------- run_mvn properties and environment variables ---------- >>>>>>>>>>"
@@ -811,10 +845,8 @@ function run_mvn() {
             eval "$(cat ../maven-build-opts-$(ci_opt_infrastructure)/${CI_OPT_CI_OPTS_SCRIPT})"
         else
             # for maven-build* user
-            CI_OPT_CI_OPTS_SCRIPT="${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO}/${CI_OPT_CI_OPTS_SCRIPT}"
-            if [[ "$(is_remote_resource_exists "${CI_OPT_CI_OPTS_SCRIPT}" "${curl_options}")" == "true" ]]; then
-                echo "eval \$(curl -H \"Cache-Control: no-cache\" -H \"PRIVATE-TOKEN: <secret>\" -s -L ${CI_OPT_CI_OPTS_SCRIPT})"
-                eval "$(curl -H "Cache-Control: no-cache" -H "PRIVATE-TOKEN: $(ci_infra_opt_git_auth_token)" -s -L ${CI_OPT_CI_OPTS_SCRIPT})"
+            if download_from_git_repo "${CI_OPT_CI_OPTS_SCRIPT}" "$(ci_opt_cache_directory)/${CI_OPT_CI_OPTS_SCRIPT}"; then
+                . $(ci_opt_cache_directory)/${CI_OPT_CI_OPTS_SCRIPT}
             else
                 echo "Error, can not download ${CI_OPT_CI_OPTS_SCRIPT}"
             fi

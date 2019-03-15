@@ -14,6 +14,7 @@ image: ubuntu
 environment:
   APPVEYOR_ENABLED: true
 
+  CI_INFRA_OPT_GIT_PREFIX: https://github.com
   CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN:
     secure: b8+kCKw7dSSIWSmdlsRzDKz9m5xU3BO1uBzd4voLqDmbGn+pVQxOQzpEzqNqw0xq
   CI_INFRA_OPT_OPENSOURCE_MVNSITE_PASSWORD:
@@ -40,7 +41,7 @@ cache:
 - "$HOME/.sonar/cache"
 
 # see: https://www.appveyor.com/docs/build-environment/
-stack: node 9, jdk 8, jdk 9, jdk 10
+stack: node 9, jdk 8, jdk 9, jdk 11
 
 install:
 - ls -al
@@ -50,8 +51,8 @@ install:
     whois $(curl ipinfo.io/ip)
     unset M2_HOME
     sudo mkdir -p /opt/maven
-    sudo aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -d /opt/maven -o apache-maven-3.5.4-bin.zip https://archive.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip && sudo unzip /opt/maven/apache-maven-3.5.4-bin.zip -d /opt/maven > /dev/null
-    sudo ln -sfn apache-maven-3.5.4 /opt/maven/latest
+    sudo aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -d /opt/maven -o apache-maven-3.6.0-bin.zip https://archive.apache.org/dist/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.zip && sudo unzip /opt/maven/apache-maven-3.6.0-bin.zip -d /opt/maven > /dev/null
+    sudo ln -sfn apache-maven-3.6.0 /opt/maven/latest
     export M3_HOME=/opt/maven/latest
     export PATH=$M3_HOME/bin:$PATH
     sudo mkdir -p /opt/gradle
@@ -62,11 +63,11 @@ install:
     export GRADLE_HOME=/opt/gradle/latest
     export PATH=$GRADLE_HOME/bin:$PATH
     echo M3_HOME=$M3_HOME, GRADLE_HOME=$GRADLE_HOME, PATH=$PATH
-    # make AppVeyor's JDK path (/usr/lib/jvm/java-8-openjdk-amd64) compatible with travis-ci's style (/usr/lib/jvm/java-8-oracle) to make toolchains.xml valid
-    sudo ln -s /usr/lib/jvm/java-8-openjdk-amd64 /usr/lib/jvm/java-8-oracle
-    sudo ln -s /usr/lib/jvm/java-9-openjdk-amd64 /usr/lib/jvm/java-9-oracle
-    sudo ln -s /usr/lib/jvm/java-10-openjdk-amd64 /usr/lib/jvm/java-10-oracle
-    export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+    # make AppVeyor's JDK path (/usr/lib/jvm/java-11-openjdk-amd64) compatible with travis-ci's style (/usr/lib/jvm/java-11-openjdk) to make toolchains.xml valid
+    sudo ln -s /usr/lib/jvm/java-8-openjdk-amd64 /usr/lib/jvm/java-8-openjdk
+    sudo ln -s /usr/lib/jvm/java-9-openjdk-amd64 /usr/lib/jvm/java-9-openjdk
+    sudo ln -s /usr/lib/jvm/java-11-openjdk-amd64 /usr/lib/jvm/java-11-openjdk
+    export JAVA_HOME=/usr/lib/jvm/java-11-openjdk
     export PATH=$JAVA_HOME:$PATH
 
 services:

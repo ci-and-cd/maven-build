@@ -318,3 +318,8 @@ see: https://github.com/APNIC-net/repositoryd/blob/master/pom.xml
 
 see: https://github.com/stevespringett/dependency-check-sonar-plugin/tree/SonarQube_6.x
 see: https://docs.sonarqube.org/display/PLUG/JaCoCo+Plugin
+
+Java 11
+see: https://dzone.com/articles/apis-to-be-removed-from-java-11
+see: https://medium.com/criciumadev/its-time-migrating-to-java-11-5eb3868354f9
+see: https://dzone.com/articles/migrating-springboot-applications-to-latest-java-v

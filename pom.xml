@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>1.0.3</version>
+    <version>2.0.0</version>
 
     <modules>
         <module>build-docker</module>
@@ -81,6 +81,12 @@
             <releases><enabled>true</enabled></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </repository>
+        <!-- Repo jvnet is for java.xml.bind (org.glassfish.jaxb:jaxb-runtime:2.4.0-b180608.0325) that removed in JDK 11 by JEP-320 -->
+        <repository>
+            <id>jvnet-nexus-staging</id>
+            <url>http://maven.java.net/content/repositories/staging/</url>
+            <layout>default</layout>
+        </repository>
         <!-- @formatter:on -->
     </repositories>
 
@@ -151,6 +157,9 @@
     </pluginRepositories>
 
     <properties>
+        <asm.version>6.2</asm.version>
+        <javassist.version>3.23.1-GA</javassist.version>
+
         <checkstyle.consoleOutput>true</checkstyle.consoleOutput>
         <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
         <checkstyle.failsOnError>false</checkstyle.failsOnError>
@@ -165,14 +174,14 @@
         <downloadSources>true</downloadSources>
 
         <!-- findbugs.effort: Min, Default, Max -->
-        <findbugs.effort>Default</findbugs.effort>
-        <findbugs.failOnError>false</findbugs.failOnError>
-        <findbugs.fork>true</findbugs.fork>
-        <findbugs.includeTests>false</findbugs.includeTests>
-        <findbugs.jvmArgs>-Xmx1024m -Xms128m -XX:MaxMetaspaceSize=512m</findbugs.jvmArgs>
-        <findbugs.relaxed>false</findbugs.relaxed>
+        <!--<findbugs.effort>Default</findbugs.effort>-->
+        <!--<findbugs.failOnError>false</findbugs.failOnError>-->
+        <!--<findbugs.fork>true</findbugs.fork>-->
+        <!--<findbugs.includeTests>false</findbugs.includeTests>-->
+        <!--<findbugs.jvmArgs>-Xmx1024m -Xms128m -XX:MaxMetaspaceSize=512m</findbugs.jvmArgs>-->
+        <!--<findbugs.relaxed>false</findbugs.relaxed>-->
         <!-- findbugs.threshold: High, Default, Low, Ignore, If set to "High", only high confidence bugs are reported -->
-        <findbugs.threshold>Default</findbugs.threshold>
+        <!--<findbugs.threshold>Default</findbugs.threshold>-->
 
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
@@ -231,7 +240,7 @@
         <animal-sniffer-maven-plugin.version>1.16</animal-sniffer-maven-plugin.version>
         <ant-contrib.version>20020829</ant-contrib.version>
         <apt-maven-plugin.version>1.1.3</apt-maven-plugin.version>
-        <asciidoctor-maven-plugin.version>1.5.6</asciidoctor-maven-plugin.version>
+        <asciidoctor-maven-plugin.version>1.5.7.1</asciidoctor-maven-plugin.version>
         <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
 
         <!--<checkstyle.version>6.19</checkstyle.version>-->
@@ -240,87 +249,101 @@
         <!--<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>-->
         <com.google.errorprone_error_prone_core.version>2.3.1</com.google.errorprone_error_prone_core.version>
 
-        <dependency-check-maven.version>4.0.0</dependency-check-maven.version>
+        <dependency-check-maven.version>5.0.0-M2</dependency-check-maven.version>
+        <!-- Fix error of multiple processes connect to same h2 in embedded mode, use mixed mode replace (AUTO_SERVER=TRUE). -->
+        <!--<dependency-check-maven.connectionString>jdbc:h2:file:%s;AUTOCOMMIT=ON;LOG=0;CACHE_SIZE=65536;AUTO_SERVER=TRUE;</dependency-check-maven.connectionString>-->
+        <!--<dependency-check-maven.connectionString>jdbc:h2:file:%s;AUTOCOMMIT=ON;LOG=0;CACHE_SIZE=65536;AUTO_SERVER=TRUE;MV_STORE=FALSE;</dependency-check-maven.connectionString>-->
+
         <doxia-module-markdown.version>1.8</doxia-module-markdown.version>
 
         <echo-maven-plugin.version>0.3.0</echo-maven-plugin.version>
-        <findbugs-annotations.version>3.0.1u2</findbugs-annotations.version>
-        <findbugs-maven-plugin.version>3.0.5</findbugs-maven-plugin.version>
-        <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
 
-        <git-commit-id-plugin.version>2.2.4</git-commit-id-plugin.version>
-        <gitflow-maven-plugin.version>1.9.0</gitflow-maven-plugin.version>
+        <!-- Findbugs is no longer maintained, please use Spotbugs -->
+        <findbugs-annotations.version>3.0.1u2</findbugs-annotations.version>
+        <findbugs-jsr305.version>3.0.2</findbugs-jsr305.version>
+        <!--<findbugs-maven-plugin.version>3.0.5</findbugs-maven-plugin.version>-->
+
+        <spotbugs.version>3.1.12</spotbugs.version>
+        <spotbugs-maven-plugin.version>3.1.11</spotbugs-maven-plugin.version>
+
+        <frontend-maven-plugin.version>1.7.5</frontend-maven-plugin.version>
+
+        <git-commit-id-plugin.version>2.2.6</git-commit-id-plugin.version>
+        <gitflow-maven-plugin.version>1.11.0</gitflow-maven-plugin.version>
 
         <!--<gmaven-plugin.version>1.0</gmaven-plugin.version>-->
 
         <groovy-maven-plugin.version>2.1</groovy-maven-plugin.version>
-        <groovy.version>2.4.15</groovy.version>
-        <!--<groovy-eclipse-compiler.version>2.9.2-02</groovy-eclipse-compiler.version>-->
-        <!--<groovy-eclipse-batch.version>2.4.12-03</groovy-eclipse-batch.version>-->
-        <groovy-eclipse-compiler.version>2.9.3-01</groovy-eclipse-compiler.version>
-        <groovy-eclipse-batch.version>2.4.15-01</groovy-eclipse-batch.version>
-        <!--<groovy-eclipse-compiler.version>3.0.0-01</groovy-eclipse-compiler.version>-->
-        <!--<groovy-eclipse-batch.version>2.5.1-02</groovy-eclipse-batch.version>-->
+        <!-- see: http://docs.groovy-lang.org/latest/html/documentation/tools-groovyc.html -->
+        <groovy.version>2.5.6</groovy.version>
+        <!--<groovy-eclipse-compiler.version>2.9.3-01</groovy-eclipse-compiler.version>-->
+        <!--<groovy-eclipse-batch.version>2.4.15-01</groovy-eclipse-batch.version>-->
+        <groovy-eclipse-compiler.version>3.3.0-01</groovy-eclipse-compiler.version>
+        <groovy-eclipse-batch.version>2.5.6-01</groovy-eclipse-batch.version>
 
-        <java10-javax.activation.version>1.1.1</java10-javax.activation.version>
+        <javax.activation.version>1.1.1</javax.activation.version>
         <java18.version>1.0</java18.version>
-        <java9-javax.activation.version>1.1.1</java9-javax.activation.version>
         <jdepend-maven-plugin.version>2.0</jdepend-maven-plugin.version>
         <jetbrains-annotations.version>16.0.3</jetbrains-annotations.version>
         <jsch.version>0.1.54</jsch.version>
 
-        <!--<kotlin.version>1.1.2-2</kotlin.version>-->
-        <!--<kotlin.version>1.2.51</kotlin.version>-->
-        <kotlin.version>1.2.60</kotlin.version>
-        <lombok.version>1.18.2</lombok.version>
+        <kotlin.version>1.3.21</kotlin.version>
+        <lombok.version>1.18.6</lombok.version>
 
         <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
         <maven-changes-plugin.version>2.12.1</maven-changes-plugin.version>
         <maven-checkstyle-plugin.version>3.0.0</maven-checkstyle-plugin.version>
         <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
-        <maven-dependency-plugin.version>3.1.0</maven-dependency-plugin.version>
-        <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
+        <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
+        <!--<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>-->
+        <maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
         <maven-enforcer-plugin.version>3.0.0-M1</maven-enforcer-plugin.version>
-        <maven-failsafe-plugin.version>2.21.0</maven-failsafe-plugin.version>
+        <!--<maven-failsafe-plugin.version>2.21.0</maven-failsafe-plugin.version>-->
+        <maven-failsafe-plugin.version>3.0.0-M3</maven-failsafe-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
-        <maven-install-plugin.version>2.5.2</maven-install-plugin.version>
-        <maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
-        <maven-javadoc-plugin.version>3.0.0</maven-javadoc-plugin.version>
-        <maven-jxr-plugin.version>2.5</maven-jxr-plugin.version>
+        <!--<maven-install-plugin.version>2.5.2</maven-install-plugin.version>-->
+        <maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
+        <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
+        <maven-javadoc-plugin.version>3.1.0</maven-javadoc-plugin.version>
+        <maven-jxr-plugin.version>3.0.0</maven-jxr-plugin.version>
         <!-- maven-pmd-plugin:3.6   depends on net.sourceforge.pmd:pmd:5.3.5 -->
         <!-- maven-pmd-plugin:3.7   depends on net.sourceforge.pmd:pmd:5.5.1 -->
         <!-- maven-pmd-plugin:3.9.0 depends on net.sourceforge.pmd:pmd:6.4.0 -->
         <!-- maven-pmd-plugin:3.10.0 depends on net.sourceforge.pmd:pmd:6.4.0 -->
-        <maven-pmd-plugin.version>3.10.0</maven-pmd-plugin.version>
+        <!-- maven-pmd-plugin:3.11.0 depends on net.sourceforge.pmd:pmd:6.8.0 -->
+        <maven-pmd-plugin.version>3.11.0</maven-pmd-plugin.version>
         <maven-project-info-reports-plugin.version>3.0.0</maven-project-info-reports-plugin.version>
-        <maven-resources-plugin.version>3.0.1</maven-resources-plugin.version>
+        <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
         <maven-site-plugin.version>3.7.1</maven-site-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
-        <maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
-        <maven-surefire-report-plugin.version>2.21.0</maven-surefire-report-plugin.version>
+        <!--<maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>-->
+        <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
+        <maven-surefire-report-plugin.version>3.0.0-M3</maven-surefire-report-plugin.version>
         <maven-toolchains-plugin.version>1.1</maven-toolchains-plugin.version>
 
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
 
         <org.codehaus.plexus_plexus-compiler-javac-errorprone.version>2.8.5</org.codehaus.plexus_plexus-compiler-javac-errorprone.version>
-        <org.jacoco_jacoco.version>0.8.2</org.jacoco_jacoco.version>
+        <org.jacoco_jacoco.version>0.8.3</org.jacoco_jacoco.version>
         <!--<org.sonarsource.java_sonar-jacoco-listeners.version>5.3.0.13828</org.sonarsource.java_sonar-jacoco-listeners.version>-->
-        <org.sonarsource.java_sonar-jacoco-listeners.version>5.9.1.16423</org.sonarsource.java_sonar-jacoco-listeners.version>
+        <!--<org.sonarsource.java_sonar-jacoco-listeners.version>5.9.1.16423</org.sonarsource.java_sonar-jacoco-listeners.version>-->
+        <org.sonarsource.java_sonar-jacoco-listeners.version>5.11.0.17289</org.sonarsource.java_sonar-jacoco-listeners.version>
 
         <pegdown.version>1.6.0</pegdown.version>
         <properties-maven-plugin.version>1.0.0</properties-maven-plugin.version>
         <qualinsight-mojo-cobertura-core.version>2.0.0</qualinsight-mojo-cobertura-core.version>
 
-        <scala.version>2.12.6</scala.version>
-        <scala-maven-plugin.version>3.4.2</scala-maven-plugin.version>
+        <scala.version>2.12.8</scala.version>
+        <scala-maven-plugin.version>4.0.1</scala-maven-plugin.version>
 
         <!--<sonar-maven-plugin.version>3.4.1.1168</sonar-maven-plugin.version>-->
-        <sonar-maven-plugin.version>3.5.0.1254</sonar-maven-plugin.version>
+        <!--<sonar-maven-plugin.version>3.5.0.1254</sonar-maven-plugin.version>-->
+        <sonar-maven-plugin.version>3.6.0.1398</sonar-maven-plugin.version>
 
         <taglist-maven-plugin.version>2.4</taglist-maven-plugin.version>
         <umlgraph.version>5.6.6</umlgraph.version>
-        <versions-maven-plugin.version>2.5</versions-maven-plugin.version>
+        <versions-maven-plugin.version>2.7</versions-maven-plugin.version>
         <!-- Why org.codehaus.mojo:wagon-maven-plugin:wagon-maven-plugin-2.0.1-snapshot-chshawkn-1.6?
             see: https://www.mail-archive.com/users@maven.apache.org/msg129243.html -->
         <!--http://www.mojohaus.org/wagon-maven-plugin/usage.html-->
@@ -342,7 +365,7 @@
                 <!--<plugin><groupId>org.codehaus.groovy.maven</groupId><artifactId>gmaven-plugin</artifactId><version>${gmaven-plugin.version}</version></plugin>-->
                 <plugin>
                     <groupId>org.codehaus.gmaven</groupId><artifactId>groovy-maven-plugin</artifactId><version>${groovy-maven-plugin.version}</version>
-                    <dependencies><dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId><version>${groovy.version}</version></dependency></dependencies>
+                    <dependencies><dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy</artifactId><classifier>indy</classifier><version>${groovy.version}</version></dependency></dependencies>
                 </plugin>
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>${build-helper-maven-plugin.version}</version></plugin>
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>properties-maven-plugin</artifactId><version>${properties-maven-plugin.version}</version></plugin>
@@ -367,20 +390,27 @@
                     <artifactId>maven-javadoc-plugin</artifactId><version>${maven-javadoc-plugin.version}</version>
                     <configuration>
                         <additionalJOption>-J-Duser.language=en</additionalJOption>
-                        <additionalOptions>-views -all</additionalOptions>
+                        <!--<additionalOptions>-views -all</additionalOptions>-->
                         <charset>${project.build.sourceEncoding}</charset>
-                        <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
+                        <!--<doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>-->
                         <!-- UML Graph needs to match HTML tag to insert images into javadoc -->
-                        <docletArtifact><groupId>org.umlgraph</groupId><artifactId>umlgraph</artifactId><version>${umlgraph.version}</version></docletArtifact>
+                        <!--<docletArtifact><groupId>org.umlgraph</groupId><artifactId>umlgraph</artifactId><version>${umlgraph.version}</version></docletArtifact>-->
+                        <doclint>none</doclint>
                         <encoding>${project.build.sourceEncoding}</encoding>
                         <failOnError>${maven.javadoc.failsOnError}</failOnError>
+                        <notimestamp>true</notimestamp>
                         <skip>${maven.javadoc.skip}</skip>
                         <useStandardDocletOptions>true</useStandardDocletOptions>
                     </configuration>
                 </plugin>
                 <plugin><artifactId>maven-source-plugin</artifactId><version>${maven-source-plugin.version}</version></plugin>
                 <plugin><artifactId>maven-resources-plugin</artifactId><version>${maven-resources-plugin.version}</version></plugin>
-                <plugin><artifactId>maven-surefire-plugin</artifactId><version>${maven-surefire-plugin.version}</version></plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId><version>${maven-surefire-plugin.version}</version>
+                    <dependencies>
+                        <dependency><groupId>org.ow2.asm</groupId><artifactId>asm</artifactId><version>${asm.version}</version></dependency>
+                    </dependencies>
+                </plugin>
                 <plugin><artifactId>maven-toolchains-plugin</artifactId><version>${maven-toolchains-plugin.version}</version></plugin>
 
                 <plugin><artifactId>maven-project-info-reports-plugin</artifactId><version>${maven-project-info-reports-plugin.version}</version></plugin>
@@ -425,23 +455,39 @@
 
                 <!-- @formatter:off -->
                 <plugin><groupId>org.asciidoctor</groupId><artifactId>asciidoctor-maven-plugin</artifactId><version>${asciidoctor-maven-plugin.version}</version></plugin>
-                <plugin><groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId><version>${dependency-check-maven.version}</version></plugin>
-                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>animal-sniffer-maven-plugin</artifactId><version>${animal-sniffer-maven-plugin.version}</version></plugin>
                 <plugin>
-                    <groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId><version>${findbugs-maven-plugin.version}</version>
-                    <configuration>
-                        <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
-                        <effort>${findbugs.effort}</effort>
-                        <!--<excludeFilterFile>file:///${project.basedir}/${relative.parent.dir}/rulesets/findbugs-exclude-rules.xml</excludeFilterFile>-->
-                        <failOnError>${findbugs.failOnError}</failOnError>
-                        <fork>${findbugs.fork}</fork>
-                        <!--<includeFilterFile>file:///${project.basedir}/${relative.parent.dir}/rulesets/findbugs-rules.xml</includeFilterFile>-->
-                        <includeTests>${findbugs.includeTests}</includeTests>
-                        <jvmArgs>${findbugs.jvmArgs}</jvmArgs>
-                        <relaxed>${findbugs.relaxed}</relaxed>
-                        <skip>${maven.quality.skip}</skip>
-                        <threshold>${findbugs.threshold}</threshold>
-                    </configuration>
+                    <groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId><version>${dependency-check-maven.version}</version>
+                    <!--<configuration><connectionString>${dependency-check-maven.connectionString}</connectionString></configuration>-->
+                </plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>animal-sniffer-maven-plugin</artifactId><version>${animal-sniffer-maven-plugin.version}</version></plugin>
+                <!--<plugin>-->
+                    <!--<groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId><version>${findbugs-maven-plugin.version}</version>-->
+                    <!--<configuration>-->
+                        <!--<classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>-->
+                        <!--<effort>${findbugs.effort}</effort>-->
+                        <!--&lt;!&ndash;<excludeFilterFile>file:///${project.basedir}/${relative.parent.dir}/rulesets/findbugs-exclude-rules.xml</excludeFilterFile>&ndash;&gt;-->
+                        <!--<failOnError>${findbugs.failOnError}</failOnError>-->
+                        <!--<fork>${findbugs.fork}</fork>-->
+                        <!--&lt;!&ndash;<includeFilterFile>file:///${project.basedir}/${relative.parent.dir}/rulesets/findbugs-rules.xml</includeFilterFile>&ndash;&gt;-->
+                        <!--<includeTests>${findbugs.includeTests}</includeTests>-->
+                        <!--<jvmArgs>${findbugs.jvmArgs}</jvmArgs>-->
+                        <!--<relaxed>${findbugs.relaxed}</relaxed>-->
+                        <!--<skip>${maven.quality.skip}</skip>-->
+                        <!--<threshold>${findbugs.threshold}</threshold>-->
+                    <!--</configuration>-->
+                <!--</plugin>-->
+                <plugin>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs-maven-plugin</artifactId>
+                    <version>${spotbugs-maven-plugin.version}</version>
+                    <dependencies>
+                        <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
+                        <dependency>
+                            <groupId>com.github.spotbugs</groupId>
+                            <artifactId>spotbugs</artifactId>
+                            <version>${spotbugs.version}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>jdepend-maven-plugin</artifactId><version>${jdepend-maven-plugin.version}</version></plugin>
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>taglist-maven-plugin</artifactId><version>${taglist-maven-plugin.version}</version></plugin>
@@ -835,7 +881,7 @@
             <!-- mvn wrapper:wrapper -->
             <!--<plugin>
                 <groupId>com.rimerosolutions.maven.plugins</groupId><artifactId>wrapper-maven-plugin</artifactId><version>${wrapper-maven-plugin.version}</version>
-                <configuration><mavenVersion>3.5.4</mavenVersion></configuration>
+                <configuration><mavenVersion>3.6.0</mavenVersion></configuration>
             </plugin>-->
         </plugins>
 
@@ -847,6 +893,7 @@
         <!-- @formatter:off -->
         <dependencies>
             <dependency><groupId>com.google.code.findbugs</groupId><artifactId>annotations</artifactId><version>${findbugs-annotations.version}</version></dependency>
+            <dependency><groupId>com.google.code.findbugs</groupId><artifactId>jsr305</artifactId><version>${findbugs-jsr305.version}</version></dependency>
             <dependency><groupId>org.jetbrains</groupId><artifactId>annotations</artifactId><version>${jetbrains-annotations.version}</version></dependency>
         </dependencies>
         <!-- @formatter:on -->
@@ -868,30 +915,30 @@
             <properties>
                 <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
                 <checkstyle.failsOnError>false</checkstyle.failsOnError>
-                <findbugs.failOnError>false</findbugs.failOnError>
+                <!--<findbugs.failOnError>false</findbugs.failOnError>-->
                 <maven.javadoc.failsOnError>false</maven.javadoc.failsOnError>
                 <pmd.failOnViolation>false</pmd.failOnViolation>
                 <maven.quality.skip>true</maven.quality.skip>
                 <sonar.buildbreaker.skip>true</sonar.buildbreaker.skip>
             </properties>
         </profile>
-        <profile>
-            <id>enable-findbugs-exclude-filter</id>
-            <activation><file><exists>${basedir}/findbugs-exclude-filter.xml</exists></file><activeByDefault>false</activeByDefault></activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.codehaus.mojo</groupId>
-                            <artifactId>findbugs-maven-plugin</artifactId>
-                            <configuration>
-                                <excludeFilterFile>${basedir}/findbugs-exclude-filter.xml</excludeFilterFile>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
+        <!--<profile>-->
+            <!--<id>enable-findbugs-exclude-filter</id>-->
+            <!--<activation><file><exists>${basedir}/findbugs-exclude-filter.xml</exists></file><activeByDefault>false</activeByDefault></activation>-->
+            <!--<build>-->
+                <!--<pluginManagement>-->
+                    <!--<plugins>-->
+                        <!--<plugin>-->
+                            <!--<groupId>org.codehaus.mojo</groupId>-->
+                            <!--<artifactId>findbugs-maven-plugin</artifactId>-->
+                            <!--<configuration>-->
+                                <!--<excludeFilterFile>${basedir}/findbugs-exclude-filter.xml</excludeFilterFile>-->
+                            <!--</configuration>-->
+                        <!--</plugin>-->
+                    <!--</plugins>-->
+                <!--</pluginManagement>-->
+            <!--</build>-->
+        <!--</profile>-->
         <profile>
             <id>skip-tests</id>
             <activation><property><name>skip-tests</name><value>true</value></property><activeByDefault>false</activeByDefault></activation>
@@ -963,6 +1010,12 @@
                 <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
 
                 <sonar.sources>.</sonar.sources>
+                <!--
+                Warning
+                Specifying module-relative paths at project level in the property 'sonar.inclusions' is deprecated.
+                To continue matching files like 'build-docker/pom.xml',
+                update this property so that patterns refer to project-relative paths.
+                -->
                 <sonar.inclusions>pom.xml,src/main/**</sonar.inclusions>
                 <sonar.test.inclusions>src/test/**</sonar.test.inclusions>
             </properties>
@@ -1463,7 +1516,7 @@
         <profile>
             <id>default-pmd-ruleset</id>
             <activation><property><name>!pmd.ruleset.location</name></property></activation>
-            <properties><pmd.ruleset.location>https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/pmd/pmd-ruleset-6.4.0.xml</pmd.ruleset.location></properties>
+            <properties><pmd.ruleset.location>https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/pmd/pmd-ruleset-6.8.0.xml</pmd.ruleset.location></properties>
         </profile>
 
         <profile>
@@ -1518,19 +1571,32 @@
             <activation><property><name>site</name><value>true</value></property></activation>
             <build>
                 <plugins>
+                    <!--<plugin>-->
+                        <!--<groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId>-->
+                        <!--<executions>-->
+                            <!--<execution>-->
+                                <!--<id>findbugs-findbugs</id>-->
+                                <!--<phase>prepare-package</phase>-->
+                                <!--<goals>-->
+                                    <!--<goal>findbugs</goal>-->
+                                    <!--<goal>check</goal>-->
+                                <!--</goals>-->
+                            <!--</execution>-->
+                        <!--</executions>-->
+                    <!--</plugin>-->
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId>
+                        <groupId>com.github.spotbugs</groupId><artifactId>spotbugs-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>findbugs-findbugs</id>
+                                <id>spotbugs-spotbugs</id>
                                 <phase>prepare-package</phase>
                                 <goals>
-                                    <goal>findbugs</goal>
+                                    <goal>spotbugs</goal>
                                     <goal>check</goal>
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
+                        </plugin>
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <executions>
@@ -1596,13 +1662,12 @@
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <configuration>
                             <additionalJOption>-J-Duser.language=en</additionalJOption>
-                            <additionalOptions>-views -all</additionalOptions>
+                            <!--<additionalOptions>-views -all</additionalOptions>-->
                             <charset>${project.build.sourceEncoding}</charset>
-                            <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
-                            <!-- UML Graph needs to match HTML tag to insert images into javadoc -->
-                            <docletArtifact><groupId>org.umlgraph</groupId><artifactId>umlgraph</artifactId><version>${umlgraph.version}</version></docletArtifact>
+                            <doclint>none</doclint>
                             <encoding>${project.build.sourceEncoding}</encoding>
                             <failOnError>${maven.javadoc.failsOnError}</failOnError>
+                            <notimestamp>true</notimestamp>
                             <skip>${maven.javadoc.skip}</skip>
                             <useStandardDocletOptions>true</useStandardDocletOptions>
                         </configuration>
@@ -1637,7 +1702,8 @@
                             </reportSet>
                         </reportSets>
                     </plugin>
-                    <plugin><groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId></plugin>
+                    <!--<plugin><groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId></plugin>-->
+                    <plugin><groupId>com.github.spotbugs</groupId><artifactId>spotbugs-maven-plugin</artifactId></plugin>
                     <plugin><groupId>org.codehaus.mojo</groupId><artifactId>jdepend-maven-plugin</artifactId></plugin>
                     <plugin>
                         <artifactId>maven-checkstyle-plugin</artifactId>
@@ -1755,11 +1821,7 @@
                     <plugin>
                         <groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId>
                         <executions>
-                            <execution>
-                                <goals>
-                                    <goal>check</goal>
-                                </goals>
-                            </execution>
+                            <execution><goals><goal>check</goal></goals></execution>
                         </executions>
                     </plugin>
                 </plugins>
@@ -1941,7 +2003,7 @@
                         <plugin>
                             <groupId>com.spotify</groupId><artifactId>docker-maven-plugin</artifactId>
                             <dependencies>
-                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${java9-javax.activation.version}</version></dependency>
+                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
                             </dependencies>
                         </plugin>
                     </plugins>
@@ -1977,7 +2039,7 @@
             </build>
             <dependencyManagement>
                 <dependencies>
-                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${java9-javax.activation.version}</version></dependency>
+                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
                     <!-- Hibernate java.lang.NoClassDefFoundError: javax/xml/bind/JAXBException -->
                     <dependency><groupId>javax.xml.bind</groupId><artifactId>jaxb-api</artifactId><version>${jaxb-api.version}</version></dependency>
                 </dependencies>
@@ -1989,45 +2051,18 @@
             </reporting>
         </profile>
         <profile>
-            <id>default-java10-jvmArguments-addModules</id>
-            <activation><jdk>1.10</jdk><property><name>!jvmArguments.addModules</name></property></activation>
-            <properties><jvmArguments.addModules>java.xml.bind,java.xml.ws,java.xml.ws.annotation</jvmArguments.addModules></properties>
-        </profile>
-        <profile>
-            <id>java10-without-groovy</id>
-            <activation><jdk>1.10</jdk><file><missing>${basedir}/src/main/groovy</missing></file><activeByDefault>false</activeByDefault></activation>
-            <properties><java.version>1.10</java.version></properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration><compilerVersion>${java.version}</compilerVersion><compilerArgs><arg>--add-modules</arg><arg>${jvmArguments.addModules}</arg></compilerArgs></configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>java10-with-groovy</id>
-            <activation><jdk>1.10</jdk><file><exists>${basedir}/src/main/groovy</exists></file><activeByDefault>false</activeByDefault></activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration><compilerArgs><arg>-J--add-modules</arg><arg>-J${jvmArguments.addModules}</arg></compilerArgs></configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>java10</id>
-            <activation><jdk>1.10</jdk><activeByDefault>false</activeByDefault></activation>
+            <id>java11</id>
+            <activation><jdk>11</jdk><activeByDefault>false</activeByDefault></activation>
             <properties>
-                <!-- Runtime modules for java10 -->
+                <!-- Runtime modules for java11 -->
+                <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
+                <javax.transaction-api.version>1.3</javax.transaction-api.version>
                 <jaxb-api.version>2.3.0</jaxb-api.version>
-                <java.version>1.10</java.version>
-                <maven.compiler.release>10</maven.compiler.release>
-                <maven.compiler.source>1.10</maven.compiler.source>
-                <maven.compiler.target>1.10</maven.compiler.target>
+                <jaxws-api.version>2.3.0</jaxws-api.version>
+                <java.version>11</java.version>
+                <maven.compiler.release>11</maven.compiler.release>
+                <maven.compiler.source>11</maven.compiler.source>
+                <maven.compiler.target>11</maven.compiler.target>
             </properties>
             <build>
                 <pluginManagement>
@@ -2035,7 +2070,7 @@
                         <plugin>
                             <groupId>com.spotify</groupId><artifactId>docker-maven-plugin</artifactId>
                             <dependencies>
-                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${java10-javax.activation.version}</version></dependency>
+                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
                             </dependencies>
                         </plugin>
                     </plugins>
@@ -2045,7 +2080,7 @@
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>echo-argLine</id><phase>test</phase><goals><goal>run</goal></goals><configuration><target><echo message="java10 argLine: ${argLine}"/></target></configuration>
+                                <id>echo-argLine</id><phase>test</phase><goals><goal>run</goal></goals><configuration><target><echo message="java11 argLine: ${argLine}"/></target></configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -2065,15 +2100,25 @@
                             <fail>true</fail>
                         </configuration>
                     </plugin>
-                    <plugin><artifactId>maven-failsafe-plugin</artifactId><configuration><argLine>--add-modules ${jvmArguments.addModules} ${argLine}</argLine></configuration></plugin>
-                    <plugin><artifactId>maven-surefire-plugin</artifactId><configuration><argLine>--add-modules ${jvmArguments.addModules} ${argLine}</argLine></configuration></plugin>
+                    <plugin><artifactId>maven-failsafe-plugin</artifactId><configuration><argLine>--illegal-access=permit ${argLine}</argLine></configuration></plugin>
+                    <plugin><artifactId>maven-surefire-plugin</artifactId><configuration><argLine>--illegal-access=permit ${argLine}</argLine></configuration></plugin>
                 </plugins>
             </build>
             <dependencyManagement>
                 <dependencies>
-                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${java10-javax.activation.version}</version></dependency>
+                    <!-- see: https://dzone.com/articles/apis-to-be-removed-from-java-11 -->
+                    <!-- java.activation -->
+                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
+                    <!-- java.transaction -->
+                    <!--<dependency><groupId>javax.transaction</groupId><artifactId>javax.transaction-api</artifactId><version>${javax.transaction-api.version}</version></dependency>-->
                     <!-- Hibernate java.lang.NoClassDefFoundError: javax/xml/bind/JAXBException -->
+                    <!-- java.xml.bind -->
                     <dependency><groupId>javax.xml.bind</groupId><artifactId>jaxb-api</artifactId><version>${jaxb-api.version}</version></dependency>
+                    <!--<dependency><groupId>com.sun.xml.bind</groupId><artifactId>jaxb-core</artifactId><version>${jaxb-api.version}</version></dependency>-->
+                    <!--<dependency><groupId>com.sun.xml.bind</groupId><artifactId>jaxb-impl</artifactId><version>${jaxb-api.version}</version></dependency>-->
+                    <!-- java.xml.ws -->
+                    <dependency><groupId>javax.annotation</groupId><artifactId>javax.annotation-api</artifactId><version>${javax.annotation-api.version}</version></dependency>
+                    <dependency><groupId>javax.xml.ws</groupId><artifactId>jaxws-api</artifactId><version>${jaxws-api.version}</version></dependency>
                 </dependencies>
             </dependencyManagement>
             <reporting>
@@ -2146,8 +2191,8 @@
             </dependencies>
             <dependencyManagement>
                 <dependencies>
-                    <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId><version>${groovy.version}</version></dependency>
-                    <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId><classifier>indy</classifier><version>${groovy.version}</version></dependency>
+                    <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy</artifactId><classifier>indy</classifier><version>${groovy.version}</version></dependency>
+                    <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId><version>${groovy.version}</version><type>pom</type></dependency>
                 </dependencies>
             </dependencyManagement>
             <pluginRepositories>
