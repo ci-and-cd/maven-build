@@ -20,7 +20,7 @@ if [[ -z ${CI_INFRA_OPT_MAVEN_BUILD_OPTS_REPO_REF+x} ]]; then CI_INFRA_OPT_MAVEN
 
 if [[ -z ${CI_OPT_CI_SCRIPT+x} ]] && [[ -n "${TRAVIS}" ]]; then CI_OPT_CI_SCRIPT="${CI_INFRA_OPT_GIT_PREFIX}/${TRAVIS_REPO_SLUG:-ci-and-cd/maven-build}/raw/${TRAVIS_BRANCH:-develop}/src/main/ci-script/lib_ci.sh"; fi
 if [[ -z ${CI_OPT_CI_SCRIPT+x} ]] && [[ -n "${APPVEYOR}" ]]; then CI_OPT_CI_SCRIPT="${CI_INFRA_OPT_GIT_PREFIX}/${APPVEYOR_REPO_NAME:-ci-and-cd/maven-build}/raw/${APPVEYOR_REPO_BRANCH:-develop}/src/main/ci-script/lib_ci.sh"; fi
-if [[ -z ${CI_OPT_CI_SCRIPT+x} ]]; then CI_OPT_CI_SCRIPT="${CI_INFRA_OPT_GIT_PREFIX}/ci-and-cd/maven-build/raw/v0.3.8/src/main/ci-script/lib_ci.sh"; fi
+if [[ -z ${CI_OPT_CI_SCRIPT+x} ]]; then CI_OPT_CI_SCRIPT="${CI_INFRA_OPT_GIT_PREFIX}/ci-and-cd/maven-build/raw/v2.0.0/src/main/ci-script/lib_ci.sh"; fi
 
 if [[ -z ${CI_OPT_GITHUB_SITE_PUBLISH+x} ]]; then CI_OPT_GITHUB_SITE_PUBLISH="false"; fi
 if [[ -z ${CI_OPT_GITHUB_SITE_REPO_OWNER+x} ]]; then CI_OPT_GITHUB_SITE_REPO_OWNER="ci-and-cd"; fi
