@@ -56,8 +56,8 @@ install:
     export M3_HOME=/opt/maven/latest
     export PATH=$M3_HOME/bin:$PATH
     sudo mkdir -p /opt/gradle
-    sudo aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -d /opt/gradle -o gradle-4.7-all.zip https://services.gradle.org/distributions/gradle-4.7-all.zip && sudo unzip /opt/gradle/gradle-4.7-all.zip -d /opt/gradle > /dev/null
-    sudo ln -sfn gradle-4.7 /opt/gradle/latest
+    sudo aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -d /opt/gradle -o gradle-5.2.1-all.zip https://services.gradle.org/distributions/gradle-5.2.1-all.zip && sudo unzip /opt/gradle/gradle-5.2.1-all.zip -d /opt/gradle > /dev/null
+    sudo ln -sfn gradle-5.2.1 /opt/gradle/latest
     ls -la /opt/gradle
     ls -la /opt/gradle/latest/
     export GRADLE_HOME=/opt/gradle/latest
