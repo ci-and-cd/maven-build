@@ -233,6 +233,16 @@ activate by property 'jacoco' absent (Enabled by default, to disable, set `-Djac
 cobertura
 > activate by set property 'jacoco' to 'false'
 
+```bash
+JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-11.0.2.jdk/Contents/Home" mvn help:active-profiles clean package
+
+JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-10.jdk/Contents/Home" mvn help:active-profiles clean package
+
+JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-9.0.4.jdk/Contents/Home" mvn help:active-profiles clean package
+
+JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_201.jdk/Contents/Home" mvn help:active-profiles clean package
+```
+
 ### 2. report
 spring-restdocs
 > activate by set property 'spring-restdocs' to 'true'

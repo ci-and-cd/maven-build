@@ -724,6 +724,7 @@ function download_from_git_repo() {
             cat "${target_file}.json" | jq -r ".content" | base64 --decode | tee "${target_file}"
         else
             (>&2 echo "[ERROR] can not download ${target_file}")
+            # TODO log output 'please make sure you have permission to access resources and CI_INFRA_OPT_GIT_AUTH_TOKEN is defined correctly'
             return 1
         fi
     else

@@ -39,6 +39,8 @@
         <exclude name="DefaultPackage"/>
         <exclude name="EmptyMethodInAbstractClassShouldBeAbstract"/>
         <exclude name="ShortVariable"/>
+        <exclude name="LocalVariableCouldBeFinal"/>
+        <exclude name="MethodArgumentCouldBeFinal"/>
     </rule>
     <!--<rule ref="category/java/codestyle.xml/CommentDefaultAccessModifier"/>-->
     <rule ref="category/java/codestyle.xml/LongVariable">

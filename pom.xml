@@ -157,6 +157,10 @@
     </pluginRepositories>
 
     <properties>
+        <!--
+        '-D' properties in command line can not override properties defined in properties tag of pom.xml (under project root or profile).
+        Only properties defined in child projects cant override properties defined here.
+        -->
         <asm.version>6.2</asm.version>
         <javassist.version>3.23.1-GA</javassist.version>
 
@@ -298,7 +302,7 @@
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
         <!--<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>-->
         <maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
-        <maven-enforcer-plugin.version>3.0.0-M1</maven-enforcer-plugin.version>
+        <maven-enforcer-plugin.version>3.0.0-M2</maven-enforcer-plugin.version>
         <!--<maven-failsafe-plugin.version>2.21.0</maven-failsafe-plugin.version>-->
         <maven-failsafe-plugin.version>3.0.0-M3</maven-failsafe-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
@@ -1898,8 +1902,9 @@
         <!-- @formatter:off -->
         <profile>
             <id>java8-without-groovy</id>
-            <activation><jdk>8</jdk><file><missing>${basedir}/src/main/groovy</missing></file><activeByDefault>false</activeByDefault></activation>
-            <properties><java.version>1.8</java.version></properties>
+            <activation><jdk>(,1.8]</jdk><file><missing>${basedir}/src/main/groovy</missing></file><activeByDefault>false
+            </activeByDefault></activation>
+            <properties><java.version>8</java.version></properties>
             <build>
                 <plugins>
                     <plugin><artifactId>maven-compiler-plugin</artifactId><configuration><compilerVersion>${java.version}</compilerVersion></configuration></plugin>
@@ -1908,11 +1913,11 @@
         </profile>
         <profile>
             <id>java8</id>
-            <activation><jdk>1.8</jdk><activeByDefault>false</activeByDefault></activation>
+            <activation><jdk>(,1.8]</jdk><activeByDefault>false</activeByDefault></activation>
             <properties>
-                <java.version>1.8</java.version>
-                <maven.compiler.source>1.8</maven.compiler.source>
-                <maven.compiler.target>1.8</maven.compiler.target>
+                <java.version>8</java.version>
+                <maven.compiler.source>8</maven.compiler.source>
+                <maven.compiler.target>8</maven.compiler.target>
             </properties>
             <build>
                 <plugins>
@@ -1933,8 +1938,8 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <message><![CDATA[You are running an older version of Java. This application requires at least JDK ${java.version}.]]></message>
-                                    <version>[${java.version}.0,)</version>
+                                    <message><![CDATA[You are running an older version of Java. This application requires at least JDK 1.8.0.]]></message>
+                                    <version>[1.8.0,)</version>
                                 </requireJavaVersion>
                             </rules>
                             <fail>true</fail>
@@ -1953,18 +1958,18 @@
         <profile>
             <!-- Java8 does not need addModules, purpose of this is to suppress warning 'Cannot resolve symbol'   -->
             <id>default-java8-jvmArguments-addModules</id>
-            <activation><jdk>1.8</jdk><property><name>!jvmArguments.addModules</name></property></activation>
+            <activation><jdk>(,1.8]</jdk><property><name>!jvmArguments.addModules</name></property></activation>
             <properties><jvmArguments.addModules></jvmArguments.addModules></properties>
         </profile>
         <profile>
             <id>default-java9-jvmArguments-addModules</id>
-            <activation><jdk>1.9</jdk><property><name>!jvmArguments.addModules</name></property></activation>
+            <activation><jdk>(1.8,10)</jdk><property><name>!jvmArguments.addModules</name></property></activation>
             <properties><jvmArguments.addModules>java.xml.bind,java.xml.ws,java.xml.ws.annotation</jvmArguments.addModules></properties>
         </profile>
         <profile>
             <id>java9-without-groovy</id>
-            <activation><jdk>1.9</jdk><file><missing>${basedir}/src/main/groovy</missing></file><activeByDefault>false</activeByDefault></activation>
-            <properties><java.version>1.9</java.version></properties>
+            <activation><jdk>(1.8,10)</jdk><file><missing>${basedir}/src/main/groovy</missing></file><activeByDefault>false</activeByDefault></activation>
+            <properties><java.version>9</java.version></properties>
             <build>
                 <plugins>
                     <plugin>
@@ -1976,7 +1981,7 @@
         </profile>
         <profile>
             <id>java9-with-groovy</id>
-            <activation><jdk>1.9</jdk><file><exists>${basedir}/src/main/groovy</exists></file><activeByDefault>false</activeByDefault></activation>
+            <activation><jdk>(1.8,10)</jdk><file><exists>${basedir}/src/main/groovy</exists></file><activeByDefault>false</activeByDefault></activation>
             <build>
                 <plugins>
                     <plugin>
@@ -1988,14 +1993,14 @@
         </profile>
         <profile>
             <id>java9</id>
-            <activation><jdk>1.9</jdk><activeByDefault>false</activeByDefault></activation>
+            <activation><jdk>(1.8,10)</jdk><activeByDefault>false</activeByDefault></activation>
             <properties>
                 <!-- Runtime modules for java9 -->
                 <jaxb-api.version>2.3.0</jaxb-api.version>
-                <java.version>1.9</java.version>
+                <java.version>9</java.version>
                 <maven.compiler.release>9</maven.compiler.release>
-                <maven.compiler.source>1.9</maven.compiler.source>
-                <maven.compiler.target>1.9</maven.compiler.target>
+                <maven.compiler.source>9</maven.compiler.source>
+                <maven.compiler.target>9</maven.compiler.target>
             </properties>
             <build>
                 <pluginManagement>
@@ -2051,8 +2056,8 @@
             </reporting>
         </profile>
         <profile>
-            <id>java11</id>
-            <activation><jdk>11</jdk><activeByDefault>false</activeByDefault></activation>
+            <id>java11-or-later</id>
+            <activation><jdk>[11,]</jdk><activeByDefault>false</activeByDefault></activation>
             <properties>
                 <!-- Runtime modules for java11 -->
                 <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
