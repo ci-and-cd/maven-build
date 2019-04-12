@@ -1946,12 +1946,13 @@
                         </configuration>
                     </plugin>
                     <plugin><artifactId>maven-failsafe-plugin</artifactId><configuration><argLine>${argLine}</argLine></configuration></plugin>
+                    <plugin><artifactId>maven-pmd-plugin</artifactId><configuration><targetJdk>1.8</targetJdk></configuration></plugin>
                     <plugin><artifactId>maven-surefire-plugin</artifactId><configuration><argLine>${argLine}</argLine></configuration></plugin>
                 </plugins>
             </build>
             <reporting>
                 <plugins>
-                    <plugin><artifactId>maven-pmd-plugin</artifactId><configuration><targetJdk>${java.version}</targetJdk></configuration></plugin>
+                    <plugin><artifactId>maven-pmd-plugin</artifactId><configuration><targetJdk>1.8</targetJdk></configuration></plugin>
                 </plugins>
             </reporting>
         </profile>
