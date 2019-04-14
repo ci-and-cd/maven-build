@@ -2,15 +2,15 @@
 <ruleset xmlns="http://pmd.sourceforge.net/ruleset/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Custom ruleset" xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
 
     <!-- pmd-6.3.0 rules -->
-    <!-- see: https://pmd.github.io/pmd-6.3.0/pmd_rules_java.html -->
+    <!-- see: https://pmd.github.io/pmd-6.8.0/pmd_rules_java.html -->
     <!-- see: https://github.com/pmd/pmd -->
     <!-- see: https://github.com/pmd/pmd/tree/master/pmd-java/src/main/resources/rulesets/java -->
 
     <!-- make ruleset -->
-    <!-- see: https://pmd.github.io/pmd-6.3.0/pmd_userdocs_making_rulesets.html -->
+    <!-- see: https://pmd.github.io/pmd-6.8.0/pmd_userdocs_making_rulesets.html -->
 
     <!-- maven plugin -->
-    <!-- see: https://pmd.github.io/pmd-6.3.0/pmd_userdocs_tools_maven.html -->
+    <!-- see: https://pmd.github.io/pmd-6.8.0/pmd_userdocs_tools_maven.html -->
     <!-- see: https://maven.apache.org/plugins/maven-pmd-plugin/examples/usingRuleSets.html -->
 
     <!-- pmd-migration-tool -->
@@ -24,6 +24,8 @@
         <exclude name="GuardLogStatement"/>
         <exclude name="JUnitAssertionsShouldIncludeMessage"/>
         <exclude name="SystemPrintln"/>
+        <!-- rule UnusedImports can not recognize valid imports of javadoc -->
+        <exclude name="UnusedImports"/>
     </rule>
     <rule ref="category/java/bestpractices.xml/JUnitTestContainsTooManyAsserts">
         <properties>

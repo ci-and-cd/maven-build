@@ -24,6 +24,8 @@
         <exclude name="GuardLogStatement"/>
         <exclude name="JUnitAssertionsShouldIncludeMessage"/>
         <exclude name="SystemPrintln"/>
+        <!-- rule UnusedImports can not recognize valid imports of javadoc -->
+        <exclude name="UnusedImports"/>
     </rule>
     <rule ref="category/java/bestpractices.xml/JUnitTestContainsTooManyAsserts">
         <properties>
