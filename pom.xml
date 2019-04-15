@@ -233,7 +233,7 @@
         <local.deploy.model.path>${project.groupId}/${project.artifactId}</local.deploy.model.path>
         <maven.quality.skip>false</maven.quality.skip>
 
-        <relative.parent.dir>.</relative.parent.dir>
+        <!--<relative.parent.dir>.</relative.parent.dir>-->
         <repositories.releases.updatePolicy>always</repositories.releases.updatePolicy>
         <repositories.snapshots.updatePolicy>always</repositories.snapshots.updatePolicy>
 

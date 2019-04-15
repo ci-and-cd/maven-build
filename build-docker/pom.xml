@@ -123,31 +123,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>filtering-dockerfile</id>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.basedir}</outputDirectory>
-                            <delimiters>
-                                <!--<delimiter>${*}</delimiter>-->
-                                <delimiter>@</delimiter>
-                            </delimiters>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/resources/docker</directory>
-                                    <filtering>true</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
             </plugin>
         </plugins>
@@ -276,6 +251,31 @@
             </activation>
             <build>
                 <plugins>
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>filtering-dockerfile</id>
+                                <phase>process-sources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.basedir}</outputDirectory>
+                                    <delimiters>
+                                        <!--<delimiter>${*}</delimiter>-->
+                                        <delimiter>@</delimiter>
+                                    </delimiters>
+                                    <resources>
+                                        <resource>
+                                            <directory>src/main/resources/docker</directory>
+                                            <filtering>true</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
