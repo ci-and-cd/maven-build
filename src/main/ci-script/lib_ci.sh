@@ -750,7 +750,7 @@ function alter_mvn() {
         else
             (>&2 echo "alter_mvn goal '${element}' found")
 
-            if [[ "${element}" == *deploy ]]; then
+            if [[ "${element}" == *deploy ]] && [[ "${element}" != *site* ]]; then
             # deploy, site-deploy, push (docker)
                 if [[ "$(ci_opt_publish_to_repo)" == "true" ]]; then
                     if [[ "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]]; then
@@ -763,9 +763,13 @@ function alter_mvn() {
                 else
                     (>&2 echo "skip ${element}")
                 fi
-            elif [[ "${element}" == *site* ]] && [[ "$(ci_opt_site)" == true ]]; then
-            # if ci_opt_site=false, do not build site
-                goals+=("${element}")
+            elif [[ "${element}" == *site* ]]; then
+                # if ci_opt_site=false, do not build site
+                if [[ "$(ci_opt_site)" == "true" ]]; then
+                    goals+=("${element}")
+                else
+                    (>&2 echo "skip ${element}")
+                fi
             elif ([[ "${element}" == *clean ]] || [[ "${element}" == *install ]]); then
             # goals need to alter
                 if [[ "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]]; then
