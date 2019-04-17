@@ -127,6 +127,7 @@ if [[ -z ${CI_OPT_CHECKSTYLE_CONFIG_LOCATION+x} ]]; then CI_OPT_CHECKSTYLE_CONFI
 if [[ -z ${CI_OPT_CLEAN_SKIP+x} ]]; then CI_OPT_CLEAN_SKIP="false"; fi
 if [[ -z ${CI_OPT_DEPENDENCY_CHECK+x} ]]; then CI_OPT_DEPENDENCY_CHECK="true"; fi
 if [[ -z ${CI_OPT_DOCKER_IMAGE_PREFIX+x} ]]; then CI_OPT_DOCKER_IMAGE_PREFIX=""; fi
+if [[ -z ${CI_OPT_DOCKERFILE_USEMAVENSETTINGSFORAUTH+x} ]]; then CI_OPT_DOCKERFILE_USEMAVENSETTINGSFORAUTH="false"; fi
 if [[ -z ${CI_OPT_EXTRA_MAVEN_OPTS+x} ]]; then CI_OPT_EXTRA_MAVEN_OPTS=""; fi
 if [[ -z ${CI_OPT_FRONTEND_NODEDOWNLOADROOT+x} ]]; then CI_OPT_FRONTEND_NODEDOWNLOADROOT=""; fi
 if [[ -z ${CI_OPT_FRONTEND_NPMDOWNLOADROOT+x} ]]; then CI_OPT_FRONTEND_NPMDOWNLOADROOT=""; fi
@@ -615,6 +616,7 @@ function ci_opt_maven_opts() {
 
         if [[ -n "${CI_INFRA_OPT_DOCKER_REGISTRY}" ]] && [[ "${CI_INFRA_OPT_DOCKER_REGISTRY}" != *docker.io ]]; then opts="${opts} -Ddocker.registry=${CI_INFRA_OPT_DOCKER_REGISTRY}"; fi
         if [[ -n "${CI_OPT_DOCKER_IMAGE_PREFIX}" ]]; then opts="${opts} -Ddocker.image.prefix=${CI_OPT_DOCKER_IMAGE_PREFIX}"; fi
+        if [[ -n "${CI_OPT_DOCKERFILE_USEMAVENSETTINGSFORAUTH}" ]]; then opts="${opts} -Ddockerfile.useMavenSettingsForAuth=${CI_OPT_DOCKERFILE_USEMAVENSETTINGSFORAUTH}"; fi
         opts="${opts} -Dfile.encoding=UTF-8"
         if [[ -n "${CI_OPT_FRONTEND_NODEDOWNLOADROOT}" ]]; then opts="${opts} -Dfrontend.nodeDownloadRoot=${CI_OPT_FRONTEND_NODEDOWNLOADROOT}"; fi
         if [[ -n "${CI_OPT_FRONTEND_NPMDOWNLOADROOT}" ]]; then opts="${opts} -Dfrontend.npmDownloadRoot=${CI_OPT_FRONTEND_NPMDOWNLOADROOT}"; fi
