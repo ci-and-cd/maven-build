@@ -20,7 +20,6 @@
         <com.spotify_dockerfile-maven-plugin.version>1.4.10</com.spotify_dockerfile-maven-plugin.version>
 
         <dockerfile.build.skip>true</dockerfile.build.skip>
-        <dockerfile.useMavenSettingsForAuth>false</dockerfile.useMavenSettingsForAuth>
     </properties>
 
     <build>
@@ -135,6 +134,11 @@
             <id>default-docker-image-prefix</id>
             <activation><property><name>!docker.image.prefix</name></property><activeByDefault>false</activeByDefault></activation>
             <properties><docker.image.prefix></docker.image.prefix></properties>
+        </profile>
+        <profile>
+            <id>default-use-maven-settings-for-auth</id>
+            <activation><property><name>!dockerfile.useMavenSettingsForAuth</name></property><activeByDefault>false</activeByDefault></activation>
+            <properties><dockerfile.useMavenSettingsForAuth>false</dockerfile.useMavenSettingsForAuth></properties>
         </profile>
         <profile>
             <id>ues-private-docker-registry-no-docker-image-prefix</id>
