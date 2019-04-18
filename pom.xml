@@ -533,6 +533,7 @@
                 </plugin>
                 <plugin><artifactId>maven-surefire-report-plugin</artifactId><version>${maven-surefire-report-plugin.version}</version></plugin>
 
+                <plugin><groupId>org.sonatype.plugins</groupId><artifactId>nexus-staging-maven-plugin</artifactId><version>${nexus-staging-maven-plugin.version}</version></plugin>
                 <plugin>
                     <groupId>pl.project13.maven</groupId>
                     <artifactId>git-commit-id-plugin</artifactId>
@@ -1267,7 +1268,6 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>${nexus-staging-maven-plugin.version}</version>
                         <extensions>true</extensions>
                         <configuration>
                             <autoReleaseAfterClose>false</autoReleaseAfterClose>
