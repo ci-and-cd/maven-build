@@ -78,7 +78,7 @@
             <id>OSSRH-thirdparty</id>
             <name>central thirdparty</name>
             <url>https://oss.sonatype.org/content/repositories/third-party-releases/</url>
-            <releases><enabled>true</enabled></releases>
+            <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </repository>
         <!-- Repo jvnet is for java.xml.bind (org.glassfish.jaxb:jaxb-runtime:2.4.0-b180608.0325) that removed in JDK 11 by JEP-320 -->
@@ -86,6 +86,8 @@
             <id>jvnet-nexus-staging</id>
             <url>http://maven.java.net/content/repositories/staging/</url>
             <layout>default</layout>
+            <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
+            <snapshots><enabled>false</enabled></snapshots>
         </repository>
         <!-- @formatter:on -->
     </repositories>
@@ -134,7 +136,7 @@
             <id>OSSRH-thirdparty</id>
             <name>central thirdparty</name>
             <url>https://oss.sonatype.org/content/repositories/third-party-releases/</url>
-            <releases><enabled>true</enabled></releases>
+            <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
         <pluginRepository>
@@ -142,16 +144,16 @@
             <url>https://raw.github.com/ci-and-cd/maven-plugins/mvn-repo</url>
             <name>Forked github-maven-plugins that upload faster</name>
             <layout>default</layout>
-            <snapshots><enabled>true</enabled></snapshots>
-            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
+            <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
         </pluginRepository>
         <pluginRepository>
             <id>github-mvn-repo-wagon-maven-plugin</id>
             <url>https://raw.github.com/ci-and-cd/wagon-maven-plugin/mvn-repo/</url>
             <name>Fixed issue of merge snapshotVersion</name>
             <layout>default</layout>
-            <snapshots><enabled>true</enabled></snapshots>
-            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
+            <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
         </pluginRepository>
         <!-- @formatter:on -->
     </pluginRepositories>
@@ -234,8 +236,8 @@
         <maven.quality.skip>false</maven.quality.skip>
 
         <!--<relative.parent.dir>.</relative.parent.dir>-->
-        <repositories.releases.updatePolicy>always</repositories.releases.updatePolicy>
-        <repositories.snapshots.updatePolicy>always</repositories.snapshots.updatePolicy>
+        <repositories.releases.updatePolicy>never</repositories.releases.updatePolicy>
+        <repositories.snapshots.updatePolicy>daily</repositories.snapshots.updatePolicy>
 
         <site-maven-plugin.version>0.13.0.OSS-M1</site-maven-plugin.version>
         <src.generated.dir>**/generated/**</src.generated.dir>
@@ -1340,8 +1342,8 @@
                     <id>private-nexus3-thirdparty</id>
                     <name>private nexus3 thirdparty</name>
                     <url>${private-nexus3.repository}/maven-thirdparty/</url>
-                    <releases><enabled>true</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
+                    <releases><enabled>true</enabled><updatePolicy>${repositories.releases.updatePolicy}</updatePolicy></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>${repositories.snapshots.updatePolicy}</updatePolicy></snapshots>
                 </repository>
             </repositories>
         </profile>
