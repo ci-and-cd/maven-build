@@ -252,5 +252,9 @@
             <property name="exceptionVariableName" value="expected|expect|ignored|ignore"/>
         </module>
         <module name="CommentsIndentation"/>
+
+        <module name="MissingOverride">
+            <property name="javaFiveCompatibility" value="false"/>
+        </module>
     </module>
 </module>

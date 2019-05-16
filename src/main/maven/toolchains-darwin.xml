@@ -9,8 +9,8 @@
             <!--<vendor>openjdk</vendor>-->
         </provides>
         <configuration>
-            <!-- travis-ci style: /usr/lib/jvm/java-8-openjdk -->
-            <jdkHome>/usr/lib/jvm/java-8-openjdk</jdkHome>
+            <!-- OSX style: /Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home -->
+            <jdkHome>/Library/Java/JavaVirtualMachines/jdk1.8.0_211.jdk/Contents/Home</jdkHome>
         </configuration>
     </toolchain>
     <toolchain>
@@ -19,7 +19,7 @@
             <version>8</version>
         </provides>
         <configuration>
-            <jdkHome>/usr/lib/jvm/java-8-openjdk</jdkHome>
+            <jdkHome>/Library/Java/JavaVirtualMachines/jdk1.8.0_211.jdk/Contents/Home</jdkHome>
         </configuration>
     </toolchain>
     <toolchain>
@@ -30,8 +30,8 @@
             <id>jdk11</id>
         </provides>
         <configuration>
-            <!-- travis-ci style: /usr/lib/jvm/java-11-openjdk -->
-            <jdkHome>/usr/lib/jvm/java-11-openjdk</jdkHome>
+            <!-- OSX style: /Library/Java/JavaVirtualMachines/openjdk-11.0.2.jdk/Contents/Home -->
+            <jdkHome>/Library/Java/JavaVirtualMachines/jdk-11.0.2.jdk/Contents/Home</jdkHome>
         </configuration>
     </toolchain>
 </toolchains>
