@@ -5,11 +5,21 @@
     <toolchain>
         <type>jdk</type>
         <provides>
-            <version>1.8</version>
+            <version>default</version>
             <!--<vendor>openjdk</vendor>-->
         </provides>
         <configuration>
             <!-- OSX style: /Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home -->
+            <!-- OSX style: /Library/Java/JavaVirtualMachines/openjdk-11.0.2.jdk/Contents/Home -->
+            <jdkHome>/Library/Java/JavaVirtualMachines/jdk1.8.0_211.jdk/Contents/Home</jdkHome>
+        </configuration>
+    </toolchain>
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>1.8</version>
+        </provides>
+        <configuration>
             <jdkHome>/Library/Java/JavaVirtualMachines/jdk1.8.0_211.jdk/Contents/Home</jdkHome>
         </configuration>
     </toolchain>
@@ -25,12 +35,10 @@
     <toolchain>
         <type>jdk</type>
         <provides>
-            <version>11</version>
-            <!--<vendor>openjdk</vendor>-->
             <id>jdk11</id>
+            <version>11</version>
         </provides>
         <configuration>
-            <!-- OSX style: /Library/Java/JavaVirtualMachines/openjdk-11.0.2.jdk/Contents/Home -->
             <jdkHome>/Library/Java/JavaVirtualMachines/jdk-11.0.2.jdk/Contents/Home</jdkHome>
         </configuration>
     </toolchain>

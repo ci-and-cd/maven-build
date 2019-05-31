@@ -5,11 +5,20 @@
     <toolchain>
         <type>jdk</type>
         <provides>
-            <version>1.8</version>
-            <!--<vendor>openjdk</vendor>-->
+            <version>default</version>
         </provides>
         <configuration>
             <!-- travis-ci style: /usr/lib/jvm/java-8-openjdk -->
+            <!-- travis-ci style: /usr/lib/jvm/java-11-openjdk -->
+            <jdkHome>/usr/lib/jvm/java-8-openjdk</jdkHome>
+        </configuration>
+    </toolchain>
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>1.8</version>
+        </provides>
+        <configuration>
             <jdkHome>/usr/lib/jvm/java-8-openjdk</jdkHome>
         </configuration>
     </toolchain>
@@ -25,12 +34,10 @@
     <toolchain>
         <type>jdk</type>
         <provides>
-            <version>11</version>
-            <!--<vendor>openjdk</vendor>-->
             <id>jdk11</id>
+            <version>11</version>
         </provides>
         <configuration>
-            <!-- travis-ci style: /usr/lib/jvm/java-11-openjdk -->
             <jdkHome>/usr/lib/jvm/java-11-openjdk</jdkHome>
         </configuration>
     </toolchain>
