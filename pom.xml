@@ -189,7 +189,6 @@
         <!-- findbugs.threshold: High, Default, Low, Ignore, If set to "High", only high confidence bugs are reported -->
         <!--<findbugs.threshold>Default</findbugs.threshold>-->
 
-        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
         <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
         <maven.javadoc.failsOnError>false</maven.javadoc.failsOnError>
@@ -202,9 +201,6 @@
         <pmd.maxAllowedViolations>10</pmd.maxAllowedViolations>
         <pmd.printFailingErrors>true</pmd.printFailingErrors>
         <pmd.verbose>false</pmd.verbose>
-
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!--
         publish, preview, issue .
@@ -226,14 +222,9 @@
         <surefire.fork.reuse>false</surefire.fork.reuse>
 
         <!-- custom properties -->
-        <git-commit-id.skip>false</git-commit-id.skip>
 
         <jacoco.reportPath>${project.build.directory}/jacoco.exec</jacoco.reportPath>
         <jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</jacoco.itReportPath>
-
-        <linkXRef>true</linkXRef>
-        <local.deploy.model.path>${project.groupId}/${project.artifactId}</local.deploy.model.path>
-        <maven.quality.skip>false</maven.quality.skip>
 
         <!--<relative.parent.dir>.</relative.parent.dir>-->
 
@@ -415,7 +406,12 @@
                         <dependency><groupId>org.ow2.asm</groupId><artifactId>asm</artifactId><version>${asm.version}</version></dependency>
                     </dependencies>
                 </plugin>
-                <plugin><artifactId>maven-toolchains-plugin</artifactId><version>${maven-toolchains-plugin.version}</version></plugin>
+                <plugin>
+                    <artifactId>maven-toolchains-plugin</artifactId><version>${maven-toolchains-plugin.version}</version>
+                    <configuration>
+                        <toolchains><jdk><version>default</version><!--<vendor>oracle</vendor>--></jdk></toolchains>
+                    </configuration>
+                </plugin>
 
                 <plugin><artifactId>maven-project-info-reports-plugin</artifactId><version>${maven-project-info-reports-plugin.version}</version></plugin>
                 <!-- @formatter:on -->
@@ -555,7 +551,7 @@
                         <generateGitPropertiesFilename>src/main/resources/git.properties</generateGitPropertiesFilename>
                         <injectAllReactorProjects>true</injectAllReactorProjects>
                         <prefix>git</prefix>
-                        <skip>${git-commit-id.skip}</skip>
+                        <skip>${git.commit.id.skip}</skip>
                         <skipPoms>false</skipPoms>
                         <verbose>false</verbose>
                     </configuration>
@@ -564,6 +560,26 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>com.github.sviperll</groupId>
+                <artifactId>coreext-maven-plugin</artifactId>
+                <version>0.23</version>
+                <configuration>
+                    <!-- Required core extensions: -->
+                    <extensions combine.children="append">
+                    </extensions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>check-coreext</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <phase>validate</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- see: https://github.com/KimJejun/gitflow-maven-plugin -->
             <plugin>
                 <groupId>com.amashchenko.maven.plugin</groupId>
@@ -603,6 +619,28 @@
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
+                    <!--
+                    <execution>
+                        <id>print-classpath</id>
+                        <phase>compile</phase>
+                        <configuration>
+                            <target>
+                                <property name="compile_classpath" refid="maven.compile.classpath" />
+                                <property name="runtime_classpath" refid="maven.runtime.classpath" />
+                                <property name="test_classpath" refid="maven.test.classpath" />
+                                <property name="plugin_classpath" refid="maven.plugin.classpath" />
+
+                                <echo message="compile classpath: ${compile_classpath}" />
+                                <echo message="runtime classpath: ${runtime_classpath}" />
+                                <echo message="test classpath: ${test_classpath}" />
+                                <echo message="plugin classpath: ${plugin_classpath}" />
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    -->
                     <execution>
                         <id>auto-clean-git-properties</id>
                         <phase>clean</phase>
@@ -763,6 +801,7 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <argLine>${argLine}</argLine>
                     <forkCount>${surefire.fork.count}</forkCount>
                     <reuseForks>${surefire.fork.reuse}</reuseForks>
                     <includes>
@@ -788,6 +827,7 @@
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
+                    <argLine>${argLine}</argLine>
                     <skip>${maven.integration-test.skip}</skip>
                     <includes>
                         <include>**/*IT.java</include>
@@ -865,7 +905,7 @@
                     <execution>
                         <goals><goal>execute</goal></goals>
                         <phase>initialize</phase>
-                        <configuration><source>System.setProperty("local.deploy.model.path", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
+                        <configuration><source>System.setProperty("wagon.merge-maven-repos.artifactDir", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
                     </execution>
                 </executions>
             </plugin>-->
@@ -876,7 +916,7 @@
                     <execution>
                         <goals><goal>execute</goal></goals>
                         <phase>initialize</phase>
-                        <configuration><source>System.setProperty("local.deploy.model.path", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
+                        <configuration><source>System.setProperty("wagon.merge-maven-repos.artifactDir", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -908,7 +948,7 @@
         <!-- @formatter:off -->
         <profile>
             <id>skip-artifacts</id>
-            <activation><property><name>skip-artifacts</name><value>true</value></property><activeByDefault>false</activeByDefault></activation>
+            <activation><property><name>skip-artifacts</name><value>true</value></property></activation>
             <properties>
                 <maven.javadoc.skip>true</maven.javadoc.skip>
                 <maven.source.skip>true</maven.source.skip>
@@ -916,7 +956,7 @@
         </profile>
         <profile>
             <id>skip-quality</id>
-            <activation><property><name>skip-quality</name><value>true</value></property><activeByDefault>false</activeByDefault></activation>
+            <activation><property><name>skip-quality</name><value>true</value></property></activation>
             <properties>
                 <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
                 <checkstyle.failsOnError>false</checkstyle.failsOnError>
@@ -929,7 +969,7 @@
         </profile>
         <!--<profile>-->
             <!--<id>enable-findbugs-exclude-filter</id>-->
-            <!--<activation><file><exists>${basedir}/findbugs-exclude-filter.xml</exists></file><activeByDefault>false</activeByDefault></activation>-->
+            <!--<activation><file><exists>${basedir}/findbugs-exclude-filter.xml</exists></file></activation>-->
             <!--<build>-->
                 <!--<pluginManagement>-->
                     <!--<plugins>-->
@@ -946,7 +986,7 @@
         <!--</profile>-->
         <profile>
             <id>skip-tests</id>
-            <activation><property><name>skip-tests</name><value>true</value></property><activeByDefault>false</activeByDefault></activation>
+            <activation><property><name>skip-tests</name><value>true</value></property></activation>
             <properties>
                 <maven.test.skip>true</maven.test.skip>
                 <maven.integration-test.skip>true</maven.integration-test.skip>
@@ -954,39 +994,9 @@
         </profile>
 
         <profile>
-            <id>default-private-nexus3.repository</id>
-            <activation><property><name>!private-nexus3.repository</name></property></activation>
-            <properties><private-nexus3.repository>http://nexus3:28081/nexus/repository</private-nexus3.repository></properties>
-        </profile>
-        <profile>
-            <id>default-opensource-nexus3.repository</id>
-            <activation><property><name>!opensource-nexus3.repository</name></property></activation>
-            <properties><opensource-nexus3.repository>http://nexus3:28081/nexus/repository</opensource-nexus3.repository></properties>
-        </profile>
-        <profile>
-            <id>default-private-sonarqube-host-url</id>
-            <activation><property><name>!private-sonarqube.host.url</name></property></activation>
-            <properties><private-sonarqube.host.url>http://sonarqube:9000</private-sonarqube.host.url></properties>
-        </profile>
-        <profile>
-            <id>default-maven-test-failure-ignore</id>
-            <activation><property><name>!maven.test.failure.ignore</name></property></activation>
-            <properties><maven.test.failure.ignore>false</maven.test.failure.ignore></properties></profile>
-        <profile>
-            <id>default-maven-test-skip</id>
-            <activation><property><name>!maven.test.skip</name></property></activation>
-            <properties><maven.test.skip>false</maven.test.skip></properties>
-        </profile>
-        <profile>
-            <id>default-maven-integration-test-skip</id>
-            <activation><property><name>!maven.integration-test.skip</name></property></activation>
-            <properties><maven.integration-test.skip>false</maven.integration-test.skip></properties>
-        </profile>
-
-        <profile>
             <id>git-commit-id</id>
             <!-- works on both git submodule and normal local repository -->
-            <activation><file><exists>${maven.multiModuleProjectDirectory}/.git</exists></file><activeByDefault>false</activeByDefault></activation>
+            <activation><file><exists>${maven.multiModuleProjectDirectory}/.git</exists></file></activation>
             <build>
                 <plugins>
                     <plugin><groupId>pl.project13.maven</groupId><artifactId>git-commit-id-plugin</artifactId></plugin>
@@ -1063,11 +1073,6 @@
         <!-- see: https://github.com/timp/juice -->
         <!-- see: https://github.com/jacoco/jacoco/issues/409 -->
         <!-- https://www.petrikainulainen.net/programming/maven/creating-code-coverage-reports-for-unit-and-integration-tests-with-the-jacoco-maven-plugin/ -->
-        <profile>
-            <id>default-argLine</id>
-            <activation><property><name>!jacoco</name></property></activation>
-            <properties><argLine></argLine></properties>
-        </profile>
         <profile>
             <id>jacoco-build</id>
             <activation><property><name>jacoco</name><value>true</value></property></activation>
@@ -1225,7 +1230,7 @@
         </profile>
         <profile>
             <id>gpg-for-travis-and-maven-central</id>
-            <activation><file><exists>${maven.multiModuleProjectDirectory}/codesigning.asc</exists></file><activeByDefault>false</activeByDefault></activation>
+            <activation><file><exists>${maven.multiModuleProjectDirectory}/codesigning.asc</exists></file></activation>
             <properties>
                 <!-- Do not set gpg.executable here -->
                 <!--<gpg.executable>gpg</gpg.executable>-->
@@ -1245,19 +1250,13 @@
         </profile>
 
         <profile>
-            <id>default-build-publish-channel</id>
-            <activation><property><name>!build.publish.channel</name></property></activation>
-            <properties><build.publish.channel>snapshot</build.publish.channel></properties>
-        </profile>
-
-        <profile>
             <id>infrastructure_opensource</id>
-            <activation><property><name>infrastructure</name><value>opensource</value></property><activeByDefault>false</activeByDefault></activation>
+            <activation><property><name>infrastructure</name><value>opensource</value></property></activation>
             <properties>
                 <sonar.host.url>https://sonarqube.com</sonar.host.url>
                 <!--<wagon.merge-maven-repos.target>https://oss.sonatype.org/content/repositories/snapshots</wagon.merge-maven-repos.target>-->
                 <wagon.merge-maven-repos.target>https://oss.sonatype.org/service/local/staging/deploy/maven2</wagon.merge-maven-repos.target>
-                <wagon.merge-maven-repos.targetId>OSSRH-${build.publish.channel}s</wagon.merge-maven-repos.targetId>
+                <wagon.merge-maven-repos.targetId>OSSRH-${publish.channel}s</wagon.merge-maven-repos.targetId>
             </properties>
             <distributionManagement>
                 <repository><id>OSSRH-staging</id><url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url></repository>
@@ -1285,38 +1284,38 @@
 
         <profile>
             <id>infrastructure_private</id>
-            <activation><property><name>infrastructure</name><value>private</value></property><activeByDefault>false</activeByDefault></activation>
+            <activation><property><name>infrastructure</name><value>private</value></property></activation>
             <properties>
-                <sonar.host.url>${private-sonarqube.host.url}</sonar.host.url>
+                <sonar.host.url>${private.sonarqube.host.url}</sonar.host.url>
                 <!--sonar.jdbc.url>jdbc:h2:tcp://sonarqube.local/sonar</sonar.jdbc.url>
                 <sonar.jdbc.url>jdbc:postgresql://postgresql:5432/sonar</sonar.jdbc.url-->
 
-                <wagon.merge-maven-repos.target>${private-nexus3.repository}/maven-${build.publish.channel}s</wagon.merge-maven-repos.target>
-                <wagon.merge-maven-repos.targetId>private-nexus3-${build.publish.channel}s</wagon.merge-maven-repos.targetId>
+                <wagon.merge-maven-repos.target>${private.nexus3.repository}/maven-${publish.channel}s</wagon.merge-maven-repos.target>
+                <wagon.merge-maven-repos.targetId>private-nexus3-${publish.channel}s</wagon.merge-maven-repos.targetId>
             </properties>
             <distributionManagement>
-                <repository><id>private-nexus3-releases</id><url>${private-nexus3.repository}/maven-releases</url></repository>
-                <snapshotRepository><id>private-nexus3-snapshots</id><url>${private-nexus3.repository}/maven-snapshots</url></snapshotRepository>
+                <repository><id>private-nexus3-releases</id><url>${private.nexus3.repository}/maven-releases</url></repository>
+                <snapshotRepository><id>private-nexus3-snapshots</id><url>${private.nexus3.repository}/maven-snapshots</url></snapshotRepository>
             </distributionManagement>
             <pluginRepositories>
                 <pluginRepository>
                     <id>private-nexus3-releases</id>
                     <name>private nexus3 releases</name>
-                    <url>${private-nexus3.repository}/maven-releases/</url>
+                    <url>${private.nexus3.repository}/maven-releases/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </pluginRepository>
                 <pluginRepository>
                     <id>private-nexus3-snapshots</id>
                     <name>private nexus3 snapshots</name>
-                    <url>${private-nexus3.repository}/maven-snapshots/</url>
+                    <url>${private.nexus3.repository}/maven-snapshots/</url>
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </pluginRepository>
                 <pluginRepository>
                     <id>private-nexus3-thirdparty</id>
                     <name>private nexus3 thirdparty</name>
-                    <url>${private-nexus3.repository}/maven-thirdparty/</url>
+                    <url>${private.nexus3.repository}/maven-thirdparty/</url>
                     <releases><enabled>true</enabled></releases>
                     <snapshots><enabled>true</enabled></snapshots>
                 </pluginRepository>
@@ -1325,21 +1324,21 @@
                 <repository>
                     <id>private-nexus3-releases</id>
                     <name>private nexus3 releases</name>
-                    <url>${private-nexus3.repository}/maven-releases/</url>
+                    <url>${private.nexus3.repository}/maven-releases/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </repository>
                 <repository>
                     <id>private-nexus3-snapshots</id>
                     <name>private nexus3 snapshots</name>
-                    <url>${private-nexus3.repository}/maven-snapshots/</url>
+                    <url>${private.nexus3.repository}/maven-snapshots/</url>
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </repository>
                 <repository>
                     <id>private-nexus3-thirdparty</id>
                     <name>private nexus3 thirdparty</name>
-                    <url>${private-nexus3.repository}/maven-thirdparty/</url>
+                    <url>${private.nexus3.repository}/maven-thirdparty/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </repository>
@@ -1347,23 +1346,8 @@
         </profile>
 
         <profile>
-            <id>default-wagon-source-filepath</id>
-            <activation><property><name>!wagon.source.filepath</name></property><activeByDefault>false</activeByDefault></activation>
-            <properties><wagon.source.filepath>${user.home}/.ci-and-cd/local-deploy/${git.commit.id}</wagon.source.filepath></properties>
-        </profile>
-        <profile>
-            <id>default-wagon-merge-maven-repos-target</id>
-            <activation><property><name>!wagon.merge-maven-repos.target</name></property><activeByDefault>false</activeByDefault></activation>
-            <properties><wagon.merge-maven-repos.target>${private-nexus3.repository}/maven-${build.publish.channel}s</wagon.merge-maven-repos.target></properties>
-        </profile>
-        <profile>
-            <id>default-wagon-merge-maven-repos-targetId</id>
-            <activation><property><name>!wagon.merge-maven-repos.targetId</name></property><activeByDefault>false</activeByDefault></activation>
-            <properties><wagon.merge-maven-repos.targetId>private-nexus3-${build.publish.channel}s</wagon.merge-maven-repos.targetId></properties>
-        </profile>
-        <profile>
             <id>mvn-deploy-publish-segregation-by-wagon</id>
-            <activation><property><name>mvn_deploy_publish_segregation</name><value>true</value></property><activeByDefault>false</activeByDefault></activation>
+            <activation><property><name>mvn.deploy.publish.segregation</name><value>true</value></property></activation>
             <pluginRepositories>
                 <pluginRepository>
                     <id>github-mvn-repo-wagon-maven-plugin</id>
@@ -1391,8 +1375,8 @@
                                 <goals><goal>run</goal></goals>
                                 <configuration>
                                     <target>
-                                        <echo message="local.deploy.model.path: ${local.deploy.model.path}"/>
-                                        <delete failonerror="false" includeemptydirs="true" verbose="true"><fileset dir="${wagon.source.filepath}/${local.deploy.model.path}" includes="**/*"/></delete>
+                                        <echo message="wagon.merge-maven-repos.artifactDir: ${wagon.merge-maven-repos.artifactDir}"/>
+                                        <delete failonerror="false" includeemptydirs="true" verbose="true"><fileset dir="${wagon.merge-maven-repos.source}/${wagon.merge-maven-repos.artifactDir}" includes="**/*"/></delete>
                                     </target>
                                 </configuration>
                             </execution>
@@ -1407,7 +1391,7 @@
                                 <phase>none</phase>
                                 <goals><goal>merge-maven-repos</goal></goals>
                                 <configuration>
-                                    <source>file://${wagon.source.filepath}</source>
+                                    <source>file://${wagon.merge-maven-repos.source}</source>
                                     <target>${wagon.merge-maven-repos.target}</target>
                                     <targetId>${wagon.merge-maven-repos.targetId}</targetId>
                                 </configuration>
@@ -1421,7 +1405,7 @@
         <profile>
             <!-- Do mvn site site:stage -DstagingDirectory=/tmp/path first, then manually add/push to the gh-pages branch on GitHub? -->
             <id>infrastructure_opensource_github_site</id>
-            <activation><property><name>github-site-publish</name><value>true</value></property><activeByDefault>false</activeByDefault></activation>
+            <activation><property><name>github.site.publish</name><value>true</value></property></activation>
             <build>
                 <pluginManagement>
                     <plugins>
@@ -1473,54 +1457,36 @@
             </distributionManagement>
             <properties>
                 <!-- for site on github, id (github.global.server) must match the config in your settings.xml -->
-                <github.global.oauth2Token>${env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</github.global.oauth2Token>
-                <github.global.repositoryName>${env.CI_OPT_GITHUB_SITE_REPO_NAME}</github.global.repositoryName>
+                <github.global.oauth2Token>${env.CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</github.global.oauth2Token>
+                <github.global.repositoryName>${site.path.prefix}</github.global.repositoryName>
                 <github.global.repositoryOwner>${env.CI_OPT_GITHUB_SITE_REPO_OWNER}</github.global.repositoryOwner>
                 <github.global.server>github</github.global.server>
 
-                <!--<github.site.path>${build.publish.channel}/${project.version}</github.site.path>-->
-                <github.site.path>${build.publish.channel}</github.site.path>
+                <!--<github.site.path>${publish.channel}/${project.version}</github.site.path>-->
+                <github.site.path>${publish.channel}</github.site.path>
 
                 <maven.site.deploy.skip>true</maven.site.deploy.skip>
             </properties>
         </profile>
 
         <profile>
-            <id>default-site-path</id>
-            <activation><property><name>!site.path</name></property></activation>
-            <properties><site.path>${project.artifactId}/${build.publish.channel}</site.path></properties>
-        </profile>
-
-        <profile>
             <id>infrastructure_opensource_site</id>
             <activation>
-                <property><name>github-site-publish</name><value>false</value></property>
+                <property><name>github.site.publish</name><value>false</value></property>
             </activation>
             <distributionManagement>
-                <site><id>opensource-mvnsite</id><url>dav:${opensource-nexus3.repository}/mvnsite/${site.path}</url></site>
+                <site><id>opensource-mvnsite</id><url>dav:${opensource.nexus3.repository}/mvnsite/${site.path}</url></site>
             </distributionManagement>
         </profile>
 
         <profile>
             <id>infrastructure_private_site</id>
-            <activation><property><name>infrastructure</name><value>private</value></property><activeByDefault>false</activeByDefault></activation>
+            <activation><property><name>infrastructure</name><value>private</value></property></activation>
             <distributionManagement>
                 <!-- scpexe uses privateKey, scp uses password -->
                 <!-- scpexe://${domain_or_ip}:22/path/to/sites -->
-                <site><id>private-mvnsite</id><url>dav:${private-nexus3.repository}/mvnsite/${site.path}</url></site>
+                <site><id>private-mvnsite</id><url>dav:${private.nexus3.repository}/mvnsite/${site.path}</url></site>
             </distributionManagement>
-        </profile>
-
-        <!-- set property checkstyle.config.location in MAVEN_OPTS, pom.xml or settings.xml. -->
-        <profile>
-            <id>default-checkstyle-configLocation</id>
-            <activation><property><name>!checkstyle.config.location</name></property></activation>
-            <properties><checkstyle.config.location>https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/checkstyle/google_checks_8.10.xml</checkstyle.config.location></properties>
-        </profile>
-        <profile>
-            <id>default-pmd-ruleset</id>
-            <activation><property><name>!pmd.ruleset.location</name></property></activation>
-            <properties><pmd.ruleset.location>https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/pmd/pmd-ruleset-6.8.0.xml</pmd.ruleset.location></properties>
         </profile>
 
         <profile>
@@ -1600,7 +1566,7 @@
                                 </goals>
                             </execution>
                         </executions>
-                        </plugin>
+                    </plugin>
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <executions>
@@ -1863,22 +1829,9 @@
             </reporting>
         </profile>
 
-
-        <!--<frontend.nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</frontend.nodeDownloadRoot>-->
-        <profile>
-            <id>default-frontend-nodeDownloadRoot</id>
-            <activation><property><name>!frontend.nodeDownloadRoot</name></property></activation>
-            <properties><frontend.nodeDownloadRoot>https://nodejs.org/dist/</frontend.nodeDownloadRoot></properties>
-        </profile>
-        <!--<frontend.npmDownloadRoot>http://registry.npm.taobao.org/npm/-/</frontend.npmDownloadRoot>-->
-        <profile>
-            <id>default-frontend-npmDownloadRoot</id>
-            <activation><property><name>!frontend.npmDownloadRoot</name></property></activation>
-            <properties><frontend.npmDownloadRoot>https://registry.npmjs.org/npm/-/</frontend.npmDownloadRoot></properties>
-        </profile>
         <profile>
             <id>frontend</id>
-            <activation><file><exists>${basedir}/package.json</exists></file><activeByDefault>false</activeByDefault></activation>
+            <activation><file><exists>${basedir}/package.json</exists></file></activation>
             <build>
                 <pluginManagement>
                     <plugins>
@@ -1901,25 +1854,59 @@
 
         <!-- @formatter:off -->
         <profile>
-            <id>java8-without-groovy</id>
-            <activation><jdk>(,1.8]</jdk><file><missing>${basedir}/src/main/groovy</missing></file><activeByDefault>false
-            </activeByDefault></activation>
-            <properties><java.version>8</java.version></properties>
+            <id>java-compiler-add-modules-without-groovy</id>
+            <activation>
+                <file><missing>${basedir}/src/main/groovy</missing></file>
+                <property><name>java.addModules</name></property>
+            </activation>
             <build>
                 <plugins>
-                    <plugin><artifactId>maven-compiler-plugin</artifactId><configuration><compilerVersion>${java.version}</compilerVersion></configuration></plugin>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <!--<compilerVersion>${java.version}</compilerVersion>-->
+                            <compilerArgs><arg>--add-modules</arg><arg>${java.addModules}</arg></compilerArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>java-compiler-add-modules-with-groovy</id>
+            <activation>
+                <file><exists>${basedir}/src/main/groovy</exists></file>
+                <property><name>java.addModules</name></property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <compilerArgs><arg>-J--add-modules</arg><arg>-J${java.addModules}</arg></compilerArgs>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
         <profile>
             <id>java8</id>
-            <activation><jdk>(,1.8]</jdk><activeByDefault>false</activeByDefault></activation>
             <properties>
                 <java.version>8</java.version>
                 <maven.compiler.source>8</maven.compiler.source>
                 <maven.compiler.target>8</maven.compiler.target>
             </properties>
             <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-toolchains-plugin</artifactId>
+                            <version>${maven-toolchains-plugin.version}</version>
+                            <configuration>
+                                <toolchains><jdk><version>8</version><!--<vendor>oracle</vendor>--></jdk></toolchains>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
                 <plugins>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
@@ -1945,9 +1932,7 @@
                             <fail>true</fail>
                         </configuration>
                     </plugin>
-                    <plugin><artifactId>maven-failsafe-plugin</artifactId><configuration><argLine>${argLine}</argLine></configuration></plugin>
                     <plugin><artifactId>maven-pmd-plugin</artifactId><configuration><targetJdk>1.8</targetJdk></configuration></plugin>
-                    <plugin><artifactId>maven-surefire-plugin</artifactId><configuration><argLine>${argLine}</argLine></configuration></plugin>
                 </plugins>
             </build>
             <reporting>
@@ -1957,44 +1942,7 @@
             </reporting>
         </profile>
         <profile>
-            <!-- Java8 does not need addModules, purpose of this is to suppress warning 'Cannot resolve symbol'   -->
-            <id>default-java8-jvmArguments-addModules</id>
-            <activation><jdk>(,1.8]</jdk><property><name>!jvmArguments.addModules</name></property></activation>
-            <properties><jvmArguments.addModules></jvmArguments.addModules></properties>
-        </profile>
-        <profile>
-            <id>default-java9-jvmArguments-addModules</id>
-            <activation><jdk>(1.8,10)</jdk><property><name>!jvmArguments.addModules</name></property></activation>
-            <properties><jvmArguments.addModules>java.xml.bind,java.xml.ws,java.xml.ws.annotation</jvmArguments.addModules></properties>
-        </profile>
-        <profile>
-            <id>java9-without-groovy</id>
-            <activation><jdk>(1.8,10)</jdk><file><missing>${basedir}/src/main/groovy</missing></file><activeByDefault>false</activeByDefault></activation>
-            <properties><java.version>9</java.version></properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration><compilerVersion>${java.version}</compilerVersion><compilerArgs><arg>--add-modules</arg><arg>${jvmArguments.addModules}</arg></compilerArgs></configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>java9-with-groovy</id>
-            <activation><jdk>(1.8,10)</jdk><file><exists>${basedir}/src/main/groovy</exists></file><activeByDefault>false</activeByDefault></activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration><compilerArgs><arg>-J--add-modules</arg><arg>-J${jvmArguments.addModules}</arg></compilerArgs></configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
             <id>java9</id>
-            <activation><jdk>(1.8,10)</jdk><activeByDefault>false</activeByDefault></activation>
             <properties>
                 <!-- Runtime modules for java9 -->
                 <jaxb-api.version>2.3.0</jaxb-api.version>
@@ -2011,6 +1959,13 @@
                             <dependencies>
                                 <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
                             </dependencies>
+                        </plugin>
+                        <plugin>
+                            <artifactId>maven-toolchains-plugin</artifactId>
+                            <version>${maven-toolchains-plugin.version}</version>
+                            <configuration>
+                                <toolchains><jdk><version>9</version><!--<vendor>oracle</vendor>--></jdk></toolchains>
+                            </configuration>
                         </plugin>
                     </plugins>
                 </pluginManagement>
@@ -2039,8 +1994,6 @@
                             <fail>true</fail>
                         </configuration>
                     </plugin>
-                    <plugin><artifactId>maven-failsafe-plugin</artifactId><configuration><argLine>--add-modules ${jvmArguments.addModules} ${argLine}</argLine></configuration></plugin>
-                    <plugin><artifactId>maven-surefire-plugin</artifactId><configuration><argLine>--add-modules ${jvmArguments.addModules} ${argLine}</argLine></configuration></plugin>
                 </plugins>
             </build>
             <dependencyManagement>
@@ -2061,7 +2014,6 @@
         </profile>
         <profile>
             <id>java11-or-later</id>
-            <activation><jdk>[11,]</jdk><activeByDefault>false</activeByDefault></activation>
             <properties>
                 <!-- Runtime modules for java11 -->
                 <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
@@ -2081,6 +2033,13 @@
                             <dependencies>
                                 <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
                             </dependencies>
+                        </plugin>
+                        <plugin>
+                            <artifactId>maven-toolchains-plugin</artifactId>
+                            <version>${maven-toolchains-plugin.version}</version>
+                            <configuration>
+                                <toolchains><jdk><version>11</version><!--<vendor>oracle</vendor>--></jdk></toolchains>
+                            </configuration>
                         </plugin>
                     </plugins>
                 </pluginManagement>
@@ -2109,8 +2068,6 @@
                             <fail>true</fail>
                         </configuration>
                     </plugin>
-                    <plugin><artifactId>maven-failsafe-plugin</artifactId><configuration><argLine>--illegal-access=permit ${argLine}</argLine></configuration></plugin>
-                    <plugin><artifactId>maven-surefire-plugin</artifactId><configuration><argLine>--illegal-access=permit ${argLine}</argLine></configuration></plugin>
                 </plugins>
             </build>
             <dependencyManagement>
@@ -2139,12 +2096,11 @@
         </profile>
         <profile>
             <id>java-toolchains</id>
-            <activation><file><exists>${user.home}/.m2/toolchains.xml</exists></file><activeByDefault>false</activeByDefault></activation>
+            <activation><file><exists>${user.home}/.m2/toolchains.xml</exists></file></activation>
             <build>
                 <plugins>
                     <plugin>
                         <artifactId>maven-toolchains-plugin</artifactId>
-                        <configuration><toolchains><jdk><version>${java.version}</version><!--<vendor>oracle</vendor>--></jdk></toolchains></configuration>
                         <executions><execution><phase>validate</phase><goals><goal>toolchain</goal></goals></execution></executions>
                     </plugin>
                 </plugins>
@@ -2153,7 +2109,7 @@
         <profile>
             <!-- see: https://github.com/groovy/groovy-eclipse/wiki/Groovy-Eclipse-Maven-plugin -->
             <id>groovy</id>
-            <activation><file><exists>${basedir}/src/main/groovy</exists></file><activeByDefault>false</activeByDefault></activation>
+            <activation><file><exists>${basedir}/src/main/groovy</exists></file></activation>
             <build>
                 <plugins>
                     <plugin>
@@ -2216,7 +2172,7 @@
         </profile>
         <profile>
             <id>scala</id>
-            <activation><file><exists>${basedir}/src/main/scala</exists></file><activeByDefault>false</activeByDefault></activation>
+            <activation><file><exists>${basedir}/src/main/scala</exists></file></activation>
             <build>
                 <pluginManagement>
                     <plugins>
@@ -2255,7 +2211,7 @@
         </profile>
         <profile>
             <id>kotlin</id>
-            <activation><file><exists>${basedir}/src/main/kotlin</exists></file><activeByDefault>false</activeByDefault></activation>
+            <activation><file><exists>${basedir}/src/main/kotlin</exists></file></activation>
             <build>
                 <plugins>
                     <plugin>
@@ -2320,7 +2276,7 @@
 
         <profile>
             <id>jira_project</id>
-            <activation><property><name>jira.projectKey</name></property><activeByDefault>false</activeByDefault></activation>
+            <activation><property><name>jira.projectKey</name></property></activation>
             <properties>
                 <jira.user>admin</jira.user>
                 <jira.password>admin_pass</jira.password>

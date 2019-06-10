@@ -5,7 +5,8 @@
                         http://maven.apache.org/xsd/settings-1.0.0.xsd">
 
     <interactiveMode/>
-    <localRepository>${user.home}/.m2/repository</localRepository>
+    <!-- org.springframework.cloud:spring-cloud-contract-maven-plugin can not substitute variables in localRepository tag correctly -->
+    <!--<localRepository>${user.home}/.m2/repository</localRepository>-->
 
     <mirrors>
         <!-- @formatter:off -->
@@ -13,7 +14,9 @@
         <!-- mirrorOf: pom.xml repositories repository id -->
         <!--<mirrorOf>central</mirrorOf>-->
         <!--<mirrorOf>external:*,!github-mvn-repo-wagon-maven-plugin</mirrorOf>-->
-        <!--<mirror><id>mirror</id><name>mirror</name><url>http://nexus3:28081/nexus/repository/maven-public/</url><mirrorOf>*</mirrorOf></mirror>-->
+        <!--<mirror><id>mirror</id><mirrorOf>*</mirrorOf><name>mirror</name><url>http://nexus3:28081/nexus/repository/maven-public/</url></mirror>-->
+        <!--<mirror><id>mirror</id><mirrorOf>*</mirrorOf><url>https://nexus3.infra.top/nexus/repository/maven-public/</url></mirror>-->
+
         <!-- @formatter:on -->
     </mirrors>
 
@@ -22,6 +25,8 @@
     <pluginGroups>
         <pluginGroup>com.github.ferstl</pluginGroup>
         <pluginGroup>com.github.spotbugs</pluginGroup>
+        <pluginGroup>io.quarkus</pluginGroup>
+        <pluginGroup>io.takari</pluginGroup>
         <pluginGroup>org.apache.maven.plugins</pluginGroup>
         <pluginGroup>org.apache.tomcat.maven</pluginGroup>
         <pluginGroup>org.codehaus.mojo</pluginGroup>
@@ -29,15 +34,52 @@
         <pluginGroup>org.reficio</pluginGroup>
         <pluginGroup>org.sonarsource.scanner.maven</pluginGroup>
         <pluginGroup>org.springframework.boot</pluginGroup>
-        <pluginGroup>io.takari</pluginGroup>
     </pluginGroups>
 
     <profiles>
         <!-- @formatter:off -->
-        <profile>
-            <id>gpg-keyname</id>
+        <!--<profile>
+            <id>allow-using-snapshots-as-parent</id>
             <activation><activeByDefault>true</activeByDefault></activation>
-            <properties><gpg.keyname>${env.CI_OPT_GPG_KEYNAME}</gpg.keyname></properties>
+            <repositories>
+                <repository>
+                    <id>OSSRH-snapshots</id>
+                    <name>central snapshots</name>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                </repository>
+            </repositories>
+        </profile>-->
+        <profile>
+            <id>default-public-repositories</id>
+            <activation><activeByDefault>true</activeByDefault></activation>
+            <repositories>
+                <!-- Make artifacts in OSSRH repositories available -->
+                <repository>
+                    <id>OSSRH-releases</id>
+                    <name>central releases</name>
+                    <url>https://oss.sonatype.org/content/repositories/releases/</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </repository>
+                <repository>
+                    <id>OSSRH-snapshots</id>
+                    <name>central snapshots</name>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>central</id>
+                    <name>central</name>
+                    <url>https://repo1.maven.org/maven2</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </pluginRepository>
+            </pluginRepositories>
         </profile>
         <!-- @formatter:on -->
     </profiles>
@@ -49,7 +91,6 @@
 
     <servers>
         <!-- @formatter:off -->
-
         <server>
             <id>docker-hub</id>
             <username>${env.CI_OPT_DOCKER_REGISTRY_USER}</username><password>${env.CI_OPT_DOCKER_REGISTRY_PASS}</password>
@@ -60,7 +101,7 @@
             <id>docker.io</id>
             <username>${env.CI_OPT_DOCKER_REGISTRY_USER}</username><password>${env.CI_OPT_DOCKER_REGISTRY_PASS}</password>
         </server>
-        <server><id>github</id><password>${env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</password></server>
+        <server><id>github</id><password>${env.CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</password></server>
         <!--
         To fix issue: gpg: signing failed: Inappropriate ioctl for device
         1.
@@ -74,7 +115,7 @@
         echo RELOADAGENT | gpg-connect-agent
         -->
         <server><id>gpg.passphrase</id><passphrase>${env.CI_OPT_GPG_PASSPHRASE}</passphrase></server>
-        <server><id>opensource-mvnsite</id><username>${env.CI_INFRA_OPT_OPENSOURCE_MVNSITE_USERNAME}</username><password>${env.CI_INFRA_OPT_OPENSOURCE_MVNSITE_PASSWORD}</password></server>
+        <server><id>opensource-mvnsite</id><username>${env.CI_OPT_OPENSOURCE_MVNSITE_USERNAME}</username><password>${env.CI_OPT_OPENSOURCE_MVNSITE_PASSWORD}</password></server>
         <server><id>OSSRH-snapshots</id><username>${env.CI_OPT_MAVEN_CENTRAL_USER}</username><password>${env.CI_OPT_MAVEN_CENTRAL_PASS}</password></server>
         <server><id>OSSRH-staging</id><username>${env.CI_OPT_MAVEN_CENTRAL_USER}</username><password>${env.CI_OPT_MAVEN_CENTRAL_PASS}</password></server>
 
@@ -98,6 +139,11 @@
         <server><id>private-nexus3-releases</id><username>deployment</username><password>deployment</password></server>
         <server><id>private-nexus3-snapshots</id><username>deployment</username><password>deployment</password></server>
         <server><id>private-nexus3-thirdparty</id><username>deployment</username><password>deployment</password></server>
+
+        <!--<server>
+            <id>mirror</id><username>deployment</username><password></password>
+            <configuration><httpConfiguration><all><connectionTimeout>120000</connectionTimeout><readTimeout>120000</readTimeout></all></httpConfiguration></configuration>
+        </server>-->
         <!-- @formatter:on -->
     </servers>
 

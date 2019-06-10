@@ -24,12 +24,17 @@
 
     <build>
         <extensions>
+            <!--
+            I found docker-info was built, installed and deployed twice.
+            This made build failed when re-deploy is not allowed on artifact repository.
+            -->
+            <!-- for the dependency type 'docker-info' to be supported
             <extension>
-                <!-- for the dependency type 'docker-info' to be supported -->
                 <groupId>com.spotify</groupId>
                 <artifactId>dockerfile-maven-extension</artifactId>
                 <version>${com.spotify_dockerfile-maven-plugin.version}</version>
             </extension>
+            -->
         </extensions>
         <pluginManagement>
             <plugins>
@@ -39,7 +44,7 @@
                     <version>${com.spotify_dockerfile-maven-plugin.version}</version>
                     <configuration>
                         <buildArgs>
-                            <ARTIFACT_REPOSITORY>${private-nexus3.repository}</ARTIFACT_REPOSITORY>
+                            <ARTIFACT_REPOSITORY>${private.nexus3.repository}</ARTIFACT_REPOSITORY>
                             <BUILD_TIMESTAMP>${maven.build.timestamp}</BUILD_TIMESTAMP>
                             <DOCKER_REGISTRY>${docker.registry}</DOCKER_REGISTRY>
                             <GIT_BRANCH>${git.branch}</GIT_BRANCH>
@@ -200,7 +205,7 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>!mvn_deploy_publish_segregation</name>
+                    <name>!mvn.deploy.publish.segregation</name>
                 </property>
             </activation>
             <properties>
@@ -289,7 +294,7 @@
                                 <goals><goal>run</goal></goals>
                                 <configuration>
                                     <target>
-                                        <replace file="docker-compose-base.yml" token="@artifact.repository@" value="${private-nexus3.repository}"/>
+                                        <replace file="docker-compose-base.yml" token="@artifact.repository@" value="${private.nexus3.repository}"/>
                                         <replace file="docker-compose-base.yml" token="@build.timestamp@" value="${maven.build.timestamp}"/>
                                         <replace file="docker-compose-base.yml" token="@docker.image.prefix@" value="${docker.image.prefix}"/>
                                         <replace file="docker-compose-base.yml" token="@docker.registry@" value="${docker.registry}"/>

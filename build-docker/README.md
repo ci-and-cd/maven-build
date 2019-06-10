@@ -36,7 +36,7 @@ maven-deploy-plugin
 ## IV. Profiles
 
 docker-maven-plugin-lifecycle-binding-when-not-publish-deploy-segregation
-> activate by property 'mvn_deploy_publish_segregation' absent
+> activate by property 'mvn.deploy.publish.segregation' absent
 build and push docker image automatically
 
 ## VI. Appendices

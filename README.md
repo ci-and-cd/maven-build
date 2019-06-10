@@ -27,7 +27,7 @@ Copy `maven-build/src/main/maven/toolchains.xml` to `~/.m2/toolchains.xml`
 ```bash
 cp src/main/maven/toolchains.xml ~/.m2/toolchains.xml
 # or
-cp src/main/maven/toolchains-1.8.0_181-Darwin.xml ~/.m2/toolchains.xml
+cp src/main/maven/toolchains-darwin.xml ~/.m2/toolchains.xml
 ```
 Update jdkHome in ~/.m2/toolchains.xml
 
@@ -42,21 +42,27 @@ Set maven-build as parent in maven projects.
 No dependency will be imported, maven-build only responsible for software engineering,
 it does not interfering dependency management.
 
+TODO document about extensions
+```bash
+mvn coreext:check
+mvn coreext:install
+```
+
 You need to provide few properties and environment variables, see next chapter.
 
 
 ## II. Properties, Environment variables and their default values
 
 ### 1. fetch or deploy
-- private-nexus3.repository
+- private.nexus3.repository
 > default: http://nexus3:28081/nexus/repository
 Set this property to a real world url.
 
-- private-nexus3.repository
+- private.nexus3.repository
 > default: http://nexus3.localal:28081/nexus/repository
 Set this property to a real world url.
 
-- build.publish.channel
+- publish.channel
 > default: snapshot
 Set this property to 'release' when building release artifact.
 Note: CI_OPT_GITHUB_SITE_REPO_OWNER
@@ -83,9 +89,9 @@ Customize these properties only when building front-end projects and default sit
 
 ### 4. report
 #### 4.1 sonarqube
-- private-sonarqube.host.url
+- private.sonarqube.host.url
 > default: http://sonarqube:9000
-- private-sonarqube.host.url
+- private.sonarqube.host.url
 > default: http://sonarqube:9000
 
 Need these properties only when profile 'sonar' is activated.
@@ -105,15 +111,13 @@ Need to customize when github.com is not reachable.
 
 ### 5. site
 - site.path
-> default: ${project.artifactId}-${build.publish.channel}
+> default: ${project.artifactId}-${publish.channel}
 Customize this properties if you want to publish relative projects's site into same parent directory, 
 use same value on relative projects.
 
-- CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN
+- CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN
 > default: N/A (blank)
 - CI_OPT_GITHUB_SITE_REPO_OWNER
-> default: N/A (blank)
-- CI_OPT_GITHUB_SITE_REPO_NAME
 > default: N/A (blank)
 
 Need these properties only when deploy site to github.com.
@@ -224,7 +228,7 @@ git-commit-id
 activate automatically if '${maven.multiModuleProjectDirectory}/.git/HEAD' exists
 
 mvn-deploy-publish-segregation-by-wagon
-> activate by set 'mvn_deploy_publish_segregation' to 'true'
+> activate by set 'mvn.deploy.publish.segregation' to 'true'
 
 jacoco-build
 > Test coverage report.
@@ -272,9 +276,9 @@ set `-Dsite.path=maven-build-snapshot` to specify upload directory.
 
 infrastructure_opensource_site_publish
 > publish project site to github  
-activate on property 'github-site-publish' is true  
+activate on property 'github.site.publish' is true  
 needs:  
-env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN  
+env.CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN  
 env.CI_OPT_GITHUB_SITE_REPO_OWNER
 
 
@@ -298,9 +302,15 @@ Add args on `maven site`
 
 #### A.1. local install/deploy maven-build
 
-    mvn -e -U clean install
+    cp src/main/maven/settings-global.xml ~/.m2/wrapper/dists/apache-maven-3.6.1-bin/18t1vjepdne9cv9t0hdcik0hp1/apache-maven-3.6.1/conf/settings.xml
+
+    CI_OPT_INFRASTRUCTURE=opensource ./mvnw -e -U clean install
     
-    mvn -e -U -Dinfrastructure=local -Dsite=true -Dsite.path=ci-and-cd clean install deploy site site:stage site:stage-deploy
+    CI_OPT_INFRASTRUCTURE=opensource CI_OPT_ORIGIN_REPO=true CI_OPT_SONAR=true CI_OPT_SONAR_LOGIN= CI_OPT_SONAR_ORGANIZATION=home1-oss-github ./mvnw -e sonar:sonar
+    
+    CI_OPT_GITHUB_SITE_PUBLISH="true" CI_OPT_INFRASTRUCTURE=opensource CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN="${CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN}" CI_OPT_SITE="true" CI_OPT_GITHUB_SITE_REPO_OWNER="ci-and-cd" CI_OPT_SITE_PATH_PREFIX="maven-build" ./mvnw -e -U clean install site site-deploy
+    
+    CI_OPT_GITHUB_SITE_PUBLISH="false" CI_OPT_INFRASTRUCTURE=opensource CI_OPT_OPENSOURCE_MVNSITE_PASSWORD="${CI_OPT_OPENSOURCE_MVNSITE_PASSWORD}" CI_OPT_OPENSOURCE_MVNSITE_USERNAME="${CI_OPT_OPENSOURCE_MVNSITE_USERNAME}" CI_OPT_NEXUS3="https://nexus3.infra.top" CI_OPT_SITE="true" CI_OPT_SITE_PATH_PREFIX="ci-and-cd/maven-build" ./mvnw -e -U clean install site site:stage site:stage-deploy
 
 #### A.2 Pull request
 
