@@ -103,7 +103,7 @@ before_script:
   export SETTINGS_GLOBAL_XML_URL="${CI_OPT_MAVEN_BUILD_OPTS_REPO}/raw/${CI_OPT_MAVEN_BUILD_OPTS_REPO_REF}/src/main/maven/settings-global.xml";
   echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
   curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | tee ${SETTINGS_GLOBAL_XML};
-  mv -f ${SETTINGS_GLOBAL_XML} ~/.m2/wrapper/dists/apache-maven-3.6.1-bin/18t1vjepdne9cv9t0hdcik0hp1/apache-maven-3.6.1/conf/settings.xml;
+  mv -f ${SETTINGS_GLOBAL_XML} ~/.m2/wrapper/dists/apache-maven-3.6.1-bin/38pn40mp89t5c94bjdbeod370m/apache-maven-3.6.1/conf/settings.xml;
 #  rm -rf ~/.m2/repository/top/infra/maven-build-extension;
 #  rm -f ~/.m2/settings*.xml;
 #  rm -f ~/.m2/toolchains*.xml;

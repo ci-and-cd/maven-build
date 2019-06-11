@@ -302,7 +302,7 @@ Add args on `maven site`
 
 #### A.1. local install/deploy maven-build
 
-    cp src/main/maven/settings-global.xml ~/.m2/wrapper/dists/apache-maven-3.6.1-bin/18t1vjepdne9cv9t0hdcik0hp1/apache-maven-3.6.1/conf/settings.xml
+    cp src/main/maven/settings-global.xml ~/.m2/wrapper/dists/apache-maven-3.6.1-bin/38pn40mp89t5c94bjdbeod370m/apache-maven-3.6.1/conf/settings.xml
 
     CI_OPT_INFRASTRUCTURE=opensource ./mvnw -e -U clean install
     
