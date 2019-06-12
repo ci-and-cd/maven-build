@@ -140,8 +140,8 @@ test_script:
   - sh: |
       if [[ "${APPVEYOR_REPO_BRANCH}" =~ ^release/.+ ]] || [[ "${APPVEYOR_REPO_BRANCH}" =~ ^support/.+ ]]; then export CI_OPT_GITHUB_SITE_PUBLISH=true; else export CI_OPT_GITHUB_SITE_PUBLISH=false; fi;
       if [[ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]]; then
-        export CI_OPT_GITHUB_SITE_REPO_OWNER="$(echo ${APPVEYOR_REPO_NAME} | awk -F'/' '{print $1}')";
-        export CI_OPT_SITE_PATH_PREFIX="${CI_OPT_GITHUB_SITE_REPO_OWNER}";
+        export CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER="$(echo ${APPVEYOR_REPO_NAME} | awk -F'/' '{print $1}')";
+        export CI_OPT_SITE_PATH_PREFIX="${CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER}";
       else
         export CI_OPT_SITE_PATH_PREFIX="${APPVEYOR_REPO_NAME}";
       fi;

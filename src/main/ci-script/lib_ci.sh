@@ -133,8 +133,8 @@ if [[ -z ${CI_OPT_MAVEN_EXTRA_OPTS+x} ]]; then CI_OPT_MAVEN_EXTRA_OPTS=""; fi
 if [[ -z ${CI_OPT_FRONTEND_NODEDOWNLOADROOT+x} ]]; then CI_OPT_FRONTEND_NODEDOWNLOADROOT=""; fi
 if [[ -z ${CI_OPT_FRONTEND_NPMDOWNLOADROOT+x} ]]; then CI_OPT_FRONTEND_NPMDOWNLOADROOT=""; fi
 if [[ -z ${CI_OPT_GITHUB_SITE_PUBLISH+x} ]]; then CI_OPT_GITHUB_SITE_PUBLISH=""; fi
-if [[ -z ${CI_OPT_GITHUB_SITE_REPO_NAME+x} ]]; then CI_OPT_GITHUB_SITE_REPO_NAME=""; fi
-if [[ -z ${CI_OPT_GITHUB_SITE_REPO_OWNER+x} ]]; then CI_OPT_GITHUB_SITE_REPO_OWNER=""; fi
+if [[ -z ${CI_OPT_GITHUB_GLOBAL_REPOSITORYNAME+x} ]]; then CI_OPT_GITHUB_GLOBAL_REPOSITORYNAME=""; fi
+if [[ -z ${CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER+x} ]]; then CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER=""; fi
 if [[ -z ${CI_OPT_MAVEN_INTEGRATIONTEST_SKIP+x} ]]; then CI_OPT_MAVEN_INTEGRATIONTEST_SKIP=""; fi
 if [[ -z ${CI_OPT_JACOCO+x} ]]; then CI_OPT_JACOCO="true"; fi
 if [[ -z ${CI_OPT_JIRA_PASSWORD+x} ]]; then CI_OPT_JIRA_PASSWORD=""; fi
@@ -877,11 +877,11 @@ function run_mvn() {
     fi
 
     if [[ "opensource" == "$(ci_opt_infrastructure)" ]]; then
-        if [[ -z "${CI_OPT_GITHUB_SITE_REPO_NAME}" ]]; then CI_OPT_GITHUB_SITE_REPO_NAME="$(ci_opt_site_path_prefix)"; fi
-        if [[ -z "${CI_OPT_GITHUB_SITE_REPO_OWNER}" ]]; then CI_OPT_GITHUB_SITE_REPO_OWNER="$(echo $(git_repo_slug) | cut -d '/' -f1-)"; fi
+        if [[ -z "${CI_OPT_GITHUB_GLOBAL_REPOSITORYNAME}" ]]; then CI_OPT_GITHUB_GLOBAL_REPOSITORYNAME="$(ci_opt_site_path_prefix)"; fi
+        if [[ -z "${CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER}" ]]; then CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER="$(echo $(git_repo_slug) | cut -d '/' -f1-)"; fi
         # export and expose to maven sub process
-        export CI_OPT_GITHUB_SITE_REPO_NAME
-        export CI_OPT_GITHUB_SITE_REPO_OWNER
+        export CI_OPT_GITHUB_GLOBAL_REPOSITORYNAME
+        export CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER
     fi
 
     if [[ -z "${CI_OPT_MAVEN_EFFECTIVE_POM}" ]]; then CI_OPT_MAVEN_EFFECTIVE_POM="true"; fi

@@ -165,6 +165,9 @@
         <frontend.nodeDownloadRoot></frontend.nodeDownloadRoot>
         <frontend.npmDownloadRoot></frontend.npmDownloadRoot>
         <git.commit.id.skip></git.commit.id.skip>
+        <github.global.oauth2Token></github.global.oauth2Token>
+        <github.global.repositoryName></github.global.repositoryName>
+        <github.global.repositoryOwner></github.global.repositoryOwner>
         <linkXRef></linkXRef>
         <maven.integration-test.skip></maven.integration-test.skip>
         <maven.multiModuleProjectDirectory></maven.multiModuleProjectDirectory>
@@ -381,7 +384,7 @@
                 <plugin><groupId>com.amashchenko.maven.plugin</groupId><artifactId>gitflow-maven-plugin</artifactId><version>${gitflow-maven-plugin.version}</version></plugin>
                 <plugin><groupId>com.mysema.maven</groupId><artifactId>apt-maven-plugin</artifactId><version>${apt-maven-plugin.version}</version></plugin>
                 <plugin><groupId>com.soebes.maven.plugins</groupId><artifactId>echo-maven-plugin</artifactId><version>${echo-maven-plugin.version}</version></plugin>
-                <!-- TODO find a newer plugin for groovy scripts to replace gmaven-plugin -->
+                <!-- Use groovy-maven-plugin for groovy scripts to replace gmaven-plugin -->
                 <!--<plugin><groupId>org.codehaus.groovy.maven</groupId><artifactId>gmaven-plugin</artifactId><version>${gmaven-plugin.version}</version></plugin>-->
                 <plugin>
                     <groupId>org.codehaus.gmaven</groupId><artifactId>groovy-maven-plugin</artifactId><version>${groovy-maven-plugin.version}</version>
@@ -1454,9 +1457,9 @@
             </distributionManagement>
             <properties>
                 <!-- for site on github, id (github.global.server) must match the config in your settings.xml -->
-                <github.global.oauth2Token>${env.CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</github.global.oauth2Token>
-                <github.global.repositoryName>${site.path.prefix}</github.global.repositoryName>
-                <github.global.repositoryOwner>${env.CI_OPT_GITHUB_SITE_REPO_OWNER}</github.global.repositoryOwner>
+                <!--<github.global.oauth2Token>${env.CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</github.global.oauth2Token>-->
+                <!--<github.global.repositoryName>${site.path.prefix}</github.global.repositoryName>-->
+                <!--<github.global.repositoryOwner>${env.CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER}</github.global.repositoryOwner>-->
                 <github.global.server>github</github.global.server>
 
                 <!--<github.site.path>${publish.channel}/${project.version}</github.site.path>-->

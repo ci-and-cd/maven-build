@@ -10,7 +10,7 @@
 echo -e "\n>>>>>>>>>> ---------- default options ---------- >>>>>>>>>>"
 if [[ -z ${CI_OPT_GIT_PREFIX+x} ]]; then CI_OPT_GIT_PREFIX="https://github.com"; fi
 if [[ -z ${CI_OPT_GITHUB_SITE_PUBLISH+x} ]]; then CI_OPT_GITHUB_SITE_PUBLISH="false"; fi
-if [[ -z ${CI_OPT_GITHUB_SITE_REPO_OWNER+x} ]]; then CI_OPT_GITHUB_SITE_REPO_OWNER="ci-and-cd"; fi
+if [[ -z ${CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER+x} ]]; then CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER="ci-and-cd"; fi
 if [[ -z ${CI_OPT_GPG_KEYNAME+x} ]]; then CI_OPT_GPG_KEYNAME="59DBF10E"; fi
 if [[ -z ${CI_OPT_INFRASTRUCTURE+x} ]]; then CI_OPT_INFRASTRUCTURE="opensource"; fi
 #if [[ -z ${CI_OPT_MAVEN_EFFECTIVE_POM+x} ]]; then CI_OPT_MAVEN_EFFECTIVE_POM="false"; fi
@@ -33,7 +33,7 @@ if [[ -z ${CI_OPT_MAVEN_BUILD_OPTS_REPO_REF+x} ]]; then CI_OPT_MAVEN_BUILD_OPTS_
 
 # github site repo name or site path in nexus3 raw repository
 if [[ -z "${CI_OPT_SITE_PATH_PREFIX}" ]]; then
-  if [[ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]]; then CI_OPT_SITE_PATH_PREFIX="${CI_OPT_GITHUB_SITE_REPO_OWNER}"; else CI_OPT_SITE_PATH_PREFIX="${CI_PROJECT_PATH}"; fi;
+  if [[ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]]; then CI_OPT_SITE_PATH_PREFIX="${CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER}"; else CI_OPT_SITE_PATH_PREFIX="${CI_PROJECT_PATH}"; fi;
 fi
 
 #if [[ -z ${LOGGING_LEVEL_ROOT+x} ]]; then export LOGGING_LEVEL_ROOT="INFO"; fi

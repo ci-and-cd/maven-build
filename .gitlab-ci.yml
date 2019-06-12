@@ -76,7 +76,7 @@ before_script:
   - export CI_OPT_GIT_HOST=gitlab.com;
     if [ -z "${CI_OPT_GIT_PREFIX}" ]; then export CI_OPT_GIT_PREFIX=https://${CI_OPT_GIT_HOST}; fi;
     export CI_OPT_GITHUB_SITE_PUBLISH=false;
-    export CI_OPT_GITHUB_SITE_REPO_OWNER="ci-and-cd";
+    export CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER="ci-and-cd";
     export CI_OPT_GPG_KEYNAME="59DBF10E";
     export CI_OPT_INFRASTRUCTURE="opensource";
     export CI_OPT_MAVEN_EFFECTIVE_POM=false;

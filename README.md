@@ -65,7 +65,7 @@ Set this property to a real world url.
 - publish.channel
 > default: snapshot
 Set this property to 'release' when building release artifact.
-Note: CI_OPT_GITHUB_SITE_REPO_OWNER
+Note: CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER
 
 ### 2. maven-surefire-plugin and maven-failsafe-plugin
 
@@ -117,7 +117,7 @@ use same value on relative projects.
 
 - CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN
 > default: N/A (blank)
-- CI_OPT_GITHUB_SITE_REPO_OWNER
+- CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER
 > default: N/A (blank)
 
 Need these properties only when deploy site to github.com.
@@ -279,7 +279,7 @@ infrastructure_opensource_site_publish
 activate on property 'github.site.publish' is true  
 needs:  
 env.CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN  
-env.CI_OPT_GITHUB_SITE_REPO_OWNER
+env.CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER
 
 
 ## V. Repositories
@@ -309,7 +309,7 @@ Add args on `maven site`
     
     CI_OPT_INFRASTRUCTURE=opensource CI_OPT_ORIGIN_REPO=true CI_OPT_SONAR=true CI_OPT_SONAR_LOGIN= CI_OPT_SONAR_ORGANIZATION=home1-oss-github ./mvnw -e sonar:sonar
     
-    CI_OPT_GITHUB_SITE_PUBLISH="true" CI_OPT_INFRASTRUCTURE=opensource CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN="${CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN}" CI_OPT_SITE="true" CI_OPT_GITHUB_SITE_REPO_OWNER="ci-and-cd" CI_OPT_SITE_PATH_PREFIX="maven-build" ./mvnw -e -U clean install site site-deploy
+    CI_OPT_GITHUB_SITE_PUBLISH="true" CI_OPT_INFRASTRUCTURE=opensource CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN="${CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN}" CI_OPT_SITE="true" CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER="ci-and-cd" CI_OPT_SITE_PATH_PREFIX="maven-build" ./mvnw -e -U clean install site site-deploy
     
     CI_OPT_GITHUB_SITE_PUBLISH="false" CI_OPT_INFRASTRUCTURE=opensource CI_OPT_OPENSOURCE_MVNSITE_PASSWORD="${CI_OPT_OPENSOURCE_MVNSITE_PASSWORD}" CI_OPT_OPENSOURCE_MVNSITE_USERNAME="${CI_OPT_OPENSOURCE_MVNSITE_USERNAME}" CI_OPT_NEXUS3="https://nexus3.infra.top" CI_OPT_SITE="true" CI_OPT_SITE_PATH_PREFIX="ci-and-cd/maven-build" ./mvnw -e -U clean install site site:stage site:stage-deploy
 
