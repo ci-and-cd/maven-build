@@ -21,6 +21,14 @@
     - /^support\/.*$/
     #- temp
 
+.git_strategy_fetch: &git_strategy_fetch
+  variables:
+    GIT_STRATEGY: fetch
+
+.git_strategy_manual: &git_strategy_manual
+  variables:
+    GIT_STRATEGY: none
+
 .script_build: &script_build
   script:
     - export CI_OPT_MAVEN_EFFECTIVE_POM=true;
@@ -58,64 +66,63 @@
       - artifacts.tar.gz
 
 before_script:
-- if [ -f ~/env ]; then source ~/env; fi;
-- set -ex;
-# info
-- echo "HOST_HOSTNAME '${HOST_HOSTNAME}', HOST_IPADDRESS '${HOST_IPADDRESS}'";
-  echo working directory `pwd`;
-  echo CI_PROJECT_URL ${CI_PROJECT_URL} CI_COMMIT_REF_NAME ${CI_COMMIT_REF_NAME}, CI_COMMIT_SHA ${CI_COMMIT_SHA}, CI_PROJECT_NAME ${CI_PROJECT_NAME}, CI_PROJECT_NAMESPACE ${CI_PROJECT_NAMESPACE};
-# environment variables
-- export CI_OPT_GIT_HOST=gitlab.com;
-  if [ -z "${CI_OPT_GIT_PREFIX}" ]; then export CI_OPT_GIT_PREFIX=https://${CI_OPT_GIT_HOST}; fi;
-  export CI_OPT_GITHUB_SITE_PUBLISH=false;
-  export CI_OPT_GITHUB_SITE_REPO_OWNER="ci-and-cd";
-  export CI_OPT_GPG_KEYNAME="59DBF10E";
-  export CI_OPT_INFRASTRUCTURE="opensource";
-  export CI_OPT_MAVEN_EFFECTIVE_POM=false;
-  export CI_OPT_ORIGIN_REPO_SLUG="ci-and-cd/maven-build";
-  export CI_OPT_SITE=true;
-  export CI_OPT_SONAR=true;
-  export CI_OPT_SONAR_ORGANIZATION="home1-oss-github";
-  export CI_OPT_MAVEN_BUILD_OPTS_REPO="${CI_OPT_GIT_PREFIX}/ci-and-cd/maven-build-opts-opensource";
-  export CI_OPT_MAVEN_BUILD_OPTS_REPO_REF="${CI_COMMIT_REF_NAME:-develop}";
-  echo CI_OPT_GIT_PREFIX ${CI_OPT_GIT_PREFIX} CI_OPT_INFRASTRUCTURE ${CI_OPT_INFRASTRUCTURE} CI_OPT_BUILD_PREFIX ${CI_OPT_BUILD_PREFIX};
-#  export CI_OPT_CI_SCRIPT="${CI_OPT_GIT_PREFIX}/${CI_PROJECT_PATH:-ci-and-cd/maven-build}/raw/${CI_COMMIT_REF_NAME:-develop}/src/main/ci-script/lib_ci.sh";
-# manual git
-- export GIT_REMOTE="git@${CI_OPT_GIT_HOST}:${CI_PROJECT_NAMESPACE}/${CI_OPT_BUILD_PREFIX}${CI_PROJECT_NAME}.git";
-  if [ -d .git ]; then git remote set-url origin ${GIT_REMOTE} && git fetch --all; fi;
-  if [ ! -d .git ]; then echo "clone into non-empty directory"; git init && git remote add origin ${GIT_REMOTE} && git fetch --all && git reset origin/${CI_COMMIT_REF_NAME} > /dev/null 2>&1; fi;
-  if git show-ref --verify refs/tags/${CI_COMMIT_REF_NAME} > /dev/null 2>&1; then
-    echo 'build on tag is not supported'; exit 1;
-  elif git show-ref --verify refs/remotes/origin/${CI_COMMIT_REF_NAME} > /dev/null 2>&1; then
-    echo 'build on branch is supported';
-    git checkout -f origin/${CI_COMMIT_REF_NAME};
-    if [ "$(git rev-parse origin/${CI_COMMIT_REF_NAME})" != "${CI_COMMIT_SHA}" ]; then
-      echo Prevents build of an older commit;
-      PRIVATE_TOKEN_COLON='PRIVATE-TOKEN:';
-      set +x; curl -H "${PRIVATE_TOKEN_COLON} ${CI_OPT_GITLAB_GIT_AUTH_TOKEN}" -X POST ${CI_OPT_GIT_PREFIX}/api/v4/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}/cancel; set -x;
-      exit 0;
-    fi;
-    git checkout -f ${CI_COMMIT_SHA};
-    echo "remove untracked files and directories"; git clean -fdx :/ -e artifacts.tar.gz;
-  fi;
-- ./mvnw -version;
-  export SETTINGS_GLOBAL_XML="/tmp/settings-global-${CI_COMMIT_SHA}.xml";
-  export SETTINGS_GLOBAL_XML_URL="${CI_OPT_MAVEN_BUILD_OPTS_REPO}/raw/${CI_OPT_MAVEN_BUILD_OPTS_REPO_REF}/src/main/maven/settings-global.xml";
-  echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
-  curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | tee ${SETTINGS_GLOBAL_XML};
-  mv -f ${SETTINGS_GLOBAL_XML} ~/.m2/wrapper/dists/apache-maven-3.6.1-bin/38pn40mp89t5c94bjdbeod370m/apache-maven-3.6.1/conf/settings.xml;
-#  rm -rf ~/.m2/repository/top/infra/maven-build-extension;
-#  rm -f ~/.m2/settings*.xml;
-#  rm -f ~/.m2/toolchains*.xml;
-#  ls -ahl ~/.m2;
+  - if [ -f ~/env ]; then source ~/env; fi;
+  - set -ex;
+  # info
+  - echo "HOST_HOSTNAME '${HOST_HOSTNAME}', HOST_IPADDRESS '${HOST_IPADDRESS}'";
+    echo working directory `pwd`;
+    echo CI_PROJECT_URL ${CI_PROJECT_URL} CI_COMMIT_REF_NAME ${CI_COMMIT_REF_NAME}, CI_COMMIT_SHA ${CI_COMMIT_SHA}, CI_PROJECT_NAME ${CI_PROJECT_NAME}, CI_PROJECT_NAMESPACE ${CI_PROJECT_NAMESPACE};
+  # environment variables
+  - export CI_OPT_GIT_HOST=gitlab.com;
+    if [ -z "${CI_OPT_GIT_PREFIX}" ]; then export CI_OPT_GIT_PREFIX=https://${CI_OPT_GIT_HOST}; fi;
+    export CI_OPT_GITHUB_SITE_PUBLISH=false;
+    export CI_OPT_GITHUB_SITE_REPO_OWNER="ci-and-cd";
+    export CI_OPT_GPG_KEYNAME="59DBF10E";
+    export CI_OPT_INFRASTRUCTURE="opensource";
+    export CI_OPT_MAVEN_EFFECTIVE_POM=false;
+    export CI_OPT_ORIGIN_REPO_SLUG="ci-and-cd/maven-build";
+    export CI_OPT_SITE=true;
+    export CI_OPT_SONAR=true;
+    export CI_OPT_SONAR_ORGANIZATION="home1-oss-github";
+    export CI_OPT_MAVEN_BUILD_OPTS_REPO="${CI_OPT_GIT_PREFIX}/ci-and-cd/maven-build-opts-opensource";
+    export CI_OPT_MAVEN_BUILD_OPTS_REPO_REF="${CI_COMMIT_REF_NAME:-develop}";
+    echo CI_OPT_GIT_PREFIX ${CI_OPT_GIT_PREFIX} CI_OPT_INFRASTRUCTURE ${CI_OPT_INFRASTRUCTURE} CI_OPT_BUILD_PREFIX ${CI_OPT_BUILD_PREFIX};
+  #  export CI_OPT_CI_SCRIPT="${CI_OPT_GIT_PREFIX}/${CI_PROJECT_PATH:-ci-and-cd/maven-build}/raw/${CI_COMMIT_REF_NAME:-develop}/src/main/ci-script/lib_ci.sh";
+  - ./mvnw -version;
+    export SETTINGS_GLOBAL_XML="/tmp/settings-global-${CI_COMMIT_SHA}.xml";
+    export SETTINGS_GLOBAL_XML_URL="${CI_OPT_MAVEN_BUILD_OPTS_REPO}/raw/${CI_OPT_MAVEN_BUILD_OPTS_REPO_REF}/src/main/maven/settings-global.xml";
+    echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
+    curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | tee ${SETTINGS_GLOBAL_XML};
+    mv -f ${SETTINGS_GLOBAL_XML} ~/.m2/wrapper/dists/apache-maven-3.6.1-bin/38pn40mp89t5c94bjdbeod370m/apache-maven-3.6.1/conf/settings.xml;
+    rm -rf ~/.m2/repository/top/infra/maven-build-extension;
+    rm -f ~/.m2/settings*.xml;
+    rm -f ~/.m2/toolchains*.xml;
+    ls -ahl ~/.m2;
+#  # manual_git
+#  - export GIT_REMOTE="git@${CI_OPT_GIT_HOST}:${CI_PROJECT_NAMESPACE}/${CI_OPT_BUILD_PREFIX}${CI_PROJECT_NAME}.git";
+#    if [ -d .git ]; then git remote set-url origin ${GIT_REMOTE} && git fetch --all; fi;
+#    if [ ! -d .git ]; then echo "clone into non-empty directory"; git init && git remote add origin ${GIT_REMOTE} && git fetch --all && git reset origin/${CI_COMMIT_REF_NAME} > /dev/null 2>&1; fi;
+#    if git show-ref --verify refs/tags/${CI_COMMIT_REF_NAME} > /dev/null 2>&1; then
+#      echo 'build on tag is not supported'; exit 1;
+#    elif git show-ref --verify refs/remotes/origin/${CI_COMMIT_REF_NAME} > /dev/null 2>&1; then
+#      echo 'build on branch is supported';
+#      git checkout -f origin/${CI_COMMIT_REF_NAME};
+#      if [ "$(git rev-parse origin/${CI_COMMIT_REF_NAME})" != "${CI_COMMIT_SHA}" ]; then
+#        echo Prevents build of an older commit;
+#        PRIVATE_TOKEN_COLON='PRIVATE-TOKEN:';
+#        set +x; curl -H "${PRIVATE_TOKEN_COLON} ${CI_OPT_GITLAB_GIT_AUTH_TOKEN}" -X POST ${CI_OPT_GIT_PREFIX}/api/v4/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}/cancel; set -x;
+#        exit 0;
+#      fi;
+#      git checkout -f ${CI_COMMIT_SHA};
+#      echo "remove untracked files and directories"; git clean -fdx :/ -e artifacts.tar.gz;
+#    fi;
 
 build_snapshots:
   <<: *git_refs_of_snapshots
   <<: *script_build
   <<: *upload_files_for_latter_stages
   stage: build
-  variables:
-    GIT_STRATEGY: none
+  <<: *git_strategy_fetch
 
 analysis:
   dependencies:
@@ -126,8 +133,7 @@ analysis:
     - if [ -f artifacts.tar.gz ]; then tar -xzf artifacts.tar.gz; fi;
       export CI_OPT_MAVEN_CLEAN_SKIP=true;
       ./mvnw -e sonar:sonar;
-  variables:
-    GIT_STRATEGY: none
+  <<: *git_strategy_fetch
 
 publish_snapshots:
   dependencies:
@@ -136,8 +142,7 @@ publish_snapshots:
   <<: *script_publish
   <<: *upload_files_for_latter_stages
   stage: publish
-  variables:
-    GIT_STRATEGY: none
+  <<: *git_strategy_fetch
 
 site_snapshots:
   dependencies:
@@ -145,16 +150,14 @@ site_snapshots:
   <<: *git_refs_develop_only
   <<: *script_site
   stage: site
-  variables:
-    GIT_STRATEGY: none
+  <<: *git_strategy_fetch
 
 build_releases:
   <<: *git_refs_of_releases
   <<: *script_build
   <<: *upload_files_for_latter_stages
   stage: build
-  variables:
-    GIT_STRATEGY: none
+  <<: *git_strategy_fetch
 
 publish_releases:
   dependencies:
@@ -163,8 +166,19 @@ publish_releases:
   <<: *script_publish
   <<: *upload_files_for_latter_stages
   stage: publish
-  variables:
-    GIT_STRATEGY: none
+  <<: *git_strategy_fetch
+
+#publish_releases_to_gitlab:
+#  <<: *git_refs_of_releases
+##  artifacts:
+##    paths:
+##      - "**/target/pom.xml"
+#  dependencies:
+#    - build_releases
+#  script:
+#    - echo release artifacts to git service
+#  stage: publish
+#  <<: *git_strategy_fetch
 
 site_releases:
   dependencies:
@@ -172,24 +186,10 @@ site_releases:
   <<: *git_refs_of_releases
   <<: *script_site
   stage: site
-  variables:
-    GIT_STRATEGY: none
-
-#release_to_gitlab:
-#  <<: *git_refs_of_releases
-##  artifacts:
-##    paths:
-##    - "**/target/pom.xml"
-#  dependencies:
-#  - build_releases
-#  script:
-#  - echo release artifacts to git service
-#  stage: publish
-#  variables:
-#    GIT_STRATEGY: none
+  <<: *git_strategy_fetch
 
 stages:
-- build
-- analysis
-- publish
-- site
+  - build
+  - analysis
+  - publish
+  - site

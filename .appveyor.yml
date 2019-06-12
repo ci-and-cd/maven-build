@@ -133,7 +133,9 @@ stack: jdk 8
 
 test_script:
 #  - sh: export CI_OPT_CI_SCRIPT="${CI_OPT_GIT_PREFIX}/${APPVEYOR_REPO_NAME}/raw/${APPVEYOR_REPO_BRANCH}/src/main/ci-script/lib_ci.sh";
+# publish site onto github
 #  - sh: ./mvnw -ntp clean install sonar:sonar site deploy site-deploy;
+# publish site onto nexus3 raw repository by WebDAV
 #  - sh: ./mvnw -ntp clean install sonar:sonar site deploy site:stage site:stage-deploy;
   - sh: |
       if [[ "${APPVEYOR_REPO_BRANCH}" =~ ^release/.+ ]] || [[ "${APPVEYOR_REPO_BRANCH}" =~ ^support/.+ ]]; then export CI_OPT_GITHUB_SITE_PUBLISH=true; else export CI_OPT_GITHUB_SITE_PUBLISH=false; fi;
@@ -145,8 +147,8 @@ test_script:
       fi;
       if [[ "${APPVEYOR_ENABLED}" == "true" ]]; then
         if [[ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]]; then
-          ./mvnw -ntp clean install;
+          ./mvnw -ntp clean install sonar:sonar site deploy site-deploy;
         else
-          ./mvnw -ntp clean install;
+          ./mvnw -ntp clean install sonar:sonar site deploy site:stage site:stage-deploy;
         fi
       fi
