@@ -159,6 +159,31 @@
     </pluginRepositories>
 
     <properties>
+        <!-- Suppress 'Can not resolve symbol' errors in pom editor of IntelliJ IDEA -->
+        <argLine></argLine>
+        <checkstyle.config.location></checkstyle.config.location>
+        <frontend.nodeDownloadRoot></frontend.nodeDownloadRoot>
+        <frontend.npmDownloadRoot></frontend.npmDownloadRoot>
+        <git.commit.id.skip></git.commit.id.skip>
+        <linkXRef></linkXRef>
+        <maven.integration-test.skip></maven.integration-test.skip>
+        <maven.multiModuleProjectDirectory></maven.multiModuleProjectDirectory>
+        <maven.quality.skip></maven.quality.skip>
+        <maven.test.skip></maven.test.skip>
+        <opensource.nexus3.repository></opensource.nexus3.repository>
+        <pmd.ruleset.location></pmd.ruleset.location>
+        <private.nexus3.repository></private.nexus3.repository>
+        <private.sonarqube.host.url></private.sonarqube.host.url>
+        <project.build.sourceEncoding></project.build.sourceEncoding>
+        <project.reporting.outputEncoding></project.reporting.outputEncoding>
+        <publish.channel></publish.channel>
+        <site.path></site.path>
+        <site.path.prefix></site.path.prefix>
+        <wagon.merge-maven-repos.artifactDir></wagon.merge-maven-repos.artifactDir>
+        <wagon.merge-maven-repos.source></wagon.merge-maven-repos.source>
+        <wagon.merge-maven-repos.target></wagon.merge-maven-repos.target>
+        <wagon.merge-maven-repos.targetId></wagon.merge-maven-repos.targetId>
+
         <!--
         '-D' properties in command line can not override properties defined in properties tag of pom.xml (under project root or profile).
         Only properties defined in child projects cant override properties defined here.
@@ -947,14 +972,6 @@
     <profiles>
         <!-- @formatter:off -->
         <profile>
-            <id>skip-artifacts</id>
-            <activation><property><name>skip-artifacts</name><value>true</value></property></activation>
-            <properties>
-                <maven.javadoc.skip>true</maven.javadoc.skip>
-                <maven.source.skip>true</maven.source.skip>
-            </properties>
-        </profile>
-        <profile>
             <id>skip-quality</id>
             <activation><property><name>skip-quality</name><value>true</value></property></activation>
             <properties>
@@ -1224,26 +1241,6 @@
                                 <gpgArgument>loopback</gpgArgument>
                             </gpgArguments>
                         </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>gpg-for-travis-and-maven-central</id>
-            <activation><file><exists>${maven.multiModuleProjectDirectory}/codesigning.asc</exists></file></activation>
-            <properties>
-                <!-- Do not set gpg.executable here -->
-                <!--<gpg.executable>gpg</gpg.executable>-->
-                <gpg.keyname>${env.CI_OPT_GPG_KEYNAME}</gpg.keyname>
-                <gpg.passphrase>${env.CI_OPT_GPG_PASSPHRASE}</gpg.passphrase>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <executions>
-                            <execution><id>sign-artifacts</id><phase>verify</phase><goals><goal>sign</goal></goals></execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -2311,5 +2308,42 @@
             </reporting>
         </profile>
         <!-- @formatter:on -->
+
+        <profile>
+            <id>userProperties</id>
+            <activation><file><exists>${basedir}/src/main/resources/userProperties.properties</exists></file></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>filtering-dockerfile</id>
+                                <phase>process-sources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <delimiters>
+                                        <!--<delimiter>${*}</delimiter>-->
+                                        <delimiter>@</delimiter>
+                                    </delimiters>
+                                    <resources>
+                                        <resource>
+                                            <directory>src/main/resources</directory>
+                                            <includes>
+                                                <include>userProperties.properties</include>
+                                            </includes>
+                                            <filtering>true</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>
