@@ -22,7 +22,7 @@ before_install:
   - if [[ -d /usr/lib/jvm/java-8-openjdk-amd64 ]]; then sudo ln -s /usr/lib/jvm/java-8-openjdk-amd64 /usr/lib/jvm/java-8-openjdk; fi;
   - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh;
     bash install-jdk.sh -F 11 --target $HOME/openjdk11 --workspace $HOME/.cache/install-jdk;
-    if [[ -d /home/travis/openjdk11 ]]; then sudo mkdir -p /usr/lib/jvm; sudo ln -s /home/travis/openjdk11 /usr/lib/jvm/java-11-openjdk; fi;
+    if [[ -d $HOME/openjdk11 ]]; then sudo ln -s $HOME/openjdk11 /usr/lib/jvm/java-11-openjdk; fi;
   - export JAVA_HOME=/usr/lib/jvm/java-8-openjdk;
   - ./mvnw -version;
     echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
@@ -87,9 +87,9 @@ script:
     fi;
     if [[ "${TRAVIS_ENABLED}" == "true" ]]; then
       if [[ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]]; then
-        ./mvnw clean install sonar:sonar site deploy site-deploy;
+        ./mvnw -e -ntp -U clean install sonar:sonar site deploy site-deploy;
       else
-        ./mvnw clean install sonar:sonar site deploy site:stage site:stage-deploy;
+        ./mvnw -e -ntp -U clean install sonar:sonar site deploy site:stage site:stage-deploy;
       fi;
     fi
   - kill %1

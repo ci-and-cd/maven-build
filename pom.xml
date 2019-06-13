@@ -562,13 +562,6 @@
                     <groupId>pl.project13.maven</groupId>
                     <artifactId>git-commit-id-plugin</artifactId>
                     <version>${git-commit-id-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <id>get-the-git-infos</id>
-                            <phase>initialize</phase>
-                            <goals><goal>revision</goal></goals>
-                        </execution>
-                    </executions>
                     <configuration>
                         <commitIdGenerationMode>flat</commitIdGenerationMode>
                         <dotGitDirectory>${maven.multiModuleProjectDirectory}/.git</dotGitDirectory>
@@ -1019,7 +1012,16 @@
             <activation><file><exists>${maven.multiModuleProjectDirectory}/.git</exists></file></activation>
             <build>
                 <plugins>
-                    <plugin><groupId>pl.project13.maven</groupId><artifactId>git-commit-id-plugin</artifactId></plugin>
+                    <plugin>
+                        <groupId>pl.project13.maven</groupId><artifactId>git-commit-id-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>get-the-git-infos</id>
+                                <phase>initialize</phase>
+                                <goals><goal>revision</goal></goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>

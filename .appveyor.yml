@@ -55,6 +55,8 @@ environment:
 
   SETTINGS_GLOBAL_XML: /home/appveyor/.m2/wrapper/dists/apache-maven-3.6.1-bin/38pn40mp89t5c94bjdbeod370m/apache-maven-3.6.1/conf/settings.xml
 
+image: Ubuntu1804
+
 #init:
 
 install:
@@ -86,7 +88,7 @@ install:
   #  Developer's host
   #brew install https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb
   #sshpass -p "${RSYNC_PASSWORD}" ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no rsync_user@nexus3.infra.top
-  #./mvnw -Dsettings.localRepository=$(pwd)/.mvn/localRepository clean install sonar:sonar site deploy site-deploy;
+  #./mvnw -e -ntp -U -Dsettings.localRepository=$(pwd)/.mvn/localRepository clean install sonar:sonar site deploy site-deploy;
   #sshpass -p "${RSYNC_PASSWORD}" rsync -r -a -v -e ssh --delete $(pwd)/.mvn/localRepository/ rsync_user@infra.top:/restricted/rsync_user/m2_repository
   #rm -rf  $(pwd)/.mvn/localRepository/*
   #sshpass -p "${RSYNC_PASSWORD}" rsync -r -a -v -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" rsync_user@infra.top:/restricted/rsync_user/m2_repository/ $(pwd)/.mvn/localRepository
@@ -122,8 +124,6 @@ install:
 #      export PATH=$GRADLE_HOME/bin:$PATH
 #      echo GRADLE_HOME=$GRADLE_HOME, PATH=$PATH
 
-image: Ubuntu1804
-
 services:
   - docker
 
@@ -134,9 +134,9 @@ stack: jdk 8
 test_script:
 #  - sh: export CI_OPT_CI_SCRIPT="${CI_OPT_GIT_PREFIX}/${APPVEYOR_REPO_NAME}/raw/${APPVEYOR_REPO_BRANCH}/src/main/ci-script/lib_ci.sh";
 # publish site onto github
-#  - sh: ./mvnw -ntp clean install sonar:sonar site deploy site-deploy;
+#  - sh: ./mvnw -e -ntp -U clean install sonar:sonar site deploy site-deploy;
 # publish site onto nexus3 raw repository by WebDAV
-#  - sh: ./mvnw -ntp clean install sonar:sonar site deploy site:stage site:stage-deploy;
+#  - sh: ./mvnw -e -ntp -U clean install sonar:sonar site deploy site:stage site:stage-deploy;
   - sh: |
       if [[ "${APPVEYOR_REPO_BRANCH}" =~ ^release/.+ ]] || [[ "${APPVEYOR_REPO_BRANCH}" =~ ^support/.+ ]]; then export CI_OPT_GITHUB_SITE_PUBLISH=true; else export CI_OPT_GITHUB_SITE_PUBLISH=false; fi;
       if [[ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]]; then
@@ -147,8 +147,8 @@ test_script:
       fi;
       if [[ "${APPVEYOR_ENABLED}" == "true" ]]; then
         if [[ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]]; then
-          ./mvnw -ntp clean install sonar:sonar site deploy site-deploy;
+          ./mvnw -e -ntp -U clean install sonar:sonar site deploy site-deploy;
         else
-          ./mvnw -ntp clean install sonar:sonar site deploy site:stage site:stage-deploy;
+          ./mvnw -e -ntp -U clean install sonar:sonar site deploy site:stage site:stage-deploy;
         fi
       fi

@@ -32,7 +32,7 @@
 .script_build: &script_build
   script:
     - export CI_OPT_MAVEN_EFFECTIVE_POM=true;
-      ./mvnw -e clean package;
+      ./mvnw -e -ntp -U clean package;
       echo archive $(git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'artifacts.tar.gz' | wc -l) files into artifacts.tar.gz;
       git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'artifacts.tar.gz' | tar -czf artifacts.tar.gz -T -;
       #git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'artifacts.tar.gz' | xargs rm -f
@@ -43,7 +43,7 @@
     #- export CI_OPT_PUBLISH_TO_REPO=true
     - if [ -f artifacts.tar.gz ]; then tar -xzf artifacts.tar.gz; fi;
       export CI_OPT_MAVEN_CLEAN_SKIP=true; export CI_OPT_MAVEN_INTEGRATIONTEST_SKIP=true; export CI_OPT_MAVEN_TEST_SKIP=true;
-      ./mvnw -e deploy;
+      ./mvnw -e -ntp deploy;
       echo archive $(git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'artifacts.tar.gz' | wc -l) files into artifacts.tar.gz;
       git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'artifacts.tar.gz' | tar -czf artifacts.tar.gz -T -;
 
@@ -54,9 +54,9 @@
       if [[ "${CI_COMMIT_REF_NAME}" =~ ^release/.+ ]] || [[ "${CI_COMMIT_REF_NAME}" =~ ^support/.+ ]]; then export CI_OPT_GITHUB_SITE_PUBLISH=true; else export CI_OPT_GITHUB_SITE_PUBLISH=false; fi;
       if [[ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]]; then export CI_OPT_SITE_PATH_PREFIX="ci-and-cd"; else export CI_OPT_SITE_PATH_PREFIX="${CI_PROJECT_PATH}"; fi;
       if [ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]; then
-        ./mvnw -e site site-deploy;
+        ./mvnw -e -ntp site site-deploy;
       else
-        ./mvnw -e site site:stage site:stage-deploy;
+        ./mvnw -e -ntp site site:stage site:stage-deploy;
       fi
 
 .upload_files_for_latter_stages: &upload_files_for_latter_stages
@@ -132,7 +132,7 @@ analysis:
   script:
     - if [ -f artifacts.tar.gz ]; then tar -xzf artifacts.tar.gz; fi;
       export CI_OPT_MAVEN_CLEAN_SKIP=true;
-      ./mvnw -e sonar:sonar;
+      ./mvnw -e -ntp sonar:sonar;
   <<: *git_strategy_fetch
 
 publish_snapshots:
