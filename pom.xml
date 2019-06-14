@@ -428,8 +428,11 @@
                 </plugin>
                 <plugin><artifactId>maven-source-plugin</artifactId><version>${maven-source-plugin.version}</version></plugin>
                 <plugin><artifactId>maven-resources-plugin</artifactId><version>${maven-resources-plugin.version}</version></plugin>
+                <!--
+                'build.plugins.plugin.version' for org.apache.maven.plugins:maven-surefire-plugin must be a valid version but is '${maven-surefire-plugin.version}'
+                -->
                 <plugin>
-                    <artifactId>maven-surefire-plugin</artifactId><version>${maven-surefire-plugin.version}</version>
+                    <artifactId>maven-surefire-plugin</artifactId><version>3.0.0-M3</version>
                     <dependencies>
                         <dependency><groupId>org.ow2.asm</groupId><artifactId>asm</artifactId><version>${asm.version}</version></dependency>
                     </dependencies>
