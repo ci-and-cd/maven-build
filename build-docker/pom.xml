@@ -135,65 +135,6 @@
             <activation><property><name>!docker.image.prefix</name></property><activeByDefault>false</activeByDefault></activation>
             <properties><docker.image.prefix></docker.image.prefix></properties>
         </profile>
-        <profile>
-            <id>default-use-maven-settings-for-auth</id>
-            <activation><property><name>!dockerfile.useMavenSettingsForAuth</name></property><activeByDefault>false</activeByDefault></activation>
-            <properties><dockerfile.useMavenSettingsForAuth>false</dockerfile.useMavenSettingsForAuth></properties>
-        </profile>
-        <profile>
-            <id>ues-private-docker-registry-no-docker-image-prefix</id>
-            <activation>
-                <property><name>docker.registry</name></property>
-                <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
-            </activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.spotify</groupId>
-                            <artifactId>dockerfile-maven-plugin</artifactId>
-                            <configuration>
-                                <repository>${docker.registry}/${docker.image.prefix}${project.artifactId}</repository>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>com.spotify</groupId>
-                            <artifactId>docker-maven-plugin</artifactId>
-                            <configuration>
-                                <imageName>${docker.registry}/${docker.image.prefix}${project.artifactId}</imageName>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-        <profile>
-            <id>use-docker-hub-docker-image-prefix-no-docker-registry</id>
-            <activation>
-                <property><name>!docker.registry</name></property>
-                <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
-            </activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.spotify</groupId>
-                            <artifactId>dockerfile-maven-plugin</artifactId>
-                            <configuration>
-                                <repository>${docker.image.prefix}${project.artifactId}</repository>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>com.spotify</groupId>
-                            <artifactId>docker-maven-plugin</artifactId>
-                            <configuration>
-                                <imageName>${docker.image.prefix}${project.artifactId}</imageName>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
 
         <profile>
             <id>docker-maven-plugin-lifecycle-binding-when-not-publish-deploy-segregation</id>
@@ -222,6 +163,8 @@
                                         This made build failed when re-deploy is not allowed on artifact repository.
 
                                         see: [docker-info.jar will be uploaded twice](https://github.com/spotify/dockerfile-maven/issues/11)
+
+                                        If you don't run the tag "goal", you must specify the property "dockerfile.repository".
                                         -->
                                         <!--<goal>tag</goal>-->
                                         <goal>push</goal>

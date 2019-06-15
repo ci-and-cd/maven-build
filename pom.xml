@@ -554,7 +554,7 @@
                         <printFailingErrors>${pmd.printFailingErrors}</printFailingErrors>
                         <rulesets><ruleset>${pmd.ruleset.location}</ruleset></rulesets>
                         <skip>${maven.quality.skip}</skip>
-                        <targetJdk>${maven.compiler.target}</targetJdk>
+                        <!--<targetJdk>${maven.compiler.target}</targetJdk>-->
                         <verbose>${pmd.verbose}</verbose>
                     </configuration>
                 </plugin>
@@ -972,7 +972,7 @@
         <!-- @formatter:off -->
         <profile>
             <id>skip-quality</id>
-            <activation><property><name>skip-quality</name><value>true</value></property></activation>
+            <activation><property><name>maven.quality.skip</name><value>true</value></property></activation>
             <properties>
                 <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
                 <checkstyle.failsOnError>false</checkstyle.failsOnError>
@@ -1000,14 +1000,14 @@
                 <!--</pluginManagement>-->
             <!--</build>-->
         <!--</profile>-->
-        <profile>
+        <!--<profile>
             <id>skip-tests</id>
-            <activation><property><name>skip-tests</name><value>true</value></property></activation>
+            <activation><property><name>maven.tests.skip</name><value>true</value></property></activation>
             <properties>
                 <maven.test.skip>true</maven.test.skip>
                 <maven.integration-test.skip>true</maven.integration-test.skip>
             </properties>
-        </profile>
+        </profile>-->
 
         <profile>
             <id>git-commit-id</id>
@@ -1255,14 +1255,30 @@
         </profile>
 
         <profile>
+            <id>skip-nexus-staging-when-publish-snapshot</id>
+            <activation><property><name>publish.channel</name><value>snapshot</value></property></activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.sonatype.plugins</groupId>
+                            <artifactId>nexus-staging-maven-plugin</artifactId>
+                            <configuration>
+                                <skipLocalStaging>true</skipLocalStaging>
+                                <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+                                <skipRemoteStaging>true</skipRemoteStaging>
+                                <skipStaging>true</skipStaging>
+                                <skipStagingRepositoryClose>true</skipStagingRepositoryClose>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
+        <profile>
             <id>infrastructure_opensource</id>
             <activation><property><name>infrastructure</name><value>opensource</value></property></activation>
-            <properties>
-                <sonar.host.url>https://sonarqube.com</sonar.host.url>
-                <!--<wagon.merge-maven-repos.target>https://oss.sonatype.org/content/repositories/snapshots</wagon.merge-maven-repos.target>-->
-                <wagon.merge-maven-repos.target>https://oss.sonatype.org/service/local/staging/deploy/maven2</wagon.merge-maven-repos.target>
-                <wagon.merge-maven-repos.targetId>OSSRH-${publish.channel}s</wagon.merge-maven-repos.targetId>
-            </properties>
             <distributionManagement>
                 <repository><id>OSSRH-staging</id><url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url></repository>
                 <snapshotRepository><id>OSSRH-snapshots</id><url>https://oss.sonatype.org/content/repositories/snapshots</url></snapshotRepository>
@@ -1273,17 +1289,25 @@
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
                         <extensions>true</extensions>
-                        <configuration>
-                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
-                            <detectBuildFailures>true</detectBuildFailures>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <serverId>OSSRH-staging</serverId>
-                            <!--<sslAllowAll>true</sslAllowAll>-->
-                            <stagingProgressPauseDurationSeconds>30</stagingProgressPauseDurationSeconds>
-                            <stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>
-                        </configuration>
                     </plugin>
                 </plugins>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.sonatype.plugins</groupId>
+                            <artifactId>nexus-staging-maven-plugin</artifactId>
+                            <configuration>
+                                <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                                <detectBuildFailures>true</detectBuildFailures>
+                                <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                                <serverId>OSSRH-staging</serverId>
+                                <!--<sslAllowAll>true</sslAllowAll>-->
+                                <stagingProgressPauseDurationSeconds>30</stagingProgressPauseDurationSeconds>
+                                <stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
             </build>
         </profile>
 
@@ -1291,12 +1315,8 @@
             <id>infrastructure_private</id>
             <activation><property><name>infrastructure</name><value>private</value></property></activation>
             <properties>
-                <sonar.host.url>${private.sonarqube.host.url}</sonar.host.url>
                 <!--sonar.jdbc.url>jdbc:h2:tcp://sonarqube.local/sonar</sonar.jdbc.url>
                 <sonar.jdbc.url>jdbc:postgresql://postgresql:5432/sonar</sonar.jdbc.url-->
-
-                <wagon.merge-maven-repos.target>${private.nexus3.repository}/maven-${publish.channel}s</wagon.merge-maven-repos.target>
-                <wagon.merge-maven-repos.targetId>private-nexus3-${publish.channel}s</wagon.merge-maven-repos.targetId>
             </properties>
             <distributionManagement>
                 <repository><id>private-nexus3-releases</id><url>${private.nexus3.repository}/maven-releases</url></repository>
@@ -1387,6 +1407,7 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <!--<plugin><artifactId>maven-deploy-plugin</artifactId><configuration><skip>true</skip></configuration></plugin>-->
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>wagon-maven-plugin</artifactId>
@@ -1897,7 +1918,7 @@
             <id>java8</id>
             <properties>
                 <java.version>8</java.version>
-                <maven.compiler.source>8</maven.compiler.source>
+                <maven.compiler.source>1.8</maven.compiler.source>
                 <maven.compiler.target>1.8</maven.compiler.target>
             </properties>
             <build>
@@ -1910,6 +1931,7 @@
                                 <toolchains><jdk><version>8</version><!--<vendor>oracle</vendor>--></jdk></toolchains>
                             </configuration>
                         </plugin>
+                        <plugin><artifactId>maven-pmd-plugin</artifactId><configuration><targetJdk>${maven.compiler.target}</targetJdk></configuration></plugin>
                     </plugins>
                 </pluginManagement>
                 <plugins>
@@ -1923,7 +1945,7 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration><source>${java.version}</source><target>${java.version}</target></configuration>
+                        <configuration><source>${java.version}</source><target>${maven.compiler.target}</target></configuration>
                     </plugin>
                     <plugin>
                         <artifactId>maven-enforcer-plugin</artifactId>
@@ -1937,12 +1959,11 @@
                             <fail>true</fail>
                         </configuration>
                     </plugin>
-                    <plugin><artifactId>maven-pmd-plugin</artifactId><configuration><targetJdk>1.8</targetJdk></configuration></plugin>
                 </plugins>
             </build>
             <reporting>
                 <plugins>
-                    <plugin><artifactId>maven-pmd-plugin</artifactId><configuration><targetJdk>1.8</targetJdk></configuration></plugin>
+                    <plugin><artifactId>maven-pmd-plugin</artifactId><configuration><targetJdk>${maven.compiler.target}</targetJdk></configuration></plugin>
                 </plugins>
             </reporting>
         </profile>
@@ -1985,7 +2006,7 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration><release>${maven.compiler.release}</release><source>${java.version}</source><target>${java.version}</target></configuration>
+                        <configuration><release>${maven.compiler.release}</release><source>${java.version}</source><target>${maven.compiler.target}</target></configuration>
                     </plugin>
                     <plugin>
                         <artifactId>maven-enforcer-plugin</artifactId>
