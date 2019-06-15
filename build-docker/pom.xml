@@ -24,17 +24,12 @@
 
     <build>
         <extensions>
-            <!--
-            I found docker-info was built, installed and deployed twice.
-            This made build failed when re-deploy is not allowed on artifact repository.
-            -->
-            <!-- for the dependency type 'docker-info' to be supported
+            <!-- for the dependency type 'docker-info' to be supported -->
             <extension>
                 <groupId>com.spotify</groupId>
                 <artifactId>dockerfile-maven-extension</artifactId>
                 <version>${com.spotify_dockerfile-maven-plugin.version}</version>
             </extension>
-            -->
         </extensions>
         <pluginManagement>
             <plugins>
@@ -222,7 +217,13 @@
                                     <id>default</id>
                                     <goals>
                                         <goal>build</goal>
-                                        <goal>tag</goal>
+                                        <!--
+                                        I found docker-info was built, installed and deployed twice.
+                                        This made build failed when re-deploy is not allowed on artifact repository.
+
+                                        see: [docker-info.jar will be uploaded twice](https://github.com/spotify/dockerfile-maven/issues/11)
+                                        -->
+                                        <!--<goal>tag</goal>-->
                                         <goal>push</goal>
                                     </goals>
                                 </execution>
