@@ -1440,7 +1440,7 @@
 
         <profile>
             <!-- Do mvn site site:stage -DstagingDirectory=/tmp/path first, then manually add/push to the gh-pages branch on GitHub? -->
-            <id>infrastructure_opensource_github_site</id>
+            <id>infrastructure_opensource-github_site</id>
             <activation><property><name>github.site.publish</name><value>true</value></property></activation>
             <build>
                 <pluginManagement>
@@ -1506,7 +1506,7 @@
         </profile>
 
         <profile>
-            <id>infrastructure_opensource_site</id>
+            <id>infrastructure_opensource-site</id>
             <activation>
                 <property><name>github.site.publish</name><value>false</value></property>
             </activation>
@@ -1516,7 +1516,7 @@
         </profile>
 
         <profile>
-            <id>infrastructure_private_site</id>
+            <id>infrastructure_private-site</id>
             <distributionManagement>
                 <!-- scpexe uses privateKey, scp uses password -->
                 <!-- scpexe://${domain_or_ip}:22/path/to/sites -->
