@@ -792,7 +792,7 @@ function alter_mvn() {
                 # maven deploy and publish segregation
                     if [[ "${element}" == *clean ]]; then
                         goals+=("clean")
-                        goals+=("org.apache.maven.plugins:maven-antrun-plugin:run@local-deploy-model-path-clean")
+                        goals+=("org.apache.maven.plugins:maven-antrun-plugin:run@wagon-repository-clean")
                     elif [[ "${element}" == *install ]]; then
                         goals+=("deploy")
                         if [[ "$(ci_opt_use_docker)" == "true" ]]; then goals+=("dockerfile:build"); fi

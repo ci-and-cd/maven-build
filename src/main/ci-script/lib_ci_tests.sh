@@ -31,7 +31,7 @@ rm -f ${TEST_LOG}
 exec 3> >(tee ${TEST_LOG})
 CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="true" \
 ./src/main/ci-script/lib_ci.sh mvn clean install >&3
-assert_log "alter_mvn result: mvn clean org.apache.maven.plugins:maven-antrun-plugin:run@local-deploy-model-path-clean deploy" "alter_mvn result: "
+assert_log "alter_mvn result: mvn clean org.apache.maven.plugins:maven-antrun-plugin:run@wagon-repository-clean deploy" "alter_mvn result: "
 
 
 rm -f ${TEST_LOG}

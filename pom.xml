@@ -1376,7 +1376,8 @@
         </profile>
 
         <profile>
-            <id>mvn-deploy-publish-segregation-wagon-repository-clean</id>
+            <!-- multi_module_root_only is a keyword for maven-build-extension to activate this profile on root project only -->
+            <id>mvn-deploy-publish-segregation-wagon-repository-clean-run-on-multi_module_root_only</id>
             <activation><property><name>mvn.deploy.publish.segregation</name><value>true</value></property></activation>
             <build>
                 <plugins>
@@ -1385,8 +1386,16 @@
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>local-deploy-model-path-clean</id>
-                                <phase>none</phase>
+                                <id>wagon-repository-clean</id>
+                                <!--
+                                If bind to a phase (e.g. clean) and run without maven-build-extension,
+                                it will run at that phase on every modules and clean multiple times.
+                                -->
+                                <!--
+                                phase none run 'mvn org.apache.maven.plugins:maven-antrun-plugin:run@wagon-repository-clean'
+                                -->
+                                <!--<phase>none</phase>-->
+                                <phase>clean</phase>
                                 <goals><goal>run</goal></goals>
                                 <configuration>
                                     <target>
@@ -1402,8 +1411,8 @@
         </profile>
 
         <profile>
-            <!-- multi-module-root-only is a keyword for maven-build-extension to activate this profile on root project only -->
-            <id>mvn-deploy-publish-segregation-merge-maven-repos-deploy-run-on-multi-module-root-only</id>
+            <!-- multi_module_root_only is a keyword for maven-build-extension to activate this profile on root project only -->
+            <id>mvn-deploy-publish-segregation-merge-maven-repos-deploy-run-on-multi_module_root_only</id>
             <activation>
                 <property><name>mvn.deploy.publish.segregation.goal.deploy</name><value>true</value></property>
             </activation>
@@ -1417,7 +1426,7 @@
                             <execution>
                                 <id>merge-maven-repos-deploy</id>
                                 <!--
-                                If bind to a phase e.g. deploy,
+                                If bind to a phase (e.g. deploy) and run without maven-build-extension,
                                 it will run at that phase on every modules and upload whole repository multiple times.
                                 -->
                                 <!--
