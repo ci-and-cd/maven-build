@@ -137,13 +137,80 @@
         </profile>
 
         <profile>
-            <id>docker-maven-plugin-lifecycle-binding-when-not-publish-deploy-segregation</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>!mvn.deploy.publish.segregation</name>
-                </property>
-            </activation>
+            <id>dockerfile-maven-plugin-lifecycle-binding-on-publish-deploy-segregation-deploy</id>
+            <activation><property><name>mvn.deploy.publish.segregation.goal.deploy</name><value>true</value></property></activation>
+            <properties>
+                <dockerfile.build.skip>false</dockerfile.build.skip>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>dockerfile-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>push-image</id>
+                                    <goals><goal>push</goal></goals>
+                                    <phase>deploy</phase>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>docker-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>push-image</id>
+                                    <phase>deploy</phase>
+                                    <goals><goal>push</goal></goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
+        <profile>
+            <id>dockerfile-maven-plugin-lifecycle-binding-on-publish-deploy-segregation-package</id>
+            <activation><property><name>mvn.deploy.publish.segregation.goal.package</name><value>true</value></property></activation>
+            <properties>
+                <dockerfile.build.skip>false</dockerfile.build.skip>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>dockerfile-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>build-image</id>
+                                    <goals><goal>build</goal></goals>
+                                    <phase>package</phase>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>docker-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>build-image</id>
+                                    <phase>package</phase>
+                                    <goals><goal>build</goal></goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
+        <profile>
+            <id>dockerfile-maven-plugin-lifecycle-binding-when-not-publish-deploy-segregation</id>
+            <activation><property><name>!mvn.deploy.publish.segregation</name></property></activation>
             <properties>
                 <dockerfile.build.skip>false</dockerfile.build.skip>
             </properties>
@@ -198,10 +265,7 @@
         <profile>
             <!-- see: http://petr.kozelka.net/blog/2009/10/22/how-to-build-a-zip-output-artifact-in-maven/ -->
             <id>deploy-config-package</id>
-            <activation>
-                <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
-                <activeByDefault>false</activeByDefault>
-            </activation>
+            <activation><file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file></activation>
             <build>
                 <plugins>
                     <plugin>

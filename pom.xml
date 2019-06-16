@@ -149,8 +149,8 @@
         </pluginRepository>
         <pluginRepository>
             <id>github-mvn-repo-wagon-maven-plugin</id>
-            <url>https://raw.github.com/ci-and-cd/wagon-maven-plugin/mvn-repo/</url>
-            <name>Fixed issue of merge snapshotVersion</name>
+            <url>https://raw.github.com/ci-and-cd/wagon-maven-plugin/mvn-repo</url>
+            <name>Forked wagon-maven-plugin that can merge snapshots metadata correctly</name>
             <layout>default</layout>
             <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
@@ -580,6 +580,8 @@
                         <verbose>false</verbose>
                     </configuration>
                 </plugin>
+
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>wagon-maven-plugin</artifactId><version>${wagon-maven-plugin.version}</version></plugin>
                 <!-- @formatter:on -->
             </plugins>
         </pluginManagement>
@@ -1255,34 +1257,16 @@
         </profile>
 
         <profile>
-            <id>skip-nexus-staging-when-publish-snapshot</id>
-            <activation><property><name>publish.channel</name><value>snapshot</value></property></activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.sonatype.plugins</groupId>
-                            <artifactId>nexus-staging-maven-plugin</artifactId>
-                            <configuration>
-                                <skipLocalStaging>true</skipLocalStaging>
-                                <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
-                                <skipRemoteStaging>true</skipRemoteStaging>
-                                <skipStaging>true</skipStaging>
-                                <skipStagingRepositoryClose>true</skipStagingRepositoryClose>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-
-        <profile>
             <id>infrastructure_opensource</id>
-            <activation><property><name>infrastructure</name><value>opensource</value></property></activation>
             <distributionManagement>
                 <repository><id>OSSRH-staging</id><url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url></repository>
                 <snapshotRepository><id>OSSRH-snapshots</id><url>https://oss.sonatype.org/content/repositories/snapshots</url></snapshotRepository>
             </distributionManagement>
+        </profile>
+
+        <profile>
+            <id>infrastructure_opensource-nexus2-staging</id>
+            <activation><property><name>nexus2.staging</name><value>true</value></property></activation>
             <build>
                 <plugins>
                     <plugin>
@@ -1312,8 +1296,29 @@
         </profile>
 
         <profile>
+            <id>skip-nexus-staging-when-publish-snapshot</id>
+            <activation><property><name>publish.channel</name><value>snapshot</value></property></activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.sonatype.plugins</groupId>
+                            <artifactId>nexus-staging-maven-plugin</artifactId>
+                            <configuration>
+                                <skipLocalStaging>true</skipLocalStaging>
+                                <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+                                <skipRemoteStaging>true</skipRemoteStaging>
+                                <skipStaging>true</skipStaging>
+                                <skipStagingRepositoryClose>true</skipStagingRepositoryClose>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
+        <profile>
             <id>infrastructure_private</id>
-            <activation><property><name>infrastructure</name><value>private</value></property></activation>
             <properties>
                 <!--sonar.jdbc.url>jdbc:h2:tcp://sonarqube.local/sonar</sonar.jdbc.url>
                 <sonar.jdbc.url>jdbc:postgresql://postgresql:5432/sonar</sonar.jdbc.url-->
@@ -1371,24 +1376,9 @@
         </profile>
 
         <profile>
-            <id>mvn-deploy-publish-segregation-by-wagon</id>
+            <id>mvn-deploy-publish-segregation-wagon-repository-clean</id>
             <activation><property><name>mvn.deploy.publish.segregation</name><value>true</value></property></activation>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>github-mvn-repo-wagon-maven-plugin</id>
-                    <url>https://raw.github.com/ci-and-cd/wagon-maven-plugin/mvn-repo</url>
-                    <name>Forked wagon-maven-plugin that can merge snapshots metadata correctly</name>
-                    <layout>default</layout>
-                    <snapshots><enabled>true</enabled></snapshots>
-                    <releases><enabled>true</enabled></releases>
-                </pluginRepository>
-            </pluginRepositories>
             <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>wagon-maven-plugin</artifactId><version>${wagon-maven-plugin.version}</version></plugin>
-                    </plugins>
-                </pluginManagement>
                 <plugins>
                     <!-- clean files deployed to local directory -->
                     <plugin>
@@ -1407,6 +1397,18 @@
                             </execution>
                         </executions>
                     </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <!-- multi-module-root-only is a keyword for maven-build-extension to activate this profile on root project only -->
+            <id>mvn-deploy-publish-segregation-merge-maven-repos-deploy-run-on-multi-module-root-only</id>
+            <activation>
+                <property><name>mvn.deploy.publish.segregation.goal.deploy</name><value>true</value></property>
+            </activation>
+            <build>
+                <plugins>
                     <!--<plugin><artifactId>maven-deploy-plugin</artifactId><configuration><skip>true</skip></configuration></plugin>-->
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
@@ -1414,7 +1416,15 @@
                         <executions>
                             <execution>
                                 <id>merge-maven-repos-deploy</id>
-                                <phase>none</phase>
+                                <!--
+                                If bind to a phase e.g. deploy,
+                                it will run at that phase on every modules and upload whole repository multiple times.
+                                -->
+                                <!--
+                                phase none run 'mvn org.codehaus.mojo:wagon-maven-plugin:merge-maven-repos@merge-maven-repos-deploy'
+                                -->
+                                <!--<phase>none</phase>-->
+                                <phase>deploy</phase>
                                 <goals><goal>merge-maven-repos</goal></goals>
                                 <configuration>
                                     <source>file://${wagon.merge-maven-repos.source}</source>
@@ -1507,7 +1517,6 @@
 
         <profile>
             <id>infrastructure_private_site</id>
-            <activation><property><name>infrastructure</name><value>private</value></property></activation>
             <distributionManagement>
                 <!-- scpexe uses privateKey, scp uses password -->
                 <!-- scpexe://${domain_or_ip}:22/path/to/sites -->
