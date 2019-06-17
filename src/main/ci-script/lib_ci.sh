@@ -129,7 +129,6 @@ if [[ -z ${CI_OPT_MAVEN_CLEAN_SKIP+x} ]]; then CI_OPT_MAVEN_CLEAN_SKIP="false"; 
 if [[ -z ${CI_OPT_DEPENDENCY_CHECK+x} ]]; then CI_OPT_DEPENDENCY_CHECK="true"; fi
 if [[ -z ${CI_OPT_DOCKER_IMAGE_PREFIX+x} ]]; then CI_OPT_DOCKER_IMAGE_PREFIX=""; fi
 if [[ -z ${CI_OPT_DOCKERFILE_USEMAVENSETTINGSFORAUTH+x} ]]; then CI_OPT_DOCKERFILE_USEMAVENSETTINGSFORAUTH="false"; fi
-if [[ -z ${CI_OPT_MAVEN_EXTRA_OPTS+x} ]]; then CI_OPT_MAVEN_EXTRA_OPTS=""; fi
 if [[ -z ${CI_OPT_FRONTEND_NODEDOWNLOADROOT+x} ]]; then CI_OPT_FRONTEND_NODEDOWNLOADROOT=""; fi
 if [[ -z ${CI_OPT_FRONTEND_NPMDOWNLOADROOT+x} ]]; then CI_OPT_FRONTEND_NPMDOWNLOADROOT=""; fi
 if [[ -z ${CI_OPT_GITHUB_SITE_PUBLISH+x} ]]; then CI_OPT_GITHUB_SITE_PUBLISH=""; fi
@@ -617,7 +616,6 @@ function ci_opt_maven_opts() {
         echo "${CI_OPT_MAVEN_OPTS}"
     else
         local opts="${MAVEN_OPTS}"
-        if [[ -n "${CI_OPT_MAVEN_EXTRA_OPTS}" ]]; then opts="${opts} ${CI_OPT_MAVEN_EXTRA_OPTS}"; fi
 
         opts="${opts} -Dpublish.channel=$(ci_opt_publish_channel)"
         if [[ -n "${CI_OPT_CHECKSTYLE_CONFIG_LOCATION}" ]]; then opts="${opts} -Dcheckstyle.config.location=${CI_OPT_CHECKSTYLE_CONFIG_LOCATION}"; fi
