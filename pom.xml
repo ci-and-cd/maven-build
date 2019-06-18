@@ -1954,7 +1954,7 @@
 
         <!-- @formatter:off -->
         <profile>
-            <id>java-compiler-add-modules-without-groovy</id>
+            <id>java-compiler-java-modules-without-groovy</id>
             <activation>
                 <file><missing>${basedir}/src/main/groovy</missing></file>
                 <property><name>java.addModules</name></property>
@@ -1964,14 +1964,42 @@
                     <plugin>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
-                            <!--<compilerVersion>${java.version}</compilerVersion>-->
                             <compilerArgs>
                                 <arg>--add-modules</arg><arg>${java.addModules}</arg>
+                                <arg>--add-exports</arg><arg>java.base/jdk.internal.loader=ALL-UNNAMED</arg>
+                                <!--<arg>-\-add-exports</arg><arg>java.base/jdk.internal.perf=ALL-UNNAMED</arg>-->
+                                <arg>--add-exports</arg><arg>java.base/sun.security.ssl=ALL-UNNAMED</arg>
+                                <arg>--add-exports</arg><arg>java.xml/com.sun.org.apache.xerces.internal.parsers=ALL-UNNAMED</arg>
+                                <!--<arg>-\-add-exports</arg><arg>jdk.attach/sun.tools.attach=ALL-UNNAMED</arg>-->
+                                <arg>--add-opens</arg><arg>java.base/jdk.internal.loader=ALL-UNNAMED</arg>
+                                <arg>--add-opens</arg><arg>java.base/sun.nio.ch=ALL-UNNAMED</arg>
+                                <arg>--add-opens</arg><arg>java.base/java.net=ALL-UNNAMED</arg>
+                                <!--<arg>-\-add-opens</arg><arg>jdk.attach/sun.tools.attach=ALL-UNNAMED</arg>-->
+                            </compilerArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>java-compiler-java-modules-absent-without-groovy</id>
+            <activation>
+                <file><missing>${basedir}/src/main/groovy</missing></file>
+                <property><name>!java.addModules</name></property>
+                <jdk>[9,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <compilerArgs>
                                 <arg>--add-exports</arg><arg>java.base/jdk.internal.loader=ALL-UNNAMED</arg>
                                 <!--<arg>-add-exports</arg><arg>java.base/jdk.internal.perf=ALL-UNNAMED</arg>-->
                                 <arg>--add-exports</arg><arg>java.base/sun.security.ssl=ALL-UNNAMED</arg>
                                 <arg>--add-exports</arg><arg>java.xml/com.sun.org.apache.xerces.internal.parsers=ALL-UNNAMED</arg>
                                 <!--<arg>-add-exports</arg><arg>jdk.attach/sun.tools.attach=ALL-UNNAMED</arg>-->
+                                <arg>--add-opens</arg><arg>java.base/jdk.internal.loader=ALL-UNNAMED</arg>
                                 <arg>--add-opens</arg><arg>java.base/sun.nio.ch=ALL-UNNAMED</arg>
                                 <arg>--add-opens</arg><arg>java.base/java.net=ALL-UNNAMED</arg>
                                 <!--<arg>-add-opens</arg><arg>jdk.attach/sun.tools.attach=ALL-UNNAMED</arg>-->
@@ -1982,7 +2010,7 @@
             </build>
         </profile>
         <profile>
-            <id>java-compiler-add-modules-with-groovy</id>
+            <id>java-compiler-java-modules-with-groovy</id>
             <activation>
                 <file><exists>${basedir}/src/main/groovy</exists></file>
                 <property><name>java.addModules</name></property>
@@ -1995,10 +2023,39 @@
                             <compilerArgs>
                                 <arg>-J--add-modules</arg><arg>-J${java.addModules}</arg>
                                 <arg>-J--add-exports</arg><arg>-Jjava.base/jdk.internal.loader=ALL-UNNAMED</arg>
+                                <!--<arg>-J-\-add-exports</arg><arg>-Jjava.base/jdk.internal.perf=ALL-UNNAMED</arg>-->
+                                <arg>-J--add-exports</arg><arg>-Jjava.base/sun.security.ssl=ALL-UNNAMED</arg>
+                                <arg>-J--add-exports</arg><arg>-Jjava.xml/com.sun.org.apache.xerces.internal.parsers=ALL-UNNAMED</arg>
+                                <!--<arg>-J-\-add-exports</arg><arg>-Jjdk.attach/sun.tools.attach=ALL-UNNAMED</arg>-->
+                                <arg>-J--add-opens</arg><arg>java.base/jdk.internal.loader=ALL-UNNAMED</arg>
+                                <arg>-J--add-opens</arg><arg>-Jjava.base/sun.nio.ch=ALL-UNNAMED</arg>
+                                <arg>-J--add-opens</arg><arg>-Jjava.base/java.net=ALL-UNNAMED</arg>
+                                <!--<arg>-J-\-add-opens</arg><arg>-Jjdk.attach/sun.tools.attach=ALL-UNNAMED</arg>-->
+                            </compilerArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>java-compiler-java-modules-absent-with-groovy</id>
+            <activation>
+                <file><exists>${basedir}/src/main/groovy</exists></file>
+                <property><name>!java.addModules</name></property>
+                <jdk>[9,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <compilerArgs>
+                                <arg>-J--add-exports</arg><arg>-Jjava.base/jdk.internal.loader=ALL-UNNAMED</arg>
                                 <!--<arg>-J-add-exports</arg><arg>-Jjava.base/jdk.internal.perf=ALL-UNNAMED</arg>-->
                                 <arg>-J--add-exports</arg><arg>-Jjava.base/sun.security.ssl=ALL-UNNAMED</arg>
                                 <arg>-J--add-exports</arg><arg>-Jjava.xml/com.sun.org.apache.xerces.internal.parsers=ALL-UNNAMED</arg>
                                 <!--<arg>-J-add-exports</arg><arg>-Jjdk.attach/sun.tools.attach=ALL-UNNAMED</arg>-->
+                                <arg>-J--add-opens</arg><arg>java.base/jdk.internal.loader=ALL-UNNAMED</arg>
                                 <arg>-J--add-opens</arg><arg>-Jjava.base/sun.nio.ch=ALL-UNNAMED</arg>
                                 <arg>-J--add-opens</arg><arg>-Jjava.base/java.net=ALL-UNNAMED</arg>
                                 <!--<arg>-J-add-opens</arg><arg>-Jjdk.attach/sun.tools.attach=ALL-UNNAMED</arg>-->
@@ -2067,9 +2124,10 @@
                 <!-- Runtime modules for java9 -->
                 <jaxb-api.version>2.3.0</jaxb-api.version>
                 <java.version>9</java.version>
-                <maven.compiler.release>9</maven.compiler.release>
-                <maven.compiler.source>9</maven.compiler.source>
-                <maven.compiler.target>9</maven.compiler.target>
+                <!--[ERROR] error: exporting a package from system module java.base is not allowed with -\-release-->
+                <!--<maven.compiler.release>9</maven.compiler.release>-->
+                <maven.compiler.source>${java.version}</maven.compiler.source>
+                <maven.compiler.target>${java.version}</maven.compiler.target>
             </properties>
             <build>
                 <pluginManagement>
@@ -2098,9 +2156,10 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <!--[ERROR] error: exporting a package from system module java.base is not allowed with -\-release-->
                     <plugin>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration><release>${maven.compiler.release}</release><source>${java.version}</source><target>${maven.compiler.target}</target></configuration>
+                        <configuration><!--<release>${maven.compiler.release}</release>--><source>${java.version}</source><target>${maven.compiler.target}</target></configuration>
                     </plugin>
                     <plugin>
                         <artifactId>maven-enforcer-plugin</artifactId>
@@ -2141,9 +2200,10 @@
                 <jaxb-api.version>2.3.0</jaxb-api.version>
                 <jaxws-api.version>2.3.0</jaxws-api.version>
                 <java.version>11</java.version>
-                <maven.compiler.release>11</maven.compiler.release>
-                <maven.compiler.source>11</maven.compiler.source>
-                <maven.compiler.target>11</maven.compiler.target>
+                <!--[ERROR] error: exporting a package from system module java.base is not allowed with -\-release-->
+                <!--<maven.compiler.release>11</maven.compiler.release>-->
+                <maven.compiler.source>${java.version}</maven.compiler.source>
+                <maven.compiler.target>${java.version}</maven.compiler.target>
             </properties>
             <build>
                 <pluginManagement>
@@ -2172,9 +2232,10 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <!--[ERROR] error: exporting a package from system module java.base is not allowed with -\-release-->
                     <plugin>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration><release>${maven.compiler.release}</release><source>${java.version}</source><target>${java.version}</target></configuration>
+                        <configuration><!--<release>${maven.compiler.release}</release>--><source>${java.version}</source><target>${java.version}</target></configuration>
                     </plugin>
                     <plugin>
                         <artifactId>maven-enforcer-plugin</artifactId>
