@@ -436,6 +436,7 @@
                 -->
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId><version>3.0.0-M3</version>
+                    <!--<configuration><skipTests>${skipTests}</skipTests></configuration>-->
                     <dependencies>
                         <dependency><groupId>org.ow2.asm</groupId><artifactId>asm</artifactId><version>${asm.version}</version></dependency>
                     </dependencies>
@@ -830,7 +831,7 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>${argLine}</argLine>
+                    <argLine>${jacoco.agent.ut.arg} ${argLine}</argLine>
                     <forkCount>${surefire.fork.count}</forkCount>
                     <reuseForks>${surefire.fork.reuse}</reuseForks>
                     <includes>
@@ -856,7 +857,7 @@
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
-                    <argLine>${argLine}</argLine>
+                    <argLine>${jacoco.agent.it.arg} ${argLine}</argLine>
                     <skip>${maven.integration-test.skip}</skip>
                     <includes>
                         <include>**/*IT.java</include>
@@ -1128,13 +1129,13 @@
                                 <goals><goal>prepare-agent</goal></goals>
                                 <phase>test-compile</phase>
                                 <!--<phase>process-test-classes</phase>-->
-                                <configuration><propertyName>argLine</propertyName><skip>${maven.test.skip}</skip><!--<destFile>${project.build.directory}/jacoco.exec</destFile>--></configuration>
+                                <configuration><propertyName>jacoco.agent.ut.arg</propertyName><skip>${maven.test.skip}</skip><!--<destFile>${project.build.directory}/jacoco.exec</destFile>--></configuration>
                             </execution>
                             <execution>
                                 <id>default-prepare-agent-integration</id>
                                 <goals><goal>prepare-agent-integration</goal></goals>
                                 <phase>pre-integration-test</phase>
-                                <configuration><append>true</append><propertyName>argLine</propertyName><skip>${maven.integration-test.skip}</skip><!--<destFile>${project.build.directory}/jacoco-it.exec</destFile>--></configuration>
+                                <configuration><append>true</append><propertyName>jacoco.agent.it.arg</propertyName><skip>${maven.integration-test.skip}</skip><!--<destFile>${project.build.directory}/jacoco-it.exec</destFile>--></configuration>
                             </execution>
                             <!--<execution><id>default-report</id><goals><goal>report</goal></goals><phase>test</phase></execution>-->
                             <!--<execution><id>default-report-integration</id><goals><goal>report-integration</goal></goals><phase>post-integration-test</phase></execution>-->
@@ -1964,7 +1965,17 @@
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
                             <!--<compilerVersion>${java.version}</compilerVersion>-->
-                            <compilerArgs><arg>--add-modules</arg><arg>${java.addModules}</arg></compilerArgs>
+                            <compilerArgs>
+                                <arg>--add-modules</arg><arg>${java.addModules}</arg>
+                                <arg>--add-exports</arg><arg>java.base/jdk.internal.loader=ALL-UNNAMED</arg>
+                                <!--<arg>-add-exports</arg><arg>java.base/jdk.internal.perf=ALL-UNNAMED</arg>-->
+                                <arg>--add-exports</arg><arg>java.base/sun.security.ssl=ALL-UNNAMED</arg>
+                                <arg>--add-exports</arg><arg>java.xml/com.sun.org.apache.xerces.internal.parsers=ALL-UNNAMED</arg>
+                                <!--<arg>-add-exports</arg><arg>jdk.attach/sun.tools.attach=ALL-UNNAMED</arg>-->
+                                <arg>--add-opens</arg><arg>java.base/sun.nio.ch=ALL-UNNAMED</arg>
+                                <arg>--add-opens</arg><arg>java.base/java.net=ALL-UNNAMED</arg>
+                                <!--<arg>-add-opens</arg><arg>jdk.attach/sun.tools.attach=ALL-UNNAMED</arg>-->
+                            </compilerArgs>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1981,7 +1992,17 @@
                     <plugin>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
-                            <compilerArgs><arg>-J--add-modules</arg><arg>-J${java.addModules}</arg></compilerArgs>
+                            <compilerArgs>
+                                <arg>-J--add-modules</arg><arg>-J${java.addModules}</arg>
+                                <arg>-J--add-exports</arg><arg>-Jjava.base/jdk.internal.loader=ALL-UNNAMED</arg>
+                                <!--<arg>-J-add-exports</arg><arg>-Jjava.base/jdk.internal.perf=ALL-UNNAMED</arg>-->
+                                <arg>-J--add-exports</arg><arg>-Jjava.base/sun.security.ssl=ALL-UNNAMED</arg>
+                                <arg>-J--add-exports</arg><arg>-Jjava.xml/com.sun.org.apache.xerces.internal.parsers=ALL-UNNAMED</arg>
+                                <!--<arg>-J-add-exports</arg><arg>-Jjdk.attach/sun.tools.attach=ALL-UNNAMED</arg>-->
+                                <arg>-J--add-opens</arg><arg>-Jjava.base/sun.nio.ch=ALL-UNNAMED</arg>
+                                <arg>-J--add-opens</arg><arg>-Jjava.base/java.net=ALL-UNNAMED</arg>
+                                <!--<arg>-J-add-opens</arg><arg>-Jjdk.attach/sun.tools.attach=ALL-UNNAMED</arg>-->
+                            </compilerArgs>
                         </configuration>
                     </plugin>
                 </plugins>
