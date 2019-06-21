@@ -1329,7 +1329,7 @@
 
         <profile>
             <!-- multi_module_root_only is a keyword for maven-build-extension to activate this profile on root project only -->
-            <id>maven-profiler-report-clean-run-on-multi_module_root_only</id>
+            <id>clean-maven-profiler-report-directory-run-on-multi_module_root_only</id>
             <activation><property><name>profile</name></property></activation>
             <build>
                 <plugins>

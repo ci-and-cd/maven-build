@@ -25,6 +25,10 @@ environment:
 
   CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION: false
 
+#  CI_OPT_DOCKER_REGISTRY_PASS:
+#    secure:
+#  CI_OPT_DOCKER_REGISTRY_USER:
+#    secure:
   CI_OPT_GPG_PASSPHRASE:
     secure: 9W3TKuaDpCwfEF8yNbbbNCaelmjnZqHdxUqfITdKTWM=
   CI_OPT_MAVEN_CENTRAL_PASS:
@@ -81,7 +85,7 @@ install:
       fi;
   - sh: |
       if [[ -z "${CI_OPT_MAVEN_BUILD_OPTS_REPO}" ]]; then export CI_OPT_MAVEN_BUILD_OPTS_REPO="${CI_OPT_GIT_PREFIX}/ci-and-cd/maven-build-opts-${CI_OPT_INFRASTRUCTURE:-opensource}"; fi;
-      export CI_OPT_MAVEN_BUILD_OPTS_REPO_REF="${APPVEYOR_REPO_BRANCH:-develop}";
+      if [[ -z "${CI_OPT_MAVEN_BUILD_OPTS_REPO_REF}" ]]; then export CI_OPT_MAVEN_BUILD_OPTS_REPO_REF="${APPVEYOR_REPO_BRANCH:-develop}"; fi;
       export SETTINGS_GLOBAL_XML="${SETTINGS_GLOBAL_XML:-/home/appveyor/.m2/wrapper/dists/apache-maven-3.6.1-bin/38pn40mp89t5c94bjdbeod370m/apache-maven-3.6.1/conf/settings.xml}";
       export SETTINGS_GLOBAL_XML_URL="${CI_OPT_MAVEN_BUILD_OPTS_REPO}/raw/${CI_OPT_MAVEN_BUILD_OPTS_REPO_REF}/src/main/maven/settings-global.xml";
   - sh: |
@@ -113,7 +117,7 @@ install:
       du -sh /home/appveyor/.m2/repository;
       ls -ahl /home/appveyor/.m2/repository/;
   - sh: |
-      if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:TieredStopAtLevel=1 -XX:+UseParallelGC -Dprofile -DprofileFormat=JSON,HTML"; fi;
+      if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:TieredStopAtLevel=1 -XX:+UseParallelGC -Dprofile=title -DprofileFormat=JSON,HTML"; fi;
       ./mvnw -version;
       echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
       curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | dd of=${SETTINGS_GLOBAL_XML};

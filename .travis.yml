@@ -15,6 +15,8 @@ addons:
 before_install:
   - whois $(curl ipinfo.io/ip);
   # More options -> Settings -> Environment variables -> Add
+  # CI_OPT_DOCKER_REGISTRY_PASS
+  # CI_OPT_DOCKER_REGISTRY_USER
   # CI_OPT_GPG_PASSPHRASE
   # CI_OPT_MAVEN_CENTRAL_PASS
   # CI_OPT_MAVEN_CENTRAL_USER
@@ -43,7 +45,7 @@ before_install:
       export CI_OPT_SITE_PATH_PREFIX="${TRAVIS_REPO_SLUG}";
     fi;
   - if [[ -z "${CI_OPT_MAVEN_BUILD_OPTS_REPO}" ]]; then export CI_OPT_MAVEN_BUILD_OPTS_REPO="${CI_OPT_GIT_PREFIX}/ci-and-cd/maven-build-opts-${CI_OPT_INFRASTRUCTURE:-opensource}"; fi;
-    export CI_OPT_MAVEN_BUILD_OPTS_REPO_REF="${TRAVIS_BRANCH:-develop}";
+    if [[ -z "${CI_OPT_MAVEN_BUILD_OPTS_REPO_REF}" ]]; then export CI_OPT_MAVEN_BUILD_OPTS_REPO_REF="${TRAVIS_BRANCH:-develop}"; fi;
     export SETTINGS_GLOBAL_XML="${SETTINGS_GLOBAL_XML:-/home/travis/.m2/wrapper/dists/apache-maven-3.6.1-bin/38pn40mp89t5c94bjdbeod370m/apache-maven-3.6.1/conf/settings.xml}"
     export SETTINGS_GLOBAL_XML_URL="${CI_OPT_MAVEN_BUILD_OPTS_REPO}/raw/${CI_OPT_MAVEN_BUILD_OPTS_REPO_REF}/src/main/maven/settings-global.xml";
 #  - ls -ahl /usr/lib/jvm/;
@@ -53,7 +55,7 @@ before_install:
     bash install-jdk.sh -F 11 --target $HOME/openjdk11 --workspace $HOME/.cache/install-jdk;
     if [[ -d $HOME/openjdk11 ]]; then sudo ln -s $HOME/openjdk11 /usr/lib/jvm/java-11-openjdk; fi;
   - export JAVA_HOME="/usr/lib/jvm/java-8-openjdk";
-  - if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:TieredStopAtLevel=1 -XX:+UseParallelGC -Dprofile -DprofileFormat=JSON,HTML"; fi;
+  - if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:TieredStopAtLevel=1 -XX:+UseParallelGC -Dprofile=title -DprofileFormat=JSON,HTML"; fi;
     ./mvnw -version;
     echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
     curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | tee ${SETTINGS_GLOBAL_XML};
