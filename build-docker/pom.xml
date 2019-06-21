@@ -103,25 +103,6 @@
 
         <plugins>
             <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>auto-clean-dockerfile</id>
-                        <phase>clean</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <delete failonerror="false">
-                                    <fileset dir="${project.basedir}" includes="Dockerfile"/>
-                                </delete>
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
             </plugin>
         </plugins>
@@ -129,6 +110,33 @@
 
     <profiles>
         <!-- @formatter:off -->
+        <profile>
+            <id>on-project-basedir-dockerfile-present</id>
+            <activation><file><exists>${basedir}/Dockerfile</exists></file></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>auto-clean-dockerfile</id>
+                                <phase>clean</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <delete failonerror="false">
+                                            <fileset dir="${project.basedir}" includes="Dockerfile"/>
+                                        </delete>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <!-- value of ${docker.image.prefix} should ends with a '/' -->
         <profile>
             <id>default-docker-image-prefix</id>

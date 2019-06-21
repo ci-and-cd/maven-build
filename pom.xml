@@ -385,6 +385,16 @@
             <plugins>
                 <!-- @formatter:off -->
                 <plugin><groupId>com.amashchenko.maven.plugin</groupId><artifactId>gitflow-maven-plugin</artifactId><version>${gitflow-maven-plugin.version}</version></plugin>
+                <plugin>
+                    <groupId>com.github.sviperll</groupId>
+                    <artifactId>coreext-maven-plugin</artifactId>
+                    <version>0.23</version>
+                    <configuration>
+                        <!-- Required core extensions: -->
+                        <extensions combine.children="append">
+                        </extensions>
+                    </configuration>
+                </plugin>
                 <plugin><groupId>com.mysema.maven</groupId><artifactId>apt-maven-plugin</artifactId><version>${apt-maven-plugin.version}</version></plugin>
                 <plugin><groupId>com.soebes.maven.plugins</groupId><artifactId>echo-maven-plugin</artifactId><version>${echo-maven-plugin.version}</version></plugin>
                 <!-- Use groovy-maven-plugin for groovy scripts to replace gmaven-plugin -->
@@ -407,8 +417,50 @@
                 <plugin><artifactId>maven-compiler-plugin</artifactId><version>${maven-compiler-plugin.version}</version></plugin>
                 <plugin><artifactId>maven-dependency-plugin</artifactId><version>${maven-dependency-plugin.version}</version></plugin>
                 <plugin><artifactId>maven-deploy-plugin</artifactId><version>${maven-deploy-plugin.version}</version></plugin>
-                <plugin><artifactId>maven-enforcer-plugin</artifactId><version>${maven-enforcer-plugin.version}</version></plugin>
-                <plugin><artifactId>maven-failsafe-plugin</artifactId><version>${maven-failsafe-plugin.version}</version></plugin>
+                <plugin>
+                    <artifactId>maven-enforcer-plugin</artifactId><version>${maven-enforcer-plugin.version}</version>
+                    <configuration>
+                        <rules>
+                            <!-- Note: travis-ci uses old maven version  -->
+                            <requireMavenVersion><version>[3.5.3,)</version></requireMavenVersion>
+                            <!--requireUpperBoundDeps-->
+                            <dependencyConvergence><uniqueVersions>false</uniqueVersions></dependencyConvergence>
+                            <banTransitiveDependencies>
+                                <excludes><exclude>*</exclude></excludes>
+                                <includes>
+                                    <!--<include>*:commons-logging</include>-->
+                                </includes>
+                            </banTransitiveDependencies>
+                            <bannedDependencies>
+                                <includes>
+                                    <!--<include>*:commons-logging</include>-->
+                                </includes>
+                            </bannedDependencies>
+                        </rules>
+                        <fail>true</fail>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-failsafe-plugin</artifactId><version>${maven-failsafe-plugin.version}</version>
+                    <configuration>
+                        <argLine>${jacoco.agent.it.arg} ${argLine}</argLine>
+                        <skip>${maven.integration-test.skip}</skip>
+                        <includes>
+                            <include>**/*IT.java</include>
+                        </includes>
+                        <excludes>
+                            <exclude>**/Abstract*.java</exclude>
+                            <exclude>**/Base*.java</exclude>
+                            <exclude>**/deprecated/*.java</exclude>
+                            <exclude>**/Deprecated*.java</exclude>
+                            <exclude>**/*Test.java</exclude>
+                            <exclude>**/*Tests.java</exclude>
+                            <exclude>**/Test*.java</exclude>
+                            <exclude>**/*TestCase.java</exclude>
+                            <exclude>**/*Documentation.java</exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
                 <plugin><artifactId>maven-gpg-plugin</artifactId><version>${maven-gpg-plugin.version}</version></plugin>
                 <plugin><artifactId>maven-install-plugin</artifactId><version>${maven-install-plugin.version}</version></plugin>
                 <plugin><artifactId>maven-jar-plugin</artifactId><version>${maven-jar-plugin.version}</version></plugin>
@@ -429,7 +481,14 @@
                         <useStandardDocletOptions>true</useStandardDocletOptions>
                     </configuration>
                 </plugin>
-                <plugin><artifactId>maven-source-plugin</artifactId><version>${maven-source-plugin.version}</version></plugin>
+                <plugin>
+                    <!-- https://maven.apache.org/plugins/maven-source-plugin/test-jar-no-fork-mojo.html -->
+                    <!-- Use 'jar-no-fork' not 'jar' to avoid trigger default lifecycle binding of @Execute( phase = LifecyclePhase.GENERATE_SOURCES ) -->
+                    <artifactId>maven-source-plugin</artifactId><version>${maven-source-plugin.version}</version>
+                    <configuration>
+                        <skipSource>${maven.source.skip}</skipSource>
+                    </configuration>
+                </plugin>
                 <plugin><artifactId>maven-resources-plugin</artifactId><version>${maven-resources-plugin.version}</version></plugin>
                 <!--
                 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-surefire-plugin must be a valid version but is '${maven-surefire-plugin.version}'
@@ -437,6 +496,26 @@
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId><version>3.0.0-M3</version>
                     <!--<configuration><skipTests>${skipTests}</skipTests></configuration>-->
+                    <configuration>
+                        <argLine>${jacoco.agent.ut.arg} ${argLine}</argLine>
+                        <forkCount>${surefire.fork.count}</forkCount>
+                        <reuseForks>${surefire.fork.reuse}</reuseForks>
+                        <includes>
+                            <include>**/*Test.java</include>
+                            <include>**/*Tests.java</include>
+                            <include>**/Test*.java</include>
+                            <include>**/*TestCase.java</include>
+                            <include>**/*Documentation.java</include>
+                        </includes>
+                        <excludes>
+                            <exclude>**/Abstract*.java</exclude>
+                            <exclude>**/Base*.java</exclude>
+                            <exclude>**/deprecated/*.java</exclude>
+                            <exclude>**/Deprecated*.java</exclude>
+                            <exclude>**/*IT.java</exclude>
+                        </excludes>
+                        <useSystemClassLoader>false</useSystemClassLoader>
+                    </configuration>
                     <dependencies>
                         <dependency><groupId>org.ow2.asm</groupId><artifactId>asm</artifactId><version>${asm.version}</version></dependency>
                     </dependencies>
@@ -481,10 +560,6 @@
                             </exclusions>
                         </dependency>
                     </dependencies>
-                    <!-- see: http://maven.apache.org/plugins/maven-site-plugin/maven-3.html#Site_descriptor_attachment -->
-                    <executions>
-                        <execution><id>attach-descriptor</id><goals><goal>attach-descriptor</goal></goals></execution>
-                    </executions>
                 </plugin>
                 <!-- @formatter:on -->
 
@@ -590,26 +665,6 @@
             </plugins>
         </pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>com.github.sviperll</groupId>
-                <artifactId>coreext-maven-plugin</artifactId>
-                <version>0.23</version>
-                <configuration>
-                    <!-- Required core extensions: -->
-                    <extensions combine.children="append">
-                    </extensions>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>check-coreext</id>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <phase>validate</phase>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- see: https://github.com/KimJejun/gitflow-maven-plugin -->
             <plugin>
                 <groupId>com.amashchenko.maven.plugin</groupId>
@@ -679,68 +734,6 @@
                             <target>
                                 <delete failonerror="false"><fileset dir="${project.basedir}/src/main/resources" includes="git.properties"/></delete>
                             </target>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>auto-clean-readme</id>
-                        <phase>clean</phase>
-                        <goals><goal>run</goal></goals>
-                        <configuration>
-                            <target>
-                                <delete failonerror="false">
-                                    <fileset dir="${project.basedir}/src/site/markdown" includes="README.md"/>
-                                    <fileset dir="${project.basedir}/src/site/markdown/src/readme" includes="**/*"/>
-                                    <fileset dir="${project.basedir}/src/site/resources" includes="**/*"/>
-                                </delete>
-                            </target>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>echo-maven-multiModuleProjectDirectory</id>
-                        <phase>initialize</phase>
-                        <goals><goal>run</goal></goals>
-                        <configuration><tasks><echo>maven.multiModuleProjectDirectory: '${maven.multiModuleProjectDirectory}'</echo></tasks></configuration>
-                    </execution>
-                    <execution>
-                        <id>ensure-dot-gitkeep</id>
-                        <phase>initialize</phase>
-                        <goals><goal>run</goal></goals>
-                        <configuration>
-                            <tasks>
-                                <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath"/>
-                                <if>
-                                    <available file="${project.basedir}/src/readme" type="dir"/>
-                                    <then>
-                                        <echo>${project.basedir}/src/readme exists</echo>
-                                        <if>
-                                            <available file="${project.basedir}/src/readme/.gitkeep"/>
-                                            <else>
-                                                <echo>touch ${project.basedir}/src/readme/.gitkeep</echo>
-                                                <touch file="${project.basedir}/src/readme/.gitkeep"/>
-                                            </else>
-                                        </if>
-                                    </then>
-                                    <else>
-                                        <echo>${project.basedir}/src/readme does not exist</echo>
-                                    </else>
-                                </if>
-                                <if>
-                                    <available file="${project.basedir}/src/main/asciidoc" type="dir"/>
-                                    <then>
-                                        <echo>${project.basedir}/src/main/asciidoc exists</echo>
-                                        <if>
-                                            <available file="${project.basedir}/src/main/asciidoc/.gitkeep"/>
-                                            <else>
-                                                <echo>touch ${project.basedir}/src/main/asciidoc/.gitkeep</echo>
-                                                <touch file="${project.basedir}/src/main/asciidoc/.gitkeep"/>
-                                            </else>
-                                        </if>
-                                    </then>
-                                    <else>
-                                        <echo>${project.basedir}/src/main/asciidoc does not exist</echo>
-                                    </else>
-                                </if>
-                            </tasks>
                         </configuration>
                     </execution>
                 </executions>
@@ -828,134 +821,6 @@
                     <dependency><groupId>com.google.errorprone</groupId><artifactId>error_prone_core</artifactId><version>${com.google.errorprone_error_prone_core.version}</version></dependency>
                 </dependencies>
             </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>${jacoco.agent.ut.arg} ${argLine}</argLine>
-                    <forkCount>${surefire.fork.count}</forkCount>
-                    <reuseForks>${surefire.fork.reuse}</reuseForks>
-                    <includes>
-                        <include>**/*Test.java</include>
-                        <include>**/*Tests.java</include>
-                        <include>**/Test*.java</include>
-                        <include>**/*TestCase.java</include>
-                        <include>**/*Documentation.java</include>
-                    </includes>
-                    <excludes>
-                        <exclude>**/Abstract*.java</exclude>
-                        <exclude>**/Base*.java</exclude>
-                        <exclude>**/deprecated/*.java</exclude>
-                        <exclude>**/Deprecated*.java</exclude>
-                        <exclude>**/*IT.java</exclude>
-                    </excludes>
-                    <useSystemClassLoader>false</useSystemClassLoader>
-                </configuration>
-                <executions>
-                    <execution><id>default-test</id><goals><goal>test</goal></goals><configuration><skip>${maven.test.skip}</skip></configuration></execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <configuration>
-                    <argLine>${jacoco.agent.it.arg} ${argLine}</argLine>
-                    <skip>${maven.integration-test.skip}</skip>
-                    <includes>
-                        <include>**/*IT.java</include>
-                    </includes>
-                    <excludes>
-                        <exclude>**/Abstract*.java</exclude>
-                        <exclude>**/Base*.java</exclude>
-                        <exclude>**/deprecated/*.java</exclude>
-                        <exclude>**/Deprecated*.java</exclude>
-                        <exclude>**/*Test.java</exclude>
-                        <exclude>**/*Tests.java</exclude>
-                        <exclude>**/Test*.java</exclude>
-                        <exclude>**/*TestCase.java</exclude>
-                        <exclude>**/*Documentation.java</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution><id>failsafe-integration-test</id><phase>integration-test</phase><goals><goal>integration-test</goal></goals></execution>
-                    <execution><id>failsafe-verify</id><phase>post-integration-test</phase><goals><goal>verify</goal></goals></execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <configuration>
-                    <rules>
-                        <!-- Note: travis-ci uses old maven version  -->
-                        <requireMavenVersion><version>[3.5.3,)</version></requireMavenVersion>
-                        <!--requireUpperBoundDeps-->
-                        <dependencyConvergence><uniqueVersions>false</uniqueVersions></dependencyConvergence>
-                        <banTransitiveDependencies>
-                            <excludes><exclude>*</exclude></excludes>
-                            <includes>
-                                <!--<include>*:commons-logging</include>-->
-                            </includes>
-                        </banTransitiveDependencies>
-                        <bannedDependencies>
-                            <includes>
-                                <!--<include>*:commons-logging</include>-->
-                            </includes>
-                        </bannedDependencies>
-                    </rules>
-                    <fail>true</fail>
-                </configuration>
-                <executions>
-                    <execution><id>enforce-banned-dependencies</id><phase>validate</phase><goals><goal>enforce</goal></goals></execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <configuration><skip>${maven.javadoc.skip}</skip></configuration>
-                        <id>attach-javadocs</id><goals><goal>jar</goal></goals><phase>prepare-package</phase>
-                    </execution>
-                    <execution>
-                        <configuration><skip>${maven.javadoc.skip}</skip></configuration>
-                        <id>attach-test-javadocs</id><goals><goal>test-jar</goal></goals><phase>prepare-package</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- https://maven.apache.org/plugins/maven-source-plugin/test-jar-no-fork-mojo.html -->
-            <!-- Use 'jar-no-fork' not 'jar' to avoid trigger default lifecycle binding of @Execute( phase = LifecyclePhase.GENERATE_SOURCES ) -->
-            <plugin>
-                <artifactId>maven-source-plugin</artifactId>
-                <configuration>
-                    <skipSource>${maven.source.skip}</skipSource>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>prepare-package</phase>
-                        <goals><goal>jar-no-fork</goal></goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!--<plugin>
-                <groupId>org.codehaus.groovy.maven</groupId>
-                <artifactId>gmaven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals><goal>execute</goal></goals>
-                        <phase>initialize</phase>
-                        <configuration><source>System.setProperty("wagon.merge-maven-repos.artifactDir", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
-                    </execution>
-                </executions>
-            </plugin>-->
-            <plugin>
-                <groupId>org.codehaus.gmaven</groupId>
-                <artifactId>groovy-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals><goal>execute</goal></goals>
-                        <phase>initialize</phase>
-                        <configuration><source>System.setProperty("wagon.merge-maven-repos.artifactDir", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <!-- @formatter:on -->
 
             <!-- use mvn -N io.takari:maven:0.7.6:wrapper -Dmaven=3.6.1 instead of mvn wrapper:wrapper -->
@@ -982,6 +847,162 @@
 
     <profiles>
         <!-- @formatter:off -->
+        <profile>
+            <id>attach-javadocs-and-test_javadocs-if-property-maven_javadoc_skip-absent</id>
+            <activation><property><name>!maven.javadoc.skip</name></property></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <configuration><skip>${maven.javadoc.skip}</skip></configuration>
+                                <id>attach-javadocs</id><goals><goal>jar</goal></goals><phase>prepare-package</phase>
+                            </execution>
+                            <execution>
+                                <configuration><skip>${maven.javadoc.skip}</skip></configuration>
+                                <id>attach-test-javadocs</id><goals><goal>test-jar</goal></goals><phase>prepare-package</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>attach-javadocs-and-test_javadocs-if-property-maven_javadoc_skip-is-false</id>
+            <activation><property><name>maven.javadoc.skip</name><value>false</value></property></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <configuration><skip>${maven.javadoc.skip}</skip></configuration>
+                                <id>attach-javadocs</id><goals><goal>jar</goal></goals><phase>prepare-package</phase>
+                            </execution>
+                            <execution>
+                                <configuration><skip>${maven.javadoc.skip}</skip></configuration>
+                                <id>attach-test-javadocs</id><goals><goal>test-jar</goal></goals><phase>prepare-package</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>attach-source-if-property-maven_source_skip-absent</id>
+            <activation><property><name>!maven.source.skip</name></property></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution><id>attach-sources</id><phase>prepare-package</phase><goals><goal>jar-no-fork</goal></goals></execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>attach-source-if-property-maven_source_skip-is-false</id>
+            <activation><property><name>maven.source.skip</name><value>false</value></property></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution><id>attach-sources</id><phase>prepare-package</phase><goals><goal>jar-no-fork</goal></goals></execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>maven-enforcer-plugin-executions-if-property-enforcer_skip-absent</id>
+            <activation><property><name>!enforcer.skip</name></property></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <executions>
+                            <execution><id>enforce-banned-dependencies</id><phase>validate</phase><goals><goal>enforce</goal></goals></execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>maven-enforcer-plugin-executions-if-property-enforcer_skip-is-false</id>
+            <activation><property><name>enforcer.skip</name><value>false</value></property></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <executions>
+                            <execution><id>enforce-banned-dependencies</id><phase>validate</phase><goals><goal>enforce</goal></goals></execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>maven-failsafe-plugin-executions-if-property-maven_integrationtest_skip-absent</id>
+            <activation><property><name>!maven.integration-test.skip</name></property></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <executions>
+                            <execution><id>failsafe-integration-test</id><phase>integration-test</phase><goals><goal>integration-test</goal></goals></execution>
+                            <execution><id>failsafe-verify</id><phase>post-integration-test</phase><goals><goal>verify</goal></goals></execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>maven-failsafe-plugin-executions-if-property-maven_integrationtest_skip-is-false</id>
+            <activation><property><name>maven.integration-test.skip</name><value>false</value></property></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <executions>
+                            <execution><id>failsafe-integration-test</id><phase>integration-test</phase><goals><goal>integration-test</goal></goals></execution>
+                            <execution><id>failsafe-verify</id><phase>post-integration-test</phase><goals><goal>verify</goal></goals></execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>maven-surefire-plugin-executions-if-skiptests-absent</id>
+            <activation><property><name>!skipTests</name></property></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <executions>
+                            <execution><id>default-test</id><goals><goal>test</goal></goals></execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>maven-surefire-plugin-executions-if-skiptests-is-false</id>
+            <activation><property><name>skipTests</name><value>false</value></property></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <executions>
+                            <execution><id>default-test</id><goals><goal>test</goal></goals></execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>skip-quality</id>
             <activation><property><name>maven.quality.skip</name><value>true</value></property></activation>
@@ -1426,6 +1447,28 @@
             <activation><property><name>mvn.deploy.publish.segregation</name><value>true</value></property></activation>
             <build>
                 <plugins>
+                    <!--<plugin>
+                        <groupId>org.codehaus.groovy.maven</groupId>
+                        <artifactId>gmaven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals><goal>execute</goal></goals>
+                                <phase>initialize</phase>
+                                <configuration><source>System.setProperty("wagon.merge-maven-repos.artifactDir", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
+                            </execution>
+                        </executions>
+                    </plugin>-->
+                    <plugin>
+                        <groupId>org.codehaus.gmaven</groupId>
+                        <artifactId>groovy-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals><goal>execute</goal></goals>
+                                <phase>initialize</phase>
+                                <configuration><source>System.setProperty("wagon.merge-maven-repos.artifactDir", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <!-- clean files deployed to local directory -->
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
@@ -1631,6 +1674,89 @@
             <activation><property><name>site</name><value>true</value></property></activation>
             <build>
                 <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>echo-maven-multiModuleProjectDirectory</id>
+                                <phase>initialize</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration><tasks><echo>maven.multiModuleProjectDirectory: '${maven.multiModuleProjectDirectory}'</echo></tasks></configuration>
+                            </execution>
+                            <execution>
+                                <id>echo-argLine</id><phase>test</phase><goals><goal>run</goal></goals><configuration><target><echo message="argLine: ${argLine}"/></target></configuration>
+                            </execution>
+                            <execution>
+                                <id>auto-clean-readme</id>
+                                <phase>clean</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration>
+                                    <target>
+                                        <delete failonerror="false">
+                                            <fileset dir="${project.basedir}/src/site/markdown" includes="README.md"/>
+                                            <fileset dir="${project.basedir}/src/site/markdown/src/readme" includes="**/*"/>
+                                            <fileset dir="${project.basedir}/src/site/resources" includes="**/*"/>
+                                        </delete>
+                                    </target>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>ensure-dot-gitkeep</id>
+                                <phase>initialize</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration>
+                                    <tasks>
+                                        <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath"/>
+                                        <if>
+                                            <available file="${project.basedir}/src/readme" type="dir"/>
+                                            <then>
+                                                <echo>${project.basedir}/src/readme exists</echo>
+                                                <if>
+                                                    <available file="${project.basedir}/src/readme/.gitkeep"/>
+                                                    <else>
+                                                        <echo>touch ${project.basedir}/src/readme/.gitkeep</echo>
+                                                        <touch file="${project.basedir}/src/readme/.gitkeep"/>
+                                                    </else>
+                                                </if>
+                                            </then>
+                                            <else>
+                                                <echo>${project.basedir}/src/readme does not exist</echo>
+                                            </else>
+                                        </if>
+                                        <if>
+                                            <available file="${project.basedir}/src/main/asciidoc" type="dir"/>
+                                            <then>
+                                                <echo>${project.basedir}/src/main/asciidoc exists</echo>
+                                                <if>
+                                                    <available file="${project.basedir}/src/main/asciidoc/.gitkeep"/>
+                                                    <else>
+                                                        <echo>touch ${project.basedir}/src/main/asciidoc/.gitkeep</echo>
+                                                        <touch file="${project.basedir}/src/main/asciidoc/.gitkeep"/>
+                                                    </else>
+                                                </if>
+                                            </then>
+                                            <else>
+                                                <echo>${project.basedir}/src/main/asciidoc does not exist</echo>
+                                            </else>
+                                        </if>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.sviperll</groupId>
+                        <artifactId>coreext-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>check-coreext</id>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                                <phase>validate</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <!--<plugin>-->
                         <!--<groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId>-->
                         <!--<executions>-->
@@ -1667,6 +1793,10 @@
                     <plugin>
                         <artifactId>maven-site-plugin</artifactId>
                         <configuration><attach>true</attach></configuration>
+                        <!-- see: http://maven.apache.org/plugins/maven-site-plugin/maven-3.html#Site_descriptor_attachment -->
+                        <executions>
+                            <execution><id>attach-descriptor</id><goals><goal>attach-descriptor</goal></goals></execution>
+                        </executions>
                     </plugin>
                     <plugin>
                         <artifactId>maven-checkstyle-plugin</artifactId>
@@ -2076,6 +2206,18 @@
                 <pluginManagement>
                     <plugins>
                         <plugin>
+                            <artifactId>maven-enforcer-plugin</artifactId>
+                            <configuration>
+                                <rules>
+                                    <requireJavaVersion>
+                                        <message><![CDATA[You are running an older version of Java. This application requires at least JDK 1.8.0.]]></message>
+                                        <version>[1.8.0,)</version>
+                                    </requireJavaVersion>
+                                </rules>
+                                <fail>true</fail>
+                            </configuration>
+                        </plugin>
+                        <plugin>
                             <artifactId>maven-toolchains-plugin</artifactId>
                             <version>${maven-toolchains-plugin.version}</version>
                             <configuration>
@@ -2087,28 +2229,8 @@
                 </pluginManagement>
                 <plugins>
                     <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>echo-argLine</id><phase>test</phase><goals><goal>run</goal></goals><configuration><target><echo message="java8 argLine: ${argLine}"/></target></configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration><source>${java.version}</source><target>${maven.compiler.target}</target></configuration>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-enforcer-plugin</artifactId>
-                        <configuration>
-                            <rules>
-                                <requireJavaVersion>
-                                    <message><![CDATA[You are running an older version of Java. This application requires at least JDK 1.8.0.]]></message>
-                                    <version>[1.8.0,)</version>
-                                </requireJavaVersion>
-                            </rules>
-                            <fail>true</fail>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
@@ -2139,6 +2261,18 @@
                             </dependencies>
                         </plugin>
                         <plugin>
+                            <artifactId>maven-enforcer-plugin</artifactId>
+                            <configuration>
+                                <rules>
+                                    <requireJavaVersion>
+                                        <message><![CDATA[You are running an older version of Java. This application requires at least JDK ${java.version}.]]></message>
+                                        <version>[${java.version}.0,)</version>
+                                    </requireJavaVersion>
+                                </rules>
+                                <fail>true</fail>
+                            </configuration>
+                        </plugin>
+                        <plugin>
                             <artifactId>maven-toolchains-plugin</artifactId>
                             <version>${maven-toolchains-plugin.version}</version>
                             <configuration>
@@ -2148,30 +2282,10 @@
                     </plugins>
                 </pluginManagement>
                 <plugins>
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>echo-argLine</id><phase>test</phase><goals><goal>run</goal></goals><configuration><target><echo message="java9 argLine: ${argLine}"/></target></configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <!--[ERROR] error: exporting a package from system module java.base is not allowed with -\-release-->
                     <plugin>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration><!--<release>${maven.compiler.release}</release>--><source>${java.version}</source><target>${maven.compiler.target}</target></configuration>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-enforcer-plugin</artifactId>
-                        <configuration>
-                            <rules>
-                                <requireJavaVersion>
-                                    <message><![CDATA[You are running an older version of Java. This application requires at least JDK ${java.version}.]]></message>
-                                    <version>[${java.version}.0,)</version>
-                                </requireJavaVersion>
-                            </rules>
-                            <fail>true</fail>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
@@ -2215,6 +2329,18 @@
                             </dependencies>
                         </plugin>
                         <plugin>
+                            <artifactId>maven-enforcer-plugin</artifactId>
+                            <configuration>
+                                <rules>
+                                    <requireJavaVersion>
+                                        <message><![CDATA[You are running an older version of Java. This application requires at least JDK ${java.version}.]]></message>
+                                        <version>[${java.version}.0,)</version>
+                                    </requireJavaVersion>
+                                </rules>
+                                <fail>true</fail>
+                            </configuration>
+                        </plugin>
+                        <plugin>
                             <artifactId>maven-toolchains-plugin</artifactId>
                             <version>${maven-toolchains-plugin.version}</version>
                             <configuration>
@@ -2224,30 +2350,10 @@
                     </plugins>
                 </pluginManagement>
                 <plugins>
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>echo-argLine</id><phase>test</phase><goals><goal>run</goal></goals><configuration><target><echo message="java11 argLine: ${argLine}"/></target></configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <!--[ERROR] error: exporting a package from system module java.base is not allowed with -\-release-->
                     <plugin>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration><!--<release>${maven.compiler.release}</release>--><source>${java.version}</source><target>${java.version}</target></configuration>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-enforcer-plugin</artifactId>
-                        <configuration>
-                            <rules>
-                                <requireJavaVersion>
-                                    <message><![CDATA[You are running an older version of Java. This application requires at least JDK ${java.version}.]]></message>
-                                    <version>[${java.version}.0,)</version>
-                                </requireJavaVersion>
-                            </rules>
-                            <fail>true</fail>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
