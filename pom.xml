@@ -406,8 +406,7 @@
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>${build-helper-maven-plugin.version}</version></plugin>
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>properties-maven-plugin</artifactId><version>${properties-maven-plugin.version}</version></plugin>
                 <plugin>
-                    <artifactId>maven-antrun-plugin</artifactId>
-                    <version>${maven-antrun-plugin.version}</version>
+                    <artifactId>maven-antrun-plugin</artifactId><version>${maven-antrun-plugin.version}</version>
                     <dependencies>
                         <dependency><groupId>ant-contrib</groupId><artifactId>ant-contrib</artifactId><version>${ant-contrib.version}</version></dependency>
                     </dependencies>
@@ -701,109 +700,6 @@
                 </configuration>
             </plugin>
             <!-- @formatter:off -->
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <!--
-                    <execution>
-                        <id>print-classpath</id>
-                        <phase>compile</phase>
-                        <configuration>
-                            <target>
-                                <property name="compile_classpath" refid="maven.compile.classpath" />
-                                <property name="runtime_classpath" refid="maven.runtime.classpath" />
-                                <property name="test_classpath" refid="maven.test.classpath" />
-                                <property name="plugin_classpath" refid="maven.plugin.classpath" />
-
-                                <echo message="compile classpath: ${compile_classpath}" />
-                                <echo message="runtime classpath: ${runtime_classpath}" />
-                                <echo message="test classpath: ${test_classpath}" />
-                                <echo message="plugin classpath: ${plugin_classpath}" />
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                    -->
-                    <execution>
-                        <id>auto-clean-git-properties</id>
-                        <phase>clean</phase>
-                        <goals><goal>run</goal></goals>
-                        <configuration>
-                            <target>
-                                <delete failonerror="false"><fileset dir="${project.basedir}/src/main/resources" includes="git.properties"/></delete>
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>auto-copy-readme-to-site-markdown</id>
-                        <phase>pre-site</phase>
-                        <goals><goal>copy-resources</goal></goals>
-                        <configuration>
-                            <outputDirectory>${project.basedir}/src/site/markdown</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.basedir}</directory>
-                                    <includes><include>README.md</include></includes>
-                                    <filtering>false</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>auto-copy-readme-assets-to-site-markdown</id>
-                        <phase>pre-site</phase>
-                        <goals><goal>copy-resources</goal></goals>
-                        <configuration>
-                            <outputDirectory>${project.basedir}/src/site/markdown/src/readme</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.basedir}/src/readme</directory>
-                                    <filtering>false</filtering>
-                                    <excludes><exclude>**/.gitkeep</exclude></excludes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>auto-copy-readme-assets-to-site-resources</id>
-                        <phase>pre-site</phase>
-                        <goals><goal>copy-resources</goal></goals>
-                        <configuration>
-                            <outputDirectory>${project.basedir}/src/site/resources/src/readme</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.basedir}/src/readme</directory>
-                                    <filtering>false</filtering>
-                                    <excludes><exclude>**/.gitkeep</exclude></excludes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>auto-copy-markdown-assets-to-site-resources</id>
-                        <phase>pre-site</phase>
-                        <goals><goal>copy-resources</goal></goals>
-                        <configuration>
-                            <outputDirectory>${project.basedir}/src/site/resources/images</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.basedir}/src/site/markdown/images</directory>
-                                    <filtering>false</filtering>
-                                    <excludes><exclude>**/.gitkeep</exclude></excludes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <!-- see: https://github.com/google/error-prone -->
             <!-- override plexus-compiler-javac-errorprone's dependency on Error Prone with the latest version -->
             <plugin>
@@ -1003,6 +899,31 @@
                 </plugins>
             </build>
         </profile>
+
+        <profile>
+            <id>clean-file-basedir-src-main-resources-git_properties-if-present</id>
+            <activation><file><exists>${basedir}/src/main/resources/git.properties</exists></file></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>auto-clean-git-properties</id>
+                                <phase>clean</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration>
+                                    <target>
+                                        <delete failonerror="false"><fileset dir="${project.basedir}/src/main/resources" includes="git.properties"/></delete>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
         <profile>
             <id>skip-quality</id>
             <activation><property><name>maven.quality.skip</name><value>true</value></property></activation>
@@ -1677,6 +1598,28 @@
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
+                            <!--
+                            <execution>
+                                <id>print-classpath</id>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <target>
+                                        <property name="compile_classpath" refid="maven.compile.classpath" />
+                                        <property name="runtime_classpath" refid="maven.runtime.classpath" />
+                                        <property name="test_classpath" refid="maven.test.classpath" />
+                                        <property name="plugin_classpath" refid="maven.plugin.classpath" />
+
+                                        <echo message="compile classpath: ${compile_classpath}" />
+                                        <echo message="runtime classpath: ${runtime_classpath}" />
+                                        <echo message="test classpath: ${test_classpath}" />
+                                        <echo message="plugin classpath: ${plugin_classpath}" />
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                            -->
                             <execution>
                                 <id>echo-maven-multiModuleProjectDirectory</id>
                                 <phase>initialize</phase>
@@ -1740,6 +1683,71 @@
                                             </else>
                                         </if>
                                     </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>auto-copy-readme-to-site-markdown</id>
+                                <phase>pre-site</phase>
+                                <goals><goal>copy-resources</goal></goals>
+                                <configuration>
+                                    <outputDirectory>${project.basedir}/src/site/markdown</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.basedir}</directory>
+                                            <includes><include>README.md</include></includes>
+                                            <filtering>false</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>auto-copy-readme-assets-to-site-markdown</id>
+                                <phase>pre-site</phase>
+                                <goals><goal>copy-resources</goal></goals>
+                                <configuration>
+                                    <outputDirectory>${project.basedir}/src/site/markdown/src/readme</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.basedir}/src/readme</directory>
+                                            <filtering>false</filtering>
+                                            <excludes><exclude>**/.gitkeep</exclude></excludes>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>auto-copy-readme-assets-to-site-resources</id>
+                                <phase>pre-site</phase>
+                                <goals><goal>copy-resources</goal></goals>
+                                <configuration>
+                                    <outputDirectory>${project.basedir}/src/site/resources/src/readme</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.basedir}/src/readme</directory>
+                                            <filtering>false</filtering>
+                                            <excludes><exclude>**/.gitkeep</exclude></excludes>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>auto-copy-markdown-assets-to-site-resources</id>
+                                <phase>pre-site</phase>
+                                <goals><goal>copy-resources</goal></goals>
+                                <configuration>
+                                    <outputDirectory>${project.basedir}/src/site/resources/images</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.basedir}/src/site/markdown/images</directory>
+                                            <filtering>false</filtering>
+                                            <excludes><exclude>**/.gitkeep</exclude></excludes>
+                                        </resource>
+                                    </resources>
                                 </configuration>
                             </execution>
                         </executions>
@@ -2382,7 +2390,7 @@
             </reporting>
         </profile>
         <profile>
-            <id>java-toolchains</id>
+            <id>maven-toolchains-plugin-executions-if-file-user_home-dot_m2-toolchains_xml-present</id>
             <activation><file><exists>${user.home}/.m2/toolchains.xml</exists></file></activation>
             <build>
                 <plugins>
