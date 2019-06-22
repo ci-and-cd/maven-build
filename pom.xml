@@ -753,11 +753,11 @@
                         <executions>
                             <execution>
                                 <configuration><skip>${maven.javadoc.skip}</skip></configuration>
-                                <id>attach-javadocs</id><goals><goal>jar</goal></goals><phase>prepare-package</phase>
+                                <id>attach-javadocs</id><goals><goal>jar</goal></goals><!--<phase>prepare-package</phase>-->
                             </execution>
                             <execution>
                                 <configuration><skip>${maven.javadoc.skip}</skip></configuration>
-                                <id>attach-test-javadocs</id><goals><goal>test-jar</goal></goals><phase>prepare-package</phase>
+                                <id>attach-test-javadocs</id><goals><goal>test-jar</goal></goals><!--<phase>prepare-package</phase>-->
                             </execution>
                         </executions>
                     </plugin>
@@ -774,11 +774,11 @@
                         <executions>
                             <execution>
                                 <configuration><skip>${maven.javadoc.skip}</skip></configuration>
-                                <id>attach-javadocs</id><goals><goal>jar</goal></goals><phase>prepare-package</phase>
+                                <id>attach-javadocs</id><goals><goal>jar</goal></goals><!--<phase>prepare-package</phase>-->
                             </execution>
                             <execution>
                                 <configuration><skip>${maven.javadoc.skip}</skip></configuration>
-                                <id>attach-test-javadocs</id><goals><goal>test-jar</goal></goals><phase>prepare-package</phase>
+                                <id>attach-test-javadocs</id><goals><goal>test-jar</goal></goals><!--<phase>prepare-package</phase>-->
                             </execution>
                         </executions>
                     </plugin>
@@ -793,7 +793,9 @@
                     <plugin>
                         <artifactId>maven-source-plugin</artifactId>
                         <executions>
-                            <execution><id>attach-sources</id><phase>prepare-package</phase><goals><goal>jar-no-fork</goal></goals></execution>
+                            <execution>
+                                <id>attach-sources</id><goals><goal>jar-no-fork</goal></goals><!--<phase>prepare-package</phase>-->
+                            </execution>
                         </executions>
                     </plugin>
                 </plugins>
@@ -807,7 +809,9 @@
                     <plugin>
                         <artifactId>maven-source-plugin</artifactId>
                         <executions>
-                            <execution><id>attach-sources</id><phase>prepare-package</phase><goals><goal>jar-no-fork</goal></goals></execution>
+                            <execution>
+                                <id>attach-sources</id><goals><goal>jar-no-fork</goal></goals><!--<phase>prepare-package</phase>-->
+                            </execution>
                         </executions>
                     </plugin>
                 </plugins>
@@ -821,7 +825,9 @@
                     <plugin>
                         <artifactId>maven-enforcer-plugin</artifactId>
                         <executions>
-                            <execution><id>enforce-banned-dependencies</id><phase>validate</phase><goals><goal>enforce</goal></goals></execution>
+                            <execution>
+                                <id>enforce-banned-dependencies</id><goals><goal>enforce</goal></goals><!--<phase>validate</phase>-->
+                            </execution>
                         </executions>
                     </plugin>
                 </plugins>
@@ -835,7 +841,9 @@
                     <plugin>
                         <artifactId>maven-enforcer-plugin</artifactId>
                         <executions>
-                            <execution><id>enforce-banned-dependencies</id><phase>validate</phase><goals><goal>enforce</goal></goals></execution>
+                            <execution>
+                                <id>enforce-banned-dependencies</id><goals><goal>enforce</goal></goals><!--<phase>validate</phase>-->
+                            </execution>
                         </executions>
                     </plugin>
                 </plugins>
@@ -1017,7 +1025,8 @@
                 <pluginManagement>
                     <plugins>
                         <!-- see: https://github.com/SonarSource/sonar-scanner-maven -->
-                        <plugin><groupId>org.sonarsource.scanner.maven</groupId><artifactId>sonar-maven-plugin</artifactId><version>${sonar-maven-plugin.version}</version></plugin>
+                        <plugin>
+                            <groupId>org.sonarsource.scanner.maven</groupId><artifactId>sonar-maven-plugin</artifactId><version>${sonar-maven-plugin.version}</version></plugin>
                     </plugins>
                 </pluginManagement>
                 <plugins>
@@ -1040,6 +1049,15 @@
                             </properties>
                         </configuration>
                     </plugin>
+                    <plugin>
+                        <groupId>org.sonarsource.scanner.maven</groupId><artifactId>sonar-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>verify</phase>
+                                <goals><goal>sonar</goal></goals>
+                            </execution>
+                        </executions>
+                </plugin>
                 </plugins>
             </build>
             <dependencies>
@@ -1799,6 +1817,17 @@
                         </executions>
                     </plugin>
                     <plugin>
+                        <!--
+                        see: https://maven.apache.org/plugins/maven-site-plugin/usage.html
+
+                        mvn site:stage
+                        By default, the site will be staged in a directory target/staging/.
+                        A different staging location can be chosen with the stagingDirectory parameter.
+
+                        mvn site:stage-deploy
+                        By default, the site will be stage-deployed to $distributionManagement.site.url/staging/.
+                        A different location can be chosen with the stagingSiteURL parameter.
+                        -->
                         <artifactId>maven-site-plugin</artifactId>
                         <configuration><attach>true</attach></configuration>
                         <!-- see: http://maven.apache.org/plugins/maven-site-plugin/maven-3.html#Site_descriptor_attachment -->
