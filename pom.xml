@@ -1418,6 +1418,11 @@
                                 <goals><goal>run</goal></goals>
                                 <configuration>
                                     <target>
+                                        <echo message="mvn.deploy.publish.segregation.goal: ${mvn.deploy.publish.segregation.goal}"/>
+                                        <echo message="mvn.deploy.publish.segregation.goal.deploy: ${mvn.deploy.publish.segregation.goal.deploy}"/>
+                                        <echo message="mvn.deploy.publish.segregation.goal.install: ${mvn.deploy.publish.segregation.goal.install}"/>
+                                        <echo message="mvn.deploy.publish.segregation.goal.package: ${mvn.deploy.publish.segregation.goal.package}"/>
+
                                         <echo message="wagon.merge-maven-repos.source: ${wagon.merge-maven-repos.source}"/>
                                         <echo message="wagon.merge-maven-repos.artifactDir: ${wagon.merge-maven-repos.artifactDir}"/>
                                         <delete failonerror="false" includeemptydirs="true" verbose="true"><fileset dir="${wagon.merge-maven-repos.source}/${wagon.merge-maven-repos.artifactDir}" includes="**/*"/></delete>
