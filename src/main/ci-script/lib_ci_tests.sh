@@ -38,12 +38,12 @@ rm -f ${TEST_LOG}
 exec 3> >(tee ${TEST_LOG})
 CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="true" \
 CI_OPT_MAVEN_CLEAN_SKIP="true" \
-CI_OPT_MAVEN_INTEGRATIONTEST_SKIP="true" \
+CI_OPT_SKIPITS="true" \
 CI_OPT_MAVEN_TEST_SKIP="true" \
 ./src/main/ci-script/lib_ci.sh mvn deploy >&3
 assert_log "alter_mvn result: mvn org.codehaus.mojo:wagon-maven-plugin:merge-maven-repos@merge-maven-repos-deploy" "alter_mvn result: "
 assert_log "CI_OPT_MAVEN_CLEAN_SKIP=true" "^CI_OPT_MAVEN_CLEAN_SKIP="
-assert_log "CI_OPT_MAVEN_INTEGRATIONTEST_SKIP=true" "^CI_OPT_MAVEN_INTEGRATIONTEST_SKIP="
+assert_log "CI_OPT_SKIPITS=true" "^CI_OPT_SKIPITS="
 assert_log "CI_OPT_MAVEN_TEST_SKIP=true" "^CI_OPT_MAVEN_TEST_SKIP="
 
 

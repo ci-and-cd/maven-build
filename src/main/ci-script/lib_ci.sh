@@ -134,7 +134,7 @@ if [[ -z ${CI_OPT_FRONTEND_NPMDOWNLOADROOT+x} ]]; then CI_OPT_FRONTEND_NPMDOWNLO
 if [[ -z ${CI_OPT_GITHUB_SITE_PUBLISH+x} ]]; then CI_OPT_GITHUB_SITE_PUBLISH=""; fi
 if [[ -z ${CI_OPT_GITHUB_GLOBAL_REPOSITORYNAME+x} ]]; then CI_OPT_GITHUB_GLOBAL_REPOSITORYNAME=""; fi
 if [[ -z ${CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER+x} ]]; then CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER=""; fi
-if [[ -z ${CI_OPT_MAVEN_INTEGRATIONTEST_SKIP+x} ]]; then CI_OPT_MAVEN_INTEGRATIONTEST_SKIP=""; fi
+if [[ -z ${CI_OPT_SKIPITS+x} ]]; then CI_OPT_SKIPITS=""; fi
 if [[ -z ${CI_OPT_JACOCO+x} ]]; then CI_OPT_JACOCO="true"; fi
 if [[ -z ${CI_OPT_JIRA_PASSWORD+x} ]]; then CI_OPT_JIRA_PASSWORD=""; fi
 if [[ -z ${CI_OPT_JIRA_PROJECTKEY+x} ]]; then CI_OPT_JIRA_PROJECTKEY=""; fi
@@ -634,7 +634,7 @@ function ci_opt_maven_opts() {
         if [[ -n "${CI_OPT_FRONTEND_NODEDOWNLOADROOT}" ]]; then opts="${opts} -Dfrontend.nodeDownloadRoot=${CI_OPT_FRONTEND_NODEDOWNLOADROOT}"; fi
         if [[ -n "${CI_OPT_FRONTEND_NPMDOWNLOADROOT}" ]]; then opts="${opts} -Dfrontend.npmDownloadRoot=${CI_OPT_FRONTEND_NPMDOWNLOADROOT}"; fi
         opts="${opts} -Dinfrastructure=$(ci_opt_infrastructure)"
-        if [[ "${CI_OPT_MAVEN_INTEGRATIONTEST_SKIP}" == "true" ]]; then opts="${opts} -Dmaven.integration-test.skip=true"; else opts="${opts} -Dmaven.integration-test.skip=false"; fi
+        if [[ "${CI_OPT_SKIPITS}" == "true" ]]; then opts="${opts} -DskipITs=true"; else opts="${opts} -DskipITs=false"; fi
         if [[ "${CI_OPT_JACOCO}" == "true" ]]; then opts="${opts} -Djacoco=true"; elif [[ "${CI_OPT_JACOCO}" == "false" ]]; then opts="${opts} -Djacoco=false"; fi
         if [[ "${CI_OPT_MAVEN_TEST_FAILURE_IGNORE}" == "true" ]]; then opts="${opts} -Dmaven.test.failure.ignore=true"; fi
         if [[ "${CI_OPT_MAVEN_TEST_SKIP}" == "true" ]]; then opts="${opts} -Dmaven.test.skip=true"; else opts="${opts} -Dmaven.test.skip=false"; fi

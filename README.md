@@ -72,10 +72,13 @@ Note: CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER
 - maven.test.skip
 > default: false
 
-- maven.integration-test.skip
+- maven.test.failure.ignore
 > default: false
 
-- maven.test.failure.ignore
+- skipITs
+> default: false
+
+- skipTests
 > default: false
 
 ### 3. com.github.eirslett:frontend-maven-plugin

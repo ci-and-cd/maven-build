@@ -71,7 +71,6 @@ install:
       export APPVEYOR_ENABLED="${APPVEYOR_ENABLED:-true}";
       if [[ "${CI_OPT_FAST}" != "true" ]]; then export CI_OPT_MAVEN_EFFECTIVE_POM="${CI_OPT_MAVEN_EFFECTIVE_POM:-false}"; fi;
       if [[ "${CI_OPT_FAST}" != "true" ]]; then export CI_OPT_SITE="${CI_OPT_SITE:-true}"; fi;
-      if [[ "${CI_OPT_FAST}" != "true" ]]; then export CI_OPT_SONAR="${CI_OPT_SONAR:-true}"; fi;
       #export CI_OPT_CI_SCRIPT="${CI_OPT_GIT_PREFIX}/${APPVEYOR_REPO_NAME}/raw/${APPVEYOR_REPO_BRANCH}/src/main/ci-script/lib_ci.sh";
   - sh: |
       if [[ -z ${CI_OPT_GITHUB_SITE_PUBLISH} ]]; then
@@ -158,10 +157,6 @@ test_script:
 #  - sh: ./mvnw -e -ntp -U clean install sonar:sonar site deploy site:stage site:stage-deploy;
   - sh: |
       if [[ "${APPVEYOR_ENABLED}" == "true" ]]; then
-        if [[ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]]; then
-          time ./mvnw -e -ntp -U clean install sonar:sonar site deploy site-deploy;
-        else
-          time ./mvnw -e -ntp -U clean install sonar:sonar site deploy site:stage site:stage-deploy;
-        fi;
+        time CI_OPT_SONAR="true" ./mvnw -e -ntp -U clean verify install deploy site site-deploy;
         find .mvn/profilerReport -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t;
       fi;
