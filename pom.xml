@@ -527,7 +527,9 @@
                     </configuration>
                 </plugin>
 
-                <plugin><artifactId>maven-project-info-reports-plugin</artifactId><version>${maven-project-info-reports-plugin.version}</version></plugin>
+                <plugin>
+                    <artifactId>maven-project-info-reports-plugin</artifactId><version>${maven-project-info-reports-plugin.version}</version>
+                </plugin>
                 <!-- @formatter:on -->
 
                 <!-- @formatter:off -->
@@ -1644,6 +1646,125 @@
         </profile>
 
         <profile>
+            <id>generateReports</id>
+            <activation><property><name>notGenerateReports</name><value>false</value></property></activation>
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <additionalJOption>-J-Duser.language=en</additionalJOption>
+                            <!--<additionalOptions>-views -all</additionalOptions>-->
+                            <charset>${project.build.sourceEncoding}</charset>
+                            <doclint>none</doclint>
+                            <encoding>${project.build.sourceEncoding}</encoding>
+                            <failOnError>${maven.javadoc.failsOnError}</failOnError>
+                            <notimestamp>true</notimestamp>
+                            <skip>${maven.javadoc.skip}</skip>
+                            <useStandardDocletOptions>true</useStandardDocletOptions>
+                        </configuration>
+                        <reportSets>
+                            <reportSet><id>html</id><reports><report>javadoc</report></reports></reportSet>
+                            <reportSet><id>test-html</id><reports><report>test-javadoc</report></reports></reportSet>
+                            <reportSet><id>aggregate</id><inherited>false</inherited><reports><report>aggregate</report></reports></reportSet>
+                        </reportSets>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-jxr-plugin</artifactId>
+                        <reportSets>
+                            <reportSet><id>aggregate</id><inherited>false</inherited><reports><report>aggregate</report></reports></reportSet>
+                        </reportSets>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-report-plugin</artifactId>
+                        <configuration>
+                            <aggregate>true</aggregate>
+                            <linkXRef>${linkXRef}</linkXRef>
+                        </configuration>
+                        <reportSets>
+                            <reportSet>
+                                <id>unit-tests</id>
+                                <inherited>false</inherited>
+                                <reports><report>report-only</report></reports>
+                            </reportSet>
+                            <reportSet>
+                                <id>integration-tests</id>
+                                <inherited>false</inherited>
+                                <reports><report>failsafe-report-only</report></reports>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+                    <!--<plugin><groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId></plugin>-->
+                    <plugin><groupId>com.github.spotbugs</groupId><artifactId>spotbugs-maven-plugin</artifactId></plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId><artifactId>jdepend-maven-plugin</artifactId>
+                        <configuration><skip>${notGenerateReports}</skip></configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <reportSets>
+                            <reportSet>
+                                <configuration>
+                                    <configLocation>${checkstyle.config.location}</configLocation>
+                                    <consoleOutput>false</consoleOutput>
+                                    <encoding>${project.reporting.outputEncoding}</encoding>
+                                    <failsOnError>false</failsOnError>
+                                    <linkXRef>${linkXRef}</linkXRef>
+                                </configuration>
+                                <reports><report>checkstyle</report></reports>
+                            </reportSet>
+                            <reportSet>
+                                <id>aggregate</id>
+                                <inherited>false</inherited>
+                                <reports><report>checkstyle-aggregate</report></reports>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+                    <!-- Taglist plugin MUST be executed after the JXR plugin. -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>taglist-maven-plugin</artifactId>
+                        <configuration>
+                            <aggregate>true</aggregate>
+                            <tagListOptions>
+                                <tagClasses>
+                                    <tagClass>
+                                        <displayName>Todo Work</displayName>
+                                        <tags>
+                                            <tag><matchString>todo</matchString><matchType>ignoreCase</matchType></tag>
+                                            <tag><matchString>FIXME</matchString><matchType>exact</matchType></tag>
+                                        </tags>
+                                    </tagClass>
+                                </tagClasses>
+                            </tagListOptions>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                        <configuration>
+                            <aggregate>true</aggregate>
+                            <linkXRef>${linkXRef}</linkXRef>
+                            <minimumTokens>100</minimumTokens>
+                            <rulesets><ruleset>${pmd.ruleset.location}</ruleset></rulesets>
+                            <skip>${notGenerateReports}</skip>
+                            <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
+                        </configuration>
+                    </plugin>
+                    <!-- see: https://maven.apache.org/plugins/maven-dependency-plugin/analyze-mojo.html -->
+                    <!--
+                    dependency:analyze goal is intended to be used standalone,
+                    thus it always executes the test-compile phase.
+                    use the dependency:analyze-only goal instead when participating in the build lifecycle.
+                    -->
+                    <!--<plugin>-->
+                    <!--<artifactId>maven-dependency-plugin</artifactId>-->
+                    <!--<reportSets><reportSet><reports><report>analyze-report</report></reports></reportSet></reportSets>-->
+                    <!--</plugin>-->
+                </plugins>
+            </reporting>
+        </profile>
+
+        <profile>
             <id>reports-for-site</id>
             <activation><property><name>site</name><value>true</value></property></activation>
             <build>
@@ -1926,150 +2047,6 @@
                     </plugin>-->
                 </plugins>
             </build>
-            <reporting>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <additionalJOption>-J-Duser.language=en</additionalJOption>
-                            <!--<additionalOptions>-views -all</additionalOptions>-->
-                            <charset>${project.build.sourceEncoding}</charset>
-                            <doclint>none</doclint>
-                            <encoding>${project.build.sourceEncoding}</encoding>
-                            <failOnError>${maven.javadoc.failsOnError}</failOnError>
-                            <notimestamp>true</notimestamp>
-                            <skip>${maven.javadoc.skip}</skip>
-                            <useStandardDocletOptions>true</useStandardDocletOptions>
-                        </configuration>
-                        <reportSets>
-                            <reportSet><id>html</id><reports><report>javadoc</report></reports></reportSet>
-                            <reportSet><id>test-html</id><reports><report>test-javadoc</report></reports></reportSet>
-                            <reportSet><id>aggregate</id><inherited>false</inherited><reports><report>aggregate</report></reports></reportSet>
-                        </reportSets>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-jxr-plugin</artifactId>
-                        <reportSets>
-                            <reportSet><id>aggregate</id><inherited>false</inherited><reports><report>aggregate</report></reports></reportSet>
-                        </reportSets>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-surefire-report-plugin</artifactId>
-                        <configuration>
-                            <aggregate>true</aggregate>
-                            <linkXRef>${linkXRef}</linkXRef>
-                        </configuration>
-                        <reportSets>
-                            <reportSet>
-                                <id>unit-tests</id>
-                                <inherited>false</inherited>
-                                <reports><report>report-only</report></reports>
-                            </reportSet>
-                            <reportSet>
-                                <id>integration-tests</id>
-                                <inherited>false</inherited>
-                                <reports><report>failsafe-report-only</report></reports>
-                            </reportSet>
-                        </reportSets>
-                    </plugin>
-                    <!--<plugin><groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId></plugin>-->
-                    <plugin><groupId>com.github.spotbugs</groupId><artifactId>spotbugs-maven-plugin</artifactId></plugin>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId><artifactId>jdepend-maven-plugin</artifactId>
-                        <configuration><skip>${notGenerateReports}</skip></configuration>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-checkstyle-plugin</artifactId>
-                        <reportSets>
-                            <reportSet>
-                                <configuration>
-                                    <configLocation>${checkstyle.config.location}</configLocation>
-                                    <consoleOutput>false</consoleOutput>
-                                    <encoding>${project.reporting.outputEncoding}</encoding>
-                                    <failsOnError>false</failsOnError>
-                                    <linkXRef>${linkXRef}</linkXRef>
-                                </configuration>
-                                <reports><report>checkstyle</report></reports>
-                            </reportSet>
-                            <reportSet>
-                                <id>aggregate</id>
-                                <inherited>false</inherited>
-                                <reports><report>checkstyle-aggregate</report></reports>
-                            </reportSet>
-                        </reportSets>
-                    </plugin>
-                    <!-- Taglist plugin MUST be executed after the JXR plugin. -->
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>taglist-maven-plugin</artifactId>
-                        <configuration>
-                            <aggregate>true</aggregate>
-                            <tagListOptions>
-                                <tagClasses>
-                                    <tagClass>
-                                        <displayName>Todo Work</displayName>
-                                        <tags>
-                                            <tag><matchString>todo</matchString><matchType>ignoreCase</matchType></tag>
-                                            <tag><matchString>FIXME</matchString><matchType>exact</matchType></tag>
-                                        </tags>
-                                    </tagClass>
-                                </tagClasses>
-                            </tagListOptions>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-pmd-plugin</artifactId>
-                        <configuration>
-                            <aggregate>true</aggregate>
-                            <linkXRef>${linkXRef}</linkXRef>
-                            <minimumTokens>100</minimumTokens>
-                            <rulesets><ruleset>${pmd.ruleset.location}</ruleset></rulesets>
-                            <skip>${notGenerateReports}</skip>
-                            <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
-                        </configuration>
-                    </plugin>
-                    <!-- see: https://maven.apache.org/plugins/maven-dependency-plugin/analyze-mojo.html -->
-                    <!--
-                    dependency:analyze goal is intended to be used standalone,
-                    thus it always executes the test-compile phase.
-                    use the dependency:analyze-only goal instead when participating in the build lifecycle.
-                    -->
-                    <!--<plugin>-->
-                    <!--<artifactId>maven-dependency-plugin</artifactId>-->
-                    <!--<reportSets><reportSet><reports><report>analyze-report</report></reports></reportSet></reportSets>-->
-                    <!--</plugin>-->
-                    <plugin>
-                        <artifactId>maven-project-info-reports-plugin</artifactId>
-                        <!--<inherited>true</inherited>-->
-                        <configuration>
-                        </configuration>
-                        <reportSets>
-                            <reportSet>
-                                <reports>
-                                    <report>ci-management</report>
-                                    <report>dependencies</report>
-                                    <!---->
-                                    <report>dependency-convergence</report>
-                                    <report>dependency-info</report>
-                                    <!--<report>dependency-management</report>-->
-                                    <report>distribution-management</report>
-                                    <!---->
-                                    <report>index</report>
-                                    <report>issue-management</report>
-                                    <report>licenses</report>
-                                    <report>mailing-lists</report>
-                                    <report>modules</report>
-                                    <report>plugin-management</report>
-                                    <report>plugins</report>
-                                    <report>scm</report>
-                                    <report>summary</report>
-                                    <report>team</report>
-                                </reports>
-                            </reportSet>
-                        </reportSets>
-                    </plugin>
-                </plugins>
-            </reporting>
         </profile>
 
         <profile>
@@ -2710,4 +2687,41 @@
             </build>
         </profile>
     </profiles>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <!--
+                Plugin maven-project-info-reports-plugin must in project's top level reporting plugins tag,
+                if not, selective reports will not work.
+                -->
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <!--<inherited>true</inherited>-->
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>ci-management</report>
+                            <!-- dependencies, dependency-management reports are too slow, disable by default -->
+                            <!--<report>dependencies</report>
+                            <report>dependency-convergence</report>
+                            <report>dependency-info</report>
+                            <report>dependency-management</report>-->
+                            <report>distribution-management</report>
+                            <!---->
+                            <report>index</report>
+                            <report>issue-management</report>
+                            <report>licenses</report>
+                            <report>mailing-lists</report>
+                            <report>modules</report>
+                            <report>plugin-management</report>
+                            <report>plugins</report>
+                            <report>scm</report>
+                            <report>summary</report>
+                            <report>team</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>
