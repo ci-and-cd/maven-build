@@ -693,10 +693,10 @@
                         <id>echo-generateReports</id>
                         <phase>initialize</phase>
                         <goals><goal>run</goal></goals>
-                        <configuration><tasks>
+                        <configuration><target>
                             <echo>generateReports: '${generateReports}'</echo>
                             <echo>notGenerateReports: '${notGenerateReports}'</echo>
-                        </tasks></configuration>
+                        </target></configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -1672,7 +1672,14 @@
                     <plugin>
                         <artifactId>maven-jxr-plugin</artifactId>
                         <reportSets>
-                            <reportSet><id>aggregate</id><inherited>false</inherited><reports><report>aggregate</report></reports></reportSet>
+                            <reportSet>
+                                <id>aggregate</id>
+                                <!--<inherited>false</inherited>-->
+                                <reports>
+                                    <report>aggregate</report>
+                                    <report>test-aggregate</report>
+                                </reports>
+                            </reportSet>
                         </reportSets>
                     </plugin>
                     <plugin>
@@ -1798,9 +1805,9 @@
                                 <id>echo-maven-multiModuleProjectDirectory</id>
                                 <phase>initialize</phase>
                                 <goals><goal>run</goal></goals>
-                                <configuration><tasks>
+                                <configuration><target>
                                     <echo>maven.multiModuleProjectDirectory: '${maven.multiModuleProjectDirectory}'</echo>
-                                </tasks></configuration>
+                                </target></configuration>
                             </execution>
                             <execution>
                                 <id>echo-argLine</id><phase>test</phase><goals><goal>run</goal></goals><configuration><target><echo message="argLine: ${argLine}"/></target></configuration>
@@ -1824,7 +1831,7 @@
                                 <phase>initialize</phase>
                                 <goals><goal>run</goal></goals>
                                 <configuration>
-                                    <tasks>
+                                    <target>
                                         <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath"/>
                                         <if>
                                             <available file="${project.basedir}/src/readme" type="dir"/>
@@ -1858,7 +1865,7 @@
                                                 <echo>${project.basedir}/src/main/asciidoc does not exist</echo>
                                             </else>
                                         </if>
-                                    </tasks>
+                                    </target>
                                 </configuration>
                             </execution>
                         </executions>
