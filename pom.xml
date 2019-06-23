@@ -2699,6 +2699,16 @@
         <plugins>
             <plugin>
                 <!--
+                Plugin maven-jxr-plugin must in project's top level reporting plugins tag,
+                if not, you will get error on site phase (site:site goal).
+                Like this:
+                maven-site-plugin:3.7.1:site (default-site) ...
+                [WARNING] Unable to locate Source XRef to link to - DISABLED
+                -->
+                <artifactId>maven-jxr-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <!--
                 Plugin maven-project-info-reports-plugin must in project's top level reporting plugins tag,
                 if not, selective reports will not work.
                 -->
