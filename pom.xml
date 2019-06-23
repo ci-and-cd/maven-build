@@ -1260,6 +1260,10 @@
         </profile>
 
         <profile>
+            <!--
+            For nexus3, see 'NXRM3 Maven Plugin'
+            https://help.sonatype.com/integrations/nexus-and-continuous-integration/repository-manager-for-maven-plugin
+            -->
             <id>infrastructure_opensource-nexus2-staging</id>
             <activation><property><name>nexus2.staging</name><value>true</value></property></activation>
             <build>
@@ -1473,6 +1477,7 @@
             <id>mvn-deploy-publish-segregation-merge-maven-repos-deploy-run-on-multi_module_root_only</id>
             <activation>
                 <property><name>mvn.deploy.publish.segregation.goal.deploy</name><value>true</value></property>
+                <file><exists>${wagon.merge-maven-repos.source}</exists></file>
             </activation>
             <build>
                 <plugins>
