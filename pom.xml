@@ -38,25 +38,25 @@
     <repositories>
         <!-- @formatter:off -->
         <repository>
-            <id>central</id><url>https://repo1.maven.org/maven2</url>
+            <id>central</id><url>https://repo1.maven.org/maven2/</url>
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </repository>
         <repository>
             <id>spring-libs-release</id>
-            <url>http://repo.spring.io/libs-release</url>
+            <url>http://repo.spring.io/libs-release/</url>
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </repository>
         <repository>
             <id>spring-milestone</id>
-            <url>http://repo.spring.io/milestone</url>
+            <url>http://repo.spring.io/milestone/</url>
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </repository>
         <repository>
             <id>spring-libs-snapshot</id>
-            <url>http://repo.spring.io/libs-snapshot</url>
+            <url>http://repo.spring.io/libs-snapshot/</url>
             <releases><enabled>false</enabled></releases>
             <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
         </repository>
@@ -96,25 +96,25 @@
         <!-- @formatter:off -->
         <pluginRepository>
             <id>central</id>
-            <url>https://repo1.maven.org/maven2</url>
+            <url>https://repo1.maven.org/maven2/</url>
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
         <pluginRepository>
             <id>spring-libs-release</id>
-            <url>http://repo.spring.io/libs-release</url>
+            <url>http://repo.spring.io/libs-release/</url>
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
         <pluginRepository>
             <id>spring-milestone</id>
-            <url>http://repo.spring.io/milestone</url>
+            <url>http://repo.spring.io/milestone/</url>
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
         <pluginRepository>
             <id>spring-libs-snapshot</id>
-            <url>http://repo.spring.io/libs-snapshot</url>
+            <url>http://repo.spring.io/libs-snapshot/</url>
             <releases><enabled>false</enabled></releases>
             <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
         </pluginRepository>
@@ -141,7 +141,7 @@
         </pluginRepository>
         <pluginRepository>
             <id>github-mvn-repo-github-maven-plugins</id>
-            <url>https://raw.github.com/ci-and-cd/maven-plugins/mvn-repo</url>
+            <url>https://raw.github.com/ci-and-cd/maven-plugins/mvn-repo/</url>
             <name>Forked github-maven-plugins that upload faster</name>
             <layout>default</layout>
             <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
@@ -149,7 +149,7 @@
         </pluginRepository>
         <pluginRepository>
             <id>github-mvn-repo-wagon-maven-plugin</id>
-            <url>https://raw.github.com/ci-and-cd/wagon-maven-plugin/mvn-repo</url>
+            <url>https://raw.github.com/ci-and-cd/wagon-maven-plugin/mvn-repo/</url>
             <name>Forked wagon-maven-plugin that can merge snapshots metadata correctly</name>
             <layout>default</layout>
             <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
@@ -1254,8 +1254,8 @@
         <profile>
             <id>infrastructure_opensource</id>
             <distributionManagement>
-                <repository><id>OSSRH-staging</id><url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url></repository>
-                <snapshotRepository><id>OSSRH-snapshots</id><url>https://oss.sonatype.org/content/repositories/snapshots</url></snapshotRepository>
+                <repository><id>OSSRH-staging</id><url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url></repository>
+                <snapshotRepository><id>OSSRH-snapshots</id><url>https://oss.sonatype.org/content/repositories/snapshots/</url></snapshotRepository>
             </distributionManagement>
         </profile>
 
@@ -1323,8 +1323,8 @@
                 <sonar.jdbc.url>jdbc:postgresql://postgresql:5432/sonar</sonar.jdbc.url-->
             </properties>
             <distributionManagement>
-                <repository><id>private-nexus3-releases</id><url>${private.nexus3.repository}/maven-releases</url></repository>
-                <snapshotRepository><id>private-nexus3-snapshots</id><url>${private.nexus3.repository}/maven-snapshots</url></snapshotRepository>
+                <repository><id>private-nexus3-releases</id><url>${private.nexus3.repository}/maven-releases/</url></repository>
+                <snapshotRepository><id>private-nexus3-snapshots</id><url>${private.nexus3.repository}/maven-snapshots/</url></snapshotRepository>
             </distributionManagement>
             <pluginRepositories>
                 <pluginRepository>
@@ -1583,7 +1583,7 @@
                 <property><name>github.site.publish</name><value>false</value></property>
             </activation>
             <distributionManagement>
-                <site><id>opensource-mvnsite</id><url>dav:${opensource.nexus3.repository}/mvnsite/${site.path}</url></site>
+                <site><id>opensource-mvnsite</id><url>dav:${opensource.nexus3.repository}/mvnsite/${site.path}/</url></site>
             </distributionManagement>
         </profile>
 
@@ -1592,7 +1592,7 @@
             <distributionManagement>
                 <!-- scpexe uses privateKey, scp uses password -->
                 <!-- scpexe://${domain_or_ip}:22/path/to/sites -->
-                <site><id>private-mvnsite</id><url>dav:${private.nexus3.repository}/mvnsite/${site.path}</url></site>
+                <site><id>private-mvnsite</id><url>dav:${private.nexus3.repository}/mvnsite/${site.path}/</url></site>
             </distributionManagement>
         </profile>
 
@@ -2525,7 +2525,7 @@
             <pluginRepositories>
                 <pluginRepository>
                     <!-- Needed for latest Groovy Eclipse version -->
-                    <id>groovy-bintray</id><name>Groovy Bintray</name><url>https://dl.bintray.com/groovy/maven</url>
+                    <id>groovy-bintray</id><name>Groovy Bintray</name><url>https://dl.bintray.com/groovy/maven/</url>
                     <releases><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </pluginRepository>
