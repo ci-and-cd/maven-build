@@ -146,8 +146,8 @@ analysis:
   stage: analysis
   script:
     - if [ -f artifacts.tar.gz ]; then tar -xzf artifacts.tar.gz; fi;
-      export CI_OPT_MAVEN_CLEAN_SKIP="true"; export CI_OPT_SONAR="true";
-      time ./mvnw -e -ntp sonar:sonar;
+      export CI_OPT_MAVEN_CLEAN_SKIP="true";
+      time CI_OPT_SONAR="true" ./mvnw -e -ntp sonar:sonar;
       find .mvn/profilerReport -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t;
   <<: *git_strategy_fetch
 
