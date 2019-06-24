@@ -53,7 +53,7 @@
   script:
     - if [ -f artifacts.tar.gz ]; then tar -xzf artifacts.tar.gz; fi;
       export CI_OPT_MAVEN_CLEAN_SKIP="true"; export CI_OPT_SKIPITS="true"; export CI_OPT_SKIPTESTS="true";
-      time ./mvnw -e -ntp site site-deploy;
+      time ./mvnw -e -ntp site-deploy;
       find .mvn/profilerReport -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t;
 
 .upload_files_for_latter_stages: &upload_files_for_latter_stages

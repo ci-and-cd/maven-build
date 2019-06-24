@@ -890,8 +890,12 @@
                     <plugin>
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <executions>
-                            <execution><id>failsafe-integration-test</id><goals><goal>integration-test</goal></goals><phase>integration-test</phase></execution>
-                            <execution><id>failsafe-verify</id><goals><goal>verify</goal></goals><phase>post-integration-test</phase></execution>
+                            <execution>
+                                <id>failsafe-integration-test</id><goals><goal>integration-test</goal></goals><phase>integration-test</phase>
+                            </execution>
+                            <execution>
+                                <id>failsafe-verify</id><goals><goal>verify</goal></goals><phase>post-integration-test</phase>
+                            </execution>
                         </executions>
                     </plugin>
                 </plugins>
@@ -905,8 +909,12 @@
                     <plugin>
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <executions>
-                            <execution><id>failsafe-integration-test</id><phase>integration-test</phase><goals><goal>integration-test</goal></goals></execution>
-                            <execution><id>failsafe-verify</id><phase>post-integration-test</phase><goals><goal>verify</goal></goals></execution>
+                            <execution>
+                                <id>failsafe-integration-test</id><goals><goal>integration-test</goal></goals><phase>integration-test</phase>
+                            </execution>
+                            <execution>
+                                <id>failsafe-verify</id><phase>post-integration-test</phase><goals><goal>verify</goal></goals>
+                            </execution>
                         </executions>
                     </plugin>
                 </plugins>

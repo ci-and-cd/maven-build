@@ -157,6 +157,6 @@ test_script:
 #  - sh: ./mvnw -e -ntp -U clean install sonar:sonar site deploy site:stage site:stage-deploy;
   - sh: |
       if [[ "${APPVEYOR_ENABLED}" == "true" ]]; then
-        time CI_OPT_SONAR="true" ./mvnw -e -ntp -U clean verify install deploy site site-deploy;
+        time CI_OPT_SONAR="true" ./mvnw -e -ntp -U clean deploy site-deploy;
         find .mvn/profilerReport -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t;
       fi;
