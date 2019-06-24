@@ -331,7 +331,7 @@
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <!--<maven-install-plugin.version>2.5.2</maven-install-plugin.version>-->
         <maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
-        <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
+        <maven-jar-plugin.version>3.1.2</maven-jar-plugin.version>
         <maven-javadoc-plugin.version>3.1.0</maven-javadoc-plugin.version>
         <maven-jxr-plugin.version>3.0.0</maven-jxr-plugin.version>
         <!-- maven-pmd-plugin:3.6   depends on net.sourceforge.pmd:pmd:5.3.5 -->
@@ -490,11 +490,8 @@
                     </configuration>
                 </plugin>
                 <plugin><artifactId>maven-resources-plugin</artifactId><version>${maven-resources-plugin.version}</version></plugin>
-                <!--
-                'build.plugins.plugin.version' for org.apache.maven.plugins:maven-surefire-plugin must be a valid version but is '${maven-surefire-plugin.version}'
-                -->
                 <plugin>
-                    <artifactId>maven-surefire-plugin</artifactId><version>3.0.0-M3</version>
+                    <artifactId>maven-surefire-plugin</artifactId><version>${maven-surefire-plugin.version}</version>
                     <!--<configuration><skipTests>${skipTests}</skipTests></configuration>-->
                     <configuration>
                         <argLine>${jacoco.agent.ut.arg} ${argLine}</argLine>
@@ -2719,10 +2716,10 @@
                         <reports>
                             <report>ci-management</report>
                             <!-- dependencies, dependency-management reports are too slow, disable by default -->
-                            <!--<report>dependencies</report>
+                            <!--<report>dependencies</report>-->
                             <report>dependency-convergence</report>
                             <report>dependency-info</report>
-                            <report>dependency-management</report>-->
+                            <!--<report>dependency-management</report>-->
                             <report>distribution-management</report>
                             <!---->
                             <report>index</report>
@@ -2730,7 +2727,7 @@
                             <report>licenses</report>
                             <report>mailing-lists</report>
                             <report>modules</report>
-                            <report>plugin-management</report>
+                            <!--<report>plugin-management</report>-->
                             <report>plugins</report>
                             <report>scm</report>
                             <report>summary</report>
