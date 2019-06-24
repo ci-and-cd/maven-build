@@ -70,7 +70,6 @@ install:
   - sh: |
       export APPVEYOR_ENABLED="${APPVEYOR_ENABLED:-true}";
       if [[ "${CI_OPT_FAST}" != "true" ]]; then export CI_OPT_MAVEN_EFFECTIVE_POM="${CI_OPT_MAVEN_EFFECTIVE_POM:-false}"; fi;
-      if [[ "${CI_OPT_FAST}" != "true" ]]; then export CI_OPT_SITE="${CI_OPT_SITE:-true}"; fi;
       #export CI_OPT_CI_SCRIPT="${CI_OPT_GIT_PREFIX}/${APPVEYOR_REPO_NAME}/raw/${APPVEYOR_REPO_BRANCH}/src/main/ci-script/lib_ci.sh";
   - sh: |
       if [[ -z ${CI_OPT_GITHUB_SITE_PUBLISH} ]]; then

@@ -44,7 +44,7 @@
     #- export CI_OPT_PUBLISH_TO_REPO="true";
     - if [ -f artifacts.tar.gz ]; then tar -xzf artifacts.tar.gz; fi;
       export CI_OPT_MAVEN_CLEAN_SKIP="true"; export CI_OPT_SKIPITS="true"; export CI_OPT_SKIPTESTS="true";
-      time ./mvnw -e -ntp deploy;
+      time ./mvnw -e -ntp -Dfast=true deploy;
       find .mvn/profilerReport -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t;
       echo archive $(git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'artifacts.tar.gz' | wc -l) files into artifacts.tar.gz;
       git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'artifacts.tar.gz' | tar -czf artifacts.tar.gz -T -;
@@ -90,7 +90,6 @@ before_script:
     export CI_OPT_SONAR_ORGANIZATION="${CI_OPT_SONAR_ORGANIZATION:-home1-oss-github}";
   - export GITLAB_CI="${GITLAB_CI:-true}";
     if [[ "${CI_OPT_FAST}" != "true" ]]; then export CI_OPT_MAVEN_EFFECTIVE_POM="${CI_OPT_MAVEN_EFFECTIVE_POM:-false}"; fi;
-    if [[ "${CI_OPT_FAST}" != "true" ]]; then export CI_OPT_SITE="${CI_OPT_SITE:-true}"; fi;
     #export CI_OPT_CI_SCRIPT="${CI_OPT_GIT_PREFIX}/${CI_PROJECT_PATH:-ci-and-cd/maven-build}/raw/${CI_COMMIT_REF_NAME:-develop}/src/main/ci-script/lib_ci.sh";
   - if [[ -z ${CI_OPT_GITHUB_SITE_PUBLISH} ]]; then
       if [[ "${CI_COMMIT_REF_NAME}" =~ ^release/.+ ]] || [[ "${CI_COMMIT_REF_NAME}" =~ ^support/.+ ]]; then export CI_OPT_GITHUB_SITE_PUBLISH="true"; else export CI_OPT_GITHUB_SITE_PUBLISH="false"; fi;
