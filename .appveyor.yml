@@ -62,9 +62,9 @@ install:
   # Settings -> Environment -> Environment variables -> Add variable
   # CI_OPT_ORIGIN_REPO_SLUG
   - sh: |
+      export CI_OPT_INFRASTRUCTURE="${CI_OPT_INFRASTRUCTURE:-opensource}";
       export CI_OPT_GIT_PREFIX="${CI_OPT_GIT_PREFIX:-https://github.com}";
       export CI_OPT_GPG_KEYNAME="${CI_OPT_GPG_KEYNAME:-59DBF10E}";
-      export CI_OPT_INFRASTRUCTURE="${CI_OPT_INFRASTRUCTURE:-opensource}";
       export CI_OPT_ORIGIN_REPO_SLUG="${CI_OPT_ORIGIN_REPO_SLUG:-ci-and-cd/maven-build}";
       export CI_OPT_SONAR_ORGANIZATION="${CI_OPT_SONAR_ORGANIZATION:-home1-oss-github}";
   - sh: |
