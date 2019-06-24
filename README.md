@@ -54,11 +54,11 @@ You need to provide few properties and environment variables, see next chapter.
 ## II. Properties, Environment variables and their default values
 
 ### 1. fetch or deploy
-- private.nexus3.repository
+- private.nexus3
 > default: http://nexus3:28081/nexus/repository
 Set this property to a real world url.
 
-- private.nexus3.repository
+- private.nexus3
 > default: http://nexus3.localal:28081/nexus/repository
 Set this property to a real world url.
 
@@ -92,9 +92,9 @@ Customize these properties only when building front-end projects and default sit
 
 ### 4. report
 #### 4.1 sonarqube
-- private.sonarqube.host.url
+- private.sonar.host.url
 > default: http://sonarqube:9000
-- private.sonarqube.host.url
+- private.sonar.host.url
 > default: http://sonarqube:9000
 
 Need these properties only when profile 'sonar' is activated.

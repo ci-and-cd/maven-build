@@ -172,10 +172,10 @@
         <linkXRef></linkXRef>
         <maven.multiModuleProjectDirectory></maven.multiModuleProjectDirectory>
         <maven.test.skip></maven.test.skip>
-        <opensource.nexus3.repository></opensource.nexus3.repository>
+        <opensource.nexus3></opensource.nexus3>
         <pmd.ruleset.location></pmd.ruleset.location>
-        <private.nexus3.repository></private.nexus3.repository>
-        <private.sonarqube.host.url></private.sonarqube.host.url>
+        <private.nexus3></private.nexus3>
+        <private.sonar.host.url></private.sonar.host.url>
         <project.build.sourceEncoding></project.build.sourceEncoding>
         <project.reporting.outputEncoding></project.reporting.outputEncoding>
         <publish.channel></publish.channel>
@@ -1330,28 +1330,28 @@
                 <sonar.jdbc.url>jdbc:postgresql://postgresql:5432/sonar</sonar.jdbc.url-->
             </properties>
             <distributionManagement>
-                <repository><id>private-nexus3-releases</id><url>${private.nexus3.repository}/maven-releases/</url></repository>
-                <snapshotRepository><id>private-nexus3-snapshots</id><url>${private.nexus3.repository}/maven-snapshots/</url></snapshotRepository>
+                <repository><id>private-nexus3-releases</id><url>${private.nexus3}repository/maven-releases/</url></repository>
+                <snapshotRepository><id>private-nexus3-snapshots</id><url>${private.nexus3}repository/maven-snapshots/</url></snapshotRepository>
             </distributionManagement>
             <pluginRepositories>
                 <pluginRepository>
                     <id>private-nexus3-releases</id>
                     <name>private nexus3 releases</name>
-                    <url>${private.nexus3.repository}/maven-releases/</url>
+                    <url>${private.nexus3}repository/maven-releases/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </pluginRepository>
                 <pluginRepository>
                     <id>private-nexus3-snapshots</id>
                     <name>private nexus3 snapshots</name>
-                    <url>${private.nexus3.repository}/maven-snapshots/</url>
+                    <url>${private.nexus3}repository/maven-snapshots/</url>
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </pluginRepository>
                 <pluginRepository>
                     <id>private-nexus3-thirdparty</id>
                     <name>private nexus3 thirdparty</name>
-                    <url>${private.nexus3.repository}/maven-thirdparty/</url>
+                    <url>${private.nexus3}repository/maven-thirdparty/</url>
                     <releases><enabled>true</enabled></releases>
                     <snapshots><enabled>true</enabled></snapshots>
                 </pluginRepository>
@@ -1360,21 +1360,21 @@
                 <repository>
                     <id>private-nexus3-releases</id>
                     <name>private nexus3 releases</name>
-                    <url>${private.nexus3.repository}/maven-releases/</url>
+                    <url>${private.nexus3}repository/maven-releases/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </repository>
                 <repository>
                     <id>private-nexus3-snapshots</id>
                     <name>private nexus3 snapshots</name>
-                    <url>${private.nexus3.repository}/maven-snapshots/</url>
+                    <url>${private.nexus3}repository/maven-snapshots/</url>
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </repository>
                 <repository>
                     <id>private-nexus3-thirdparty</id>
                     <name>private nexus3 thirdparty</name>
-                    <url>${private.nexus3.repository}/maven-thirdparty/</url>
+                    <url>${private.nexus3}repository/maven-thirdparty/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </repository>
@@ -1590,7 +1590,7 @@
                 <property><name>github.site.publish</name><value>false</value></property>
             </activation>
             <distributionManagement>
-                <site><id>opensource-mvnsite</id><url>dav:${opensource.nexus3.repository}/mvnsite/${site.path}/</url></site>
+                <site><id>opensource-mvnsite</id><url>dav:${opensource.nexus3}repository/mvnsite/${site.path}/</url></site>
             </distributionManagement>
         </profile>
 
@@ -1599,7 +1599,7 @@
             <distributionManagement>
                 <!-- scpexe uses privateKey, scp uses password -->
                 <!-- scpexe://${domain_or_ip}:22/path/to/sites -->
-                <site><id>private-mvnsite</id><url>dav:${private.nexus3.repository}/mvnsite/${site.path}/</url></site>
+                <site><id>private-mvnsite</id><url>dav:${private.nexus3}repository/mvnsite/${site.path}/</url></site>
             </distributionManagement>
         </profile>
 

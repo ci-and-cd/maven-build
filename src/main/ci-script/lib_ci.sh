@@ -654,10 +654,10 @@ function ci_opt_maven_opts() {
         opts="${opts} -Duser.language=zh -Duser.region=CN -Duser.timezone=Asia/Shanghai"
         if [[ -n "${CI_OPT_WAGON_MERGEMAVENREPOS_SOURCE}" ]]; then opts="${opts} -Dwagon.merge-maven-repos.source=${CI_OPT_WAGON_MERGEMAVENREPOS_SOURCE} -DaltDeploymentRepository=repo::default::file://${CI_OPT_WAGON_MERGEMAVENREPOS_SOURCE}"; fi
 
-        if [[ "${CI_OPT_SONAR}" == "true" ]] && [[ -n "${CI_OPT_SONAR_HOST_URL}" ]]; then opts="${opts} -D$(ci_opt_infrastructure)-sonarqube.host.url=${CI_OPT_SONAR_HOST_URL}"; fi
+        if [[ "${CI_OPT_SONAR}" == "true" ]] && [[ -n "${CI_OPT_SONAR_HOST_URL}" ]]; then opts="${opts} -D$(ci_opt_infrastructure)-sonar.host.url=${CI_OPT_SONAR_HOST_URL}"; fi
         if [[ "${CI_OPT_SONAR}" == "true" ]] && [[ -n "${CI_OPT_SONAR_LOGIN}" ]]; then opts="${opts} -Dsonar.login=${CI_OPT_SONAR_LOGIN}"; fi
         if [[ "${CI_OPT_SONAR}" == "true" ]] && [[ -n "${CI_OPT_SONAR_PASSWORD}" ]]; then opts="${opts} -Dsonar.password=${CI_OPT_SONAR_PASSWORD}"; fi
-        if [[ -n "${CI_OPT_NEXUS3}" ]]; then opts="${opts} -D$(ci_opt_infrastructure)-nexus3.repository=${CI_OPT_NEXUS3}/nexus/repository"; fi
+        if [[ -n "${CI_OPT_NEXUS3}" ]]; then opts="${opts} -D$(ci_opt_infrastructure)-nexus3.repository=${CI_OPT_NEXUS3}repository"; fi
 
         # MAVEN_OPTS that need to kept secret
         if [[ -n "${CI_OPT_JIRA_PROJECTKEY}" ]]; then opts="${opts} -Djira.projectKey=${CI_OPT_JIRA_PROJECTKEY} -Djira.user=${CI_OPT_JIRA_USER} -Djira.password=${CI_OPT_JIRA_PASSWORD}"; fi

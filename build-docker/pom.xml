@@ -39,7 +39,7 @@
                     <version>${com.spotify_dockerfile-maven-plugin.version}</version>
                     <configuration>
                         <buildArgs>
-                            <ARTIFACT_REPOSITORY>${private.nexus3.repository}</ARTIFACT_REPOSITORY>
+                            <ARTIFACT_REPOSITORY>${private.nexus3}</ARTIFACT_REPOSITORY>
                             <BUILD_TIMESTAMP>${maven.build.timestamp}</BUILD_TIMESTAMP>
                             <DOCKER_REGISTRY>${docker.registry}</DOCKER_REGISTRY>
                             <GIT_BRANCH>${git.branch}</GIT_BRANCH>
@@ -310,7 +310,7 @@
                                 <goals><goal>run</goal></goals>
                                 <configuration>
                                     <target>
-                                        <replace file="docker-compose-base.yml" token="@artifact.repository@" value="${private.nexus3.repository}"/>
+                                        <replace file="docker-compose-base.yml" token="@artifact.repository@" value="${private.nexus3}"/>
                                         <replace file="docker-compose-base.yml" token="@build.timestamp@" value="${maven.build.timestamp}"/>
                                         <replace file="docker-compose-base.yml" token="@docker.image.prefix@" value="${docker.image.prefix}"/>
                                         <replace file="docker-compose-base.yml" token="@docker.registry@" value="${docker.registry}"/>

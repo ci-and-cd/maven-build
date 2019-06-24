@@ -52,9 +52,9 @@ else
 fi
 
 
-NEXUS_REPO_RELEASES="${CI_OPT_NEXUS3}/nexus/repository/maven-releases";
-NEXUS_REPO_SNAPSHOTS="${CI_OPT_NEXUS3}/nexus/repository/maven-snapshots";
-NEXUS_REPO_THIRDPARTY="${CI_OPT_NEXUS3}/nexus/repository/maven-thirdparty";
+NEXUS_REPO_RELEASES="${CI_OPT_NEXUS3}repository/maven-releases";
+NEXUS_REPO_SNAPSHOTS="${CI_OPT_NEXUS3}repository/maven-snapshots";
+NEXUS_REPO_THIRDPARTY="${CI_OPT_NEXUS3}repository/maven-thirdparty";
 NEXUS_REPO_ID="${CI_OPT_INFRASTRUCTURE}-nexus3-thirdparty";
 
 
