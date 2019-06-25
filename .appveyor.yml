@@ -23,8 +23,6 @@ cache:
 environment:
   #DEBIAN_FRONTEND: noninteractive
 
-  CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION: false
-
 #  CI_OPT_DOCKER_REGISTRY_PASS:
 #    secure:
 #  CI_OPT_DOCKER_REGISTRY_USER:
@@ -61,31 +59,7 @@ install:
   - whois $(curl ipinfo.io/ip);
   # Settings -> Environment -> Environment variables -> Add variable
   # CI_OPT_ORIGIN_REPO_SLUG
-  - sh: |
-      export CI_OPT_INFRASTRUCTURE="${CI_OPT_INFRASTRUCTURE:-opensource}";
-      export CI_OPT_GIT_PREFIX="${CI_OPT_GIT_PREFIX:-https://github.com}";
-      export CI_OPT_GPG_KEYNAME="${CI_OPT_GPG_KEYNAME:-59DBF10E}";
-      export CI_OPT_ORIGIN_REPO_SLUG="${CI_OPT_ORIGIN_REPO_SLUG:-ci-and-cd/maven-build}";
-      export CI_OPT_SONAR_ORGANIZATION="${CI_OPT_SONAR_ORGANIZATION:-home1-oss-github}";
-  - sh: |
-      export APPVEYOR_ENABLED="${APPVEYOR_ENABLED:-true}";
-      if [[ "${CI_OPT_FAST}" != "true" ]]; then export CI_OPT_MAVEN_EFFECTIVE_POM="${CI_OPT_MAVEN_EFFECTIVE_POM:-false}"; fi;
-      #export CI_OPT_CI_SCRIPT="${CI_OPT_GIT_PREFIX}/${APPVEYOR_REPO_NAME}/raw/${APPVEYOR_REPO_BRANCH}/src/main/ci-script/lib_ci.sh";
-  - sh: |
-      if [[ -z ${CI_OPT_GITHUB_SITE_PUBLISH} ]]; then
-        if [[ "${APPVEYOR_REPO_BRANCH}" =~ ^release/.+ ]] || [[ "${APPVEYOR_REPO_BRANCH}" =~ ^support/.+ ]]; then export CI_OPT_GITHUB_SITE_PUBLISH="true"; else export CI_OPT_GITHUB_SITE_PUBLISH="false"; fi;
-      fi;
-      if [[ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]]; then
-        export CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER="$(echo ${APPVEYOR_REPO_NAME} | awk -F'/' '{print $1}')";
-        export CI_OPT_SITE_PATH_PREFIX="${CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER}";
-      else
-        export CI_OPT_SITE_PATH_PREFIX="${APPVEYOR_REPO_NAME}";
-      fi;
-  - sh: |
-      if [[ -z "${CI_OPT_MAVEN_BUILD_OPTS_REPO}" ]]; then export CI_OPT_MAVEN_BUILD_OPTS_REPO="${CI_OPT_GIT_PREFIX}/ci-and-cd/maven-build-opts-${CI_OPT_INFRASTRUCTURE:-opensource}"; fi;
-      if [[ -z "${CI_OPT_MAVEN_BUILD_OPTS_REPO_REF}" ]]; then export CI_OPT_MAVEN_BUILD_OPTS_REPO_REF="${APPVEYOR_REPO_BRANCH:-develop}"; fi;
-      export SETTINGS_GLOBAL_XML="${SETTINGS_GLOBAL_XML:-/home/appveyor/.m2/wrapper/dists/apache-maven-3.6.1-bin/38pn40mp89t5c94bjdbeod370m/apache-maven-3.6.1/conf/settings.xml}";
-      export SETTINGS_GLOBAL_XML_URL="${CI_OPT_MAVEN_BUILD_OPTS_REPO}/raw/${CI_OPT_MAVEN_BUILD_OPTS_REPO_REF}/src/main/maven/settings-global.xml";
+  - source circ.sh
   - sh: |
       # make AppVeyor's JDK path (/usr/lib/jvm/java-11-openjdk-amd64) compatible with travis-ci's style (/usr/lib/jvm/java-11-openjdk) to make toolchains.xml valid
       if [[ -d /usr/lib/jvm/java-8-openjdk-amd64 ]]; then sudo ln -s /usr/lib/jvm/java-8-openjdk-amd64 /usr/lib/jvm/java-8-openjdk; fi;
@@ -115,15 +89,12 @@ install:
       du -sh /home/appveyor/.m2/repository;
       ls -ahl /home/appveyor/.m2/repository/;
   - sh: |
-      if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:TieredStopAtLevel=1 -XX:+UseParallelGC -Dprofile=title -DprofileFormat=JSON,HTML"; fi;
-      ./mvnw -version;
-      echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
-      curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | dd of=${SETTINGS_GLOBAL_XML};
-      cat ${SETTINGS_GLOBAL_XML};
       rm -rf ~/.m2/repository/top/infra/maven-build-extension;
-      rm -f ~/.m2/settings*.xml;
-      rm -f ~/.m2/toolchains*.xml;
+      if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:+UseParallelGC -Dprofile=title -DprofileFormat=JSON,HTML"; fi;
+      echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
+      curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | dd of=${SETTINGS_GLOBAL_XML}; cat ${SETTINGS_GLOBAL_XML};
       ls -ahl ~/.m2;
+      ./mvnw --global-settings "${SETTINGS_GLOBAL_XML}" -version;
 #  - sh: |
 #      unset M2_HOME;
 #      sudo mkdir -p /opt/maven;
@@ -156,6 +127,6 @@ test_script:
 #  - sh: ./mvnw -e -ntp -U clean install sonar:sonar site deploy site:stage site:stage-deploy;
   - sh: |
       if [[ "${APPVEYOR_ENABLED}" == "true" ]]; then
-        time CI_OPT_SONAR="true" ./mvnw -e -ntp -U clean deploy site-deploy;
-        find .mvn/profilerReport -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t;
+        time CI_OPT_SONAR="true" ./mvnw --global-settings "${SETTINGS_GLOBAL_XML}" -e -ntp -U clean deploy site-deploy;
+        if type -p column > /dev/null; then find .mvn/profilerReport -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi;
       fi;

@@ -25,27 +25,8 @@ before_install:
   # CI_OPT_OPENSOURCE_MVNSITE_USERNAME
   # CI_OPT_ORIGIN_REPO_SLUG
   # CI_OPT_SONAR_LOGIN
-  - export CI_OPT_INFRASTRUCTURE="${CI_OPT_INFRASTRUCTURE:-opensource}";
-    export CI_OPT_GIT_PREFIX="${CI_OPT_GIT_PREFIX:-https://github.com}";
-    export CI_OPT_GPG_KEYNAME="${CI_OPT_GPG_KEYNAME:-59DBF10E}";
-    export CI_OPT_ORIGIN_REPO_SLUG="${CI_OPT_ORIGIN_REPO_SLUG:-ci-and-cd/maven-build}";
-    export CI_OPT_SONAR_ORGANIZATION="${CI_OPT_SONAR_ORGANIZATION:-home1-oss-github}";
-  - export TRAVIS_ENABLED="${TRAVIS_ENABLED:-true}";
-    if [[ "${CI_OPT_FAST}" != "true" ]]; then export CI_OPT_MAVEN_EFFECTIVE_POM="${CI_OPT_MAVEN_EFFECTIVE_POM:-false}"; fi;
-    #export CI_OPT_CI_SCRIPT="${CI_OPT_GIT_PREFIX}/${TRAVIS_REPO_SLUG:-ci-and-cd/maven-build}/raw/${TRAVIS_BRANCH:-develop}/src/main/ci-script/lib_ci.sh";
-  - if [[ -z ${CI_OPT_GITHUB_SITE_PUBLISH} ]]; then
-      if [[ "${TRAVIS_BRANCH}" =~ ^release/.+ ]] || [[ "${TRAVIS_BRANCH}" =~ ^support/.+ ]]; then export CI_OPT_GITHUB_SITE_PUBLISH="true"; else export CI_OPT_GITHUB_SITE_PUBLISH="false"; fi;
-    fi;
-    if [[ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]]; then
-      export CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER="$(echo ${TRAVIS_REPO_SLUG} | awk -F'/' '{print $1}')";
-      export CI_OPT_SITE_PATH_PREFIX="${CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER}";
-    else
-      export CI_OPT_SITE_PATH_PREFIX="${TRAVIS_REPO_SLUG}";
-    fi;
-  - if [[ -z "${CI_OPT_MAVEN_BUILD_OPTS_REPO}" ]]; then export CI_OPT_MAVEN_BUILD_OPTS_REPO="${CI_OPT_GIT_PREFIX}/ci-and-cd/maven-build-opts-${CI_OPT_INFRASTRUCTURE:-opensource}"; fi;
-    if [[ -z "${CI_OPT_MAVEN_BUILD_OPTS_REPO_REF}" ]]; then export CI_OPT_MAVEN_BUILD_OPTS_REPO_REF="${TRAVIS_BRANCH:-develop}"; fi;
-    export SETTINGS_GLOBAL_XML="${SETTINGS_GLOBAL_XML:-/home/travis/.m2/wrapper/dists/apache-maven-3.6.1-bin/38pn40mp89t5c94bjdbeod370m/apache-maven-3.6.1/conf/settings.xml}"
-    export SETTINGS_GLOBAL_XML_URL="${CI_OPT_MAVEN_BUILD_OPTS_REPO}/raw/${CI_OPT_MAVEN_BUILD_OPTS_REPO_REF}/src/main/maven/settings-global.xml";
+  - source circ.sh
+#  - export CI_OPT_CI_SCRIPT="${CI_OPT_GIT_PREFIX}/${TRAVIS_REPO_SLUG:-ci-and-cd/maven-build}/raw/${TRAVIS_BRANCH:-develop}/src/main/ci-script/lib_ci.sh";
 #  - ls -ahl /usr/lib/jvm/;
 #  - if [[ -d /usr/lib/jvm/java-8-oracle ]]; then sudo ln -s /usr/lib/jvm/java-8-oracle /usr/lib/jvm/java-8-openjdk; fi;
   - if [[ -d /usr/lib/jvm/java-8-openjdk-amd64 ]]; then sudo ln -s /usr/lib/jvm/java-8-openjdk-amd64 /usr/lib/jvm/java-8-openjdk; fi;
@@ -53,15 +34,12 @@ before_install:
     bash install-jdk.sh -F 11 --target $HOME/openjdk11 --workspace $HOME/.cache/install-jdk;
     if [[ -d $HOME/openjdk11 ]]; then sudo ln -s $HOME/openjdk11 /usr/lib/jvm/java-11-openjdk; fi;
   - export JAVA_HOME="/usr/lib/jvm/java-8-openjdk";
-  - if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:TieredStopAtLevel=1 -XX:+UseParallelGC -Dprofile=title -DprofileFormat=JSON,HTML"; fi;
-    ./mvnw -version;
+  - rm -rf ~/.m2/repository/top/infra/maven-build-extension;
+    if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:+UseParallelGC -Dprofile=title -DprofileFormat=JSON,HTML"; fi;
     echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
     curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | tee ${SETTINGS_GLOBAL_XML};
-    cat ${SETTINGS_GLOBAL_XML};
-    rm -rf ~/.m2/repository/top/infra/maven-build-extension;
-    rm -f ~/.m2/settings*.xml;
-    rm -f ~/.m2/toolchains*.xml;
     ls -ahl ~/.m2;
+    ./mvnw --global-settings "${SETTINGS_GLOBAL_XML}" -version;
 #  - aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -o apache-maven-3.6.1-bin.zip https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.zip && unzip -qq apache-maven-3.6.1-bin.zip;
 #    export M2_HOME="$PWD/apache-maven-3.6.1";
 #    export PATH="$M2_HOME/bin:$PATH";
@@ -85,7 +63,6 @@ cache:
 dist: xenial
 env:
   global:
-    - CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION=false
     - MAVEN_SKIP_RC=true
 group: edge
 install: true
@@ -98,8 +75,8 @@ script:
   # see: https://github.com/travis-ci/travis-ci/issues/4190 or https://github.com/HaxeFoundation/hxcpp/issues/709
   - while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
   - if [[ "${TRAVIS_ENABLED}" == "true" ]]; then
-      time CI_OPT_SONAR="true" ./mvnw -e -ntp -U clean deploy site-deploy;
-      find .mvn/profilerReport -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t;
+      time CI_OPT_SONAR="true" ./mvnw --global-settings "${SETTINGS_GLOBAL_XML}" -e -ntp -U clean deploy site-deploy;
+      if type -p column > /dev/null; then find .mvn/profilerReport -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi;
     fi
   - kill %1
 services:
