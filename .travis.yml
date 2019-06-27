@@ -13,6 +13,7 @@ addons:
       - sshpass
       - whois
 before_install:
+  - set -ex;
   - whois $(curl ipinfo.io/ip);
   # More options -> Settings -> Environment variables -> Add
   # CI_OPT_GPG_PASSPHRASE
