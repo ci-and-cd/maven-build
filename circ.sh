@@ -1,12 +1,13 @@
 
-export CI_OPT_OSSRH_SONAR_ORGANIZATION="${CI_OPT_SONAR_ORGANIZATION:-home1-oss-github}";
+export CI_OPT_ORIGIN_REPO_SLUG="${CI_OPT_ORIGIN_REPO_SLUG:-ci-and-cd/maven-build}";
+
+export CI_OPT_OSSRH_SONAR_ORGANIZATION="${CI_OPT_OSSRH_SONAR_ORGANIZATION:-home1-oss-github}";
 
 export CI_OPT_INFRASTRUCTURE="${CI_OPT_INFRASTRUCTURE:-ossrh}";
 export CI_OPT_GIT_HOST="${CI_OPT_GIT_HOST:-gitlab.com}";
 if [[ -z "${CI_OPT_GIT_PREFIX}" ]]; then export CI_OPT_GIT_PREFIX="https://${CI_OPT_GIT_HOST}"; fi;
 export CI_OPT_GPG_KEYNAME="${CI_OPT_GPG_KEYNAME:-59DBF10E}";
 export CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="false";
-export CI_OPT_ORIGIN_REPO_SLUG="${CI_OPT_ORIGIN_REPO_SLUG:-ci-and-cd/maven-build}";
 
 if [[ -n "${APPVEYOR_REPO_BRANCH}" ]]; then export APPVEYOR_ENABLED="${APPVEYOR_ENABLED:-true}"; fi;
 if [[ -n "${CI_COMMIT_REF_NAME}" ]]; then export GITLAB_CI="${GITLAB_CI:-true}"; fi;
