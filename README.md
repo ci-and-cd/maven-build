@@ -118,7 +118,7 @@ Need to customize when github.com is not reachable.
 Customize this properties if you want to publish relative projects's site into same parent directory, 
 use same value on relative projects.
 
-- CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN
+- CI_OPT_OSSRH_GIT_AUTH_TOKEN
 > default: N/A (blank)
 - CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER
 > default: N/A (blank)
@@ -146,9 +146,9 @@ pinentry-mode loopback
 Need these properties only when deploy artifacts into maven central repository.
 
 ### 7. maven central
-- CI_OPT_MAVEN_CENTRAL_USER
+- CI_OPT_OSSRH_NEXUS2_USER
 > Maven central's username
-- CI_OPT_MAVEN_CENTRAL_PASS
+- CI_OPT_OSSRH_NEXUS2_PASS
 > Maven central's password
 
 Need these properties only when deploy artifacts into maven central repository.
@@ -214,7 +214,7 @@ maven-resources-plugin
 ## IV. Profiles
 
 ### 1. build
-infrastructure_opensource
+infrastructure_ossrh
 > Use maven central service.
 Deploy maven site to github.
 
@@ -277,11 +277,11 @@ site
 run `mvn -Dsite=true site site:stage site:stage-deploy` to active this profile and build site, 
 set `-Dsite.path=maven-build-snapshot` to specify upload directory.
 
-infrastructure_opensource_site_publish
+infrastructure_ossrh_site_publish
 > publish project site to github  
 activate on property 'github.site.publish' is true  
 needs:  
-env.CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN  
+env.CI_OPT_OSSRH_GIT_AUTH_TOKEN  
 env.CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER
 
 
@@ -308,13 +308,13 @@ Add args on `maven site`
     cp src/main/maven/settings-global.xml /usr/local/Cellar/maven/3.6.1/libexec/conf/settings.xml
     cp src/main/maven/settings-global.xml ~/.m2/wrapper/dists/apache-maven-3.6.1-bin/38pn40mp89t5c94bjdbeod370m/apache-maven-3.6.1/conf/settings.xml
 
-    CI_OPT_INFRASTRUCTURE=opensource ./mvnw -e -U clean install
+    CI_OPT_INFRASTRUCTURE=ossrh ./mvnw -e -U clean install
     
-    CI_OPT_INFRASTRUCTURE=opensource CI_OPT_ORIGIN_REPO=true CI_OPT_SONAR=true CI_OPT_SONAR_LOGIN= CI_OPT_SONAR_ORGANIZATION=home1-oss-github ./mvnw -e sonar:sonar
+    CI_OPT_INFRASTRUCTURE=ossrh CI_OPT_ORIGIN_REPO=true CI_OPT_SONAR=true CI_OPT_SONAR_LOGIN= CI_OPT_SONAR_ORGANIZATION=home1-oss-github ./mvnw -e sonar:sonar
     
-    CI_OPT_GITHUB_SITE_PUBLISH="true" CI_OPT_INFRASTRUCTURE=opensource CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN="${CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN}" CI_OPT_SITE="true" CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER="ci-and-cd" CI_OPT_SITE_PATH_PREFIX="maven-build" ./mvnw -e -U clean install site-deploy
+    CI_OPT_GITHUB_SITE_PUBLISH="true" CI_OPT_INFRASTRUCTURE=ossrh CI_OPT_OSSRH_GIT_AUTH_TOKEN="${CI_OPT_OSSRH_GIT_AUTH_TOKEN}" CI_OPT_SITE="true" CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER="ci-and-cd" CI_OPT_SITE_PATH_PREFIX="maven-build" ./mvnw -e -U clean install site-deploy
     
-    CI_OPT_GITHUB_SITE_PUBLISH="false" CI_OPT_INFRASTRUCTURE=opensource CI_OPT_OPENSOURCE_MVNSITE_PASSWORD="${CI_OPT_OPENSOURCE_MVNSITE_PASSWORD}" CI_OPT_OPENSOURCE_MVNSITE_USERNAME="${CI_OPT_OPENSOURCE_MVNSITE_USERNAME}" CI_OPT_NEXUS3="https://nexus3.infra.top" CI_OPT_SITE="true" CI_OPT_SITE_PATH_PREFIX="ci-and-cd/maven-build" ./mvnw -e -U clean install site site:stage site:stage-deploy
+    CI_OPT_GITHUB_SITE_PUBLISH="false" CI_OPT_INFRASTRUCTURE=ossrh CI_OPT_OSSRH_MVNSITE_PASSWORD="${CI_OPT_OSSRH_MVNSITE_PASSWORD}" CI_OPT_OSSRH_MVNSITE_USERNAME="${CI_OPT_OSSRH_MVNSITE_USERNAME}" CI_OPT_NEXUS3="https://nexus3.infra.top" CI_OPT_SITE="true" CI_OPT_SITE_PATH_PREFIX="ci-and-cd/maven-build" ./mvnw -e -U clean install site site:stage site:stage-deploy
 
 #### A.2 Pull request
 

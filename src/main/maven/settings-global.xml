@@ -248,7 +248,7 @@ under the License.
             <id>repos-for-core-extensions</id>
             <repositories>
                 <repository>
-                    <id>OSSRH-snapshots</id>
+                    <id>ossrh-snapshots</id>
                     <name>central snapshots</name>
                     <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
                     <releases><enabled>false</enabled></releases>
@@ -257,7 +257,7 @@ under the License.
             </repositories>
             <pluginRepositories>
                 <pluginRepository>
-                    <id>OSSRH-snapshots</id>
+                    <id>ossrh-snapshots</id>
                     <name>central snapshots</name>
                     <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
                     <releases><enabled>false</enabled></releases>

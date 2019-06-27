@@ -34,18 +34,18 @@ if [[ -z ${ZSH_VERSION+x} ]]; then ZSH_VERSION=""; fi
 
 if [[ -z ${CI_OPT_INFRASTRUCTURE+x} ]]; then CI_OPT_INFRASTRUCTURE=""; fi
 if [[ -z ${CI_OPT_GIT_PREFIX+x} ]]; then CI_OPT_GIT_PREFIX=""; fi
-if [[ -z ${CI_OPT_OPENSOURCE_GIT_PREFIX+x} ]]; then CI_OPT_OPENSOURCE_GIT_PREFIX=""; fi
+if [[ -z ${CI_OPT_OSSRH_GIT_PREFIX+x} ]]; then CI_OPT_OSSRH_GIT_PREFIX=""; fi
 if [[ -z ${CI_OPT_PRIVATE_GIT_PREFIX+x} ]]; then CI_OPT_PRIVATE_GIT_PREFIX=""; fi
 
 
 # auto detect infrastructure using for this build.
 # example of gitlab-ci's CI_PROJECT_URL: "https://example.com/gitlab-org/gitlab-ce"
-# returns: opensource, private or customized infrastructure name
+# returns: ossrh, private or customized infrastructure name
 function ci_opt_infrastructure() {
     if [[ -n "${CI_OPT_INFRASTRUCTURE}" ]]; then
         echo ${CI_OPT_INFRASTRUCTURE}
     elif [[ -n "${TRAVIS_REPO_SLUG}" ]]; then
-        echo "opensource"
+        echo "ossrh"
         # TODO APPVEYOR_REPO_NAME
     elif [[ -n "${CI_PROJECT_URL}" ]] && [[ "${CI_PROJECT_URL}" == ${CI_OPT_PRIVATE_GIT_PREFIX}* ]]; then
         echo "private"
@@ -73,9 +73,9 @@ function ci_infra_opt_git_prefix() {
     else
         local infrastructure="$(ci_opt_infrastructure)"
         local default_value=""
-        if [[ "opensource" == "${infrastructure}" ]]; then
+        if [[ "ossrh" == "${infrastructure}" ]]; then
             default_value="https://github.com"
-            CI_OPT_GIT_PREFIX="${CI_OPT_OPENSOURCE_GIT_PREFIX}"
+            CI_OPT_GIT_PREFIX="${CI_OPT_OSSRH_GIT_PREFIX}"
         elif [[ "private" == "${infrastructure}" ]] || [[ -z "${infrastructure}" ]]; then
             default_value="http://gitlab"
             CI_OPT_GIT_PREFIX="${CI_OPT_PRIVATE_GIT_PREFIX}"
@@ -642,7 +642,7 @@ function ci_opt_maven_opts() {
         if [[ -n "${CI_OPT_PMD_RULESET_LOCATION}" ]]; then opts="${opts} -Dpmd.ruleset.location=${CI_OPT_PMD_RULESET_LOCATION}"; fi
         opts="${opts} -Dsite=$(ci_opt_site)"
         opts="${opts} -Dsite.path=$(ci_opt_site_path_prefix)/$(ci_opt_publish_channel)"
-        if [[ "$(ci_opt_site)" == "true" ]] && [[ "$(ci_opt_infrastructure)" == "opensource" ]]; then
+        if [[ "$(ci_opt_site)" == "true" ]] && [[ "$(ci_opt_infrastructure)" == "ossrh" ]]; then
             if [[ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]]; then
                 opts="${opts} -Dgithub.site.publish=true"
             else
@@ -662,7 +662,7 @@ function ci_opt_maven_opts() {
         # MAVEN_OPTS that need to kept secret
         if [[ -n "${CI_OPT_JIRA_PROJECTKEY}" ]]; then opts="${opts} -Djira.projectKey=${CI_OPT_JIRA_PROJECTKEY} -Djira.user=${CI_OPT_JIRA_USER} -Djira.password=${CI_OPT_JIRA_PASSWORD}"; fi
         # public sonarqube config, see: https://sonarcloud.io
-        if [[ "${CI_OPT_SONAR}" == "true" ]] && [[ -n "${CI_OPT_SONAR_ORGANIZATION}" ]] && [[ "$(ci_opt_infrastructure)" == "opensource" ]]; then opts="${opts} -Dsonar.organization=${CI_OPT_SONAR_ORGANIZATION}"; fi
+        if [[ "${CI_OPT_SONAR}" == "true" ]] && [[ -n "${CI_OPT_SONAR_ORGANIZATION}" ]] && [[ "$(ci_opt_infrastructure)" == "ossrh" ]]; then opts="${opts} -Dsonar.organization=${CI_OPT_SONAR_ORGANIZATION}"; fi
         if [[ -n "${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE}" ]] && [[ -f "${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE}" ]]; then opts="${opts} -Dsettings.security=${CI_OPT_MAVEN_SETTINGS_SECURITY_FILE}"; fi
 
         echo "${opts}"
@@ -874,7 +874,7 @@ function run_mvn() {
         . ${CI_OPT_CI_OPTS_FILE}
     fi
 
-    if [[ "opensource" == "$(ci_opt_infrastructure)" ]]; then
+    if [[ "ossrh" == "$(ci_opt_infrastructure)" ]]; then
         if [[ -z "${CI_OPT_GITHUB_GLOBAL_REPOSITORYNAME}" ]]; then CI_OPT_GITHUB_GLOBAL_REPOSITORYNAME="$(ci_opt_site_path_prefix)"; fi
         if [[ -z "${CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER}" ]]; then CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER="$(echo $(git_repo_slug) | cut -d '/' -f1-)"; fi
         # export and expose to maven sub process
@@ -1070,7 +1070,7 @@ if [[ -z "${CI_OPT_MAVEN_BUILD_REPO}" ]]; then
     fi
 fi
 if [[ -z "$(ci_infra_opt_git_auth_token)" ]]; then
-    if [[ "$(ci_opt_is_origin_repo)" == "true" ]] && [[ "$(ci_opt_infrastructure)" != "opensource" ]]; then
+    if [[ "$(ci_opt_is_origin_repo)" == "true" ]] && [[ "$(ci_opt_infrastructure)" != "ossrh" ]]; then
         echo "[ERROR] CI_OPT_GIT_AUTH_TOKEN not set and using origin private repo, exit."; return 1;
     else
         # For PR build on travis-ci or appveyor

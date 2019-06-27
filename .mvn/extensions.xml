@@ -13,8 +13,13 @@ see:
     </extension>
     <extension>
         <groupId>top.infra</groupId>
-        <artifactId>maven-build-extension</artifactId>
+        <artifactId>settings-helper-extension</artifactId>
         <version>0.0.1-SNAPSHOT</version>
+    </extension>
+    <extension>
+        <groupId>top.infra</groupId>
+        <artifactId>maven-build-extension</artifactId>
+        <version>0.0.1-newoptions-SNAPSHOT</version>
     </extension>
 
     <!-- see: https://github.com/random-maven/profile-activator-extension/issues/3

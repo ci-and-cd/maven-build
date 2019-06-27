@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>2.0.1-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
 
     <modules>
         <module>build-docker</module>
@@ -61,21 +61,21 @@
             <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
         </repository>
         <repository>
-            <id>OSSRH-releases</id>
+            <id>ossrh-releases</id>
             <name>central releases</name>
             <url>https://oss.sonatype.org/content/repositories/releases/</url>
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </repository>
         <repository>
-            <id>OSSRH-snapshots</id>
+            <id>ossrh-snapshots</id>
             <name>central snapshots</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
             <releases><enabled>false</enabled></releases>
             <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
         </repository>
         <repository>
-            <id>OSSRH-thirdparty</id>
+            <id>ossrh-thirdparty</id>
             <name>central thirdparty</name>
             <url>https://oss.sonatype.org/content/repositories/third-party-releases/</url>
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
@@ -119,21 +119,21 @@
             <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
         </pluginRepository>
         <pluginRepository>
-            <id>OSSRH-releases</id>
+            <id>ossrh-releases</id>
             <name>central releases</name>
             <url>https://oss.sonatype.org/content/repositories/releases/</url>
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
         <pluginRepository>
-            <id>OSSRH-snapshots</id>
+            <id>ossrh-snapshots</id>
             <name>central snapshots</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
             <releases><enabled>false</enabled></releases>
             <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
         </pluginRepository>
         <pluginRepository>
-            <id>OSSRH-thirdparty</id>
+            <id>ossrh-thirdparty</id>
             <name>central thirdparty</name>
             <url>https://oss.sonatype.org/content/repositories/third-party-releases/</url>
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
@@ -172,10 +172,11 @@
         <linkXRef></linkXRef>
         <maven.multiModuleProjectDirectory></maven.multiModuleProjectDirectory>
         <maven.test.skip></maven.test.skip>
-        <opensource.nexus3></opensource.nexus3>
+        <ossrh.nexus3>http://nexus3:28081/nexus/</ossrh.nexus3>
         <pmd.ruleset.location></pmd.ruleset.location>
-        <private.nexus3></private.nexus3>
-        <private.sonar.host.url></private.sonar.host.url>
+        <private.nexus3>http://nexus3:28081/nexus/</private.nexus3>
+        <ossrh.sonar.host.url>https://sonarqube.com</ossrh.sonar.host.url>
+        <private.sonar.host.url>http://sonarqube:9000</private.sonar.host.url>
         <project.build.sourceEncoding></project.build.sourceEncoding>
         <project.reporting.outputEncoding></project.reporting.outputEncoding>
         <publish.channel></publish.channel>
@@ -1259,11 +1260,14 @@
         </profile>
 
         <profile>
-            <id>infrastructure_opensource</id>
+            <id>infrastructure_ossrh</id>
             <distributionManagement>
-                <repository><id>OSSRH-staging</id><url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url></repository>
-                <snapshotRepository><id>OSSRH-snapshots</id><url>https://oss.sonatype.org/content/repositories/snapshots/</url></snapshotRepository>
+                <repository><id>ossrh-staging</id><url>${ossrh.nexus2}service/local/staging/deploy/maven2/</url></repository>
+                <snapshotRepository><id>ossrh-snapshots</id><url>${ossrh.nexus2}content/repositories/snapshots/</url></snapshotRepository>
             </distributionManagement>
+            <properties>
+                <ossrh.nexus2>https://oss.sonatype.org/</ossrh.nexus2>
+            </properties>
         </profile>
 
         <profile>
@@ -1271,7 +1275,7 @@
             For nexus3, see 'NXRM3 Maven Plugin'
             https://help.sonatype.com/integrations/nexus-and-continuous-integration/repository-manager-for-maven-plugin
             -->
-            <id>infrastructure_opensource-nexus2-staging</id>
+            <id>infrastructure_ossrh-nexus2_staging</id>
             <activation><property><name>nexus2.staging</name><value>true</value></property></activation>
             <build>
                 <plugins>
@@ -1290,7 +1294,7 @@
                                 <autoReleaseAfterClose>false</autoReleaseAfterClose>
                                 <detectBuildFailures>true</detectBuildFailures>
                                 <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                                <serverId>OSSRH-staging</serverId>
+                                <serverId>ossrh-staging</serverId>
                                 <!--<sslAllowAll>true</sslAllowAll>-->
                                 <stagingProgressPauseDurationSeconds>30</stagingProgressPauseDurationSeconds>
                                 <stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>
@@ -1330,27 +1334,27 @@
                 <sonar.jdbc.url>jdbc:postgresql://postgresql:5432/sonar</sonar.jdbc.url-->
             </properties>
             <distributionManagement>
-                <repository><id>private-nexus3-releases</id><url>${private.nexus3}repository/maven-releases/</url></repository>
-                <snapshotRepository><id>private-nexus3-snapshots</id><url>${private.nexus3}repository/maven-snapshots/</url></snapshotRepository>
+                <repository><id>private-releases</id><url>${private.nexus3}repository/maven-releases/</url></repository>
+                <snapshotRepository><id>private-snapshots</id><url>${private.nexus3}repository/maven-snapshots/</url></snapshotRepository>
             </distributionManagement>
             <pluginRepositories>
                 <pluginRepository>
-                    <id>private-nexus3-releases</id>
-                    <name>private nexus3 releases</name>
+                    <id>private-releases</id>
+                    <name>private releases</name>
                     <url>${private.nexus3}repository/maven-releases/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </pluginRepository>
                 <pluginRepository>
-                    <id>private-nexus3-snapshots</id>
-                    <name>private nexus3 snapshots</name>
+                    <id>private-snapshots</id>
+                    <name>private snapshots</name>
                     <url>${private.nexus3}repository/maven-snapshots/</url>
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </pluginRepository>
                 <pluginRepository>
-                    <id>private-nexus3-thirdparty</id>
-                    <name>private nexus3 thirdparty</name>
+                    <id>private-thirdparty</id>
+                    <name>private thirdparty</name>
                     <url>${private.nexus3}repository/maven-thirdparty/</url>
                     <releases><enabled>true</enabled></releases>
                     <snapshots><enabled>true</enabled></snapshots>
@@ -1358,22 +1362,22 @@
             </pluginRepositories>
             <repositories>
                 <repository>
-                    <id>private-nexus3-releases</id>
-                    <name>private nexus3 releases</name>
+                    <id>private-releases</id>
+                    <name>private releases</name>
                     <url>${private.nexus3}repository/maven-releases/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </repository>
                 <repository>
-                    <id>private-nexus3-snapshots</id>
-                    <name>private nexus3 snapshots</name>
+                    <id>private-snapshots</id>
+                    <name>private snapshots</name>
                     <url>${private.nexus3}repository/maven-snapshots/</url>
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </repository>
                 <repository>
-                    <id>private-nexus3-thirdparty</id>
-                    <name>private nexus3 thirdparty</name>
+                    <id>private-thirdparty</id>
+                    <name>private thirdparty</name>
                     <url>${private.nexus3}repository/maven-thirdparty/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
@@ -1519,7 +1523,7 @@
 
         <profile>
             <!-- Do mvn site site:stage -DstagingDirectory=/tmp/path first, then manually add/push to the gh-pages branch on GitHub? -->
-            <id>infrastructure_opensource-github_site</id>
+            <id>infrastructure_ossrh-github_site</id>
             <activation><property><name>github.site.publish</name><value>true</value></property></activation>
             <build>
                 <pluginManagement>
@@ -1572,7 +1576,7 @@
             </distributionManagement>
             <properties>
                 <!-- for site on github, id (github.global.server) must match the config in your settings.xml -->
-                <!--<github.global.oauth2Token>${env.CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</github.global.oauth2Token>-->
+                <!--<github.global.oauth2Token>${env.CI_OPT_OSSRH_GIT_AUTH_TOKEN}</github.global.oauth2Token>-->
                 <!--<github.global.repositoryName>${site.path.prefix}</github.global.repositoryName>-->
                 <!--<github.global.repositoryOwner>${env.CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER}</github.global.repositoryOwner>-->
                 <github.global.server>github</github.global.server>
@@ -1585,12 +1589,12 @@
         </profile>
 
         <profile>
-            <id>infrastructure_opensource-site</id>
+            <id>infrastructure_ossrh-site</id>
             <activation>
                 <property><name>github.site.publish</name><value>false</value></property>
             </activation>
             <distributionManagement>
-                <site><id>opensource-mvnsite</id><url>dav:${opensource.nexus3}repository/mvnsite/${site.path}/</url></site>
+                <site><id>ossrh-mvnsite</id><url>dav:${ossrh.nexus3}repository/mvnsite/${site.path}/</url></site>
             </distributionManagement>
         </profile>
 
@@ -1778,7 +1782,7 @@
 
         <profile>
             <id>reports-for-site</id>
-            <activation><property><name>site</name><value>true</value></property></activation>
+            <activation><property><name>generateReports</name><value>true</value></property></activation>
             <build>
                 <plugins>
                     <plugin>

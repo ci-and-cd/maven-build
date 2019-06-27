@@ -23,6 +23,7 @@ buildNumber.properties
 
 *.asc
 git.properties
+/settings-security.xml
 
 **/src/site/markdown/README.md
 **/src/site/markdown/src/readme

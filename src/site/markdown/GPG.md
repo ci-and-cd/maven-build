@@ -16,7 +16,7 @@ Key-Length: 2048
 Subkey-Type: default
 Name-Real: home1 oss
 Name-Comment: with passphrase
-Name-Email: opensource@home1.cn
+Name-Email: ossrh@home1.cn
 Expire-Date: 0
 Passphrase: <passphrase>
 %pubring codesigning.pub

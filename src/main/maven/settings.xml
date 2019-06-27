@@ -38,33 +38,20 @@
 
     <profiles>
         <!-- @formatter:off -->
-        <!--<profile>
-            <id>allow-using-snapshots-as-parent</id>
-            <activation><activeByDefault>true</activeByDefault></activation>
-            <repositories>
-                <repository>
-                    <id>OSSRH-snapshots</id>
-                    <name>central snapshots</name>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-                    <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
-                </repository>
-            </repositories>
-        </profile>-->
         <profile>
             <id>default-public-repositories</id>
             <activation><activeByDefault>true</activeByDefault></activation>
             <repositories>
                 <!-- Make artifacts in OSSRH repositories available -->
                 <repository>
-                    <id>OSSRH-releases</id>
+                    <id>ossrh-releases</id>
                     <name>central releases</name>
                     <url>https://oss.sonatype.org/content/repositories/releases/</url>
                     <releases><enabled>true</enabled></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </repository>
                 <repository>
-                    <id>OSSRH-snapshots</id>
+                    <id>ossrh-snapshots</id>
                     <name>central snapshots</name>
                     <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
                     <releases><enabled>false</enabled></releases>
@@ -75,7 +62,7 @@
                 <pluginRepository>
                     <id>central</id>
                     <name>central</name>
-                    <url>https://repo1.maven.org/maven2/</url>
+                    <url>https://repo1.maven.org/maven2</url>
                     <releases><enabled>true</enabled></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </pluginRepository>
@@ -101,7 +88,7 @@
             <id>docker.io</id>
             <username>${env.CI_OPT_DOCKER_REGISTRY_USER}</username><password>${env.CI_OPT_DOCKER_REGISTRY_PASS}</password>
         </server>
-        <server><id>github</id><password>${env.CI_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</password></server>
+        <server><id>github</id><password>${env.CI_OPT_OSSRH_GIT_AUTH_TOKEN}</password></server>
         <!--
         To fix issue: gpg: signing failed: Inappropriate ioctl for device
         1.
@@ -115,35 +102,9 @@
         echo RELOADAGENT | gpg-connect-agent
         -->
         <server><id>gpg.passphrase</id><passphrase>${env.CI_OPT_GPG_PASSPHRASE}</passphrase></server>
-        <server><id>opensource-mvnsite</id><username>${env.CI_OPT_OPENSOURCE_MVNSITE_USERNAME}</username><password>${env.CI_OPT_OPENSOURCE_MVNSITE_PASSWORD}</password></server>
-        <server><id>OSSRH-snapshots</id><username>${env.CI_OPT_MAVEN_CENTRAL_USER}</username><password>${env.CI_OPT_MAVEN_CENTRAL_PASS}</password></server>
-        <server><id>OSSRH-staging</id><username>${env.CI_OPT_MAVEN_CENTRAL_USER}</username><password>${env.CI_OPT_MAVEN_CENTRAL_PASS}</password></server>
-
-        <server><id>nexus3:5000</id><username>deployment</username><password>deployment</password></server>
-        <!-- see: http://maven.apache.org/guides/mini/guide-encryption.html -->
-        <!-- mvn &#x002d;&#x002d;encrypt-password ${password} -->
-        <!-- accept RSA key fingerprint -->
-        <!-- ssh -o UserKnownHostsFile=~/.ssh/known_hosts root@mvnsite.local -p 10022 -->
-        <server>
-            <id>private-mvnsite</id>
-            <username>deployment</username><password>deployment</password>
-            <!--<username>root</username><passphrase>if required</passphrase><privateKey>${user.home}/.ssh/mvnsite.local</privateKey>-->
-            <configuration>
-                <!-- see: https://maven.apache.org/wagon/apidocs/index.html -->
-                <!-- java.lang.ClassNotFoundException: org.apache.maven.wagon.providers.ssh.knownhost.NullKnownHostProvider -->
-                <!--knownHostsProvider implementation="org.apache.maven.wagon.providers.ssh.knownhost.NullKnownHostProvider">
-                    <hostKeyChecking>no</hostKeyChecking>
-                </knownHostsProvider-->
-            </configuration>
-        </server>
-        <server><id>private-nexus3-releases</id><username>deployment</username><password>deployment</password></server>
-        <server><id>private-nexus3-snapshots</id><username>deployment</username><password>deployment</password></server>
-        <server><id>private-nexus3-thirdparty</id><username>deployment</username><password>deployment</password></server>
-
-        <!--<server>
-            <id>mirror</id><username>deployment</username><password></password>
-            <configuration><httpConfiguration><all><connectionTimeout>120000</connectionTimeout><readTimeout>120000</readTimeout></all></httpConfiguration></configuration>
-        </server>-->
+        <server><id>ossrh-mvnsite</id><username>${env.CI_OPT_OSSRH_MVNSITE_USERNAME}</username><password>${env.CI_OPT_OSSRH_MVNSITE_PASSWORD}</password></server>
+        <server><id>ossrh-snapshots</id><username>${env.CI_OPT_OSSRH_NEXUS2_USER}</username><password>${env.CI_OPT_OSSRH_NEXUS2_PASS}</password></server>
+        <server><id>ossrh-staging</id><username>${env.CI_OPT_OSSRH_NEXUS2_USER}</username><password>${env.CI_OPT_OSSRH_NEXUS2_PASS}</password></server>
         <!-- @formatter:on -->
     </servers>
 
