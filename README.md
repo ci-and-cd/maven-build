@@ -305,6 +305,8 @@ Add args on `maven site`
 
 #### A.1. local install/deploy maven-build
 
+    export MAVEN_HOME="${PWD}/../extension-core/target/apache-maven-3.6.1/apache-maven-3.6.1"
+
     cp src/main/maven/settings-global.xml /usr/local/Cellar/maven/3.6.1/libexec/conf/settings.xml
     cp src/main/maven/settings-global.xml ~/.m2/wrapper/dists/apache-maven-3.6.1-bin/38pn40mp89t5c94bjdbeod370m/apache-maven-3.6.1/conf/settings.xml
 

@@ -7,19 +7,32 @@ see:
 <extensions>
     <!-- mvn install -Dprofile="profile name" -DprofileFormat=JSON,HTML -->
     <extension>
-        <groupId>fr.jcgay.maven</groupId>
-        <artifactId>maven-profiler</artifactId>
-        <version>2.6</version>
+        <groupId>fr.jcgay.maven</groupId><artifactId>maven-profiler</artifactId><version>2.6</version>
+    </extension>
+
+    <extension>
+        <artifactId>docker-login-extension</artifactId><groupId>top.infra</groupId><version>0.0.1-SNAPSHOT</version>
     </extension>
     <extension>
-        <groupId>top.infra</groupId>
-        <artifactId>settings-helper-extension</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <artifactId>gitflow-semantic-versioning-extension</artifactId><groupId>top.infra</groupId><version>0.0.1-SNAPSHOT</version>
     </extension>
     <extension>
-        <groupId>top.infra</groupId>
-        <artifactId>maven-build-extension</artifactId>
-        <version>0.0.1-newoptions-SNAPSHOT</version>
+        <artifactId>gpg-helper-extension</artifactId><groupId>top.infra</groupId><version>0.0.1-SNAPSHOT</version>
+    </extension>
+    <extension>
+        <artifactId>infrastructure-extension</artifactId><groupId>top.infra</groupId><version>0.0.1-SNAPSHOT</version>
+    </extension>
+    <!--
+    <extension>
+        <artifactId>maven-build-pom-extension</artifactId><groupId>top.infra</groupId><version>0.0.1-SNAPSHOT</version>
+    </extension>
+    -->
+    <extension>
+        <artifactId>settings-security-extension</artifactId><groupId>top.infra</groupId><version>0.0.1-SNAPSHOT</version>
+    </extension>
+
+    <extension>
+        <artifactId>maven-build-extension</artifactId><groupId>top.infra</groupId><version>0.0.1-SNAPSHOT</version>
     </extension>
 
     <!-- see: https://github.com/random-maven/profile-activator-extension/issues/3
