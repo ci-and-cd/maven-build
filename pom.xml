@@ -11,10 +11,6 @@
     <url>https://github.com/ci-and-cd/maven-build</url>
     <version>3.0.0-SNAPSHOT</version>
 
-    <modules>
-        <module>build-docker</module>
-    </modules>
-
     <developers>
         <developer>
             <name>Haolun Zhang</name>
@@ -160,44 +156,8 @@
 
     <properties>
         <!-- Suppress 'Can not resolve symbol' errors in pom editor of IntelliJ IDEA -->
-        <!--  -->
+        <!-- maven and plugin properties -->
         <argLine></argLine>
-        <checkstyle.config.location></checkstyle.config.location>
-        <frontend.nodeDownloadRoot></frontend.nodeDownloadRoot>
-        <frontend.npmDownloadRoot></frontend.npmDownloadRoot>
-        <git.commit.id.skip></git.commit.id.skip>
-        <github.global.oauth2Token></github.global.oauth2Token>
-        <github.global.repositoryName></github.global.repositoryName>
-        <github.global.repositoryOwner></github.global.repositoryOwner>
-        <linkXRef></linkXRef>
-        <maven.multiModuleProjectDirectory></maven.multiModuleProjectDirectory>
-        <maven.test.skip></maven.test.skip>
-        <ossrh.nexus3>http://nexus3:28081/nexus/</ossrh.nexus3>
-        <pmd.ruleset.location></pmd.ruleset.location>
-        <private.nexus3>http://nexus3:28081/nexus/</private.nexus3>
-        <ossrh.sonar.host.url>https://sonarqube.com</ossrh.sonar.host.url>
-        <private.sonar.host.url>http://sonarqube:9000</private.sonar.host.url>
-        <project.build.sourceEncoding></project.build.sourceEncoding>
-        <project.reporting.outputEncoding></project.reporting.outputEncoding>
-        <publish.channel></publish.channel>
-        <site.path></site.path>
-        <site.path.prefix></site.path.prefix>
-        <skipITs></skipITs>
-        <wagon.merge-maven-repos.artifactDir></wagon.merge-maven-repos.artifactDir>
-        <wagon.merge-maven-repos.source></wagon.merge-maven-repos.source>
-        <wagon.merge-maven-repos.target></wagon.merge-maven-repos.target>
-        <wagon.merge-maven-repos.targetId></wagon.merge-maven-repos.targetId>
-        <!--  -->
-
-        <!-- mvn install -Dprofile="profile name" -DprofileFormat=JSON,HTML -->
-        <maven-profiler-report-directory>${maven.multiModuleProjectDirectory}/.mvn/profilerReport</maven-profiler-report-directory>
-
-        <!--
-        '-D' properties in command line can not override properties defined in properties tag of pom.xml (under project root or profile).
-        Only properties defined in child projects cant override properties defined here.
-        -->
-        <asm.version>6.2</asm.version>
-        <javassist.version>3.23.1-GA</javassist.version>
 
         <checkstyle.consoleOutput>true</checkstyle.consoleOutput>
         <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
@@ -222,11 +182,13 @@
         <!-- findbugs.threshold: High, Default, Low, Ignore, If set to "High", only high confidence bugs are reported -->
         <!--<findbugs.threshold>Default</findbugs.threshold>-->
 
+        <linkXRef>true</linkXRef>
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
         <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
         <maven.javadoc.failsOnError>false</maven.javadoc.failsOnError>
         <maven.javadoc.skip>false</maven.javadoc.skip>
         <maven.source.skip>false</maven.source.skip>
+        <maven.test.skip>false</maven.test.skip>
 
         <pmd.failOnViolation>false</pmd.failOnViolation>
         <!-- Minimum Priority = 5 Maximum Priority = 0 Default value is: 5. -->
@@ -234,6 +196,11 @@
         <pmd.maxAllowedViolations>10</pmd.maxAllowedViolations>
         <pmd.printFailingErrors>true</pmd.printFailingErrors>
         <pmd.verbose>false</pmd.verbose>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <skipITs>false</skipITs>
 
         <!--
         publish, preview, issue .
@@ -254,139 +221,197 @@
         <surefire.fork.count>1</surefire.fork.count>
         <surefire.fork.reuse>false</surefire.fork.reuse>
 
-        <!-- custom properties -->
 
+        <!-- maven-build properties -->
+        <checkstyle.config.location>https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/checkstyle/google_checks_8.10.xml</checkstyle.config.location>
+        <!-- https://npm.taobao.org/mirrors/node/ -->
+        <frontend.nodeDownloadRoot>https://nodejs.org/dist/</frontend.nodeDownloadRoot>
+        <!-- http://registry.npm.taobao.org/npm/-/ -->
+        <frontend.npmDownloadRoot>https://registry.npmjs.org/npm/-/</frontend.npmDownloadRoot>
+        <git.commit.id.skip>false</git.commit.id.skip>
+        <github.global.oauth2Token></github.global.oauth2Token>
+        <github.global.repositoryName></github.global.repositoryName>
+        <github.global.repositoryOwner>unknown-owner</github.global.repositoryOwner>
+        <pmd.ruleset.location>https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/pmd/pmd-ruleset-6.8.0.xml</pmd.ruleset.location>
+
+        <ossrh.nexus3>http://nexus3:28081/nexus/</ossrh.nexus3>
+        <private.nexus3>http://nexus3:28081/nexus/</private.nexus3>
+        <ossrh.sonar.host.url>https://sonarqube.com</ossrh.sonar.host.url>
+        <private.sonar.host.url>http://sonarqube:9000</private.sonar.host.url>
+
+        <!-- TODO refactor publish.channel to a bool value -->
+        <!--
+        nexus2.staging, github.site.path, site.path,
+        wagon.merge-maven-repos.target, wagon.merge-maven-repos.targetId
+        depends on publish.channel
+        -->
+        <publish.channel>snapshot</publish.channel>
+        <!-- TODO expose git slug to project and calculate site.path.prefix here -->
+        <site.path.prefix></site.path.prefix>
+        <!-- TODO remove site.path.prefix, keep site.path -->
+        <site.path>${publish.channel}/${site.path.prefix}</site.path>
+        <wagon.merge-maven-repos.artifactDir></wagon.merge-maven-repos.artifactDir>
+        <!-- TODO calculate wagon.merge-maven-repos.source and altDeploymentRepository here -->
+        <wagon.merge-maven-repos.source></wagon.merge-maven-repos.source>
+        <wagon.merge-maven-repos.target></wagon.merge-maven-repos.target>
+        <!-- TODO caluculate wagon.merge-maven-repos.targetId here -->
+        <wagon.merge-maven-repos.targetId></wagon.merge-maven-repos.targetId>
+
+
+        <!-- custom properties -->
         <jacoco.reportPath>${project.build.directory}/jacoco.exec</jacoco.reportPath>
         <jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</jacoco.itReportPath>
 
-        <!--<relative.parent.dir>.</relative.parent.dir>-->
+        <!-- mvn install -Dprofile="profile name" -DprofileFormat=JSON,HTML -->
+        <maven.multiModuleProjectDirectory></maven.multiModuleProjectDirectory>
+        <maven-profiler-report-directory>${maven.multiModuleProjectDirectory}/.mvn/profilerReport</maven-profiler-report-directory>
 
-        <site-maven-plugin.version>0.13.0.OSS-M1</site-maven-plugin.version>
+        <!--<relative.parent.dir>.</relative.parent.dir>-->
         <src.generated.dir>**/generated/**</src.generated.dir>
 
+
         <!-- versions -->
-        <animal-sniffer-maven-plugin.version>1.16</animal-sniffer-maven-plugin.version>
-        <ant-contrib.version>20020829</ant-contrib.version>
-        <apt-maven-plugin.version>1.1.3</apt-maven-plugin.version>
-        <asciidoctor-maven-plugin.version>1.5.7.1</asciidoctor-maven-plugin.version>
-        <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
+        <groovy.version>2.5.6</groovy.version>
+        <kotlin.version>1.3.21</kotlin.version>
+        <scala.version>2.12.8</scala.version>
 
-        <!--<checkstyle.version>6.19</checkstyle.version>-->
-        <checkstyle.version>8.14</checkstyle.version>
-        <clirr-maven-plugin.version>2.8</clirr-maven-plugin.version>
-        <!--<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>-->
-        <com.google.errorprone_error_prone_core.version>2.3.1</com.google.errorprone_error_prone_core.version>
 
-        <dependency-check-maven.version>5.0.0-M2</dependency-check-maven.version>
+        <version.asm>6.2</version.asm>
+        <version.javassist>3.23.1-GA</version.javassist>
+
+        <version.animal-sniffer-maven-plugin>1.16</version.animal-sniffer-maven-plugin>
+        <version.ant-contrib>20020829</version.ant-contrib>
+        <version.apt-maven-plugin>1.1.3</version.apt-maven-plugin>
+        <version.asciidoctor-maven-plugin>1.5.7.1</version.asciidoctor-maven-plugin>
+        <version.build-helper-maven-plugin>3.0.0</version.build-helper-maven-plugin>
+
+        <!--<version.checkstyle>6.19</version.checkstyle>-->
+        <version.checkstyle>8.14</version.checkstyle>
+        <version.clirr-maven-plugin>2.8</version.clirr-maven-plugin>
+        <!--<version.cobertura-maven-plugin>2.7</version.cobertura-maven-plugin>-->
+        <version.com.google.errorprone_error_prone_core>2.3.1</version.com.google.errorprone_error_prone_core>
+
+        <version.dependency-check-maven>5.0.0-M2</version.dependency-check-maven>
         <!-- Fix error of multiple processes connect to same h2 in embedded mode, use mixed mode replace (AUTO_SERVER=TRUE). -->
         <!--<dependency-check-maven.connectionString>jdbc:h2:file:%s;AUTOCOMMIT=ON;LOG=0;CACHE_SIZE=65536;AUTO_SERVER=TRUE;</dependency-check-maven.connectionString>-->
         <!--<dependency-check-maven.connectionString>jdbc:h2:file:%s;AUTOCOMMIT=ON;LOG=0;CACHE_SIZE=65536;AUTO_SERVER=TRUE;MV_STORE=FALSE;</dependency-check-maven.connectionString>-->
 
-        <doxia-module-markdown.version>1.8</doxia-module-markdown.version>
+        <version.doxia-module-markdown>1.8</version.doxia-module-markdown>
 
-        <echo-maven-plugin.version>0.3.0</echo-maven-plugin.version>
+        <version.echo-maven-plugin>0.3.0</version.echo-maven-plugin>
 
         <!-- Findbugs is no longer maintained, please use Spotbugs -->
-        <findbugs-annotations.version>3.0.1u2</findbugs-annotations.version>
-        <findbugs-jsr305.version>3.0.2</findbugs-jsr305.version>
-        <!--<findbugs-maven-plugin.version>3.0.5</findbugs-maven-plugin.version>-->
+        <version.findbugs-annotations>3.0.1u2</version.findbugs-annotations>
+        <version.findbugs-jsr305>3.0.2</version.findbugs-jsr305>
+        <!--<version.findbugs-maven-plugin>3.0.5</version.findbugs-maven-plugin>-->
 
-        <spotbugs.version>3.1.12</spotbugs.version>
-        <spotbugs-maven-plugin.version>3.1.11</spotbugs-maven-plugin.version>
+        <version.spotbugs>3.1.12</version.spotbugs>
+        <version.spotbugs-maven-plugin>3.1.11</version.spotbugs-maven-plugin>
 
-        <frontend-maven-plugin.version>1.7.5</frontend-maven-plugin.version>
+        <version.frontend-maven-plugin>1.7.5</version.frontend-maven-plugin>
 
-        <git-commit-id-plugin.version>2.2.6</git-commit-id-plugin.version>
-        <gitflow-maven-plugin.version>1.11.0</gitflow-maven-plugin.version>
+        <version.git-commit-id-plugin>2.2.6</version.git-commit-id-plugin>
+        <version.gitflow-maven-plugin>1.11.0</version.gitflow-maven-plugin>
 
-        <!--<gmaven-plugin.version>1.0</gmaven-plugin.version>-->
+        <!--<version.gmaven-plugin>1.0</version.gmaven-plugin>-->
 
-        <groovy-maven-plugin.version>2.1</groovy-maven-plugin.version>
+        <version.groovy-maven-plugin>2.1</version.groovy-maven-plugin>
         <!-- see: http://docs.groovy-lang.org/latest/html/documentation/tools-groovyc.html -->
-        <groovy.version>2.5.6</groovy.version>
-        <!--<groovy-eclipse-compiler.version>2.9.3-01</groovy-eclipse-compiler.version>-->
-        <!--<groovy-eclipse-batch.version>2.4.15-01</groovy-eclipse-batch.version>-->
-        <groovy-eclipse-compiler.version>3.3.0-01</groovy-eclipse-compiler.version>
-        <groovy-eclipse-batch.version>2.5.6-01</groovy-eclipse-batch.version>
+        <!--<version.groovy-eclipse-compiler>2.9.3-01</version.groovy-eclipse-compiler>-->
+        <!--<version.groovy-eclipse-batch>2.4.15-01</version.groovy-eclipse-batch>-->
+        <version.groovy-eclipse-compiler>3.3.0-01</version.groovy-eclipse-compiler>
+        <version.groovy-eclipse-batch>2.5.6-01</version.groovy-eclipse-batch>
 
-        <javax.activation.version>1.1.1</javax.activation.version>
-        <java18.version>1.0</java18.version>
-        <jdepend-maven-plugin.version>2.0</jdepend-maven-plugin.version>
-        <jetbrains-annotations.version>16.0.3</jetbrains-annotations.version>
-        <jsch.version>0.1.54</jsch.version>
+        <version.javax.activation>1.1.1</version.javax.activation>
+        <version.java18>1.0</version.java18>
+        <version.jdepend-maven-plugin>2.0</version.jdepend-maven-plugin>
+        <version.jetbrains-annotations>16.0.3</version.jetbrains-annotations>
+        <version.jsch>0.1.54</version.jsch>
+        <version.lombok>1.18.6</version.lombok>
 
-        <kotlin.version>1.3.21</kotlin.version>
-        <lombok.version>1.18.6</lombok.version>
-
-        <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
-        <maven-changes-plugin.version>2.12.1</maven-changes-plugin.version>
-        <maven-checkstyle-plugin.version>3.0.0</maven-checkstyle-plugin.version>
-        <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
-        <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
-        <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
-        <!--<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>-->
-        <maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
-        <maven-enforcer-plugin.version>3.0.0-M2</maven-enforcer-plugin.version>
-        <!--<maven-failsafe-plugin.version>2.21.0</maven-failsafe-plugin.version>-->
-        <maven-failsafe-plugin.version>3.0.0-M3</maven-failsafe-plugin.version>
-        <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
-        <!--<maven-install-plugin.version>2.5.2</maven-install-plugin.version>-->
-        <maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
-        <maven-jar-plugin.version>3.1.2</maven-jar-plugin.version>
-        <maven-javadoc-plugin.version>3.1.0</maven-javadoc-plugin.version>
-        <maven-jxr-plugin.version>3.0.0</maven-jxr-plugin.version>
+        <version.maven-antrun-plugin>1.8</version.maven-antrun-plugin>
+        <version.maven-changes-plugin>2.12.1</version.maven-changes-plugin>
+        <version.maven-checkstyle-plugin>3.0.0</version.maven-checkstyle-plugin>
+        <version.maven-clean-plugin>3.1.0</version.maven-clean-plugin>
+        <version.maven-compiler-plugin>3.8.0</version.maven-compiler-plugin>
+        <version.maven-dependency-plugin>3.1.1</version.maven-dependency-plugin>
+        <!--<version.maven-deploy-plugin>2.8.2</version.maven-deploy-plugin>-->
+        <version.maven-deploy-plugin>3.0.0-M1</version.maven-deploy-plugin>
+        <version.maven-enforcer-plugin>3.0.0-M2</version.maven-enforcer-plugin>
+        <!--<version.maven-failsafe-plugin>2.21.0</version.maven-failsafe-plugin>-->
+        <version.maven-failsafe-plugin>3.0.0-M3</version.maven-failsafe-plugin>
+        <version.maven-gpg-plugin>1.6</version.maven-gpg-plugin>
+        <!--<version.maven-install-plugin>2.5.2</version.maven-install-plugin>-->
+        <version.maven-install-plugin>3.0.0-M1</version.maven-install-plugin>
+        <version.maven-jar-plugin>3.1.2</version.maven-jar-plugin>
+        <version.maven-javadoc-plugin>3.1.0</version.maven-javadoc-plugin>
+        <version.maven-jxr-plugin>3.0.0</version.maven-jxr-plugin>
         <!-- maven-pmd-plugin:3.6   depends on net.sourceforge.pmd:pmd:5.3.5 -->
         <!-- maven-pmd-plugin:3.7   depends on net.sourceforge.pmd:pmd:5.5.1 -->
         <!-- maven-pmd-plugin:3.9.0 depends on net.sourceforge.pmd:pmd:6.4.0 -->
         <!-- maven-pmd-plugin:3.10.0 depends on net.sourceforge.pmd:pmd:6.4.0 -->
         <!-- maven-pmd-plugin:3.11.0 depends on net.sourceforge.pmd:pmd:6.8.0 -->
-        <maven-pmd-plugin.version>3.11.0</maven-pmd-plugin.version>
-        <maven-project-info-reports-plugin.version>3.0.0</maven-project-info-reports-plugin.version>
-        <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
-        <maven-site-plugin.version>3.7.1</maven-site-plugin.version>
-        <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
-        <!--<maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>-->
-        <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
-        <maven-surefire-report-plugin.version>3.0.0-M3</maven-surefire-report-plugin.version>
-        <maven-toolchains-plugin.version>1.1</maven-toolchains-plugin.version>
+        <version.maven-pmd-plugin>3.11.0</version.maven-pmd-plugin>
+        <version.maven-project-info-reports-plugin>3.0.0</version.maven-project-info-reports-plugin>
+        <version.maven-resources-plugin>3.1.0</version.maven-resources-plugin>
+        <version.maven-site-plugin>3.7.1</version.maven-site-plugin>
+        <version.maven-source-plugin>3.0.1</version.maven-source-plugin>
+        <!--<version.maven-surefire-plugin>2.21.0</version.maven-surefire-plugin>-->
+        <version.maven-surefire-plugin>3.0.0-M3</version.maven-surefire-plugin>
+        <version.maven-surefire-report-plugin>3.0.0-M3</version.maven-surefire-report-plugin>
+        <version.maven-toolchains-plugin>1.1</version.maven-toolchains-plugin>
 
-        <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
+        <version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
 
-        <org.codehaus.plexus_plexus-compiler-javac-errorprone.version>2.8.5</org.codehaus.plexus_plexus-compiler-javac-errorprone.version>
-        <org.jacoco_jacoco.version>0.8.3</org.jacoco_jacoco.version>
-        <!--<org.sonarsource.java_sonar-jacoco-listeners.version>5.3.0.13828</org.sonarsource.java_sonar-jacoco-listeners.version>-->
-        <!--<org.sonarsource.java_sonar-jacoco-listeners.version>5.9.1.16423</org.sonarsource.java_sonar-jacoco-listeners.version>-->
-        <org.sonarsource.java_sonar-jacoco-listeners.version>5.11.0.17289</org.sonarsource.java_sonar-jacoco-listeners.version>
+        <version.org.codehaus.plexus_plexus-compiler-javac-errorprone>2.8.5</version.org.codehaus.plexus_plexus-compiler-javac-errorprone>
+        <version.org.jacoco_jacoco>0.8.3</version.org.jacoco_jacoco>
+        <!--<version.org.sonarsource.java_sonar-jacoco-listeners>5.3.0.13828</version.org.sonarsource.java_sonar-jacoco-listeners>-->
+        <!--<version.org.sonarsource.java_sonar-jacoco-listeners>5.9.1.16423</version.org.sonarsource.java_sonar-jacoco-listeners>-->
+        <version.org.sonarsource.java_sonar-jacoco-listeners>5.11.0.17289</version.org.sonarsource.java_sonar-jacoco-listeners>
 
-        <pegdown.version>1.6.0</pegdown.version>
-        <properties-maven-plugin.version>1.0.0</properties-maven-plugin.version>
-        <qualinsight-mojo-cobertura-core.version>2.0.0</qualinsight-mojo-cobertura-core.version>
+        <version.pegdown>1.6.0</version.pegdown>
+        <version.properties-maven-plugin>1.0.0</version.properties-maven-plugin>
+        <version.qualinsight-mojo-cobertura-core>2.0.0</version.qualinsight-mojo-cobertura-core>
 
-        <scala.version>2.12.8</scala.version>
-        <scala-maven-plugin.version>4.0.1</scala-maven-plugin.version>
 
-        <!--<sonar-maven-plugin.version>3.4.1.1168</sonar-maven-plugin.version>-->
-        <!--<sonar-maven-plugin.version>3.5.0.1254</sonar-maven-plugin.version>-->
-        <sonar-maven-plugin.version>3.6.0.1398</sonar-maven-plugin.version>
+        <version.site-maven-plugin>0.13.0.OSS-M1</version.site-maven-plugin>
+        <version.scala-maven-plugin>4.0.1</version.scala-maven-plugin>
 
-        <taglist-maven-plugin.version>2.4</taglist-maven-plugin.version>
-        <umlgraph.version>5.6.6</umlgraph.version>
-        <versions-maven-plugin.version>2.7</versions-maven-plugin.version>
+        <!--<version.sonar-maven-plugin>3.4.1.1168</version.sonar-maven-plugin>-->
+        <!--<version.sonar-maven-plugin>3.5.0.1254</version.sonar-maven-plugin>-->
+        <version.sonar-maven-plugin>3.6.0.1398</version.sonar-maven-plugin>
+
+        <version.taglist-maven-plugin>2.4</version.taglist-maven-plugin>
+        <version.umlgraph>5.6.6</version.umlgraph>
+        <version.versions-maven-plugin>2.7</version.versions-maven-plugin>
+
+        <version.io.fabric8_docker-maven-plugin>0.28.0</version.io.fabric8_docker-maven-plugin>
+        <version.com.spotify_docker-maven-plugin>1.2.0</version.com.spotify_docker-maven-plugin>
+        <version.com.spotify_dockerfile-maven-plugin>1.4.10</version.com.spotify_dockerfile-maven-plugin>
+
         <!-- Why org.codehaus.mojo:wagon-maven-plugin:wagon-maven-plugin-2.0.1-snapshot-chshawkn-1.6?
             see: https://www.mail-archive.com/users@maven.apache.org/msg129243.html -->
         <!--http://www.mojohaus.org/wagon-maven-plugin/usage.html-->
         <!--http://www.mojohaus.org/wagon-maven-plugin/-->
-        <wagon-maven-plugin.version>wagon-maven-plugin-2.0.1-snapshot-chshawkn-1.6</wagon-maven-plugin.version>
-        <wagon-ssh.version>3.0.0</wagon-ssh.version>
-        <wagon-webdav-jackrabbit.version>3.0.0</wagon-webdav-jackrabbit.version>
-        <!--<wrapper-maven-plugin.version>0.0.4</wrapper-maven-plugin.version>-->
+        <version.wagon-maven-plugin>wagon-maven-plugin-2.0.1-snapshot-chshawkn-1.6</version.wagon-maven-plugin>
+        <version.wagon-ssh>3.0.0</version.wagon-ssh>
+        <version.wagon-webdav-jackrabbit>3.0.0</version.wagon-webdav-jackrabbit>
+        <!--<version.wrapper-maven-plugin>0.0.4</version.wrapper-maven-plugin>-->
     </properties>
 
     <build>
+        <extensions>
+            <!-- for the dependency type 'docker-info' to be supported -->
+            <extension>
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-extension</artifactId>
+                <version>${version.com.spotify_dockerfile-maven-plugin}</version>
+            </extension>
+        </extensions>
         <pluginManagement>
             <plugins>
                 <!-- @formatter:off -->
-                <plugin><groupId>com.amashchenko.maven.plugin</groupId><artifactId>gitflow-maven-plugin</artifactId><version>${gitflow-maven-plugin.version}</version></plugin>
+                <plugin><groupId>com.amashchenko.maven.plugin</groupId><artifactId>gitflow-maven-plugin</artifactId><version>${version.gitflow-maven-plugin}</version></plugin>
                 <plugin>
                     <groupId>com.github.sviperll</groupId>
                     <artifactId>coreext-maven-plugin</artifactId>
@@ -397,29 +422,29 @@
                         </extensions>
                     </configuration>
                 </plugin>
-                <plugin><groupId>com.mysema.maven</groupId><artifactId>apt-maven-plugin</artifactId><version>${apt-maven-plugin.version}</version></plugin>
-                <plugin><groupId>com.soebes.maven.plugins</groupId><artifactId>echo-maven-plugin</artifactId><version>${echo-maven-plugin.version}</version></plugin>
+                <plugin><groupId>com.mysema.maven</groupId><artifactId>apt-maven-plugin</artifactId><version>${version.apt-maven-plugin}</version></plugin>
+                <plugin><groupId>com.soebes.maven.plugins</groupId><artifactId>echo-maven-plugin</artifactId><version>${version.echo-maven-plugin}</version></plugin>
                 <!-- Use groovy-maven-plugin for groovy scripts to replace gmaven-plugin -->
-                <!--<plugin><groupId>org.codehaus.groovy.maven</groupId><artifactId>gmaven-plugin</artifactId><version>${gmaven-plugin.version}</version></plugin>-->
+                <!--<plugin><groupId>org.codehaus.groovy.maven</groupId><artifactId>gmaven-plugin</artifactId><version>${version.gmaven-plugin}</version></plugin>-->
                 <plugin>
-                    <groupId>org.codehaus.gmaven</groupId><artifactId>groovy-maven-plugin</artifactId><version>${groovy-maven-plugin.version}</version>
+                    <groupId>org.codehaus.gmaven</groupId><artifactId>groovy-maven-plugin</artifactId><version>${version.groovy-maven-plugin}</version>
                     <dependencies><dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy</artifactId><classifier>indy</classifier><version>${groovy.version}</version></dependency></dependencies>
                 </plugin>
-                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>${build-helper-maven-plugin.version}</version></plugin>
-                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>properties-maven-plugin</artifactId><version>${properties-maven-plugin.version}</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>${version.build-helper-maven-plugin}</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>properties-maven-plugin</artifactId><version>${version.properties-maven-plugin}</version></plugin>
                 <plugin>
-                    <artifactId>maven-antrun-plugin</artifactId><version>${maven-antrun-plugin.version}</version>
+                    <artifactId>maven-antrun-plugin</artifactId><version>${version.maven-antrun-plugin}</version>
                     <dependencies>
-                        <dependency><groupId>ant-contrib</groupId><artifactId>ant-contrib</artifactId><version>${ant-contrib.version}</version></dependency>
+                        <dependency><groupId>ant-contrib</groupId><artifactId>ant-contrib</artifactId><version>${version.ant-contrib}</version></dependency>
                     </dependencies>
                 </plugin>
-                <plugin><artifactId>maven-changes-plugin</artifactId><version>${maven-changes-plugin.version}</version></plugin>
-                <plugin><artifactId>maven-clean-plugin</artifactId><version>${maven-clean-plugin.version}</version></plugin>
-                <plugin><artifactId>maven-compiler-plugin</artifactId><version>${maven-compiler-plugin.version}</version></plugin>
-                <plugin><artifactId>maven-dependency-plugin</artifactId><version>${maven-dependency-plugin.version}</version></plugin>
-                <plugin><artifactId>maven-deploy-plugin</artifactId><version>${maven-deploy-plugin.version}</version></plugin>
+                <plugin><artifactId>maven-changes-plugin</artifactId><version>${version.maven-changes-plugin}</version></plugin>
+                <plugin><artifactId>maven-clean-plugin</artifactId><version>${version.maven-clean-plugin}</version></plugin>
+                <plugin><artifactId>maven-compiler-plugin</artifactId><version>${version.maven-compiler-plugin}</version></plugin>
+                <plugin><artifactId>maven-dependency-plugin</artifactId><version>${version.maven-dependency-plugin}</version></plugin>
+                <plugin><artifactId>maven-deploy-plugin</artifactId><version>${version.maven-deploy-plugin}</version></plugin>
                 <plugin>
-                    <artifactId>maven-enforcer-plugin</artifactId><version>${maven-enforcer-plugin.version}</version>
+                    <artifactId>maven-enforcer-plugin</artifactId><version>${version.maven-enforcer-plugin}</version>
                     <configuration>
                         <rules>
                             <!-- Note: travis-ci uses old maven version  -->
@@ -442,7 +467,7 @@
                     </configuration>
                 </plugin>
                 <plugin>
-                    <artifactId>maven-failsafe-plugin</artifactId><version>${maven-failsafe-plugin.version}</version>
+                    <artifactId>maven-failsafe-plugin</artifactId><version>${version.maven-failsafe-plugin}</version>
                     <configuration>
                         <argLine>${jacoco.agent.it.arg} ${argLine}</argLine>
                         <skip>${skipITs}</skip>
@@ -462,18 +487,18 @@
                         </excludes>
                     </configuration>
                 </plugin>
-                <plugin><artifactId>maven-gpg-plugin</artifactId><version>${maven-gpg-plugin.version}</version></plugin>
-                <plugin><artifactId>maven-install-plugin</artifactId><version>${maven-install-plugin.version}</version></plugin>
-                <plugin><artifactId>maven-jar-plugin</artifactId><version>${maven-jar-plugin.version}</version></plugin>
+                <plugin><artifactId>maven-gpg-plugin</artifactId><version>${version.maven-gpg-plugin}</version></plugin>
+                <plugin><artifactId>maven-install-plugin</artifactId><version>${version.maven-install-plugin}</version></plugin>
+                <plugin><artifactId>maven-jar-plugin</artifactId><version>${version.maven-jar-plugin}</version></plugin>
                 <plugin>
-                    <artifactId>maven-javadoc-plugin</artifactId><version>${maven-javadoc-plugin.version}</version>
+                    <artifactId>maven-javadoc-plugin</artifactId><version>${version.maven-javadoc-plugin}</version>
                     <configuration>
                         <additionalJOption>-J-Duser.language=en</additionalJOption>
                         <!--<additionalOptions>-views -all</additionalOptions>-->
                         <charset>${project.build.sourceEncoding}</charset>
                         <!--<doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>-->
                         <!-- UML Graph needs to match HTML tag to insert images into javadoc -->
-                        <!--<docletArtifact><groupId>org.umlgraph</groupId><artifactId>umlgraph</artifactId><version>${umlgraph.version}</version></docletArtifact>-->
+                        <!--<docletArtifact><groupId>org.umlgraph</groupId><artifactId>umlgraph</artifactId><version>${version.umlgraph}</version></docletArtifact>-->
                         <doclint>none</doclint>
                         <encoding>${project.build.sourceEncoding}</encoding>
                         <failOnError>${maven.javadoc.failsOnError}</failOnError>
@@ -485,14 +510,14 @@
                 <plugin>
                     <!-- https://maven.apache.org/plugins/maven-source-plugin/test-jar-no-fork-mojo.html -->
                     <!-- Use 'jar-no-fork' not 'jar' to avoid trigger default lifecycle binding of @Execute( phase = LifecyclePhase.GENERATE_SOURCES ) -->
-                    <artifactId>maven-source-plugin</artifactId><version>${maven-source-plugin.version}</version>
+                    <artifactId>maven-source-plugin</artifactId><version>${version.maven-source-plugin}</version>
                     <configuration>
                         <skipSource>${maven.source.skip}</skipSource>
                     </configuration>
                 </plugin>
-                <plugin><artifactId>maven-resources-plugin</artifactId><version>${maven-resources-plugin.version}</version></plugin>
+                <plugin><artifactId>maven-resources-plugin</artifactId><version>${version.maven-resources-plugin}</version></plugin>
                 <plugin>
-                    <artifactId>maven-surefire-plugin</artifactId><version>${maven-surefire-plugin.version}</version>
+                    <artifactId>maven-surefire-plugin</artifactId><version>${version.maven-surefire-plugin}</version>
                     <!--<configuration><skipTests>${skipTests}</skipTests></configuration>-->
                     <configuration>
                         <argLine>${jacoco.agent.ut.arg} ${argLine}</argLine>
@@ -515,46 +540,46 @@
                         <useSystemClassLoader>false</useSystemClassLoader>
                     </configuration>
                     <dependencies>
-                        <dependency><groupId>org.ow2.asm</groupId><artifactId>asm</artifactId><version>${asm.version}</version></dependency>
+                        <dependency><groupId>org.ow2.asm</groupId><artifactId>asm</artifactId><version>${version.asm}</version></dependency>
                     </dependencies>
                 </plugin>
                 <plugin>
-                    <artifactId>maven-toolchains-plugin</artifactId><version>${maven-toolchains-plugin.version}</version>
+                    <artifactId>maven-toolchains-plugin</artifactId><version>${version.maven-toolchains-plugin}</version>
                     <configuration>
                         <toolchains><jdk><version>default</version><!--<vendor>oracle</vendor>--></jdk></toolchains>
                     </configuration>
                 </plugin>
 
                 <plugin>
-                    <artifactId>maven-project-info-reports-plugin</artifactId><version>${maven-project-info-reports-plugin.version}</version>
+                    <artifactId>maven-project-info-reports-plugin</artifactId><version>${version.maven-project-info-reports-plugin}</version>
                 </plugin>
                 <!-- @formatter:on -->
 
                 <!-- @formatter:off -->
                 <plugin>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>${maven-site-plugin.version}</version>
+                    <version>${version.maven-site-plugin}</version>
                     <dependencies>
-                        <dependency><groupId>org.apache.maven.doxia</groupId><artifactId>doxia-module-markdown</artifactId><version>${doxia-module-markdown.version}</version></dependency>
-                        <dependency><groupId>org.pegdown</groupId><artifactId>pegdown</artifactId><version>${pegdown.version}</version></dependency>
-                        <dependency><groupId>org.apache.maven.wagon</groupId><artifactId>wagon-webdav-jackrabbit</artifactId><version>${wagon-webdav-jackrabbit.version}</version></dependency>
+                        <dependency><groupId>org.apache.maven.doxia</groupId><artifactId>doxia-module-markdown</artifactId><version>${version.doxia-module-markdown}</version></dependency>
+                        <dependency><groupId>org.pegdown</groupId><artifactId>pegdown</artifactId><version>${version.pegdown}</version></dependency>
+                        <dependency><groupId>org.apache.maven.wagon</groupId><artifactId>wagon-webdav-jackrabbit</artifactId><version>${version.wagon-webdav-jackrabbit}</version></dependency>
                         <!-- org.apache.maven.wagon:wagon-ssh support ssh/scp and password only -->
                         <dependency>
                             <groupId>org.apache.maven.wagon</groupId>
                             <artifactId>wagon-ssh</artifactId>
-                            <version>${wagon-ssh.version}</version>
+                            <version>${version.wagon-ssh}</version>
                             <exclusions>
                                 <exclusion><groupId>com.jcraft</groupId><artifactId>jsch</artifactId></exclusion>
                             </exclusions>
                         </dependency>
-                        <dependency><groupId>com.jcraft</groupId><artifactId>jsch</artifactId><version>${jsch.version}</version></dependency>
+                        <dependency><groupId>com.jcraft</groupId><artifactId>jsch</artifactId><version>${version.jsch}</version></dependency>
                         <!-- support for sshexe/scpexe and privateKey -->
-                        <dependency><groupId>org.apache.maven.wagon</groupId><artifactId>wagon-ssh-external</artifactId><version>${wagon-ssh.version}</version></dependency>
+                        <dependency><groupId>org.apache.maven.wagon</groupId><artifactId>wagon-ssh-external</artifactId><version>${version.wagon-ssh}</version></dependency>
                         <!-- provide org.apache.maven.wagon.providers.ssh.knownhost.NullKnownHostProvider -->
                         <dependency>
                             <groupId>org.apache.maven.wagon</groupId>
                             <artifactId>wagon-ssh-common</artifactId>
-                            <version>${wagon-ssh.version}</version>
+                            <version>${version.wagon-ssh}</version>
                             <exclusions>
                                 <exclusion><groupId>org.codehaus.plexus</groupId><artifactId>plexus-utils</artifactId></exclusion>
                             </exclusions>
@@ -564,14 +589,14 @@
                 <!-- @formatter:on -->
 
                 <!-- @formatter:off -->
-                <plugin><groupId>org.asciidoctor</groupId><artifactId>asciidoctor-maven-plugin</artifactId><version>${asciidoctor-maven-plugin.version}</version></plugin>
+                <plugin><groupId>org.asciidoctor</groupId><artifactId>asciidoctor-maven-plugin</artifactId><version>${version.asciidoctor-maven-plugin}</version></plugin>
                 <plugin>
-                    <groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId><version>${dependency-check-maven.version}</version>
+                    <groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId><version>${version.dependency-check-maven}</version>
                     <!--<configuration><connectionString>${dependency-check-maven.connectionString}</connectionString></configuration>-->
                 </plugin>
-                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>animal-sniffer-maven-plugin</artifactId><version>${animal-sniffer-maven-plugin.version}</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>animal-sniffer-maven-plugin</artifactId><version>${version.animal-sniffer-maven-plugin}</version></plugin>
                 <!--<plugin>-->
-                    <!--<groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId><version>${findbugs-maven-plugin.version}</version>-->
+                    <!--<groupId>org.codehaus.mojo</groupId><artifactId>findbugs-maven-plugin</artifactId><version>${version.findbugs-maven-plugin}</version>-->
                     <!--<configuration>-->
                         <!--<classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>-->
                         <!--<effort>${findbugs.effort}</effort>-->
@@ -589,22 +614,22 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>${spotbugs-maven-plugin.version}</version>
+                    <version>${version.spotbugs-maven-plugin}</version>
                     <dependencies>
                         <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
                         <dependency>
                             <groupId>com.github.spotbugs</groupId>
                             <artifactId>spotbugs</artifactId>
-                            <version>${spotbugs.version}</version>
+                            <version>${version.spotbugs}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
-                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>jdepend-maven-plugin</artifactId><version>${jdepend-maven-plugin.version}</version></plugin>
-                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>taglist-maven-plugin</artifactId><version>${taglist-maven-plugin.version}</version></plugin>
-                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>versions-maven-plugin</artifactId><version>${versions-maven-plugin.version}</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>jdepend-maven-plugin</artifactId><version>${version.jdepend-maven-plugin}</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>taglist-maven-plugin</artifactId><version>${version.taglist-maven-plugin}</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>versions-maven-plugin</artifactId><version>${version.versions-maven-plugin}</version></plugin>
                 <plugin>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>${maven-checkstyle-plugin.version}</version>
+                    <version>${version.maven-checkstyle-plugin}</version>
                     <configuration>
                         <configLocation>${checkstyle.config.location}</configLocation>
                         <consoleOutput>${checkstyle.consoleOutput}</consoleOutput>
@@ -618,12 +643,12 @@
                         </sourceDirectories>
                     </configuration>
                     <dependencies>
-                        <dependency><groupId>com.puppycrawl.tools</groupId><artifactId>checkstyle</artifactId><version>${checkstyle.version}</version></dependency>
+                        <dependency><groupId>com.puppycrawl.tools</groupId><artifactId>checkstyle</artifactId><version>${version.checkstyle}</version></dependency>
                     </dependencies>
                 </plugin>
-                <plugin><artifactId>maven-jxr-plugin</artifactId><version>${maven-jxr-plugin.version}</version></plugin>
+                <plugin><artifactId>maven-jxr-plugin</artifactId><version>${version.maven-jxr-plugin}</version></plugin>
                 <plugin>
-                    <artifactId>maven-pmd-plugin</artifactId><version>${maven-pmd-plugin.version}</version>
+                    <artifactId>maven-pmd-plugin</artifactId><version>${version.maven-pmd-plugin}</version>
                     <configuration>
                         <!-- Dont include clover instrumented src, when pmd  -->
                         <excludeRoots><excludeRoot>${project.build.directory}/clover/src</excludeRoot></excludeRoots>
@@ -637,13 +662,13 @@
                         <verbose>${pmd.verbose}</verbose>
                     </configuration>
                 </plugin>
-                <plugin><artifactId>maven-surefire-report-plugin</artifactId><version>${maven-surefire-report-plugin.version}</version></plugin>
+                <plugin><artifactId>maven-surefire-report-plugin</artifactId><version>${version.maven-surefire-report-plugin}</version></plugin>
 
-                <plugin><groupId>org.sonatype.plugins</groupId><artifactId>nexus-staging-maven-plugin</artifactId><version>${nexus-staging-maven-plugin.version}</version></plugin>
+                <plugin><groupId>org.sonatype.plugins</groupId><artifactId>nexus-staging-maven-plugin</artifactId><version>${version.nexus-staging-maven-plugin}</version></plugin>
                 <plugin>
                     <groupId>pl.project13.maven</groupId>
                     <artifactId>git-commit-id-plugin</artifactId>
-                    <version>${git-commit-id-plugin.version}</version>
+                    <version>${version.git-commit-id-plugin}</version>
                     <configuration>
                         <commitIdGenerationMode>flat</commitIdGenerationMode>
                         <dotGitDirectory>${maven.multiModuleProjectDirectory}/.git</dotGitDirectory>
@@ -660,7 +685,74 @@
                     </configuration>
                 </plugin>
 
-                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>wagon-maven-plugin</artifactId><version>${wagon-maven-plugin.version}</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>wagon-maven-plugin</artifactId><version>${version.wagon-maven-plugin}</version></plugin>
+
+                <plugin>
+                    <groupId>com.spotify</groupId>
+                    <artifactId>dockerfile-maven-plugin</artifactId>
+                    <version>${version.com.spotify_dockerfile-maven-plugin}</version>
+                    <configuration>
+                        <buildArgs>
+                            <ARTIFACT_REPOSITORY>${private.nexus3}</ARTIFACT_REPOSITORY>
+                            <BUILD_TIMESTAMP>${maven.build.timestamp}</BUILD_TIMESTAMP>
+                            <DOCKER_REGISTRY>${docker.registry}</DOCKER_REGISTRY>
+                            <GIT_BRANCH>${git.branch}</GIT_BRANCH>
+                            <GIT_COMMIT_ID>${git.commit.id}</GIT_COMMIT_ID>
+                            <GIT_COMMIT_ID_ABBREV>${git.commit.id.abbrev}</GIT_COMMIT_ID_ABBREV>
+                            <GIT_COMMIT_TIME>${git.commit.time}</GIT_COMMIT_TIME>
+                            <GIT_REMOTE_ORIGIN_URL>${git.remote.origin.url}</GIT_REMOTE_ORIGIN_URL>
+                            <JAR_FILE>${project.build.finalName}-exec.jar</JAR_FILE>
+                            <PROJECT_ARTIFACTID>${project.artifactId}</PROJECT_ARTIFACTID>
+                            <PROJECT_GROUPID>${project.groupId}</PROJECT_GROUPID>
+                            <PROJECT_VERSION>${project.version}</PROJECT_VERSION>
+                        </buildArgs>
+                        <tag>${project.version}</tag>
+                        <useMavenSettingsForAuth>${dockerfile.useMavenSettingsForAuth}</useMavenSettingsForAuth>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>javax.activation</groupId>
+                            <artifactId>activation</artifactId>
+                            <version>${version.javax.activation}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <!--
+                <plugin>
+                    <groupId>com.spotify</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>${version.com.spotify_docker-maven-plugin}</version>
+                    <configuration>
+                        <imageTags>
+                            <imageTag>${project.version}</imageTag>
+                        </imageTags>
+                        <resources>
+                            <resource>
+                                <targetPath>/</targetPath>
+                                <directory>${project.build.directory}</directory>
+                                <include>${project.build.finalName}.jar</include>
+                                <include>${project.build.finalName}-exec.jar</include>
+                            </resource>
+                        </resources>
+                        <dockerDirectory>${project.basedir}</dockerDirectory>
+                        <noCache>true</noCache>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>remove-image</id>
+                            <phase>clean</phase>
+                            <goals>
+                                <goal>removeImage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                -->
+                <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>${version.io.fabric8_docker-maven-plugin}</version>
+                </plugin>
                 <!-- @formatter:on -->
             </plugins>
         </pluginManagement>
@@ -747,8 +839,8 @@
                     <!--<forceJavacCompilerUse>true</forceJavacCompilerUse>-->
                 </configuration>
                 <dependencies>
-                    <dependency><groupId>org.codehaus.plexus</groupId><artifactId>plexus-compiler-javac-errorprone</artifactId><version>${org.codehaus.plexus_plexus-compiler-javac-errorprone.version}</version></dependency>
-                    <dependency><groupId>com.google.errorprone</groupId><artifactId>error_prone_core</artifactId><version>${com.google.errorprone_error_prone_core.version}</version></dependency>
+                    <dependency><groupId>org.codehaus.plexus</groupId><artifactId>plexus-compiler-javac-errorprone</artifactId><version>${version.org.codehaus.plexus_plexus-compiler-javac-errorprone}</version></dependency>
+                    <dependency><groupId>com.google.errorprone</groupId><artifactId>error_prone_core</artifactId><version>${version.com.google.errorprone_error_prone_core}</version></dependency>
                 </dependencies>
             </plugin>
             <!-- @formatter:on -->
@@ -756,7 +848,7 @@
             <!-- use mvn -N io.takari:maven:0.7.6:wrapper -Dmaven=3.6.1 instead of mvn wrapper:wrapper -->
             <!-- mvn wrapper:wrapper -->
             <!--<plugin>
-                <groupId>com.rimerosolutions.maven.plugins</groupId><artifactId>wrapper-maven-plugin</artifactId><version>${wrapper-maven-plugin.version}</version>
+                <groupId>com.rimerosolutions.maven.plugins</groupId><artifactId>wrapper-maven-plugin</artifactId><version>${version.wrapper-maven-plugin}</version>
                 <configuration><mavenVersion>3.6.0</mavenVersion></configuration>
             </plugin>-->
         </plugins>
@@ -768,9 +860,9 @@
     <dependencyManagement>
         <!-- @formatter:off -->
         <dependencies>
-            <dependency><groupId>com.google.code.findbugs</groupId><artifactId>annotations</artifactId><version>${findbugs-annotations.version}</version></dependency>
-            <dependency><groupId>com.google.code.findbugs</groupId><artifactId>jsr305</artifactId><version>${findbugs-jsr305.version}</version></dependency>
-            <dependency><groupId>org.jetbrains</groupId><artifactId>annotations</artifactId><version>${jetbrains-annotations.version}</version></dependency>
+            <dependency><groupId>com.google.code.findbugs</groupId><artifactId>annotations</artifactId><version>${version.findbugs-annotations}</version></dependency>
+            <dependency><groupId>com.google.code.findbugs</groupId><artifactId>jsr305</artifactId><version>${version.findbugs-jsr305}</version></dependency>
+            <dependency><groupId>org.jetbrains</groupId><artifactId>annotations</artifactId><version>${version.jetbrains-annotations}</version></dependency>
         </dependencies>
         <!-- @formatter:on -->
     </dependencyManagement>
@@ -1059,7 +1151,7 @@
                     <plugins>
                         <!-- see: https://github.com/SonarSource/sonar-scanner-maven -->
                         <plugin>
-                            <groupId>org.sonarsource.scanner.maven</groupId><artifactId>sonar-maven-plugin</artifactId><version>${sonar-maven-plugin.version}</version></plugin>
+                            <groupId>org.sonarsource.scanner.maven</groupId><artifactId>sonar-maven-plugin</artifactId><version>${version.sonar-maven-plugin}</version></plugin>
                     </plugins>
                 </pluginManagement>
                 <plugins>
@@ -1095,7 +1187,7 @@
             </build>
             <dependencies>
                 <!-- sonar-jacoco-listeners's version should match version of sonar-java-plugin -->
-                <dependency><artifactId>sonar-jacoco-listeners</artifactId><groupId>org.sonarsource.java</groupId><version>${org.sonarsource.java_sonar-jacoco-listeners.version}</version><scope>test</scope></dependency>
+                <dependency><artifactId>sonar-jacoco-listeners</artifactId><groupId>org.sonarsource.java</groupId><version>${version.org.sonarsource.java_sonar-jacoco-listeners}</version><scope>test</scope></dependency>
             </dependencies>
         </profile>
 
@@ -1109,7 +1201,7 @@
             <build>
                 <pluginManagement>
                     <plugins>
-                        <plugin><groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId><version>${org.jacoco_jacoco.version}</version></plugin>
+                        <plugin><groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId><version>${version.org.jacoco_jacoco}</version></plugin>
                     </plugins>
                 </pluginManagement>
                 <plugins>
@@ -1178,7 +1270,7 @@
                 </plugins>
             </build>
             <dependencies>
-                <dependency><groupId>org.jacoco</groupId><artifactId>org.jacoco.agent</artifactId><classifier>runtime</classifier><scope>test</scope><version>${org.jacoco_jacoco.version}</version></dependency>
+                <dependency><groupId>org.jacoco</groupId><artifactId>org.jacoco.agent</artifactId><classifier>runtime</classifier><scope>test</scope><version>${version.org.jacoco_jacoco}</version></dependency>
             </dependencies>
         </profile>
 
@@ -1192,17 +1284,17 @@
             <id>cobertura</id>
             <activation><property><name>jacoco</name><value>false</value></property></activation>
             <properties>
-                <net.sourceforge.cobertura_cobertura.version>2.1.1</net.sourceforge.cobertura_cobertura.version>
-                <junit_junit.version>4.12</junit_junit.version>
+                <version.net.sourceforge.cobertura_cobertura>2.1.1</version.net.sourceforge.cobertura_cobertura>
+                <version.junit_junit>4.12</version.junit_junit>
             </properties>
             <dependencyManagement>
                 <dependencies>
                     <dependency>
-                        <groupId>net.sourceforge.cobertura</groupId><artifactId>cobertura</artifactId><version>${net.sourceforge.cobertura_cobertura.version}</version>
+                        <groupId>net.sourceforge.cobertura</groupId><artifactId>cobertura</artifactId><version>${version.net.sourceforge.cobertura_cobertura}</version>
                         <exclusions><exclusion><groupId>ch.qos.logback</groupId><artifactId>logback-classic</artifactId></exclusion></exclusions>
                     </dependency>
                     <dependency>
-                        <groupId>junit</groupId><artifactId>junit</artifactId><version>${junit_junit.version}</version>
+                        <groupId>junit</groupId><artifactId>junit</artifactId><version>${version.junit_junit}</version>
                     </dependency>
                 </dependencies>
             </dependencyManagement>
@@ -1213,8 +1305,8 @@
             <build>
                 <pluginManagement>
                     <plugins>
-                        <plugin><groupId>com.qualinsight.mojo.cobertura</groupId><artifactId>qualinsight-mojo-cobertura-core</artifactId><version>${qualinsight-mojo-cobertura-core.version}</version></plugin>
-                        <!--<plugin><groupId>org.codehaus.mojo</groupId><artifactId>cobertura-maven-plugin</artifactId><version>${cobertura-maven-plugin.version}</version></plugin>-->
+                        <plugin><groupId>com.qualinsight.mojo.cobertura</groupId><artifactId>qualinsight-mojo-cobertura-core</artifactId><version>${version.qualinsight-mojo-cobertura-core}</version></plugin>
+                        <!--<plugin><groupId>org.codehaus.mojo</groupId><artifactId>cobertura-maven-plugin</artifactId><version>${version.cobertura-maven-plugin}</version></plugin>-->
                     </plugins>
                 </pluginManagement>
                 <plugins>
@@ -1386,7 +1478,7 @@
         </profile>
 
         <profile>
-            <!-- multi_module_root_only is a keyword for maven-build-extension to activate this profile on root project only -->
+            <!-- multi_module_root_only is a keyword for topinfra-maven-extension to activate this profile on root project only -->
             <id>clean-maven-profiler-report-directory-run-on-multi_module_root_only</id>
             <activation><property><name>profile</name></property></activation>
             <build>
@@ -1398,7 +1490,7 @@
                             <execution>
                                 <id>maven-profiler-report-clean</id>
                                 <!--
-                                If bind to a phase (e.g. clean) and run without maven-build-extension,
+                                If bind to a phase (e.g. clean) and run without topinfra-maven-extension,
                                 it will run at that phase on every modules and clean multiple times.
                                 -->
                                 <!--
@@ -1421,7 +1513,7 @@
         </profile>
 
         <profile>
-            <!-- multi_module_root_only is a keyword for maven-build-extension to activate this profile on root project only -->
+            <!-- multi_module_root_only is a keyword for topinfra-maven-extension to activate this profile on root project only -->
             <id>mvn-deploy-publish-segregation-wagon-repository-clean-run-on-multi_module_root_only</id>
             <activation><property><name>mvn.deploy.publish.segregation</name><value>true</value></property></activation>
             <build>
@@ -1455,7 +1547,7 @@
                             <execution>
                                 <id>wagon-repository-clean</id>
                                 <!--
-                                If bind to a phase (e.g. clean) and run without maven-build-extension,
+                                If bind to a phase (e.g. clean) and run without topinfra-maven-extension,
                                 it will run at that phase on every modules and clean multiple times.
                                 -->
                                 <!--
@@ -1484,7 +1576,7 @@
         </profile>
 
         <profile>
-            <!-- multi_module_root_only is a keyword for maven-build-extension to activate this profile on root project only -->
+            <!-- multi_module_root_only is a keyword for topinfra-maven-extension to activate this profile on root project only -->
             <id>mvn-deploy-publish-segregation-merge-maven-repos-deploy-run-on-multi_module_root_only</id>
             <activation>
                 <property><name>mvn.deploy.publish.segregation.goal.deploy</name><value>true</value></property>
@@ -1500,7 +1592,7 @@
                             <execution>
                                 <id>merge-maven-repos-deploy</id>
                                 <!--
-                                If bind to a phase (e.g. deploy) and run without maven-build-extension,
+                                If bind to a phase (e.g. deploy) and run without topinfra-maven-extension,
                                 it will run at that phase on every modules and upload whole repository multiple times.
                                 -->
                                 <!--
@@ -1529,7 +1621,7 @@
                 <pluginManagement>
                     <plugins>
                         <plugin>
-                            <groupId>com.github.github</groupId><artifactId>site-maven-plugin</artifactId><version>${site-maven-plugin.version}</version>
+                            <groupId>com.github.github</groupId><artifactId>site-maven-plugin</artifactId><version>${version.site-maven-plugin}</version>
                         </plugin>
                     </plugins>
                 </pluginManagement>
@@ -2070,7 +2162,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId><artifactId>animal-sniffer-maven-plugin</artifactId>
                         <configuration>
-                            <signature><groupId>org.codehaus.mojo.signature</groupId><artifactId>java18</artifactId><version>${java18.version}</version></signature>
+                            <signature><groupId>org.codehaus.mojo.signature</groupId><artifactId>java18</artifactId><version>${version.java18}</version></signature>
                         </configuration>
                     </plugin>
                     <!--<plugin>
@@ -2157,7 +2249,7 @@
                         <plugin>
                             <groupId>com.github.eirslett</groupId>
                             <artifactId>frontend-maven-plugin</artifactId>
-                            <version>${frontend-maven-plugin.version}</version>
+                            <version>${version.frontend-maven-plugin}</version>
                             <configuration>
                                 <installDirectory>.mvn</installDirectory>
                                 <!-- Defaults to https://nodejs.org/dist/ -->
@@ -2308,7 +2400,7 @@
                         </plugin>
                         <plugin>
                             <artifactId>maven-toolchains-plugin</artifactId>
-                            <version>${maven-toolchains-plugin.version}</version>
+                            <version>${version.maven-toolchains-plugin}</version>
                             <configuration>
                                 <toolchains><jdk><version>8</version><!--<vendor>oracle</vendor>--></jdk></toolchains>
                             </configuration>
@@ -2333,7 +2425,7 @@
             <id>java9</id>
             <properties>
                 <!-- Runtime modules for java9 -->
-                <jaxb-api.version>2.3.0</jaxb-api.version>
+                <version.jaxb-api>2.3.0</version.jaxb-api>
                 <java.version>9</java.version>
                 <!--[ERROR] error: exporting a package from system module java.base is not allowed with -\-release-->
                 <!--<maven.compiler.release>9</maven.compiler.release>-->
@@ -2346,7 +2438,7 @@
                         <plugin>
                             <groupId>com.spotify</groupId><artifactId>docker-maven-plugin</artifactId>
                             <dependencies>
-                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
+                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${version.javax.activation}</version></dependency>
                             </dependencies>
                         </plugin>
                         <plugin>
@@ -2363,7 +2455,7 @@
                         </plugin>
                         <plugin>
                             <artifactId>maven-toolchains-plugin</artifactId>
-                            <version>${maven-toolchains-plugin.version}</version>
+                            <version>${version.maven-toolchains-plugin}</version>
                             <configuration>
                                 <toolchains><jdk><version>9</version><!--<vendor>oracle</vendor>--></jdk></toolchains>
                             </configuration>
@@ -2380,12 +2472,12 @@
             </build>
             <dependencyManagement>
                 <dependencies>
-                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
+                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${version.javax.activation}</version></dependency>
                     <!-- Hibernate java.lang.NoClassDefFoundError: javax/xml/bind/JAXBException -->
-                    <dependency><groupId>javax.xml.bind</groupId><artifactId>jaxb-api</artifactId><version>${jaxb-api.version}</version></dependency>
-                    <dependency><groupId>com.sun.xml.bind</groupId><artifactId>jaxb-core</artifactId><version>${jaxb-api.version}</version></dependency>
-                    <dependency><groupId>com.sun.xml.bind</groupId><artifactId>jaxb-impl</artifactId><version>${jaxb-api.version}</version></dependency>
-                    <dependency><groupId>org.glassfish.jaxb</groupId><artifactId>jaxb-runtime</artifactId><version>${jaxb-api.version}</version></dependency>
+                    <dependency><groupId>javax.xml.bind</groupId><artifactId>jaxb-api</artifactId><version>${version.jaxb-api}</version></dependency>
+                    <dependency><groupId>com.sun.xml.bind</groupId><artifactId>jaxb-core</artifactId><version>${version.jaxb-api}</version></dependency>
+                    <dependency><groupId>com.sun.xml.bind</groupId><artifactId>jaxb-impl</artifactId><version>${version.jaxb-api}</version></dependency>
+                    <dependency><groupId>org.glassfish.jaxb</groupId><artifactId>jaxb-runtime</artifactId><version>${version.jaxb-api}</version></dependency>
                 </dependencies>
             </dependencyManagement>
             <reporting>
@@ -2398,10 +2490,10 @@
             <id>java11-or-later</id>
             <properties>
                 <!-- Runtime modules for java11 -->
-                <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
-                <javax.transaction-api.version>1.3</javax.transaction-api.version>
-                <jaxb-api.version>2.3.0</jaxb-api.version>
-                <jaxws-api.version>2.3.0</jaxws-api.version>
+                <version.javax.annotation-api>1.3.2</version.javax.annotation-api>
+                <version.javax.transaction-api>1.3</version.javax.transaction-api>
+                <version.jaxb-api>2.3.0</version.jaxb-api>
+                <version.jaxws-api>2.3.0</version.jaxws-api>
                 <java.version>11</java.version>
                 <!--[ERROR] error: exporting a package from system module java.base is not allowed with -\-release-->
                 <!--<maven.compiler.release>11</maven.compiler.release>-->
@@ -2414,7 +2506,7 @@
                         <plugin>
                             <groupId>com.spotify</groupId><artifactId>docker-maven-plugin</artifactId>
                             <dependencies>
-                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
+                                <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${version.javax.activation}</version></dependency>
                             </dependencies>
                         </plugin>
                         <plugin>
@@ -2431,7 +2523,7 @@
                         </plugin>
                         <plugin>
                             <artifactId>maven-toolchains-plugin</artifactId>
-                            <version>${maven-toolchains-plugin.version}</version>
+                            <version>${version.maven-toolchains-plugin}</version>
                             <configuration>
                                 <toolchains><jdk><version>11</version><!--<vendor>oracle</vendor>--></jdk></toolchains>
                             </configuration>
@@ -2450,18 +2542,18 @@
                 <dependencies>
                     <!-- see: https://dzone.com/articles/apis-to-be-removed-from-java-11 -->
                     <!-- java.activation -->
-                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${javax.activation.version}</version></dependency>
+                    <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${version.javax.activation}</version></dependency>
                     <!-- java.transaction -->
-                    <!--<dependency><groupId>javax.transaction</groupId><artifactId>javax.transaction-api</artifactId><version>${javax.transaction-api.version}</version></dependency>-->
+                    <!--<dependency><groupId>javax.transaction</groupId><artifactId>javax.transaction-api</artifactId><version>${version.javax.transaction-api}</version></dependency>-->
                     <!-- Hibernate java.lang.NoClassDefFoundError: javax/xml/bind/JAXBException -->
                     <!-- java.xml.bind -->
-                    <dependency><groupId>javax.xml.bind</groupId><artifactId>jaxb-api</artifactId><version>${jaxb-api.version}</version></dependency>
-                    <dependency><groupId>com.sun.xml.bind</groupId><artifactId>jaxb-core</artifactId><version>${jaxb-api.version}</version></dependency>
-                    <dependency><groupId>com.sun.xml.bind</groupId><artifactId>jaxb-impl</artifactId><version>${jaxb-api.version}</version></dependency>
-                    <dependency><groupId>org.glassfish.jaxb</groupId><artifactId>jaxb-runtime</artifactId><version>${jaxb-api.version}</version></dependency>
+                    <dependency><groupId>javax.xml.bind</groupId><artifactId>jaxb-api</artifactId><version>${version.jaxb-api}</version></dependency>
+                    <dependency><groupId>com.sun.xml.bind</groupId><artifactId>jaxb-core</artifactId><version>${version.jaxb-api}</version></dependency>
+                    <dependency><groupId>com.sun.xml.bind</groupId><artifactId>jaxb-impl</artifactId><version>${version.jaxb-api}</version></dependency>
+                    <dependency><groupId>org.glassfish.jaxb</groupId><artifactId>jaxb-runtime</artifactId><version>${version.jaxb-api}</version></dependency>
                     <!-- java.xml.ws -->
-                    <dependency><groupId>javax.annotation</groupId><artifactId>javax.annotation-api</artifactId><version>${javax.annotation-api.version}</version></dependency>
-                    <dependency><groupId>javax.xml.ws</groupId><artifactId>jaxws-api</artifactId><version>${jaxws-api.version}</version></dependency>
+                    <dependency><groupId>javax.annotation</groupId><artifactId>javax.annotation-api</artifactId><version>${version.javax.annotation-api}</version></dependency>
+                    <dependency><groupId>javax.xml.ws</groupId><artifactId>jaxws-api</artifactId><version>${version.jaxws-api}</version></dependency>
                 </dependencies>
             </dependencyManagement>
             <reporting>
@@ -2501,7 +2593,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin><groupId>org.codehaus.groovy</groupId><artifactId>groovy-eclipse-compiler</artifactId><version>${groovy-eclipse-compiler.version}</version><extensions>true</extensions></plugin>
+                    <plugin><groupId>org.codehaus.groovy</groupId><artifactId>groovy-eclipse-compiler</artifactId><version>${version.groovy-eclipse-compiler}</version><extensions>true</extensions></plugin>
                 </plugins>
                 <pluginManagement>
                     <plugins>
@@ -2519,9 +2611,9 @@
                                 <fork>true</fork>
                             </configuration>
                             <dependencies>
-                                <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-eclipse-compiler</artifactId><version>${groovy-eclipse-compiler.version}</version></dependency>
-                                <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-eclipse-batch</artifactId><version>${groovy-eclipse-batch.version}</version></dependency>
-                                <dependency><groupId>org.projectlombok</groupId><artifactId>lombok</artifactId><version>${lombok.version}</version></dependency>
+                                <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-eclipse-compiler</artifactId><version>${version.groovy-eclipse-compiler}</version></dependency>
+                                <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-eclipse-batch</artifactId><version>${version.groovy-eclipse-batch}</version></dependency>
+                                <dependency><groupId>org.projectlombok</groupId><artifactId>lombok</artifactId><version>${version.lombok}</version></dependency>
                             </dependencies>
                         </plugin>
                     </plugins>
@@ -2553,7 +2645,7 @@
                 <pluginManagement>
                     <plugins>
                         <plugin>
-                            <groupId>net.alchim31.maven</groupId><artifactId>scala-maven-plugin</artifactId><version>${scala-maven-plugin.version}</version>
+                            <groupId>net.alchim31.maven</groupId><artifactId>scala-maven-plugin</artifactId><version>${version.scala-maven-plugin}</version>
                         </plugin>
                     </plugins>
                 </pluginManagement>
@@ -2636,7 +2728,7 @@
             <build>
                 <pluginManagement>
                     <plugins>
-                        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>clirr-maven-plugin</artifactId><version>${clirr-maven-plugin.version}</version></plugin>
+                        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>clirr-maven-plugin</artifactId><version>${version.clirr-maven-plugin}</version></plugin>
                     </plugins>
                 </pluginManagement>
                 <plugins>
@@ -2662,7 +2754,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-changes-plugin</artifactId>
-                        <version>${maven-changes-plugin.version}</version>
+                        <version>${version.maven-changes-plugin}</version>
                         <configuration>
                             <!-- if jira version > 5.1, set 'useJql' to true -->
                             <useJql>true</useJql>
@@ -2724,6 +2816,314 @@
                 </plugins>
             </build>
         </profile>
+
+        <!-- @formatter:off -->
+        <profile>
+            <id>docker-auto-clean-project_basedir-dockerfile</id>
+            <activation><file><exists>${basedir}/Dockerfile</exists></file></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>auto-clean-dockerfile</id>
+                                <phase>clean</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <delete failonerror="false">
+                                            <fileset dir="${project.basedir}" includes="Dockerfile"/>
+                                        </delete>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- @formatter:on -->
+        <!-- @formatter:off -->
+        <profile>
+            <!-- value of ${docker.image.prefix} should ends with a '/' -->
+            <id>docker-default-docker_image_prefix</id>
+            <activation><property><name>!docker.image.prefix</name></property></activation>
+            <properties><docker.image.prefix></docker.image.prefix></properties>
+        </profile>
+        <!-- @formatter:on -->
+        <!-- @formatter:off -->
+        <profile>
+            <id>dockerfile-maven-plugin-lifecycle-binding-on-publish_deploy_segregation-deploy</id>
+            <activation><property><name>mvn.deploy.publish.segregation.goal.deploy</name><value>true</value></property></activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>dockerfile-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>push-image</id>
+                                    <goals><goal>push</goal></goals>
+                                    <phase>deploy</phase>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        <!--
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>docker-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>push-image</id>
+                                    <phase>deploy</phase>
+                                    <goals><goal>push</goal></goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        -->
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <!-- @formatter:on -->
+        <!-- @formatter:off -->
+        <profile>
+            <id>dockerfile_maven_plugin-lifecycle_binding-on-publish_deploy_segregation-package</id>
+            <activation><property><name>mvn.deploy.publish.segregation.goal.package</name><value>true</value></property></activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>dockerfile-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>build-image</id>
+                                    <goals><goal>build</goal></goals>
+                                    <phase>package</phase>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>docker-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>build-image</id>
+                                    <phase>package</phase>
+                                    <goals><goal>build</goal></goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <!-- @formatter:on -->
+        <!-- @formatter:off -->
+        <profile>
+            <id>dockerfile_maven_plugin-lifecycle_binding-when-not-publish_deploy_segregation</id>
+            <activation><property><name>!mvn.deploy.publish.segregation</name></property></activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>dockerfile-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>default</id>
+                                    <goals>
+                                        <goal>build</goal>
+                                        <!--
+                                        I found docker-info was built, installed and deployed twice.
+                                        This made build failed when re-deploy is not allowed on artifact repository.
+
+                                        see: [docker-info.jar will be uploaded twice](https://github.com/spotify/dockerfile-maven/issues/11)
+
+                                        If you don't run the tag "goal", you must specify the property "dockerfile.repository".
+                                        -->
+                                        <!--<goal>tag</goal>-->
+                                        <goal>push</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        <!--
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>docker-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>build-image</id>
+                                    <phase>package</phase>
+                                    <goals><goal>build</goal></goals>
+                                </execution>
+                                <execution>
+                                    <id>push-image</id>
+                                    <phase>deploy</phase>
+                                    <goals><goal>push</goal></goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        -->
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <!-- @formatter:on -->
+        <!-- @formatter:off -->
+        <profile>
+            <!-- see: http://petr.kozelka.net/blog/2009/10/22/how-to-build-a-zip-output-artifact-in-maven/ -->
+            <id>docker-deploy-info-package</id>
+            <activation><file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file></activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>filtering-dockerfile</id>
+                                <phase>process-sources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.basedir}</outputDirectory>
+                                    <delimiters>
+                                        <!--<delimiter>${*}</delimiter>-->
+                                        <delimiter>@</delimiter>
+                                    </delimiters>
+                                    <resources>
+                                        <resource>
+                                            <directory>src/main/resources/docker</directory>
+                                            <filtering>true</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>deploy-config-package</id>
+                                <phase>prepare-package</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration>
+                                    <target>
+                                        <replace file="docker-compose-base.yml" token="@artifact.repository@" value="${private.nexus3}"/>
+                                        <replace file="docker-compose-base.yml" token="@build.timestamp@" value="${maven.build.timestamp}"/>
+                                        <replace file="docker-compose-base.yml" token="@docker.image.prefix@" value="${docker.image.prefix}"/>
+                                        <replace file="docker-compose-base.yml" token="@docker.registry@" value="${docker.registry}"/>
+                                        <replace file="docker-compose-base.yml" token="@git.branch@" value="${git.branch}"/>
+                                        <replace file="docker-compose-base.yml" token="@git.commit.id@" value="${git.commit.id}"/>
+                                        <replace file="docker-compose-base.yml" token="@git.commit.id.abbrev@" value="${git.commit.id.abbrev}"/>
+                                        <replace file="docker-compose-base.yml" token="@git.commit.time@" value="${git.commit.time}"/>
+                                        <replace file="docker-compose-base.yml" token="@git.remote.origin.url@" value="${git.remote.origin.url}"/>
+                                        <replace file="docker-compose-base.yml" token="@project.artifactId@" value="${project.artifactId}"/>
+                                        <replace file="docker-compose-base.yml" token="@project.groupId@" value="${project.groupId}"/>
+                                        <replace file="docker-compose-base.yml" token="@project.version@" value="${project.version}"/>
+                                        <zip destfile="${project.build.directory}/${project.artifactId}-${project.version}-deploy.zip">
+                                            <fileset dir="."
+                                                     defaultexcludes="no"
+                                                     includes="data/**/.gitignore,data/**/permissions,${project.artifactId}.properties,instance.properties"
+                                                     excludes="**/*.log,**/*.tmp,**/*.bak"
+                                            />
+                                            <fileset dir="." includes="docker-compose*.yml"/>
+                                        </zip>
+                                        <copy file="${project.build.directory}/${project.artifactId}-${project.version}-deploy.zip"
+                                              tofile="${project.basedir}/src/main/docker/deploy.zip"
+                                              overwrite="true"
+                                        />
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-deploy-config-package</id>
+                                <phase>prepare-package</phase>
+                                <goals><goal>attach-artifact</goal></goals>
+                                <configuration>
+                                    <artifacts>
+                                        <artifact>
+                                            <classifier>deploy</classifier>
+                                            <file>${project.build.directory}/${project.artifactId}-${project.version}-deploy.zip</file>
+                                            <type>zip</type>
+                                        </artifact>
+                                    </artifacts>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!--
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-deploy-config-package</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.basedir}/src/main/docker</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.build.directory}</directory>
+                                            <includes>
+                                                <include>${project.artifactId}-${project.version}-deploy.zip</include>
+                                            </includes>
+                                            <filtering>false</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    -->
+                    <!-- maven-jar-plugin can not copy .* hidden files -->
+                    <!--
+                    <plugin>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>deploy-config-package</id>
+                                <phase>package</phase>
+                                <configuration>
+                                    <classifier>deploy</classifier>
+                                    <classesDirectory>${project.basedir}</classesDirectory>
+                                    <includes>
+                                        <include>/docker-compose*.yml</include>
+                                        <include>/data/**/*</include>
+                                    </includes>
+                                    <excludes>
+                                        <exclude>**/*.log</exclude>
+                                        <exclude>**/*.tmp</exclude>
+                                        <exclude>**/*.bak</exclude>
+                                    </excludes>
+                                </configuration>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    -->
+                </plugins>
+            </build>
+        </profile>
+        <!-- @formatter:on -->
     </profiles>
 
     <reporting>

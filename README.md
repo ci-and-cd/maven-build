@@ -16,7 +16,7 @@
 [![Build Status](https://travis-ci.org/ci-and-cd/maven-build.svg?branch=develop)travis-ci](https://travis-ci.org/ci-and-cd/maven-build)  
 
 
-Parent pom for maven based projects
+Parent pom for maven based jar, war and docker projects
 
 maven-build support code environment segregation and build deploy segregation.  
 
@@ -36,17 +36,25 @@ Set maven-build as parent in maven projects.
         <parent>
             <groupId>cn.home1</groupId>
             <artifactId>maven-build</artifactId>
-            <version>${maven-build.version}</version>
+            <version>${version.maven-build}</version>
         </parent>
 
 No dependency will be imported, maven-build only responsible for software engineering,
 it does not interfering dependency management.
 
 TODO document about extensions
+see: 
+[topinfra-mvnext-module-maven-build-pom](https://github.com/ci-and-cd/topinfra-maven/tree/develop/topinfra-mvnext-module-maven-build-pom)
+[topinfra-mvnext-module-infrastructure-settings](https://github.com/ci-and-cd/topinfra-maven/tree/develop/topinfra-mvnext-module-infrastructure-settings)
+
 ```bash
 mvn coreext:check
 mvn coreext:install
 ```
+
+if src/main/resources/Dockerfile absent or CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION=true (use script),
+no docker image is built at package phase.
+see profile 'dockerfile_maven_plugin-lifecycle_binding-when-not-publish_deploy_segregation' in pom.xml.
 
 You need to provide few properties and environment variables, see next chapter.
 
@@ -157,6 +165,12 @@ Need these properties only when deploy artifacts into maven central repository.
 - project.build.sourceEncoding
 > default: UTF-8
 
+### 9. docker
+
+com.spotify:dockerfile-maven-plugin
+
+- docker.registry
+
 
 ## III. Plugins
 
@@ -210,6 +224,21 @@ maven-resources-plugin
 '${project.basedir}/src/readme' to '${project.basedir}/src/site/resources/src/readme'
 '${project.basedir}/src/site/markdown/images' to '${project.basedir}/src/site/resources/images'
 
+### 4. docker
+
+io.fabric8:docker-maven-plugin
+
+com.spotify:dockerfile-maven-plugin
+> clean, build, push docker images
+
+maven-antrun-plugin
+> clean filtered '${project.basedir}/src/main/docker/Dockerfile'
+
+maven-resources-plugin
+> copy and filter contents from 'src/main/resources/docker' into '${project.basedir}/src/main/docker'
+
+maven-deploy-plugin
+> must run after docker-maven-plugin
 
 ## IV. Profiles
 
@@ -285,6 +314,12 @@ env.CI_OPT_OSSRH_GIT_AUTH_TOKEN
 env.CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER
 
 
+### 4. docker
+
+dockerfile_maven_plugin-lifecycle_binding-when-not-publish_deploy_segregation
+> activate by property 'mvn.deploy.publish.segregation' absent
+build and push docker image automatically
+
 ## V. Repositories
 
 central, spring-libs-release, spring-milestone, spring-libs-snapshot
@@ -301,15 +336,29 @@ Add args on `maven site`
 
 ## VII. Appendices
 
-### A. Contribution to maven-build
 
-#### A.1. local install/deploy maven-build
+## A. Example ~/.docker/daemon.json of Docker for Mac
+```json
+{
+  "debug" : true,
+  "experimental" : true,
+  "registry-mirrors" : [
+    "https://docker.mirrors.ustc.edu.cn",
+    "http://hub-mirror.c.163.com",
+    "http://mirror.gcr.io"
+  ]
+}
+```
+
+### B. Contribution to maven-build
+
+#### B.1. local install/deploy maven-build
 
     export MAVEN_HOME="${PWD}/../extension-core/target/apache-maven-3.6.1/apache-maven-3.6.1"
 
     cp src/main/maven/settings-global.xml /usr/local/Cellar/maven/3.6.1/libexec/conf/settings.xml
     cp src/main/maven/settings-global.xml ~/.m2/wrapper/dists/apache-maven-3.6.1-bin/38pn40mp89t5c94bjdbeod370m/apache-maven-3.6.1/conf/settings.xml
-
+    
     CI_OPT_INFRASTRUCTURE=ossrh ./mvnw -e -U clean install
     
     CI_OPT_INFRASTRUCTURE=ossrh CI_OPT_ORIGIN_REPO=true CI_OPT_SONAR=true CI_OPT_SONAR_LOGIN= CI_OPT_SONAR_ORGANIZATION=home1-oss-github ./mvnw -e sonar:sonar
@@ -318,11 +367,11 @@ Add args on `maven site`
     
     CI_OPT_GITHUB_SITE_PUBLISH="false" CI_OPT_INFRASTRUCTURE=ossrh CI_OPT_OSSRH_MVNSITE_PASSWORD="${CI_OPT_OSSRH_MVNSITE_PASSWORD}" CI_OPT_OSSRH_MVNSITE_USERNAME="${CI_OPT_OSSRH_MVNSITE_USERNAME}" CI_OPT_NEXUS3="https://nexus3.infra.top" CI_OPT_SITE="true" CI_OPT_SITE_PATH_PREFIX="ci-and-cd/maven-build" ./mvnw -e -U clean install site site:stage site:stage-deploy
 
-#### A.2 Pull request
+#### B.2 Pull request
 
 Please open PR on develop branch.
 
-### B. GPG issue
+### C. GPG issues
 ```
 gpg: signing failed: Inappropriate ioctl for device
 ```

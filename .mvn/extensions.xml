@@ -10,30 +10,15 @@ see:
         <groupId>fr.jcgay.maven</groupId><artifactId>maven-profiler</artifactId><version>2.6</version>
     </extension>
 
-    <extension>
-        <artifactId>docker-login-extension</artifactId><groupId>top.infra</groupId><version>0.0.1-SNAPSHOT</version>
-    </extension>
-    <extension>
-        <artifactId>gitflow-semantic-versioning-extension</artifactId><groupId>top.infra</groupId><version>0.0.1-SNAPSHOT</version>
-    </extension>
-    <extension>
-        <artifactId>gpg-helper-extension</artifactId><groupId>top.infra</groupId><version>0.0.1-SNAPSHOT</version>
-    </extension>
-    <extension>
-        <artifactId>infrastructure-extension</artifactId><groupId>top.infra</groupId><version>0.0.1-SNAPSHOT</version>
-    </extension>
-    <!--
-    <extension>
-        <artifactId>maven-build-pom-extension</artifactId><groupId>top.infra</groupId><version>0.0.1-SNAPSHOT</version>
-    </extension>
-    -->
-    <extension>
-        <artifactId>settings-security-extension</artifactId><groupId>top.infra</groupId><version>0.0.1-SNAPSHOT</version>
-    </extension>
-
-    <extension>
-        <artifactId>maven-build-extension</artifactId><groupId>top.infra</groupId><version>0.0.1-SNAPSHOT</version>
-    </extension>
+    <!-- @formatter:off -->
+    <extension><artifactId>topinfra-maven-extension</artifactId><groupId>top.infra.maven</groupId><version>0.0.1-SNAPSHOT</version></extension>
+    <extension><artifactId>topinfra-mvnext-module-docker</artifactId><groupId>top.infra.maven</groupId><version>0.0.1-SNAPSHOT</version></extension>
+    <extension><artifactId>topinfra-mvnext-module-gitflow-semver</artifactId><groupId>top.infra.maven</groupId><version>0.0.1-SNAPSHOT</version></extension>
+    <extension><artifactId>topinfra-mvnext-module-gpg-key</artifactId><groupId>top.infra.maven</groupId><version>0.0.1-SNAPSHOT</version></extension>
+    <extension><artifactId>topinfra-mvnext-module-infrastructure-settings</artifactId><groupId>top.infra.maven</groupId><version>0.0.1-SNAPSHOT</version></extension>
+    <extension><artifactId>topinfra-mvnext-module-maven-build-pom</artifactId><groupId>top.infra.maven</groupId><version>0.0.1-SNAPSHOT</version></extension>
+    <extension><artifactId>topinfra-mvnext-module-settings-security</artifactId><groupId>top.infra.maven</groupId><version>0.0.1-SNAPSHOT</version></extension>
+    <!-- @formatter:on -->
 
     <!-- see: https://github.com/random-maven/profile-activator-extension/issues/3
     <extension>
