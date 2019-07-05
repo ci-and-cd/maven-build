@@ -4,10 +4,10 @@ export CI_OPT_ORIGIN_REPO_SLUG="${CI_OPT_ORIGIN_REPO_SLUG:-ci-and-cd/maven-build
 export CI_OPT_OSSRH_SONAR_ORGANIZATION="${CI_OPT_OSSRH_SONAR_ORGANIZATION:-home1-oss-github}";
 
 export CI_OPT_INFRASTRUCTURE="${CI_OPT_INFRASTRUCTURE:-ossrh}";
-export CI_OPT_GIT_HOST="${CI_OPT_GIT_HOST:-gitlab.com}";
-if [[ -z "${CI_OPT_GIT_PREFIX}" ]]; then export CI_OPT_GIT_PREFIX="https://${CI_OPT_GIT_HOST}"; fi;
+export GIT_HOST="${GIT_HOST:-gitlab.com}";
+if [[ -z "${GIT_PREFIX}" ]]; then export GIT_PREFIX="https://${GIT_HOST}"; fi;
 export CI_OPT_GPG_KEYNAME="${CI_OPT_GPG_KEYNAME:-59DBF10E}";
-export CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="false";
+export CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION:-false}";
 
 if [[ -n "${APPVEYOR_REPO_BRANCH}" ]]; then export APPVEYOR_ENABLED="${APPVEYOR_ENABLED:-true}"; fi;
 if [[ -n "${CI_COMMIT_REF_NAME}" ]]; then export GITLAB_CI="${GITLAB_CI:-true}"; fi;
@@ -30,7 +30,7 @@ else
   if [[ "${TRAVIS_ENABLED}" == "true" ]]; then export CI_OPT_SITE_PATH_PREFIX="${TRAVIS_REPO_SLUG}"; fi;
 fi;
 
-if [[ -z "${CI_OPT_MAVEN_BUILD_OPTS_REPO}" ]]; then export CI_OPT_MAVEN_BUILD_OPTS_REPO="${CI_OPT_GIT_PREFIX}/ci-and-cd/maven-build-opts-${CI_OPT_INFRASTRUCTURE:-ossrh}"; fi;
+if [[ -z "${CI_OPT_MAVEN_BUILD_OPTS_REPO}" ]]; then export CI_OPT_MAVEN_BUILD_OPTS_REPO="${GIT_PREFIX}/ci-and-cd/maven-build-opts-${CI_OPT_INFRASTRUCTURE:-ossrh}"; fi;
 if [[ -z "${CI_OPT_MAVEN_BUILD_OPTS_REPO_REF}" ]]; then
   if [[ "${APPVEYOR_ENABLED}" == "true" ]]; then export CI_OPT_MAVEN_BUILD_OPTS_REPO_REF="${APPVEYOR_REPO_BRANCH:-develop}"; fi;
   if [[ "${GITLAB_CI}" == "true" ]]; then export CI_OPT_MAVEN_BUILD_OPTS_REPO_REF="${CI_COMMIT_REF_NAME:-develop}"; fi;

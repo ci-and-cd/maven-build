@@ -77,7 +77,9 @@ before_script:
   # CI_OPT_OSSRH_NEXUS2_PASS
   # CI_OPT_OSSRH_NEXUS2_USER
   # CI_OPT_OSSRH_SONAR_LOGIN
-  - source circ.sh;
+  - |
+    export CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="true";
+    source circ.sh;
 #  - export CI_OPT_CI_SCRIPT="${CI_OPT_GIT_PREFIX}/${CI_PROJECT_PATH:-ci-and-cd/maven-build}/raw/${CI_COMMIT_REF_NAME:-develop}/src/main/ci-script/lib_ci.sh";
   - |
     rm -rf ~/.m2/repository/top/infra/maven-build-extension;

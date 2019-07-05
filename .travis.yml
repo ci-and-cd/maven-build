@@ -26,7 +26,8 @@ before_install:
   # CI_OPT_OSSRH_NEXUS2_PASS
   # CI_OPT_OSSRH_NEXUS2_USER
   # CI_OPT_OSSRH_SONAR_LOGIN
-  - source circ.sh
+  - export CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="false";
+    source circ.sh;
 #  - export CI_OPT_CI_SCRIPT="${CI_OPT_GIT_PREFIX}/${TRAVIS_REPO_SLUG:-ci-and-cd/maven-build}/raw/${TRAVIS_BRANCH:-develop}/src/main/ci-script/lib_ci.sh";
 #  - ls -ahl /usr/lib/jvm/;
 #  - if [[ -d /usr/lib/jvm/java-8-oracle ]]; then sudo ln -s /usr/lib/jvm/java-8-oracle /usr/lib/jvm/java-8-openjdk; fi;
