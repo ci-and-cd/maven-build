@@ -1,9 +1,11 @@
-
 <!-- see: http://maven.apache.org/guides/mini/guide-encryption.html -->
 <!-- mvn &#x002d;&#x002d;encrypt-master-password ${master_password} -->
 <!-- save result in settings-security.xml settingsSecurity master -->
 <!-- then mvn &#x002d;&#x002d;encrypt-password ${password} -->
 <settingsSecurity>
 	<!-- NOTE: THIS FILE IS A EXAMPLE, DO NOT USE THIS FILE DIRECTLY. -->
-	<master>{you-need-to-fill-your-encrypted-master-password-here}</master>
+
+	<!-- -emp "password" "{d9B+VbRQ4kYH4T7bCu/fUxXmfNx0NwBbZAxqWZnEAg8=}" -->
+	<!-- -ep "thisismypassword" "{lvggcgCyZ0QHIoYV5vXzvAjARj0nptlO/7R1CnPlNWOlIpnOo7y8bIJEhyDQchJb}" -->
+	<master>{d9B+VbRQ4kYH4T7bCu/fUxXmfNx0NwBbZAxqWZnEAg8=}</master>
 </settingsSecurity>
