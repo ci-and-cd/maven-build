@@ -537,6 +537,10 @@
                 <plugin>
                     <artifactId>maven-site-plugin</artifactId>
                     <version>${version.maven-site-plugin}</version>
+                    <configuration>
+                        <inputEncoding>${project.build.sourceEncoding}</inputEncoding>
+                        <outputEncoding>${project.reporting.outputEncoding}</outputEncoding>
+                    </configuration>
                     <dependencies>
                         <dependency><groupId>org.apache.maven.doxia</groupId><artifactId>doxia-module-markdown</artifactId><version>${version.doxia-module-markdown}</version></dependency>
                         <dependency><groupId>org.pegdown</groupId><artifactId>pegdown</artifactId><version>${version.pegdown}</version></dependency>
@@ -2098,6 +2102,13 @@
                             </execution>
                             <execution>
                                 <id>echo-argLine</id><phase>test</phase><goals><goal>run</goal></goals><configuration><target><echo message="argLine: ${argLine}"/></target></configuration>
+                            </execution>
+                            <execution>
+                                <id>echo-encoding</id><phase>pre-site</phase><goals><goal>run</goal></goals>
+                                <configuration><target>
+                                    <echo message="project.build.sourceEncoding: ${project.build.sourceEncoding}"/>
+                                    <echo message="project.reporting.outputEncoding: ${project.reporting.outputEncoding}"/>
+                                </target></configuration>
                             </execution>
                             <execution>
                                 <id>auto-clean-readme</id>
