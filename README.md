@@ -70,7 +70,7 @@ Set this property to a real world url.
 > default: http://nexus3.localal:28081/nexus/repository
 Set this property to a real world url.
 
-- publish.channel
+- publish.channel TODO publish.channel deprecated
 > default: snapshot
 Set this property to 'release' when building release artifact.
 Note: CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER
@@ -122,7 +122,7 @@ Need to customize when github.com is not reachable.
 
 ### 5. site
 - site.path
-> default: ${project.artifactId}-${publish.channel}
+> default: ${project.artifactId}-${publish.channel} TODO update doc
 Customize this properties if you want to publish relative projects's site into same parent directory, 
 use same value on relative projects.
 

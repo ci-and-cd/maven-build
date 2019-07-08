@@ -25,9 +25,18 @@ if [[ "${CI_OPT_GITHUB_SITE_PUBLISH}" == "true" ]]; then
   if [[ "${TRAVIS_ENABLED}" == "true" ]]; then export CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER="$(echo ${TRAVIS_REPO_SLUG} | awk -F'/' '{print $1}')"; fi;
   export CI_OPT_SITE_PATH_PREFIX="${CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER}";
 else
-  if [[ "${APPVEYOR_ENABLED}" == "true" ]]; then export CI_OPT_SITE_PATH_PREFIX="${APPVEYOR_REPO_NAME}"; fi;
-  if [[ "${GITLAB_CI}" == "true" ]]; then export CI_OPT_SITE_PATH_PREFIX="${CI_PROJECT_PATH}"; fi;
-  if [[ "${TRAVIS_ENABLED}" == "true" ]]; then export CI_OPT_SITE_PATH_PREFIX="${TRAVIS_REPO_SLUG}"; fi;
+  if [[ -z ${PUBLISH_CHANNEL} ]]; then
+    if [[ -n "${APPVEYOR_REPO_BRANCH}" ]]; then REF_NAME="${APPVEYOR_REPO_BRANCH}"; elif [[ -n "${CI_COMMIT_REF_NAME}" ]]; then REF_NAME="${CI_COMMIT_REF_NAME}"; elif [[ -n "${TRAVIS_BRANCH}" ]]; then REF_NAME="${TRAVIS_BRANCH}"; fi;
+    if [[ "${REF_NAME}" =~ ^release/.+ ]] || [[ "${REF_NAME}" =~ ^support/.+ ]] || [[ "${REF_NAME}" =~ ^hotfix/.+ ]]; then
+      export PUBLISH_CHANNEL="release";
+    elif [[ "${REF_NAME}" =~ ^feature/.+ ]] || [[ "${APPVEYOR_ENABLED}" == "develop" ]]; then
+      export PUBLISH_CHANNEL="snapshot";
+    fi;
+  fi;
+  if [[ -n "${PUBLISH_CHANNEL}" ]]; then SITE_PATH_PREFIX="${PUBLISH_CHANNEL}/"; fi;
+  if [[ "${APPVEYOR_ENABLED}" == "true" ]]; then export CI_OPT_SITE_PATH="${SITE_PATH_PREFIX}${APPVEYOR_REPO_NAME}"; fi;
+  if [[ "${GITLAB_CI}" == "true" ]]; then export CI_OPT_SITE_PATH="${SITE_PATH_PREFIX}${CI_PROJECT_PATH}"; fi;
+  if [[ "${TRAVIS_ENABLED}" == "true" ]]; then export CI_OPT_SITE_PATH="${SITE_PATH_PREFIX}${TRAVIS_REPO_SLUG}"; fi;
 fi;
 
 if [[ -z "${CI_OPT_MAVEN_BUILD_OPTS_REPO}" ]]; then export CI_OPT_MAVEN_BUILD_OPTS_REPO="${GIT_PREFIX}/ci-and-cd/maven-build-opts-${CI_OPT_INFRASTRUCTURE:-ossrh}"; fi;

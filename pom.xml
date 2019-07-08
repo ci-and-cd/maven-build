@@ -230,32 +230,17 @@
         <frontend.npmDownloadRoot>https://registry.npmjs.org/npm/-/</frontend.npmDownloadRoot>
         <git.commit.id.skip>false</git.commit.id.skip>
         <github.global.oauth2Token></github.global.oauth2Token>
-        <github.global.repositoryName></github.global.repositoryName>
-        <github.global.repositoryOwner>unknown-owner</github.global.repositoryOwner>
+        <github.global.repositoryName>unknown</github.global.repositoryName>
+        <github.global.repositoryOwner>unknown</github.global.repositoryOwner>
+        <github.site.path></github.site.path>
         <pmd.ruleset.location>https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/pmd/pmd-ruleset-6.8.0.xml</pmd.ruleset.location>
+        <site.path>${project.groupId}</site.path>
 
-        <ossrh.nexus3>http://nexus3:28081/nexus/</ossrh.nexus3>
-        <private.nexus3>http://nexus3:28081/nexus/</private.nexus3>
+
+        <nexus3>http://nexus3:38081/nexus/</nexus3>
+        <nexus2>http://nexus2:28081/nexus/</nexus2>
         <ossrh.sonar.host.url>https://sonarqube.com</ossrh.sonar.host.url>
         <private.sonar.host.url>http://sonarqube:9000</private.sonar.host.url>
-
-        <!-- TODO refactor publish.channel to a bool value -->
-        <!--
-        nexus2.staging, github.site.path, site.path,
-        wagon.merge-maven-repos.target, wagon.merge-maven-repos.targetId
-        depends on publish.channel
-        -->
-        <publish.channel>snapshot</publish.channel>
-        <!-- TODO expose git slug to project and calculate site.path.prefix here -->
-        <site.path.prefix></site.path.prefix>
-        <!-- TODO remove site.path.prefix, keep site.path -->
-        <site.path>${publish.channel}/${site.path.prefix}</site.path>
-        <wagon.merge-maven-repos.artifactDir></wagon.merge-maven-repos.artifactDir>
-        <!-- TODO calculate wagon.merge-maven-repos.source and altDeploymentRepository here -->
-        <wagon.merge-maven-repos.source></wagon.merge-maven-repos.source>
-        <wagon.merge-maven-repos.target></wagon.merge-maven-repos.target>
-        <!-- TODO caluculate wagon.merge-maven-repos.targetId here -->
-        <wagon.merge-maven-repos.targetId></wagon.merge-maven-repos.targetId>
 
 
         <!-- custom properties -->
@@ -263,7 +248,6 @@
         <jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</jacoco.itReportPath>
 
         <!-- mvn install -Dprofile="profile name" -DprofileFormat=JSON,HTML -->
-        <maven.multiModuleProjectDirectory></maven.multiModuleProjectDirectory>
         <maven-profiler-report-directory>${maven.multiModuleProjectDirectory}/.mvn/profilerReport</maven-profiler-report-directory>
 
         <!--<relative.parent.dir>.</relative.parent.dir>-->
@@ -693,7 +677,7 @@
                     <version>${version.com.spotify_dockerfile-maven-plugin}</version>
                     <configuration>
                         <buildArgs>
-                            <ARTIFACT_REPOSITORY>${private.nexus3}</ARTIFACT_REPOSITORY>
+                            <ARTIFACT_REPOSITORY>${nexus3}</ARTIFACT_REPOSITORY>
                             <BUILD_TIMESTAMP>${maven.build.timestamp}</BUILD_TIMESTAMP>
                             <DOCKER_REGISTRY>${docker.registry}</DOCKER_REGISTRY>
                             <GIT_BRANCH>${git.branch}</GIT_BRANCH>
@@ -757,36 +741,91 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <!-- @formatter:off -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
                     <!-- see: http://www.beanshell.org/ -->
                     <execution>
-                        <id>negate-generateReports</id>
-                        <phase>initialize</phase>
+                        <id>negate-generateReports-on-pre_clean</id>
+                        <phase>pre-clean</phase>
                         <goals><goal>bsh-property</goal></goals>
                         <configuration>
                             <source>
-                                value = project.getProperties().getProperty("generateReports");
-                                notGenerateReports = value == null ? false : !Boolean.parseBoolean(value);
+                                value = project.getProperties().getProperty("generateReports", session.getUserProperties().getProperty("generateReports"));
+                                notGenerateReports = value == null || value.equals("") ? false : !Boolean.parseBoolean(value);
                             </source>
                             <properties><property>notGenerateReports</property></properties>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>negate-generateReports-on-initialize</id>
+                        <phase>initialize</phase>
+                        <goals><goal>bsh-property</goal></goals>
+                        <configuration>
+                            <source>
+                                value = project.getProperties().getProperty("generateReports", session.getUserProperties().getProperty("generateReports"));
+                                notGenerateReports = value == null || value.equals("") ? false : !Boolean.parseBoolean(value);
+                            </source>
+                            <properties><property>notGenerateReports</property></properties>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>releaseRef</id>
+                        <phase>initialize</phase>
+                        <goals><goal>bsh-property</goal></goals>
+                        <configuration>
+                            <source>
+                                ref = project.getProperties().getProperty("git.ref.name", session.getUserProperties().getProperty("git.ref.name"));
+                                releaseRef = ref == null || ref.equals("") ? false : ref.startsWith("hotfix/") || ref.startsWith("release/") || ref.startsWith("support/");
+                            </source>
+                            <properties><property>releaseRef</property></properties>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>snapshotRef</id>
+                        <phase>initialize</phase>
+                        <goals><goal>bsh-property</goal></goals>
+                        <configuration>
+                            <source>
+                                ref = project.getProperties().getProperty("git.ref.name", session.getUserProperties().getProperty("git.ref.name"));
+                                snapshotRef = ref == null || ref.equals("") ? false : ref.equals("develop") || ref.startsWith("feature/");
+                            </source>
+                            <properties><property>snapshotRef</property></properties>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
+            <!-- @formatter:on -->
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>echo-generateReports</id>
+                        <id>echo-bsh-properties-on-pre_clean</id>
+                        <phase>pre-clean</phase>
+                        <goals><goal>run</goal></goals>
+                        <configuration>
+                            <target>
+                                <echo>generateReports: '${generateReports}'</echo>
+                                <echo>notGenerateReports: '${notGenerateReports}'</echo>
+                                <echo>releaseRef: '${releaseRef}'</echo>
+                                <echo>snapshotRef: '${snapshotRef}'</echo>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>echo-bsh-properties-on-initialize</id>
                         <phase>initialize</phase>
                         <goals><goal>run</goal></goals>
-                        <configuration><target>
-                            <echo>generateReports: '${generateReports}'</echo>
-                            <echo>notGenerateReports: '${notGenerateReports}'</echo>
-                        </target></configuration>
+                        <configuration>
+                            <target>
+                                <echo>generateReports: '${generateReports}'</echo>
+                                <echo>notGenerateReports: '${notGenerateReports}'</echo>
+                                <echo>releaseRef: '${releaseRef}'</echo>
+                                <echo>snapshotRef: '${snapshotRef}'</echo>
+                            </target>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -1479,7 +1518,7 @@
 
         <profile>
             <!-- multi_module_root_only is a keyword for topinfra-maven-extension to activate this profile on root project only -->
-            <id>clean-maven-profiler-report-directory-run-on-multi_module_root_only</id>
+            <id>clean-maven_profiler_report_directory-run-on-multi_module_root_only</id>
             <activation><property><name>profile</name></property></activation>
             <build>
                 <plugins>
@@ -1518,6 +1557,137 @@
             <activation><property><name>mvn.deploy.publish.segregation</name><value>true</value></property></activation>
             <build>
                 <plugins>
+                    <!-- @formatter:off -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>artifactDir-on-pre_clean</id>
+                                <phase>pre-clean</phase>
+                                <goals><goal>bsh-property</goal></goals>
+                                <configuration>
+                                    <source>
+                                        artifactDir = project.getGroupId().replace('.', '/') + "/" + project.getArtifactId();
+                                        System.setProperty("wagon.merge-maven-repos.artifactDir", artifactDir);
+                                    </source>
+                                    <properties><property>artifactDir</property></properties>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>artifactDir-on-initialize</id>
+                                <phase>initialize</phase>
+                                <goals><goal>bsh-property</goal></goals>
+                                <configuration>
+                                    <source>
+                                        artifactDir = project.getGroupId().replace('.', '/') + "/" + project.getArtifactId();
+                                        System.setProperty("wagon.merge-maven-repos.artifactDir", artifactDir);
+                                        session.getUserProperties().setProperty("wagon.merge-maven-repos.artifactDir", artifactDir);
+                                        project.getProperties().setProperty("wagon.merge-maven-repos.artifactDir", artifactDir);
+                                    </source>
+                                    <properties><property>artifactDir</property></properties>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>sourceDir-on-pre_clean</id>
+                                <phase>pre-clean</phase>
+                                <goals><goal>bsh-property</goal></goals>
+                                <configuration>
+                                    <source>
+                                        commitId = project.getProperties().getProperty("git.commit.id", session.getUserProperties().getProperty("git.commit.id"));
+                                        commitId = commitId == null || commitId.equals("") ? "unknown-commit" : commitId.substring(0, 8);
+
+                                        multiModuleProjectDirectory = System.getProperty("maven.multiModuleProjectDirectory", "");
+
+                                        sourceDir = multiModuleProjectDirectory + File.separator + ".mvn" + File.separator + "wagonRepository";
+
+                                        System.setProperty("wagon.merge-maven-repos.source", sourceDir);
+                                    </source>
+                                    <properties><property>sourceDir</property></properties>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>targetRepo-on-initialize</id>
+                                <phase>initialize</phase>
+                                <goals><goal>bsh-property</goal></goals>
+                                <configuration>
+                                    <source>
+                                        ref = project.getProperties().getProperty("git.ref.name", session.getUserProperties().getProperty("git.ref.name"));
+                                        releaseRef = ref == null || ref.equals("") ? false : ref.startsWith("hotfix/") || ref.startsWith("release/") || ref.startsWith("support/");
+                                        snapshotRef = ref == null || ref.equals("") ? false : ref.equals("develop") || ref.startsWith("feature/");
+                                        channel = releaseRef ? "releases" : snapshotRef ? "snapshots" : "mixed";
+
+                                        nexus2 = project.getProperties().getProperty("nexus2", session.getUserProperties().getProperty("nexus2"));
+                                        nexus2Staging = project.getProperties().getProperty("nexus2.staging", session.getUserProperties().getProperty("nexus2.staging"));
+
+                                        targetRepo = "${nexus3}repository/maven-" + channel;
+                                        if (nexus2 != null @and !nexus2.equals("")) {
+                                            if (releaseRef) {
+                                                if (nexus2Staging == null || nexus2Staging.equals("") || !Boolean.parseBoolean(nexus2Staging)) {
+                                                    targetRepo = "${nexus2}content/repositories/releases/";
+                                                } else {
+                                                    targetRepo = "${nexus2}service/local/staging/deploy/maven2/";
+                                                }
+                                            } else {
+                                                targetRepo = "${nexus2}content/repositories/snapshots/";
+                                            }
+                                        }
+
+                                        System.setProperty("wagon.merge-maven-repos.target", targetRepo);
+                                        session.getUserProperties().setProperty("wagon.merge-maven-repos.target", targetRepo);
+                                        project.getProperties().setProperty("wagon.merge-maven-repos.target", targetRepo);
+                                    </source>
+                                    <properties><property>targetRepo</property></properties>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>sourceDir-on-initialize</id>
+                                <phase>initialize</phase>
+                                <goals><goal>bsh-property</goal></goals>
+                                <configuration>
+                                    <source>
+                                        commitId = project.getProperties().getProperty("git.commit.id", session.getUserProperties().getProperty("git.commit.id"));
+                                        commitId = commitId == null || commitId.equals("") ? "unknown-commit" : commitId.substring(0, 8);
+
+                                        multiModuleProjectDirectory = System.getProperty("maven.multiModuleProjectDirectory", "");
+
+                                        sourceDir = multiModuleProjectDirectory + File.separator + ".mvn" + File.separator + "wagonRepository";
+
+                                        System.setProperty("wagon.merge-maven-repos.source", sourceDir);
+                                        session.getUserProperties().setProperty("wagon.merge-maven-repos.source", sourceDir);
+
+                                        altDeploymentRepository = "repo::default::file://" + sourceDir;
+                                        System.setProperty("altDeploymentRepository", altDeploymentRepository);
+                                        session.getUserProperties().setProperty("altDeploymentRepository", altDeploymentRepository);
+                                    </source>
+                                    <properties><property>sourceDir</property></properties>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>targetId-on-initialize</id>
+                                <phase>initialize</phase>
+                                <goals><goal>bsh-property</goal></goals>
+                                <configuration>
+                                    <source>
+                                        ref = project.getProperties().getProperty("git.ref.name", session.getUserProperties().getProperty("git.ref.name"));
+                                        releaseRef = ref == null || ref.equals("") ? false : ref.startsWith("hotfix/") || ref.startsWith("release/") || ref.startsWith("support/");
+                                        snapshotRef = ref == null || ref.equals("") ? false : ref.equals("develop") || ref.startsWith("feature/");
+                                        channel = releaseRef ? "releases" : snapshotRef ? "snapshots" : "mixed";
+
+                                        infra = project.getProperties().getProperty("infrastructure", session.getUserProperties().getProperty("infrastructure"));
+
+                                        targetId = infra == null || infra.equals("") ? channel : infra + "-" + channel;
+
+                                        System.setProperty("wagon.merge-maven-repos.targetId", targetId);
+                                        session.getUserProperties().setProperty("wagon.merge-maven-repos.targetId", targetId);
+                                        project.getProperties().setProperty("wagon.merge-maven-repos.targetId", targetId);
+                                    </source>
+                                    <properties><property>targetId</property></properties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- @formatter:on -->
                     <!--<plugin>
                         <groupId>org.codehaus.groovy.maven</groupId>
                         <artifactId>gmaven-plugin</artifactId>
@@ -1529,7 +1699,7 @@
                             </execution>
                         </executions>
                     </plugin>-->
-                    <plugin>
+                    <!--<plugin>
                         <groupId>org.codehaus.gmaven</groupId>
                         <artifactId>groovy-maven-plugin</artifactId>
                         <executions>
@@ -1539,7 +1709,7 @@
                                 <configuration><source>System.setProperty("wagon.merge-maven-repos.artifactDir", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
                             </execution>
                         </executions>
-                    </plugin>
+                    </plugin>-->
                     <!-- clean files deployed to local directory -->
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
@@ -1558,14 +1728,27 @@
                                 <goals><goal>run</goal></goals>
                                 <configuration>
                                     <target>
+                                        <echo message="wagon.merge-maven-repos.source: ${wagon.merge-maven-repos.source}"/>
+                                        <echo message="wagon.merge-maven-repos.artifactDir: ${wagon.merge-maven-repos.artifactDir}"/>
+                                        <delete failonerror="false" includeemptydirs="true" verbose="true"><fileset dir="${wagon.merge-maven-repos.source}/${wagon.merge-maven-repos.artifactDir}" includes="**/*"/></delete>
+                                    </target>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>echo-wagon-properties-at-initialize</id>
+                                <phase>initialize</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration>
+                                    <target>
+                                        <echo message="altDeploymentRepository: ${altDeploymentRepository}"/>
                                         <echo message="mvn.deploy.publish.segregation.goal: ${mvn.deploy.publish.segregation.goal}"/>
                                         <echo message="mvn.deploy.publish.segregation.goal.deploy: ${mvn.deploy.publish.segregation.goal.deploy}"/>
                                         <echo message="mvn.deploy.publish.segregation.goal.install: ${mvn.deploy.publish.segregation.goal.install}"/>
                                         <echo message="mvn.deploy.publish.segregation.goal.package: ${mvn.deploy.publish.segregation.goal.package}"/>
-
                                         <echo message="wagon.merge-maven-repos.source: ${wagon.merge-maven-repos.source}"/>
                                         <echo message="wagon.merge-maven-repos.artifactDir: ${wagon.merge-maven-repos.artifactDir}"/>
-                                        <delete failonerror="false" includeemptydirs="true" verbose="true"><fileset dir="${wagon.merge-maven-repos.source}/${wagon.merge-maven-repos.artifactDir}" includes="**/*"/></delete>
+                                        <echo message="wagon.merge-maven-repos.target: ${wagon.merge-maven-repos.target}"/>
+                                        <echo message="wagon.merge-maven-repos.targetId: ${wagon.merge-maven-repos.targetId}"/>
                                     </target>
                                 </configuration>
                             </execution>
@@ -1669,12 +1852,9 @@
             <properties>
                 <!-- for site on github, id (github.global.server) must match the config in your settings.xml -->
                 <!--<github.global.oauth2Token>${env.CI_OPT_OSSRH_GIT_AUTH_TOKEN}</github.global.oauth2Token>-->
-                <!--<github.global.repositoryName>${site.path.prefix}</github.global.repositoryName>-->
+                <!--<github.global.repositoryName>${env.CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER}</github.global.repositoryName>-->
                 <!--<github.global.repositoryOwner>${env.CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER}</github.global.repositoryOwner>-->
                 <github.global.server>github</github.global.server>
-
-                <!--<github.site.path>${publish.channel}/${project.version}</github.site.path>-->
-                <github.site.path>${publish.channel}</github.site.path>
 
                 <maven.site.deploy.skip>true</maven.site.deploy.skip>
             </properties>
@@ -1990,7 +2170,15 @@
                             </execution>
                             -->
                             <execution>
-                                <id>echo-maven-multiModuleProjectDirectory</id>
+                                <id>echo-maven-multiModuleProjectDirectory-on-pre_clean</id>
+                                <phase>pre-clean</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration><target>
+                                    <echo>maven.multiModuleProjectDirectory: '${maven.multiModuleProjectDirectory}'</echo>
+                                </target></configuration>
+                            </execution>
+                            <execution>
+                                <id>echo-maven-multiModuleProjectDirectory-on-initialize</id>
                                 <phase>initialize</phase>
                                 <goals><goal>run</goal></goals>
                                 <configuration><target>
