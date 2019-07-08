@@ -229,20 +229,12 @@
         <!-- http://registry.npm.taobao.org/npm/-/ -->
         <frontend.npmDownloadRoot>https://registry.npmjs.org/npm/-/</frontend.npmDownloadRoot>
         <git.commit.id.skip>false</git.commit.id.skip>
-        <!--<github.global.oauth2Token>${env.CI_OPT_OSSRH_GIT_AUTH_TOKEN}</github.global.oauth2Token>-->
-        <!--<github.global.repositoryName>${env.CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER}</github.global.repositoryName>-->
-        <!--<github.global.repositoryOwner>${env.CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER}</github.global.repositoryOwner>-->
         <github.global.oauth2Token>${git.auth.token}</github.global.oauth2Token>
         <github.global.repositoryName>unknown</github.global.repositoryName>
         <github.global.repositoryOwner>unknown</github.global.repositoryOwner>
         <github.site.path></github.site.path>
         <pmd.ruleset.location>https://raw.githubusercontent.com/ci-and-cd/maven-build/master/src/main/pmd/pmd-ruleset-6.8.0.xml</pmd.ruleset.location>
         <site.path>${project.groupId}</site.path>
-
-
-        <nexus2>http://nexus2:28081/nexus/</nexus2>
-        <nexus3>http://nexus3:38081/nexus/</nexus3>
-        <private.sonar.host.url>http://sonarqube:9000</private.sonar.host.url>
 
 
         <!-- custom properties -->
@@ -909,6 +901,7 @@
     </dependencyManagement>
 
     <modules>
+        <module>maven-build-infra-local</module>
         <module>maven-build-infra-ossrh</module>
     </modules>
 
@@ -1457,64 +1450,6 @@
         </profile>
 
         <profile>
-            <id>infrastructure_private</id>
-            <properties>
-                <!--sonar.jdbc.url>jdbc:h2:tcp://sonarqube.local/sonar</sonar.jdbc.url>
-                <sonar.jdbc.url>jdbc:postgresql://postgresql:5432/sonar</sonar.jdbc.url-->
-            </properties>
-            <distributionManagement>
-                <repository><id>private-releases</id><url>${private.nexus3}repository/maven-releases/</url></repository>
-                <snapshotRepository><id>private-snapshots</id><url>${private.nexus3}repository/maven-snapshots/</url></snapshotRepository>
-            </distributionManagement>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>private-releases</id>
-                    <name>private releases</name>
-                    <url>${private.nexus3}repository/maven-releases/</url>
-                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
-                    <snapshots><enabled>false</enabled></snapshots>
-                </pluginRepository>
-                <pluginRepository>
-                    <id>private-snapshots</id>
-                    <name>private snapshots</name>
-                    <url>${private.nexus3}repository/maven-snapshots/</url>
-                    <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
-                </pluginRepository>
-                <pluginRepository>
-                    <id>private-thirdparty</id>
-                    <name>private thirdparty</name>
-                    <url>${private.nexus3}repository/maven-thirdparty/</url>
-                    <releases><enabled>true</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
-                </pluginRepository>
-            </pluginRepositories>
-            <repositories>
-                <repository>
-                    <id>private-releases</id>
-                    <name>private releases</name>
-                    <url>${private.nexus3}repository/maven-releases/</url>
-                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
-                    <snapshots><enabled>false</enabled></snapshots>
-                </repository>
-                <repository>
-                    <id>private-snapshots</id>
-                    <name>private snapshots</name>
-                    <url>${private.nexus3}repository/maven-snapshots/</url>
-                    <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
-                </repository>
-                <repository>
-                    <id>private-thirdparty</id>
-                    <name>private thirdparty</name>
-                    <url>${private.nexus3}repository/maven-thirdparty/</url>
-                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
-                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
-                </repository>
-            </repositories>
-        </profile>
-
-        <profile>
             <!-- multi_module_root_only is a keyword for topinfra-maven-extension to activate this profile on root project only -->
             <id>clean-maven_profiler_report_directory-run-on-multi_module_root_only</id>
             <activation><property><name>profile</name></property></activation>
@@ -1853,15 +1788,6 @@
 
                 <maven.site.deploy.skip>true</maven.site.deploy.skip>
             </properties>
-        </profile>
-
-        <profile>
-            <id>infrastructure_private-site</id>
-            <distributionManagement>
-                <!-- scpexe uses privateKey, scp uses password -->
-                <!-- scpexe://${domain_or_ip}:22/path/to/sites -->
-                <site><id>private-mvnsite</id><url>dav:${private.nexus3}repository/mvnsite/${site.path}/</url></site>
-            </distributionManagement>
         </profile>
 
         <profile>
@@ -3220,7 +3146,7 @@
                                 <goals><goal>run</goal></goals>
                                 <configuration>
                                     <target>
-                                        <replace file="docker-compose-base.yml" token="@artifact.repository@" value="${private.nexus3}"/>
+                                        <replace file="docker-compose-base.yml" token="@artifact.repository@" value="${nexus3}"/>
                                         <replace file="docker-compose-base.yml" token="@build.timestamp@" value="${maven.build.timestamp}"/>
                                         <replace file="docker-compose-base.yml" token="@docker.image.prefix@" value="${docker.image.prefix}"/>
                                         <replace file="docker-compose-base.yml" token="@docker.registry@" value="${docker.registry}"/>

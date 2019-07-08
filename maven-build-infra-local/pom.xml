@@ -9,9 +9,9 @@
         <version>3.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>maven-build-infra-ossrh</artifactId>
-    <description>Parent pom for maven projects that deploy to OSSRH</description>
-    <name>maven-build-infra-ossrh</name>
+    <artifactId>maven-build-infra-local</artifactId>
+    <description>Parent pom for maven projects that deploy to local nexus3</description>
+    <name>maven-build-infra-local</name>
     <packaging>pom</packaging>
 
     <pluginRepositories>
@@ -40,87 +40,62 @@
     <profiles>
         <!-- @formatter:off -->
         <profile>
-            <id>infrastructure_ossrh</id>
-            <activation><property><name>infrastructure</name><value>ossrh</value></property></activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <extensions>true</extensions>
-                    </plugin>
-                </plugins>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.sonatype.plugins</groupId>
-                            <artifactId>nexus-staging-maven-plugin</artifactId>
-                            <configuration>
-                                <autoReleaseAfterClose>false</autoReleaseAfterClose>
-                                <detectBuildFailures>true</detectBuildFailures>
-                                <nexusUrl>${nexus2}</nexusUrl>
-                                <serverId>${nexus.staging.serverId}</serverId>
-                                <!--<sslAllowAll>true</sslAllowAll>-->
-                                <stagingProgressPauseDurationSeconds>30</stagingProgressPauseDurationSeconds>
-                                <stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
+            <id>infrastructure_local</id>
+            <activation><property><name>infrastructure</name><value>local</value></property></activation>
             <distributionManagement>
-                <repository><id>ossrh-staging</id><url>${ossrh.nexus2}service/local/staging/deploy/maven2/</url></repository>
-                <snapshotRepository><id>ossrh-snapshots</id><url>${ossrh.nexus2}content/repositories/snapshots/</url></snapshotRepository>
+                <repository><id>local-releases</id><url>${local.nexus3}repository/maven-releases/</url></repository>
+                <snapshotRepository><id>local-snapshots</id><url>${local.nexus3}repository/maven-snapshots/</url></snapshotRepository>
             </distributionManagement>
             <pluginRepositories>
                 <pluginRepository>
-                    <id>ossrh-releases</id>
-                    <name>ossrh releases</name>
-                    <url>${ossrh.nexus2}content/repositories/releases/</url>
+                    <id>local-releases</id>
+                    <name>local releases</name>
+                    <url>${local.nexus3}repository/maven-releases/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </pluginRepository>
                 <pluginRepository>
-                    <id>ossrh-snapshots</id>
-                    <name>ossrh snapshots</name>
-                    <url>${ossrh.nexus2}content/repositories/snapshots/</url>
+                    <id>local-snapshots</id>
+                    <name>local snapshots</name>
+                    <url>${local.nexus3}repository/maven-snapshots/</url>
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </pluginRepository>
                 <pluginRepository>
-                    <id>ossrh-thirdparty</id>
-                    <name>ossrh thirdparty</name>
-                    <url>${ossrh.nexus2}content/repositories/third-party-releases/</url>
+                    <id>local-thirdparty</id>
+                    <name>local thirdparty</name>
+                    <url>${local.nexus3}repository/maven-thirdparty/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </pluginRepository>
             </pluginRepositories>
             <properties>
-                <docker.registry.url>${ossrh.docker.registry.url}</docker.registry.url>
-                <nexus.staging.serverId>${infrastructure}-staging</nexus.staging.serverId>
-                <nexus2>${ossrh.nexus2}</nexus2>
-                <nexus3>${ossrh.nexus3}</nexus3>
-                <sonar.host.url>${ossrh.sonar.host.url}</sonar.host.url>
+                <docker.registry.url>${local.docker.registry.url}</docker.registry.url>
+                <!--<nexus2>${local.nexus2}</nexus2>-->
+                <nexus3>${local.nexus3}</nexus3>
+                <!--sonar.jdbc.url>jdbc:h2:tcp://sonarqube.local/sonar</sonar.jdbc.url>
+                <sonar.jdbc.url>jdbc:postgresql://postgresql:5432/sonar</sonar.jdbc.url-->
+                <sonar.host.url>${local.sonar.host.url}</sonar.host.url>
             </properties>
             <repositories>
                 <repository>
-                    <id>ossrh-releases</id>
-                    <name>ossrh releases</name>
-                    <url>${ossrh.nexus2}content/repositories/releases/</url>
+                    <id>local-releases</id>
+                    <name>local releases</name>
+                    <url>${local.nexus3}repository/maven-releases/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </repository>
                 <repository>
-                    <id>ossrh-snapshots</id>
-                    <name>ossrh snapshots</name>
-                    <url>${ossrh.nexus2}content/repositories/snapshots/</url>
+                    <id>local-snapshots</id>
+                    <name>local snapshots</name>
+                    <url>${local.nexus3}repository/maven-snapshots/</url>
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </repository>
                 <repository>
-                    <id>ossrh-thirdparty</id>
-                    <name>ossrh thirdparty</name>
-                    <url>${ossrh.nexus2}content/repositories/third-party-releases/</url>
+                    <id>local-thirdparty</id>
+                    <name>local thirdparty</name>
+                    <url>${local.nexus3}repository/maven-thirdparty/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </repository>
@@ -128,10 +103,12 @@
         </profile>
 
         <profile>
-            <id>infrastructure_ossrh-dav-site</id>
+            <id>infrastructure_local-dav-site</id>
             <activation><property><name>github.site.publish</name><value>false</value></property></activation>
             <distributionManagement>
-                <site><id>ossrh-mvnsite</id><url>dav:${ossrh.nexus3}repository/mvnsite/${site.path}/</url></site>
+                <!-- scpexe uses privateKey, scp uses password -->
+                <!-- scpexe://${domain_or_ip}:22/path/to/sites -->
+                <site><id>local-mvnsite</id><url>dav:${local.nexus3}repository/mvnsite/${site.path}/</url></site>
             </distributionManagement>
         </profile>
         <!-- @formatter:on -->
@@ -140,10 +117,10 @@
     <!-- @formatter:off -->
     <properties>
         <checkstyle.config.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/checkstyle/google_checks_8.10.xml</checkstyle.config.location>
-        <ossrh.docker.registry.url>https://docker.io/v2/</ossrh.docker.registry.url>
-        <ossrh.nexus2>https://oss.sonatype.org/</ossrh.nexus2>
-        <ossrh.nexus3>https://nexus3.infra.top/nexus/</ossrh.nexus3>
-        <ossrh.sonar.host.url>https://sonarqube.com</ossrh.sonar.host.url>
+        <local.docker.registry.url>http://nexus3:5000/v2/</local.docker.registry.url>
+        <!--<local.nexus2>http://nexus2:28081/nexus/</local.nexus2>-->
+        <local.nexus3>http://nexus3:38081/nexus/</local.nexus3>
+        <local.sonar.host.url>http://sonarqube:9000</local.sonar.host.url>
         <pmd.ruleset.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/pmd/pmd-ruleset-6.8.0.xml</pmd.ruleset.location>
     </properties>
     <!-- @formatter:on -->
