@@ -229,7 +229,10 @@
         <!-- http://registry.npm.taobao.org/npm/-/ -->
         <frontend.npmDownloadRoot>https://registry.npmjs.org/npm/-/</frontend.npmDownloadRoot>
         <git.commit.id.skip>false</git.commit.id.skip>
-        <github.global.oauth2Token></github.global.oauth2Token>
+        <!--<github.global.oauth2Token>${env.CI_OPT_OSSRH_GIT_AUTH_TOKEN}</github.global.oauth2Token>-->
+        <!--<github.global.repositoryName>${env.CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER}</github.global.repositoryName>-->
+        <!--<github.global.repositoryOwner>${env.CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER}</github.global.repositoryOwner>-->
+        <github.global.oauth2Token>${git.auth.token}</github.global.oauth2Token>
         <github.global.repositoryName>unknown</github.global.repositoryName>
         <github.global.repositoryOwner>unknown</github.global.repositoryOwner>
         <github.site.path></github.site.path>
@@ -1851,9 +1854,6 @@
             </distributionManagement>
             <properties>
                 <!-- for site on github, id (github.global.server) must match the config in your settings.xml -->
-                <!--<github.global.oauth2Token>${env.CI_OPT_OSSRH_GIT_AUTH_TOKEN}</github.global.oauth2Token>-->
-                <!--<github.global.repositoryName>${env.CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER}</github.global.repositoryName>-->
-                <!--<github.global.repositoryOwner>${env.CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER}</github.global.repositoryOwner>-->
                 <github.global.server>github</github.global.server>
 
                 <maven.site.deploy.skip>true</maven.site.deploy.skip>
