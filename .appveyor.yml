@@ -91,7 +91,7 @@ install:
       du -sh /home/appveyor/.m2/repository;
       ls -ahl /home/appveyor/.m2/repository/;
   - sh: |
-      rm -rf ~/.m2/repository/top/infra/maven-build-extension;
+      rm -rf ~/.m2/repository/top/infra/maven/maven-build-extension;
       if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:+UseParallelGC -Dprofile=title -DprofileFormat=JSON,HTML"; fi;
       echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
       curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | dd of=${SETTINGS_GLOBAL_XML}; cat ${SETTINGS_GLOBAL_XML};
