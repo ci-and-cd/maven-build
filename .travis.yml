@@ -36,13 +36,13 @@ before_install:
     bash install-jdk.sh -F 11 --target $HOME/openjdk11 --workspace $HOME/.cache/install-jdk;
     if [[ -d $HOME/openjdk11 ]]; then sudo ln -s $HOME/openjdk11 /usr/lib/jvm/java-11-openjdk; fi;
   - export JAVA_HOME="/usr/lib/jvm/java-8-openjdk";
+#  - echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
+#    mkdir -p $(dirname ${SETTINGS_GLOBAL_XML});
+#    curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | tee ${SETTINGS_GLOBAL_XML};
+#    export MAVEN_GLOBAL_SETTINGS="--global-settings ${SETTINGS_GLOBAL_XML}";
   - rm -rf ~/.m2/repository/top/infra/maven/maven-build-extension;
     if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:+UseParallelGC -Dprofile=title -DprofileFormat=JSON,HTML"; fi;
-    #echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
-    #mkdir -p $(dirname ${SETTINGS_GLOBAL_XML});
-    #curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | tee ${SETTINGS_GLOBAL_XML};
     ls -ahl ~/.m2;
-    #export MAVEN_GLOBAL_SETTINGS="--global-settings ${SETTINGS_GLOBAL_XML}";
     ./mvnw ${MAVEN_GLOBAL_SETTINGS} -version;
 #  - aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -o apache-maven-3.6.1-bin.zip https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.zip && unzip -qq apache-maven-3.6.1-bin.zip;
 #    export M2_HOME="$PWD/apache-maven-3.6.1";

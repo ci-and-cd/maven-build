@@ -90,14 +90,15 @@ install:
       sshpass -p "${RSYNC_PASSWORD}" rsync -r -a -v -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" rsync_user@infra.top:/restricted/rsync_user/m2_repository/ /home/appveyor/.m2/repository > /dev/null;
       du -sh /home/appveyor/.m2/repository;
       ls -ahl /home/appveyor/.m2/repository/;
+#  - sh: |
+#      echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
+#      mkdir -p $(dirname ${SETTINGS_GLOBAL_XML});
+#      curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | dd of=${SETTINGS_GLOBAL_XML}; cat ${SETTINGS_GLOBAL_XML};
+#      export MAVEN_GLOBAL_SETTINGS="--global-settings ${SETTINGS_GLOBAL_XML}";
   - sh: |
       rm -rf ~/.m2/repository/top/infra/maven/maven-build-extension;
       if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:+UseParallelGC -Dprofile=title -DprofileFormat=JSON,HTML"; fi;
-      #echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
-      #mkdir -p $(dirname ${SETTINGS_GLOBAL_XML});
-      #curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | dd of=${SETTINGS_GLOBAL_XML}; cat ${SETTINGS_GLOBAL_XML};
       ls -ahl ~/.m2;
-      #export MAVEN_GLOBAL_SETTINGS="--global-settings ${SETTINGS_GLOBAL_XML}";
       ./mvnw ${MAVEN_GLOBAL_SETTINGS} -version;
 #  - sh: |
 #      unset M2_HOME;

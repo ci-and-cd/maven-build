@@ -81,14 +81,15 @@ before_script:
     export CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="true";
     source circ.sh;
 #  - export CI_OPT_CI_SCRIPT="${CI_OPT_GIT_PREFIX}/${CI_PROJECT_PATH:-ci-and-cd/maven-build}/raw/${CI_COMMIT_REF_NAME:-develop}/src/main/ci-script/lib_ci.sh";
+#  - |
+#    echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
+#    mkdir -p $(dirname ${SETTINGS_GLOBAL_XML});
+#    curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | tee ${SETTINGS_GLOBAL_XML};
+#    export MAVEN_GLOBAL_SETTINGS="--global-settings ${SETTINGS_GLOBAL_XML}";
   - |
     rm -rf ~/.m2/repository/top/infra/maven/maven-build-extension;
     if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:+UseParallelGC -Dprofile=title -DprofileFormat=JSON,HTML"; fi;
-    #echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
-    #mkdir -p $(dirname ${SETTINGS_GLOBAL_XML});
-    #curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | tee ${SETTINGS_GLOBAL_XML};
     ls -ahl ~/.m2;
-    #export MAVEN_GLOBAL_SETTINGS="--global-settings ${SETTINGS_GLOBAL_XML}";
     ./mvnw ${MAVEN_GLOBAL_SETTINGS} -version;
 
 #  # manual_git
