@@ -1645,6 +1645,12 @@
                             </execution>
                         </executions>
                     </plugin>-->
+                    <!--
+                    groovy-maven-plugin error on java11:
+                    [ERROR] WARNING: Please consider reporting this to the maintainers of org.codehaus.groovy.vmplugin.v7.Java7$1
+                    [ERROR] WARNING: Use -\-illegal-access=warn to enable warnings of further illegal reflective access operations
+                    [ERROR] WARNING: All illegal access operations will be denied in a future release
+                    -->
                     <!--<plugin>
                         <groupId>org.codehaus.gmaven</groupId>
                         <artifactId>groovy-maven-plugin</artifactId>
