@@ -30,7 +30,7 @@ else
     if [[ -n "${APPVEYOR_REPO_BRANCH}" ]]; then REF_NAME="${APPVEYOR_REPO_BRANCH}"; elif [[ -n "${CI_COMMIT_REF_NAME}" ]]; then REF_NAME="${CI_COMMIT_REF_NAME}"; elif [[ -n "${TRAVIS_BRANCH}" ]]; then REF_NAME="${TRAVIS_BRANCH}"; fi;
     if [[ "${REF_NAME}" =~ ^release/.+ ]] || [[ "${REF_NAME}" =~ ^support/.+ ]] || [[ "${REF_NAME}" =~ ^hotfix/.+ ]]; then
       export PUBLISH_CHANNEL="release";
-    elif [[ "${REF_NAME}" =~ ^feature/.+ ]] || [[ "${APPVEYOR_ENABLED}" == "develop" ]]; then
+    elif [[ "${REF_NAME}" =~ ^feature/.+ ]] || [[ "${REF_NAME}" == "develop" ]]; then
       export PUBLISH_CHANNEL="snapshot";
     fi;
   fi;
