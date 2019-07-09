@@ -8,6 +8,7 @@ export GIT_HOST="${GIT_HOST:-gitlab.com}";
 if [[ -z "${GIT_PREFIX}" ]]; then export GIT_PREFIX="https://${GIT_HOST}"; fi;
 export CI_OPT_GPG_KEYNAME="${CI_OPT_GPG_KEYNAME:-59DBF10E}";
 export CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION:-false}";
+export CI_OPT_NEXUS2_STAGING="${CI_OPT_NEXUS2_STAGING:-true}";
 
 if [[ -n "${APPVEYOR_REPO_BRANCH}" ]]; then export APPVEYOR_ENABLED="${APPVEYOR_ENABLED:-true}"; fi;
 if [[ -n "${CI_COMMIT_REF_NAME}" ]]; then export GITLAB_CI="${GITLAB_CI:-true}"; fi;
