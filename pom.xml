@@ -1837,6 +1837,26 @@
                         </executions>
                     </plugin>
                     <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>package-spring-restdocs</id>
+                                <phase>prepare-package</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration>
+                                    <target name="package-spring-restdocs">
+                                        <copy todir="${project.build.outputDirectory}/static/docs">
+                                            <fileset dir="${project.build.directory}/generated-docs" includes="*.*">
+                                                <filename regex=".*"/>
+                                            </fileset>
+                                        </copy>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!--
+                    <plugin>
                         <artifactId>maven-resources-plugin</artifactId>
                         <executions>
                             <execution>
@@ -1852,6 +1872,7 @@
                             </execution>
                         </executions>
                     </plugin>
+                    -->
                 </plugins>
             </build>
         </profile>
@@ -1988,6 +2009,54 @@
             <build>
                 <plugins>
                     <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-readme_md-to-src_site_markdown</id>
+                                <phase>pre-site</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration>
+                                    <target name="copy-readme_md-to-src_site_markdown">
+                                        <copy todir="${project.basedir}/src/site/markdown">
+                                            <fileset dir="${project.basedir}" includes="**/*">
+                                                <filename name="README.md"/>
+                                            </fileset>
+                                        </copy>
+                                    </target>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-src_readme-to-src_site_markdown_src_readme</id>
+                                <phase>pre-site</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration>
+                                    <target name="copy-src_readme-to-src_site_markdown_src_readme">
+                                        <copy todir="${project.basedir}/src/site/markdown/src/readme">
+                                            <fileset dir="${project.basedir}/src/readme" includes="**/*">
+                                                <not><filename name="**/.gitkeep"/></not>
+                                            </fileset>
+                                        </copy>
+                                    </target>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-src_readme-to-src_site_resources_src_readme</id>
+                                <phase>pre-site</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration>
+                                    <target name="copy-src_readme-to-src_site_resources_src_readme">
+                                        <copy todir="${project.basedir}/src/site/resources/src/readme">
+                                            <fileset dir="${project.basedir}/src/readme" includes="**/*">
+                                                <not><filename name="**/.gitkeep"/></not>
+                                            </fileset>
+                                        </copy>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!--
+                    <plugin>
                         <artifactId>maven-resources-plugin</artifactId>
                         <executions>
                             <execution>
@@ -2037,6 +2106,7 @@
                             </execution>
                         </executions>
                     </plugin>
+                    -->
                 </plugins>
             </build>
         </profile>
@@ -2045,6 +2115,26 @@
             <activation><file><exists>${basedir}/src/site/markdown/images</exists></file></activation>
             <build>
                 <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-src_site_markdown_images-to-src_site_resources_images</id>
+                                <phase>pre-site</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration>
+                                    <target name="copy-src_site_markdown_images-to-src_site_resources_images">
+                                        <copy todir="${project.basedir}/src/site/resources/images">
+                                            <fileset dir="${project.basedir}/src/site/markdown/images" includes="**/*">
+                                                <not><filename name="**/.gitkeep"/></not>
+                                            </fileset>
+                                        </copy>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!--
                     <plugin>
                         <artifactId>maven-resources-plugin</artifactId>
                         <executions>
@@ -2065,6 +2155,7 @@
                             </execution>
                         </executions>
                     </plugin>
+                    -->
                 </plugins>
             </build>
         </profile>
