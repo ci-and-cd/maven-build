@@ -2810,7 +2810,25 @@
         </profile>
         <profile>
             <id>maven-toolchains-plugin-executions-if-file-user_home-dot_m2-toolchains_xml-present</id>
-            <activation><file><exists>${user.home}/.m2/toolchains.xml</exists></file></activation>
+            <activation>
+                <file><exists>${user.home}/.m2/toolchains.xml</exists></file>
+                <property><name>!toolchains</name></property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-toolchains-plugin</artifactId>
+                        <executions><execution><phase>validate</phase><goals><goal>toolchain</goal></goals></execution></executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>maven-toolchains-plugin-executions-if-file-present</id>
+            <activation>
+                <file><exists>${toolchains}</exists></file>
+                <property><name>toolchains</name></property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
