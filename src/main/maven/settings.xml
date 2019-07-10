@@ -23,6 +23,7 @@
     <offline/>
 
     <pluginGroups>
+        <pluginGroup>com.amashchenko.maven.plugin</pluginGroup>
         <pluginGroup>com.github.ferstl</pluginGroup>
         <pluginGroup>com.github.spotbugs</pluginGroup>
         <pluginGroup>io.quarkus</pluginGroup>
