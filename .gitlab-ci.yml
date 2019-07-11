@@ -36,9 +36,8 @@
     # force publish on temp branch push
     #- export CI_OPT_PUBLISH_TO_REPO="true";
     - |
-      if [ -f artifacts.tar.gz ]; then tar -xzf artifacts.tar.gz; fi;
-      export CI_OPT_MAVEN_CLEAN_SKIP="true"; export CI_OPT_SKIPITS="true"; export CI_OPT_SKIPTESTS="true";
-      time ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -U -Dfast=true deploy;
+      if [ -f artifacts.tar.gz ]; then tar -xzf artifacts.tar.gz; fi; ls -ahl;
+      time CI_OPT_MAVEN_CLEAN_SKIP="true" CI_OPT_SKIPITS="true" CI_OPT_SKIPTESTS="true" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -U -Dfast=true deploy;
       if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
       echo archive $(git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'artifacts.tar.gz' | grep -v 'profiler-report' | wc -l) files into artifacts.tar.gz;
       git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'artifacts.tar.gz' | grep -v 'profiler-report' | tar -czf artifacts.tar.gz -T -;
@@ -46,9 +45,8 @@
 .script_site: &script_site
   script:
     - |
-      if [ -f artifacts.tar.gz ]; then tar -xzf artifacts.tar.gz; fi;
-      export CI_OPT_MAVEN_CLEAN_SKIP="true"; export CI_OPT_SKIPITS="true"; export CI_OPT_SKIPTESTS="true";
-      time ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp site-deploy;
+      if [ -f artifacts.tar.gz ]; then tar -xzf artifacts.tar.gz; fi; ls -ahl;
+      time CI_OPT_MAVEN_CLEAN_SKIP="true" CI_OPT_SKIPITS="true" CI_OPT_SKIPTESTS="true" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp site-deploy;
       if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
 
 .upload_files_for_latter_stages: &upload_files_for_latter_stages
@@ -126,9 +124,8 @@ analysis:
   stage: analysis
   script:
     - |
-      if [ -f artifacts.tar.gz ]; then tar -xzf artifacts.tar.gz; fi;
-      export CI_OPT_MAVEN_CLEAN_SKIP="true";
-      time CI_OPT_SONAR="true" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp sonar:sonar;
+      if [ -f artifacts.tar.gz ]; then tar -xzf artifacts.tar.gz; fi; ls -ahl;
+      time CI_OPT_MAVEN_CLEAN_SKIP="true" CI_OPT_SONAR="true" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp sonar:sonar;
       if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
   variables:
     GIT_STRATEGY: fetch
