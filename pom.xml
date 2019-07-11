@@ -1399,7 +1399,7 @@
         <profile>
             <id>gpg-when-gpg_keyname-present</id>
             <activation>
-                <file><exists>${maven.multiModuleProjectDirectory}/codesigning.asc</exists></file>
+                <file><exists>${maven.multiModuleProjectDirectory}/codesigning.asc.enc</exists></file>
                 <property><name>gpg.keyname</name></property>
             </activation>
             <build>
@@ -1416,7 +1416,7 @@
         <profile>
             <id>gpg-when-gpg2_argument-gpg_loopback-present</id>
             <activation>
-                <file><exists>${maven.multiModuleProjectDirectory}/codesigning.asc</exists></file>
+                <file><exists>${maven.multiModuleProjectDirectory}/codesigning.asc.enc</exists></file>
                 <property><name>gpg.loopback</name><value>true</value></property>
             </activation>
             <build>
