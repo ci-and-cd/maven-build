@@ -47,12 +47,14 @@ before_install:
 #  - aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -o apache-maven-3.6.1-bin.zip https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.zip && unzip -qq apache-maven-3.6.1-bin.zip;
 #    export M2_HOME="$PWD/apache-maven-3.6.1";
 #    export PATH="$M2_HOME/bin:$PATH";
-  - if [[ "${CLEAN_TRAVIS_LOGS}" == "true" ]]; then
-      travis login --github-token ${CI_OPT_OSSRH_GIT_AUTH_TOKEN} --org;
-      LAST_BUILD_NUMBER=$(print '\n' | travis history --limit 10 --org | head -n1 | cut -d" " -f1 | cut -c2-);
-      echo "LAST_BUILD_NUMBER [${LAST_BUILD_NUMBER}]";
-      for bn in $(seq 1 ${LAST_BUILD_NUMBER} ); do print '\n' | travis logs ${bn} --delete --force --org; done;
-    fi;
+#  # see: https://github.com/travis-ci/travis.rb
+#  - if [[ "${CLEAN_TRAVIS_LOGS}" == "true" ]]; then
+#      ruby -v; gem install travis -v 1.8.10 --no-rdoc --no-ri; travis version;
+#      travis login --github-token ${CI_OPT_OSSRH_GIT_AUTH_TOKEN} --org;
+#      LAST_BUILD_NUMBER=$(print '\n' | travis history --limit 10 --org | head -n1 | cut -d" " -f1 | cut -c2-);
+#      echo "LAST_BUILD_NUMBER [${LAST_BUILD_NUMBER}]";
+#      for bn in $(seq 1 ${LAST_BUILD_NUMBER} ); do print '\n' | travis logs ${bn} --delete --force --org; done;
+#    fi;
 branches:
   only:
     #- master # do nothing on master branch
@@ -79,7 +81,10 @@ install: true
 jdk:
   - openjdk8
 #  - oraclejdk9
-language: java
+#language: java
+language: ruby
+rvm:
+  - 2.0
 script:
   # When prefixed with `travis_wait 30`, no log output until it is done.
   # see: https://github.com/travis-ci/travis-ci/issues/4190 or https://github.com/HaxeFoundation/hxcpp/issues/709
