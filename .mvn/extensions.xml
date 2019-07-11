@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+see:
+[Add ability to easily retrieve core extensions from alternative pluginRepository](https://issues.apache.org/jira/browse/MNG-6327)
+[Maven core extension resolution ignores repositories from activeByDefault profiles in settings.xml](https://issues.apache.org/jira/browse/MNG-5984)
+-->
+<extensions>
+    <!-- mvn install -Dprofile="profile name" -DprofileFormat=JSON,HTML -->
+    <extension>
+        <groupId>fr.jcgay.maven</groupId><artifactId>maven-profiler</artifactId><version>2.6</version>
+    </extension>
+
+    <!-- @formatter:off -->
+    <extension><artifactId>topinfra-maven-extension</artifactId><groupId>top.infra.maven</groupId><version>1.0.3</version></extension>
+    <extension><artifactId>topinfra-mvnext-module-docker</artifactId><groupId>top.infra.maven</groupId><version>1.0.3</version></extension>
+    <extension><artifactId>topinfra-mvnext-module-gitflow-semver</artifactId><groupId>top.infra.maven</groupId><version>1.0.3</version></extension>
+    <extension><artifactId>topinfra-mvnext-module-gpg-key</artifactId><groupId>top.infra.maven</groupId><version>1.0.3</version></extension>
+    <extension><artifactId>topinfra-mvnext-module-infrastructure-settings</artifactId><groupId>top.infra.maven</groupId><version>1.0.3</version></extension>
+    <extension><artifactId>topinfra-mvnext-module-maven-build-pom</artifactId><groupId>top.infra.maven</groupId><version>1.0.3</version></extension>
+    <extension><artifactId>topinfra-mvnext-module-settings-security</artifactId><groupId>top.infra.maven</groupId><version>1.0.3</version></extension>
+    <!-- @formatter:on -->
+
+    <!-- see: https://github.com/random-maven/profile-activator-extension/issues/3
+    <extension>
+        <groupId>com.carrotgarden.maven</groupId>
+        <artifactId>arkon-maven-extension</artifactId>
+        <version>1.3.20190513180922</version>
+    </extension>
+    -->
+    <!-- profile-activator-extension conflicts with maven-profiledep-extension
+    <extension>
+        <groupId>com.carrotgarden.maven</groupId>
+        <artifactId>profile-activator-extension</artifactId>
+        <version>1.2.20180119141943</version>
+    </extension>
+    -->
+    <!-- maven-profiledep-extension conflicts with profile-activator-extension
+    <extension>
+        <groupId>com.github.sviperll</groupId>
+        <artifactId>maven-profiledep-extension</artifactId>
+        <version>0.23</version>
+    </extension>
+    -->
+    <!--
+    <extension>
+        <groupId>io.takari.maven</groupId>
+        <artifactId>takari-smart-builder</artifactId>
+        <version>0.6.1</version>
+    </extension>
+    -->
+</extensions>

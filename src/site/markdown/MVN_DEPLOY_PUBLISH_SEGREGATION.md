@@ -17,7 +17,7 @@ This make build process more flexible for most CI systems.
 
 | Command           | segregation/infrastructure | maven goals                                                                                                |
 |-------------------|:--------------------------:|:----------------------------------------------------------------------------------------------------------:|
-| clean             | true/any                   | `clean org.apache.maven.plugins:maven-antrun-plugin:run@local-deploy-model-path-clean`                     |
+| clean             | true/any                   | `clean org.apache.maven.plugins:maven-antrun-plugin:run@wagon-repository-clean`                     |
 |                   |                            |                                                                                                            |
 | clean             | false/any                  | `clean`                                                                                                    |
 |                   |                            |                                                                                                            |
@@ -29,7 +29,7 @@ This make build process more flexible for most CI systems.
 |                   |                            |                                                                                                            |
 | publish_artifact  | false/any                  | `deploy`                                                                                                   |
 |                   |                            |                                                                                                            |
-| publish_site      | any/github                 | `site site-deploy`                                                                                         |
+| publish_site      | any/github                 | `site-deploy`                                                                                         |
 |                   |                            |                                                                                                            |
 | publish_site      | any/not github             | `site site:stage site:stage-deploy`                                                                        |
 |                   |                            |                                                                                                            |

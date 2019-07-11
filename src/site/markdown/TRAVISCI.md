@@ -21,7 +21,7 @@ JAVA_HOME /usr/lib/jvm/java-9-oracle
     travis version
     
 
-`travis login` or `travis login --github-token $CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN`
+`travis login` or `travis login --github-token $CI_OPT_OSSRH_GIT_AUTH_TOKEN`
 
 ## Deploying to Maven Repositories from Tavis CI
 
@@ -32,7 +32,7 @@ JAVA_HOME /usr/lib/jvm/java-9-oracle
 * see: [Publishing a Maven Site to GitHub Pages with Travis-CI](https://blog.lanyonm.org/articles/2015/12/19/publish-maven-site-github-pages-travis-ci.html)
 
 
-    travis encrypt CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN="${CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN}" --add env.global
+    travis encrypt CI_OPT_OSSRH_GIT_AUTH_TOKEN="${CI_OPT_OSSRH_GIT_AUTH_TOKEN}" --add env.global
 
 ## Environment variables
 
@@ -42,18 +42,18 @@ Variables in travis repo settings:
 
 |name                                   | usage                                          | note                           |
 |---------------------------------------|:----------------------------------------------:|:------------------------------:|
-|CI_OPT_GITHUB_SITE_REPO_OWNER          | for github maven site                          | Display value in build log     |
-|CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN | for github maven site and config fetch         | Not display value in build log |
+|CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER          | for github maven site                          | Display value in build log     |
+|CI_OPT_OSSRH_GIT_AUTH_TOKEN | for github maven site and config fetch         | Not display value in build log |
 |                                       |                                                |                                |
-|CI_OPT_MAVEN_CENTRAL_USER              | for deploy artifact | Do not set on forked repo, Not display value in build log |
-|CI_OPT_MAVEN_CENTRAL_PASS              | for deploy artifact | Do not set on forked repo, Not display value in build log |
+|CI_OPT_OSSRH_NEXUS2_USER              | for deploy artifact | Do not set on forked repo, Not display value in build log |
+|CI_OPT_OSSRH_NEXUS2_PASS              | for deploy artifact | Do not set on forked repo, Not display value in build log |
 
 ## Note
 
     env:
       global:
-      # ci-script and infrastructure config ref, ex master/develop/v1.0.8
-      - CI_OPT_CI_SCRIPT=https://github.com/ci-and-cd/maven-build/raw/v0.3.0/src/main/ci-script/lib_ci.sh
+      # ci-script and infrastructure config ref, ex master/develop/v2.0.0
+      - CI_OPT_CI_SCRIPT=https://github.com/ci-and-cd/maven-build/raw/v2.0.0/src/main/ci-script/lib_ci.sh
       # or delete /etc/mavenrc
       - MAVEN_SKIP_RC=true
     # Skipping the Installation Step
@@ -68,7 +68,7 @@ Variables in travis repo settings:
 
     deploy:
       provider: releases
-      api_key: $CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN
+      api_key: $CI_OPT_OSSRH_GIT_AUTH_TOKEN
       file: "target/oss-keygen-${PROJECT_MAVEN_VERSION}.jar"
       skip_cleanup: true
       on:

@@ -6,7 +6,15 @@
         <type>jdk</type>
         <provides>
             <version>1.8</version>
-            <!--<vendor>oracle</vendor>-->
+        </provides>
+        <configuration>
+            <jdkHome>/Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home</jdkHome>
+        </configuration>
+    </toolchain>
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>8</version>
         </provides>
         <configuration>
             <jdkHome>/Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home</jdkHome>

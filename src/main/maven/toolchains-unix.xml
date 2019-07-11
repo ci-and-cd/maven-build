@@ -6,7 +6,6 @@
         <type>jdk</type>
         <provides>
             <version>default</version>
-            <!--<vendor>openjdk</vendor>-->
         </provides>
         <configuration>
             <!-- travis-ci style: /usr/lib/jvm/java-8-openjdk -->

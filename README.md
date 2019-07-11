@@ -16,7 +16,7 @@
 [![Build Status](https://travis-ci.org/ci-and-cd/maven-build.svg?branch=develop)travis-ci](https://travis-ci.org/ci-and-cd/maven-build)  
 
 
-Parent pom for maven based projects
+Parent pom for maven based jar, war and docker projects
 
 maven-build support code environment segregation and build deploy segregation.  
 
@@ -27,7 +27,7 @@ Copy `maven-build/src/main/maven/toolchains.xml` to `~/.m2/toolchains.xml`
 ```bash
 cp src/main/maven/toolchains.xml ~/.m2/toolchains.xml
 # or
-cp src/main/maven/toolchains-1.8.0_181-Darwin.xml ~/.m2/toolchains.xml
+cp src/main/maven/toolchains-darwin.xml ~/.m2/toolchains.xml
 ```
 Update jdkHome in ~/.m2/toolchains.xml
 
@@ -36,11 +36,25 @@ Set maven-build as parent in maven projects.
         <parent>
             <groupId>cn.home1</groupId>
             <artifactId>maven-build</artifactId>
-            <version>${maven-build.version}</version>
+            <version>${version.maven-build}</version>
         </parent>
 
 No dependency will be imported, maven-build only responsible for software engineering,
 it does not interfering dependency management.
+
+TODO document about extensions
+see: 
+[topinfra-mvnext-module-maven-build-pom](https://github.com/ci-and-cd/topinfra-maven/tree/develop/topinfra-mvnext-module-maven-build-pom)
+[topinfra-mvnext-module-infrastructure-settings](https://github.com/ci-and-cd/topinfra-maven/tree/develop/topinfra-mvnext-module-infrastructure-settings)
+
+```bash
+mvn coreext:check
+mvn coreext:install
+```
+
+if src/main/resources/Dockerfile absent or CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION=true (use script),
+no docker image is built at package phase.
+see profile 'dockerfile_maven_plugin-lifecycle_binding-when-not-publish_deploy_segregation' in pom.xml.
 
 You need to provide few properties and environment variables, see next chapter.
 
@@ -48,28 +62,31 @@ You need to provide few properties and environment variables, see next chapter.
 ## II. Properties, Environment variables and their default values
 
 ### 1. fetch or deploy
-- private-nexus3.repository
+- private.nexus3
 > default: http://nexus3:28081/nexus/repository
 Set this property to a real world url.
 
-- private-nexus3.repository
+- private.nexus3
 > default: http://nexus3.localal:28081/nexus/repository
 Set this property to a real world url.
 
-- build.publish.channel
+- publish.channel TODO publish.channel deprecated
 > default: snapshot
 Set this property to 'release' when building release artifact.
-Note: CI_OPT_GITHUB_SITE_REPO_OWNER
+Note: CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER
 
 ### 2. maven-surefire-plugin and maven-failsafe-plugin
 
 - maven.test.skip
 > default: false
 
-- maven.integration-test.skip
+- maven.test.failure.ignore
 > default: false
 
-- maven.test.failure.ignore
+- skipITs
+> default: false
+
+- skipTests
 > default: false
 
 ### 3. com.github.eirslett:frontend-maven-plugin
@@ -83,9 +100,9 @@ Customize these properties only when building front-end projects and default sit
 
 ### 4. report
 #### 4.1 sonarqube
-- private-sonarqube.host.url
+- private.sonar.host.url
 > default: http://sonarqube:9000
-- private-sonarqube.host.url
+- private.sonar.host.url
 > default: http://sonarqube:9000
 
 Need these properties only when profile 'sonar' is activated.
@@ -105,15 +122,13 @@ Need to customize when github.com is not reachable.
 
 ### 5. site
 - site.path
-> default: ${project.artifactId}-${build.publish.channel}
+> default: ${project.artifactId}-${publish.channel} TODO update doc
 Customize this properties if you want to publish relative projects's site into same parent directory, 
 use same value on relative projects.
 
-- CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN
+- CI_OPT_OSSRH_GIT_AUTH_TOKEN
 > default: N/A (blank)
-- CI_OPT_GITHUB_SITE_REPO_OWNER
-> default: N/A (blank)
-- CI_OPT_GITHUB_SITE_REPO_NAME
+- CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER
 > default: N/A (blank)
 
 Need these properties only when deploy site to github.com.
@@ -139,9 +154,9 @@ pinentry-mode loopback
 Need these properties only when deploy artifacts into maven central repository.
 
 ### 7. maven central
-- CI_OPT_MAVEN_CENTRAL_USER
+- CI_OPT_OSSRH_NEXUS2_USER
 > Maven central's username
-- CI_OPT_MAVEN_CENTRAL_PASS
+- CI_OPT_OSSRH_NEXUS2_PASS
 > Maven central's password
 
 Need these properties only when deploy artifacts into maven central repository.
@@ -149,6 +164,12 @@ Need these properties only when deploy artifacts into maven central repository.
 ### 8. maven-compiler-plugin and maven-javadoc-plugin
 - project.build.sourceEncoding
 > default: UTF-8
+
+### 9. docker
+
+com.spotify:dockerfile-maven-plugin
+
+- docker.registry
 
 
 ## III. Plugins
@@ -203,11 +224,26 @@ maven-resources-plugin
 '${project.basedir}/src/readme' to '${project.basedir}/src/site/resources/src/readme'
 '${project.basedir}/src/site/markdown/images' to '${project.basedir}/src/site/resources/images'
 
+### 4. docker
+
+io.fabric8:docker-maven-plugin
+
+com.spotify:dockerfile-maven-plugin
+> clean, build, push docker images
+
+maven-antrun-plugin
+> clean filtered '${project.basedir}/src/main/docker/Dockerfile'
+
+maven-resources-plugin
+> copy and filter contents from 'src/main/resources/docker' into '${project.basedir}/src/main/docker'
+
+maven-deploy-plugin
+> must run after docker-maven-plugin
 
 ## IV. Profiles
 
 ### 1. build
-infrastructure_opensource
+infrastructure_ossrh
 > Use maven central service.
 Deploy maven site to github.
 
@@ -224,7 +260,7 @@ git-commit-id
 activate automatically if '${maven.multiModuleProjectDirectory}/.git/HEAD' exists
 
 mvn-deploy-publish-segregation-by-wagon
-> activate by set 'mvn_deploy_publish_segregation' to 'true'
+> activate by set 'mvn.deploy.publish.segregation' to 'true'
 
 jacoco-build
 > Test coverage report.
@@ -232,6 +268,16 @@ activate by property 'jacoco' absent (Enabled by default, to disable, set `-Djac
 
 cobertura
 > activate by set property 'jacoco' to 'false'
+
+```bash
+JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-11.0.2.jdk/Contents/Home" mvn help:active-profiles clean package
+
+JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-10.jdk/Contents/Home" mvn help:active-profiles clean package
+
+JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-9.0.4.jdk/Contents/Home" mvn help:active-profiles clean package
+
+JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_201.jdk/Contents/Home" mvn help:active-profiles clean package
+```
 
 ### 2. report
 spring-restdocs
@@ -260,13 +306,19 @@ site
 run `mvn -Dsite=true site site:stage site:stage-deploy` to active this profile and build site, 
 set `-Dsite.path=maven-build-snapshot` to specify upload directory.
 
-infrastructure_opensource_site_publish
+infrastructure_ossrh_site_publish
 > publish project site to github  
-activate on property 'github-site-publish' is true  
+activate on property 'github.site.publish' is true  
 needs:  
-env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN  
-env.CI_OPT_GITHUB_SITE_REPO_OWNER
+env.CI_OPT_OSSRH_GIT_AUTH_TOKEN  
+env.CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER
 
+
+### 4. docker
+
+dockerfile_maven_plugin-lifecycle_binding-when-not-publish_deploy_segregation
+> activate by property 'mvn.deploy.publish.segregation' absent
+build and push docker image automatically
 
 ## V. Repositories
 
@@ -284,19 +336,41 @@ Add args on `maven site`
 
 ## VII. Appendices
 
-### A. Contribution to maven-build
 
-#### A.1. local install/deploy maven-build
+## A. Example ~/.docker/daemon.json of Docker for Mac
+```json
+{
+  "debug" : true,
+  "experimental" : true,
+  "registry-mirrors" : [
+    "https://docker.mirrors.ustc.edu.cn",
+    "http://hub-mirror.c.163.com",
+    "http://mirror.gcr.io"
+  ]
+}
+```
 
-    mvn -e -U clean install
+### B. Contribution to maven-build
+
+#### B.1. local install/deploy maven-build
+
+    export MAVEN_HOME="${PWD}/../extension-core/target/apache-maven-3.6.1/apache-maven-3.6.1"
+
+    cp src/main/maven/settings-global.xml /usr/local/Cellar/maven/3.6.1/libexec/conf/settings.xml
     
-    mvn -e -U -Dinfrastructure=local -Dsite=true -Dsite.path=ci-and-cd clean install deploy site site:stage site:stage-deploy
+    CI_OPT_INFRASTRUCTURE=ossrh ./mvnw -e -U clean install
+    
+    CI_OPT_INFRASTRUCTURE=ossrh CI_OPT_ORIGIN_REPO=true CI_OPT_SONAR=true CI_OPT_SONAR_LOGIN= CI_OPT_SONAR_ORGANIZATION=home1-oss-github ./mvnw -e sonar:sonar
+    
+    CI_OPT_GITHUB_SITE_PUBLISH="true" CI_OPT_INFRASTRUCTURE=ossrh CI_OPT_OSSRH_GIT_AUTH_TOKEN="${CI_OPT_OSSRH_GIT_AUTH_TOKEN}" CI_OPT_SITE="true" CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER="ci-and-cd" CI_OPT_SITE_PATH_PREFIX="maven-build" ./mvnw -e -U clean install site-deploy
+    
+    CI_OPT_GITHUB_SITE_PUBLISH="false" CI_OPT_INFRASTRUCTURE=ossrh CI_OPT_OSSRH_MVNSITE_PASSWORD="${CI_OPT_OSSRH_MVNSITE_PASSWORD}" CI_OPT_OSSRH_MVNSITE_USERNAME="${CI_OPT_OSSRH_MVNSITE_USERNAME}" CI_OPT_NEXUS3="https://nexus3.infra.top" CI_OPT_SITE="true" CI_OPT_SITE_PATH_PREFIX="ci-and-cd/maven-build" ./mvnw -e -U clean install site site:stage site:stage-deploy
 
-#### A.2 Pull request
+#### B.2 Pull request
 
 Please open PR on develop branch.
 
-### B. GPG issue
+### C. GPG issues
 ```
 gpg: signing failed: Inappropriate ioctl for device
 ```

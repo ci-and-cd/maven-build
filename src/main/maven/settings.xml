@@ -5,7 +5,8 @@
                         http://maven.apache.org/xsd/settings-1.0.0.xsd">
 
     <interactiveMode/>
-    <localRepository>${user.home}/.m2/repository</localRepository>
+    <!-- org.springframework.cloud:spring-cloud-contract-maven-plugin can not substitute variables in localRepository tag correctly -->
+    <!--<localRepository>${user.home}/.m2/repository</localRepository>-->
 
     <mirrors>
         <!-- @formatter:off -->
@@ -13,17 +14,25 @@
         <!-- mirrorOf: pom.xml repositories repository id -->
         <!--<mirrorOf>central</mirrorOf>-->
         <!--<mirrorOf>external:*,!github-mvn-repo-wagon-maven-plugin</mirrorOf>-->
-        <!--<mirror><id>mirror</id><name>mirror</name><url>http://nexus3:28081/nexus/repository/maven-public/</url><mirrorOf>*</mirrorOf></mirror>-->
+        <!--<mirror><id>mirror</id><mirrorOf>*</mirrorOf><name>mirror</name><url>http://nexus3:28081/nexus/repository/maven-public/</url></mirror>-->
+        <!--<mirror><id>mirror</id><mirrorOf>*</mirrorOf><url>https://nexus3.infra.top/nexus/repository/maven-public/</url></mirror>-->
+
         <!-- @formatter:on -->
     </mirrors>
 
     <offline/>
 
     <pluginGroups>
+        <pluginGroup>com.amashchenko.maven.plugin</pluginGroup>
+        <pluginGroup>com.github.ferstl</pluginGroup>
+        <pluginGroup>com.github.spotbugs</pluginGroup>
+        <pluginGroup>io.quarkus</pluginGroup>
+        <pluginGroup>io.takari</pluginGroup>
         <pluginGroup>org.apache.maven.plugins</pluginGroup>
         <pluginGroup>org.apache.tomcat.maven</pluginGroup>
         <pluginGroup>org.codehaus.mojo</pluginGroup>
         <pluginGroup>org.owasp</pluginGroup>
+        <pluginGroup>org.reficio</pluginGroup>
         <pluginGroup>org.sonarsource.scanner.maven</pluginGroup>
         <pluginGroup>org.springframework.boot</pluginGroup>
     </pluginGroups>
@@ -31,9 +40,34 @@
     <profiles>
         <!-- @formatter:off -->
         <profile>
-            <id>gpg-keyname</id>
+            <id>default-public-repositories</id>
             <activation><activeByDefault>true</activeByDefault></activation>
-            <properties><gpg.keyname>${env.CI_OPT_GPG_KEYNAME}</gpg.keyname></properties>
+            <repositories>
+                <!-- Make artifacts in OSSRH repositories available -->
+                <repository>
+                    <id>ossrh-releases</id>
+                    <name>central releases</name>
+                    <url>https://oss.sonatype.org/content/repositories/releases/</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </repository>
+                <repository>
+                    <id>ossrh-snapshots</id>
+                    <name>central snapshots</name>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>central</id>
+                    <name>central</name>
+                    <url>https://repo1.maven.org/maven2</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </pluginRepository>
+            </pluginRepositories>
         </profile>
         <!-- @formatter:on -->
     </profiles>
@@ -45,13 +79,17 @@
 
     <servers>
         <!-- @formatter:off -->
-
         <server>
             <id>docker-hub</id>
             <username>${env.CI_OPT_DOCKER_REGISTRY_USER}</username><password>${env.CI_OPT_DOCKER_REGISTRY_PASS}</password>
             <configuration><email>${env.CI_OPT_DOCKER_DOCKERHUB_MAIL}</email></configuration>
         </server>
-        <server><id>github</id><password>${env.CI_INFRA_OPT_OPENSOURCE_GIT_AUTH_TOKEN}</password></server>
+        <!-- for dockerfile-maven-plugin, see: https://github.com/spotify/dockerfile-maven/blob/master/docs/authentication.md -->
+        <server>
+            <id>docker.io</id>
+            <username>${env.CI_OPT_DOCKER_REGISTRY_USER}</username><password>${env.CI_OPT_DOCKER_REGISTRY_PASS}</password>
+        </server>
+        <server><id>github</id><password>${env.CI_OPT_OSSRH_GIT_AUTH_TOKEN}</password></server>
         <!--
         To fix issue: gpg: signing failed: Inappropriate ioctl for device
         1.
@@ -65,30 +103,9 @@
         echo RELOADAGENT | gpg-connect-agent
         -->
         <server><id>gpg.passphrase</id><passphrase>${env.CI_OPT_GPG_PASSPHRASE}</passphrase></server>
-        <server><id>opensource-mvnsite</id><username>${env.CI_INFRA_OPT_OPENSOURCE_MVNSITE_USERNAME}</username><password>${env.CI_INFRA_OPT_OPENSOURCE_MVNSITE_PASSWORD}</password></server>
-        <server><id>OSSRH-snapshots</id><username>${env.CI_OPT_MAVEN_CENTRAL_USER}</username><password>${env.CI_OPT_MAVEN_CENTRAL_PASS}</password></server>
-        <server><id>OSSRH-staging</id><username>${env.CI_OPT_MAVEN_CENTRAL_USER}</username><password>${env.CI_OPT_MAVEN_CENTRAL_PASS}</password></server>
-
-        <server><id>nexus3:5000</id><username>deployment</username><password>deployment</password></server>
-        <!-- see: http://maven.apache.org/guides/mini/guide-encryption.html -->
-        <!-- mvn &#x002d;&#x002d;encrypt-password ${password} -->
-        <!-- accept RSA key fingerprint -->
-        <!-- ssh -o UserKnownHostsFile=~/.ssh/known_hosts root@mvnsite.local -p 10022 -->
-        <server>
-            <id>private-mvnsite</id>
-            <username>deployment</username><password>deployment</password>
-            <!--<username>root</username><passphrase>if required</passphrase><privateKey>${user.home}/.ssh/mvnsite.local</privateKey>-->
-            <configuration>
-                <!-- see: https://maven.apache.org/wagon/apidocs/index.html -->
-                <!-- java.lang.ClassNotFoundException: org.apache.maven.wagon.providers.ssh.knownhost.NullKnownHostProvider -->
-                <!--knownHostsProvider implementation="org.apache.maven.wagon.providers.ssh.knownhost.NullKnownHostProvider">
-                    <hostKeyChecking>no</hostKeyChecking>
-                </knownHostsProvider-->
-            </configuration>
-        </server>
-        <server><id>private-nexus3-releases</id><username>deployment</username><password>deployment</password></server>
-        <server><id>private-nexus3-snapshots</id><username>deployment</username><password>deployment</password></server>
-        <server><id>private-nexus3-thirdparty</id><username>deployment</username><password>deployment</password></server>
+        <server><id>ossrh-mvnsite</id><username>${env.CI_OPT_OSSRH_MVNSITE_USERNAME}</username><password>${env.CI_OPT_OSSRH_MVNSITE_PASSWORD}</password></server>
+        <server><id>ossrh-snapshots</id><username>${env.CI_OPT_OSSRH_NEXUS2_USER}</username><password>${env.CI_OPT_OSSRH_NEXUS2_PASS}</password></server>
+        <server><id>ossrh-staging</id><username>${env.CI_OPT_OSSRH_NEXUS2_USER}</username><password>${env.CI_OPT_OSSRH_NEXUS2_PASS}</password></server>
         <!-- @formatter:on -->
     </servers>
 
