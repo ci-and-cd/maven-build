@@ -18,7 +18,10 @@
         </developer>
     </developers>
 
-    <!-- For this to work, you must go to: Preferences->Editor->Code Style->Formatter Control and check Enable formatter markers in comments -->
+    <!--
+    To make formatter:off/on instructions work,
+    you must go to 'Preferences->Editor->Code Style->Formatter Control' and check 'Enable formatter markers in comments'.
+    -->
     <!-- @formatter:off -->
     <ciManagement><system>Travis CI</system><url>https://travis-ci.org/ci-and-cd/maven-build</url></ciManagement>
     <issueManagement><system>GitHub Issues</system><url>https://github.com/ci-and-cd/maven-build/issues</url></issueManagement>
@@ -242,7 +245,7 @@
         <jacoco.itReportPath>${project.build.directory}/jacoco-it.exec</jacoco.itReportPath>
 
         <!-- mvn install -Dprofile="profile name" -DprofileFormat=JSON,HTML -->
-        <maven-profiler-report-directory>${maven.multiModuleProjectDirectory}/.mvn/profilerReport</maven-profiler-report-directory>
+        <maven-profiler-report-directory>${maven.multiModuleProjectDirectory}/.mvn/profiler-report</maven-profiler-report-directory>
 
         <!--<relative.parent.dir>.</relative.parent.dir>-->
         <src.generated.dir>**/generated/**</src.generated.dir>

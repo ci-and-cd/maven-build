@@ -47,6 +47,12 @@ before_install:
 #  - aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -o apache-maven-3.6.1-bin.zip https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.zip && unzip -qq apache-maven-3.6.1-bin.zip;
 #    export M2_HOME="$PWD/apache-maven-3.6.1";
 #    export PATH="$M2_HOME/bin:$PATH";
+  - if [[ "${CLEAN_TRAVIS_LOGS}" == "true" ]]; then
+      travis login --github-token ${CI_OPT_OSSRH_GIT_AUTH_TOKEN} --org;
+      LAST_BUILD_NUMBER=$(print '\n' | travis history --limit 10 --org | head -n1 | cut -d" " -f1 | cut -c2-);
+      echo "LAST_BUILD_NUMBER [${LAST_BUILD_NUMBER}]";
+      for bn in $(seq 1 ${LAST_BUILD_NUMBER} ); do print '\n' | travis logs ${bn} --delete --force --org; done;
+    fi;
 branches:
   only:
     #- master # do nothing on master branch
@@ -80,9 +86,9 @@ script:
   - while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
   - if [[ "${TRAVIS_ENABLED}" == "true" ]]; then
       time CI_OPT_SONAR="true" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -U clean deploy;
-      if type -p column > /dev/null; then find .mvn/profilerReport -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi;
+      if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
       time CI_OPT_MAVEN_CLEAN_SKIP="true" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp site-deploy;
-      if type -p column > /dev/null; then find .mvn/profilerReport -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi;
+      if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
     fi
   - kill %1
 services:

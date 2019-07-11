@@ -133,7 +133,7 @@ test_script:
   - sh: |
       if [[ "${APPVEYOR_ENABLED}" == "true" ]]; then
         time CI_OPT_SONAR="true" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -U clean deploy;
-        if type -p column > /dev/null; then find .mvn/profilerReport -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi;
+        if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
         time CI_OPT_MAVEN_CLEAN_SKIP="true" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp site-deploy;
-        if type -p column > /dev/null; then find .mvn/profilerReport -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi;
+        if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
       fi;

@@ -357,7 +357,7 @@ Add args on `maven site`
     export MAVEN_HOME="${PWD}/../extension-core/target/apache-maven-3.6.1/apache-maven-3.6.1"
 
     cp src/main/maven/settings-global.xml /usr/local/Cellar/maven/3.6.1/libexec/conf/settings.xml
-    cp src/main/maven/settings-global.xml ~/.m2/wrapper/dists/topinfra-maven-dist-0.0.1-20190710.085622-33/7nshe2k13lvltgpe5mc3ibvhrg/apache-maven-3.6.1/conf/settings.xml
+    cp src/main/maven/settings-global.xml ~/.m2/wrapper/dists/topinfra-maven-dist-1.0.1/6h5plk17d8flutp9soj00vfokf/apache-maven-3.6.1/conf/settings.xml
     
     CI_OPT_INFRASTRUCTURE=ossrh ./mvnw -e -U clean install
     

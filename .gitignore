@@ -7,8 +7,8 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
-.mvn/*Report/
-.mvn/*Repository/
+/.mvn/profiler-report/
+/.mvn/*Repository/
 
 # Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
 !/.mvn/wrapper/maven-wrapper.jar
@@ -28,6 +28,8 @@ git.properties
 **/src/site/markdown/README.md
 **/src/site/markdown/src/readme
 **/src/site/resources
+
+/clean_*_logs.sh
 
 /src/main/ci-script/lib_ci_lines_deleted.sh
 /src/main/ci-script/lib_ci_previous_release.sh
