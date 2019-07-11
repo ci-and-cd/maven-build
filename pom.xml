@@ -1397,8 +1397,28 @@
 
         <!-- @formatter:off -->
         <profile>
-            <id>gpg2-arguments</id>
-            <activation><property><name>gpg.loopback</name><value>true</value></property></activation>
+            <id>gpg-when-gpg_keyname-present</id>
+            <activation>
+                <file><exists>${maven.multiModuleProjectDirectory}/codesigning.asc</exists></file>
+                <property><name>gpg.keyname</name></property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution><id>sign-artifacts</id><phase>verify</phase><goals><goal>sign</goal></goals></execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>gpg-when-gpg2_argument-gpg_loopback-present</id>
+            <activation>
+                <file><exists>${maven.multiModuleProjectDirectory}/codesigning.asc</exists></file>
+                <property><name>gpg.loopback</name><value>true</value></property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
