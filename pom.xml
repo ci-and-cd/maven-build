@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>3.0.1</version>
+    <version>3.0.2</version>
 
     <developers>
         <developer>
@@ -1493,6 +1493,24 @@
                 </pluginManagement>
                 <plugins>
                     <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>wagonRepository-on-initialize</id>
+                                <phase>initialize</phase>
+                                <goals><goal>bsh-property</goal></goals>
+                                <configuration>
+                                    <source>
+                                        multiModuleProjectDirectory = System.getProperty("maven.multiModuleProjectDirectory", "");
+                                        wagonRepository = multiModuleProjectDirectory + File.separator + ".mvn" + File.separator + "wagonRepository";
+                                    </source>
+                                    <properties><property>wagonRepository</property></properties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <artifactId>maven-deploy-plugin</artifactId>
                         <executions>
                             <execution>
@@ -1543,7 +1561,7 @@
                         <executions>
                             <execution>
                                 <id>maven-profiler-report-clean</id>
-                                <inherited>false</inherited>
+                                <!--<inherited>false</inherited>-->
                                 <!--
                                 phase none run 'mvn org.apache.maven.plugins:maven-antrun-plugin:run@maven-profiler-report-clean'
                                 -->
@@ -1575,18 +1593,6 @@
                         <artifactId>build-helper-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>wagonRepository-on-initialize</id>
-                                <phase>initialize</phase>
-                                <goals><goal>bsh-property</goal></goals>
-                                <configuration>
-                                    <source>
-                                        multiModuleProjectDirectory = System.getProperty("maven.multiModuleProjectDirectory", "");
-                                        wagonRepository = multiModuleProjectDirectory + File.separator + ".mvn" + File.separator + "wagonRepository";
-                                    </source>
-                                    <properties><property>wagonRepository</property></properties>
-                                </configuration>
-                            </execution>
-                            <execution>
                                 <id>artifactDir-on-pre_clean</id>
                                 <phase>pre-clean</phase>
                                 <goals><goal>bsh-property</goal></goals>
@@ -1600,6 +1606,146 @@
                                     <properties><property>artifactDir</property></properties>
                                 </configuration>
                             </execution>
+                        </executions>
+                    </plugin>
+                    <!-- @formatter:on -->
+                    <!--<plugin>
+                        <groupId>org.codehaus.groovy.maven</groupId>
+                        <artifactId>gmaven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals><goal>execute</goal></goals>
+                                <phase>pre-clean</phase>
+                                <configuration><source>System.setProperty("wagon.merge-maven-repos.artifactDir", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
+                            </execution>
+                        </executions>
+                    </plugin>-->
+                    <!--
+                    groovy-maven-plugin error on java11:
+                    [ERROR] WARNING: Please consider reporting this to the maintainers of org.codehaus.groovy.vmplugin.v7.Java7$1
+                    [ERROR] WARNING: Use -\-illegal-access=warn to enable warnings of further illegal reflective access operations
+                    [ERROR] WARNING: All illegal access operations will be denied in a future release
+                    -->
+                    <!--<plugin>
+                        <groupId>org.codehaus.gmaven</groupId>
+                        <artifactId>groovy-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals><goal>execute</goal></goals>
+                                <phase>pre-clean</phase>
+                                <configuration><source>System.setProperty("wagon.merge-maven-repos.artifactDir", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
+                            </execution>
+                        </executions>
+                    </plugin>-->
+                    <!-- clean files deployed to local directory -->
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>wagon-repository-clean</id>
+                                <!--<inherited>false</inherited>-->
+                                <!--
+                                phase none run 'mvn org.apache.maven.plugins:maven-antrun-plugin:run@wagon-repository-clean'
+                                -->
+                                <!--<phase>none</phase>-->
+                                <phase>clean</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration>
+                                    <target>
+                                        <echo message="wagon.merge-maven-repos.source: ${wagon.merge-maven-repos.source}"/>
+                                        <echo message="wagon.merge-maven-repos.artifactDir: ${wagon.merge-maven-repos.artifactDir}"/>
+                                        <delete failonerror="false" includeemptydirs="true" verbose="true"><fileset dir="${wagon.merge-maven-repos.source}/${wagon.merge-maven-repos.artifactDir}" includes="**/*"/></delete>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- disable packages for wagon-maven-plugin -->
+        <profile>
+            <id>maven_packages_skip</id>
+            <activation>
+                <!--<file><exists>${wagon.merge-maven-repos.source}</exists></file>-->
+                <property><name>maven.packages.skip</name><value>true</value></property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <!-- -Dassembly.skipAssembly=true -->
+                        <plugin>
+                            <artifactId>maven-assembly-plugin</artifactId>
+                            <configuration><skipAssembly>true</skipAssembly></configuration>
+                        </plugin>
+                        <plugin>
+                            <artifactId>maven-gpg-plugin</artifactId>
+                            <configuration><skip>true</skip></configuration>
+                            <executions>
+                                <execution><id>sign-artifacts</id><phase>none</phase><goals><goal>sign</goal></goals></execution>
+                            </executions>
+                        </plugin>
+                        <plugin>
+                            <artifactId>maven-jar-plugin</artifactId>
+                            <executions><execution><id>default-jar</id><phase>none</phase></execution></executions>
+                        </plugin>
+                        <plugin>
+                            <artifactId>maven-deploy-plugin</artifactId>
+                            <configuration><skip>true</skip></configuration>
+                        </plugin>
+                        <plugin>
+                            <artifactId>maven-install-plugin</artifactId>
+                            <configuration><skip>true</skip></configuration>
+                            <executions>
+                                <execution>
+                                    <id>default-install</id>
+                                    <phase>none</phase>
+                                    <goals><goal>install</goal></goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>dockerfile-maven-plugin</artifactId>
+                            <configuration>
+                                <!--<skip>true</skip>-->
+                                <skipBuild>true</skipBuild>
+                                <skipDockerInfo>true</skipDockerInfo>
+                                <!--<skipPush>true</skipPush>-->
+                                <skipTag>true</skipTag>
+                            </configuration>
+                        </plugin>
+                        <!--
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>docker-maven-plugin</artifactId>
+                            <configuration>
+                                <skipDocker>true</skipDocker>
+                                <skipDockerBuild>true</skipDockerBuild>
+                                <skipDockerPush>true</skipDockerPush>
+                                <skipDockerTag>true</skipDockerTag>
+                            </configuration>
+                        </plugin>
+                        -->
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
+        <profile>
+            <!-- multi_module_root_only is a keyword for topinfra-maven-extension to activate this profile on root project only -->
+            <id>mvn-deploy_publish_segregation-merge_maven_repos-deploy-run-on-multi_module_root_only</id>
+            <activation>
+                <!--<file><exists>${wagon.merge-maven-repos.source}</exists></file>-->
+                <property><name>mvn.deploy.publish.segregation.goal.deploy</name><value>true</value></property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
                             <execution>
                                 <id>targetId-on-initialize</id>
                                 <phase>initialize</phase>
@@ -1673,56 +1819,9 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- @formatter:on -->
-                    <!--<plugin>
-                        <groupId>org.codehaus.groovy.maven</groupId>
-                        <artifactId>gmaven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals><goal>execute</goal></goals>
-                                <phase>pre-clean</phase>
-                                <configuration><source>System.setProperty("wagon.merge-maven-repos.artifactDir", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
-                            </execution>
-                        </executions>
-                    </plugin>-->
-                    <!--
-                    groovy-maven-plugin error on java11:
-                    [ERROR] WARNING: Please consider reporting this to the maintainers of org.codehaus.groovy.vmplugin.v7.Java7$1
-                    [ERROR] WARNING: Use -\-illegal-access=warn to enable warnings of further illegal reflective access operations
-                    [ERROR] WARNING: All illegal access operations will be denied in a future release
-                    -->
-                    <!--<plugin>
-                        <groupId>org.codehaus.gmaven</groupId>
-                        <artifactId>groovy-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals><goal>execute</goal></goals>
-                                <phase>pre-clean</phase>
-                                <configuration><source>System.setProperty("wagon.merge-maven-repos.artifactDir", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
-                            </execution>
-                        </executions>
-                    </plugin>-->
-                    <!-- clean files deployed to local directory -->
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
-                            <execution>
-                                <id>wagon-repository-clean</id>
-                                <inherited>false</inherited>
-                                <!--
-                                phase none run 'mvn org.apache.maven.plugins:maven-antrun-plugin:run@wagon-repository-clean'
-                                -->
-                                <!--<phase>none</phase>-->
-                                <phase>clean</phase>
-                                <goals><goal>run</goal></goals>
-                                <configuration>
-                                    <target>
-                                        <echo message="wagon.merge-maven-repos.source: ${wagon.merge-maven-repos.source}"/>
-                                        <echo message="wagon.merge-maven-repos.artifactDir: ${wagon.merge-maven-repos.artifactDir}"/>
-                                        <delete failonerror="false" includeemptydirs="true" verbose="true"><fileset dir="${wagon.merge-maven-repos.source}/${wagon.merge-maven-repos.artifactDir}" includes="**/*"/></delete>
-                                    </target>
-                                </configuration>
-                            </execution>
                             <execution>
                                 <id>echo-wagon-properties-at-initialize</id>
                                 <phase>initialize</phase>
@@ -1743,7 +1842,7 @@
                             </execution>
                             <execution>
                                 <id>rename-maven_metadata_nexus_xml-to-maven_metadata_xml</id>
-                                <inherited>false</inherited>
+                                <!--<inherited>false</inherited>-->
                                 <phase>initialize</phase>
                                 <goals><goal>run</goal></goals>
                                 <configuration>
@@ -1766,81 +1865,6 @@
                             </execution>
                         </executions>
                     </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!-- disable packages for wagon-maven-plugin -->
-        <profile>
-            <id>maven_packages_skip</id>
-            <activation>
-                <!--<file><exists>${wagon.merge-maven-repos.source}</exists></file>-->
-                <property><name>maven.packages.skip</name><value>true</value></property>
-            </activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <!-- -Dassembly.skipAssembly=true -->
-                        <plugin>
-                            <artifactId>maven-assembly-plugin</artifactId>
-                            <configuration><skipAssembly>true</skipAssembly></configuration>
-                        </plugin>
-                        <plugin>
-                            <artifactId>maven-jar-plugin</artifactId>
-                            <executions><execution><id>default-jar</id><phase>none</phase></execution></executions>
-                        </plugin>
-                        <plugin>
-                            <artifactId>maven-deploy-plugin</artifactId>
-                            <configuration><skip>true</skip></configuration>
-                        </plugin>
-                        <plugin>
-                            <artifactId>maven-install-plugin</artifactId>
-                            <configuration><skip>true</skip></configuration>
-                            <executions>
-                                <execution>
-                                    <id>default-install</id>
-                                    <phase>none</phase>
-                                    <goals><goal>install</goal></goals>
-                                </execution>
-                            </executions>
-                        </plugin>
-                        <plugin>
-                            <groupId>com.spotify</groupId>
-                            <artifactId>dockerfile-maven-plugin</artifactId>
-                            <configuration>
-                                <!--<skip>true</skip>-->
-                                <skipBuild>true</skipBuild>
-                                <skipDockerInfo>true</skipDockerInfo>
-                                <!--<skipPush>true</skipPush>-->
-                                <skipTag>true</skipTag>
-                            </configuration>
-                        </plugin>
-                        <!--
-                        <plugin>
-                            <groupId>com.spotify</groupId>
-                            <artifactId>docker-maven-plugin</artifactId>
-                            <configuration>
-                                <skipDocker>true</skipDocker>
-                                <skipDockerBuild>true</skipDockerBuild>
-                                <skipDockerPush>true</skipDockerPush>
-                                <skipDockerTag>true</skipDockerTag>
-                            </configuration>
-                        </plugin>
-                        -->
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-
-        <profile>
-            <!-- multi_module_root_only is a keyword for topinfra-maven-extension to activate this profile on root project only -->
-            <id>mvn-deploy_publish_segregation-merge_maven_repos-deploy-run-on-multi_module_root_only</id>
-            <activation>
-                <file><exists>${wagon.merge-maven-repos.source}</exists></file>
-                <property><name>mvn.deploy.publish.segregation.goal.deploy</name><value>true</value></property>
-            </activation>
-            <build>
-                <plugins>
                     <!--<plugin><artifactId>maven-deploy-plugin</artifactId><configuration><skip>true</skip></configuration></plugin>-->
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
@@ -1848,7 +1872,7 @@
                         <executions>
                             <execution>
                                 <id>merge-maven-repos-deploy</id>
-                                <inherited>false</inherited>
+                                <!--<inherited>false</inherited>-->
                                 <!--
                                 phase none run 'mvn org.codehaus.mojo:wagon-maven-plugin:merge-maven-repos@merge-maven-repos-deploy'
                                 -->
@@ -2042,11 +2066,13 @@
                         <reportSets>
                             <reportSet>
                                 <id>unit-tests</id>
+                                <!-- TODO run on root module only -->
                                 <inherited>false</inherited>
                                 <reports><report>report-only</report></reports>
                             </reportSet>
                             <reportSet>
                                 <id>integration-tests</id>
+                                <!-- TODO run on root module only -->
                                 <inherited>false</inherited>
                                 <reports><report>failsafe-report-only</report></reports>
                             </reportSet>
@@ -2073,6 +2099,7 @@
                             </reportSet>
                             <reportSet>
                                 <id>aggregate</id>
+                                <!-- TODO run on root module only -->
                                 <inherited>false</inherited>
                                 <reports><report>checkstyle-aggregate</report></reports>
                             </reportSet>
