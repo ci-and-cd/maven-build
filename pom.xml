@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>3.0.1-SNAPSHOT</version>
+    <version>3.0.1</version>
 
     <developers>
         <developer>
@@ -3636,7 +3636,7 @@
                 <docker.registry.url>${ossrh.docker.registry.url}</docker.registry.url>
                 <frontend.nodeDownloadRoot>${ossrh.frontend.nodeDownloadRoot}</frontend.nodeDownloadRoot>
                 <frontend.npmDownloadRoot>${ossrh.frontend.npmDownloadRoot}</frontend.npmDownloadRoot>
-                <nexus.staging.serverId>${infrastructure}-staging</nexus.staging.serverId>
+                <nexus.staging.serverId>${infrastructure}-nexus2-staging</nexus.staging.serverId>
                 <nexus2>${ossrh.nexus2}</nexus2>
                 <nexus3>${ossrh.nexus3}</nexus3>
                 <pmd.ruleset.location>${ossrh.pmd.ruleset.location}</pmd.ruleset.location>
