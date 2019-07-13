@@ -92,7 +92,11 @@ script:
   - if [[ "${TRAVIS_ENABLED}" == "true" ]]; then
       time CI_OPT_SONAR="true" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -U clean deploy;
       if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
-      time CI_OPT_MAVEN_CLEAN_SKIP="true" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp site-deploy;
+
+      time CI_OPT_FAST="true" CI_OPT_INFRASTRUCTURE="custom" CI_OPT_MAVEN_PACKAGES_SKIP="true" CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="true" CI_OPT_NEXUS2_STAGING="false" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -Dmaven.clean.skip=true -Dmaven.install.skip=true deploy;
+      if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
+
+      time ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -Dmaven.clean.skip=true site-deploy;
       if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
     fi
   - kill %1

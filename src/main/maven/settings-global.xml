@@ -257,11 +257,11 @@ under the License.
         </profile>
         -->
         <profile>
-            <id>repos-for-core-extensions</id>
+            <id>repos-for-using-extension-snapshots</id>
             <repositories>
                 <repository>
-                    <id>ossrh-snapshots</id>
-                    <name>central snapshots</name>
+                    <id>ossrh-nexus2-snapshots</id>
+                    <name>ossrh nexus2 snapshots</name>
                     <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
@@ -269,13 +269,67 @@ under the License.
             </repositories>
             <pluginRepositories>
                 <pluginRepository>
-                    <id>ossrh-snapshots</id>
-                    <name>central snapshots</name>
+                    <id>ossrh-nexus2-snapshots</id>
+                    <name>ossrh nexus2 snapshots</name>
                     <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </pluginRepository>
             </pluginRepositories>
+        </profile>
+        <!--
+        Access to 'https://oss.sonatype.org/content/repositories/releases/' is redirected (302) to 'https://repo1.maven.org/maven2/',
+        so we can not access artifacts immediately after their release.
+        We need to deploy same files into a private repository same time.
+        -->
+        <profile>
+            <id>repos-for-quick_access-artifacts-just-deployed-into-ossrh_releases-or-maven_central</id>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>topinfra-nexus3-releases</id>
+                    <name>topinfra nexus3 releases</name>
+                    <url>https://nexus3.infra.top/nexus/repository/maven-releases/</url>
+                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>topinfra-nexus3-snapshots</id>
+                    <name>topinfra nexus3 snapshots</name>
+                    <url>https://nexus3.infra.top/nexus/repository/maven-snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>topinfra-nexus3-thirdparty</id>
+                    <name>topinfra nexus3 thirdparty</name>
+                    <url>https://nexus3.infra.top/nexus/repository/maven-thirdparty/</url>
+                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+            <repositories>
+                <repository>
+                    <id>topinfra-nexus3-releases</id>
+                    <name>topinfra nexus3 releases</name>
+                    <url>https://nexus3.infra.top/nexus/repository/maven-releases/</url>
+                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </repository>
+                <repository>
+                    <id>topinfra-nexus3-snapshots</id>
+                    <name>topinfra nexus3 snapshots</name>
+                    <url>https://nexus3.infra.top/nexus/repository/maven-snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                </repository>
+                <repository>
+                    <id>topinfra-nexus3-thirdparty</id>
+                    <name>topinfra nexus3 thirdparty</name>
+                    <url>https://nexus3.infra.top/nexus/repository/maven-thirdparty/</url>
+                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                </repository>
+            </repositories>
         </profile>
     </profiles>
 
@@ -293,6 +347,7 @@ under the License.
     [Maven core extension resolution ignores repositories from activeByDefault profiles in settings.xml](https://issues.apache.org/jira/browse/MNG-5984)
     -->
     <activeProfiles>
-        <activeProfile>repos-for-core-extensions</activeProfile>
+        <activeProfile>repos-for-using-extension-snapshots</activeProfile>
+        <activeProfile>repos-for-quick_access-artifacts-just-deployed-into-ossrh_releases-or-maven_central</activeProfile>
     </activeProfiles>
 </settings>

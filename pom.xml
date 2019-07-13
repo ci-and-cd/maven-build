@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
 
     <developers>
         <developer>
@@ -60,21 +60,21 @@
             <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
         </repository>
         <repository>
-            <id>ossrh-releases</id>
-            <name>central releases</name>
+            <id>ossrh-nexus2-releases</id>
+            <name>ossrh nexus2 releases</name>
             <url>https://oss.sonatype.org/content/repositories/releases/</url>
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </repository>
         <repository>
-            <id>ossrh-snapshots</id>
-            <name>central snapshots</name>
+            <id>ossrh-nexus2-snapshots</id>
+            <name>ossrh nexus2 snapshots</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
             <releases><enabled>false</enabled></releases>
             <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
         </repository>
         <repository>
-            <id>ossrh-thirdparty</id>
+            <id>ossrh-nexus2-thirdparty</id>
             <name>central thirdparty</name>
             <url>https://oss.sonatype.org/content/repositories/third-party-releases/</url>
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
@@ -118,21 +118,21 @@
             <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
         </pluginRepository>
         <pluginRepository>
-            <id>ossrh-releases</id>
-            <name>central releases</name>
+            <id>ossrh-nexus2-releases</id>
+            <name>ossrh nexus2 releases</name>
             <url>https://oss.sonatype.org/content/repositories/releases/</url>
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
         <pluginRepository>
-            <id>ossrh-snapshots</id>
-            <name>central snapshots</name>
+            <id>ossrh-nexus2-snapshots</id>
+            <name>ossrh nexus2 snapshots</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
             <releases><enabled>false</enabled></releases>
             <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
         </pluginRepository>
         <pluginRepository>
-            <id>ossrh-thirdparty</id>
+            <id>ossrh-nexus2-thirdparty</id>
             <name>central thirdparty</name>
             <url>https://oss.sonatype.org/content/repositories/third-party-releases/</url>
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
@@ -379,6 +379,14 @@
         <version.wagon-webdav-jackrabbit>3.0.0</version.wagon-webdav-jackrabbit>
         <!--<version.wrapper-maven-plugin>0.0.4</version.wrapper-maven-plugin>-->
 
+        <custom.checkstyle.config.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/checkstyle/google_checks_8.10.xml</custom.checkstyle.config.location>
+        <custom.docker.registry.url>https://docker.io/v2/</custom.docker.registry.url>
+        <custom.frontend.nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</custom.frontend.nodeDownloadRoot>
+        <custom.frontend.npmDownloadRoot>http://registry.npm.taobao.org/npm/-/</custom.frontend.npmDownloadRoot>
+        <!--<custom.nexus2>https://oss.sonatype.org/</custom.nexus2>-->
+        <custom.nexus3>https://nexus3.infra.top/nexus/</custom.nexus3>
+        <custom.pmd.ruleset.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/pmd/pmd-ruleset-6.8.0.xml</custom.pmd.ruleset.location>
+        <custom.sonar.host.url>https://sonarqube.com</custom.sonar.host.url>
 
         <ossrh.checkstyle.config.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/checkstyle/google_checks_8.10.xml</ossrh.checkstyle.config.location>
         <ossrh.docker.registry.url>https://docker.io/v2/</ossrh.docker.registry.url>
@@ -794,13 +802,24 @@
                     </execution>
                     -->
                     <execution>
+                        <id>gitRef-on-initialize</id>
+                        <phase>initialize</phase>
+                        <goals><goal>bsh-property</goal></goals>
+                        <configuration>
+                            <source>
+                                gitRef = session.getUserProperties().getProperty("git.ref.name", System.getProperty("git.ref.name", project.getProperties().getProperty("git.ref.name")));
+                            </source>
+                            <properties><property>gitRef</property></properties>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>releaseRef</id>
                         <phase>initialize</phase>
                         <goals><goal>bsh-property</goal></goals>
                         <configuration>
                             <source>
-                                ref = project.getProperties().getProperty("git.ref.name", session.getUserProperties().getProperty("git.ref.name"));
-                                releaseRef = ref == null || ref.equals("") ? false : ref.startsWith("hotfix/") || ref.startsWith("release/") || ref.startsWith("support/");
+                                gitRef = project.getProperties().getProperty("gitRef");
+                                releaseRef = gitRef == null || gitRef.equals("") ? false : gitRef.startsWith("hotfix/") || gitRef.startsWith("release/") || gitRef.startsWith("support/");
                             </source>
                             <properties><property>releaseRef</property></properties>
                         </configuration>
@@ -811,8 +830,8 @@
                         <goals><goal>bsh-property</goal></goals>
                         <configuration>
                             <source>
-                                ref = project.getProperties().getProperty("git.ref.name", session.getUserProperties().getProperty("git.ref.name"));
-                                snapshotRef = ref == null || ref.equals("") ? false : ref.equals("develop") || ref.startsWith("feature/");
+                                gitRef = project.getProperties().getProperty("gitRef");
+                                snapshotRef = gitRef == null || gitRef.equals("") ? false : gitRef.equals("develop") || gitRef.startsWith("feature/");
                             </source>
                             <properties><property>snapshotRef</property></properties>
                         </configuration>
@@ -1443,21 +1462,18 @@
             <id>nexus2_staging</id>
             <activation><property><name>nexus2.staging</name><value>true</value></property></activation>
             <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <extensions>true</extensions>
-                    </plugin>
-                </plugins>
                 <pluginManagement>
                     <plugins>
                         <plugin>
                             <groupId>org.sonatype.plugins</groupId>
                             <artifactId>nexus-staging-maven-plugin</artifactId>
                             <configuration>
+                                <altStagingDirectory>${wagonRepository}</altStagingDirectory>
+                                <autoDropAfterRelease>true</autoDropAfterRelease>
                                 <autoReleaseAfterClose>false</autoReleaseAfterClose>
                                 <detectBuildFailures>true</detectBuildFailures>
+                                <keepStagingRepositoryOnFailure>false</keepStagingRepositoryOnFailure>
+                                <keepStagingRepositoryOnCloseRuleFailure>false</keepStagingRepositoryOnCloseRuleFailure>
                                 <nexusUrl>${nexus2}</nexusUrl>
                                 <serverId>${nexus.staging.serverId}</serverId>
                                 <!--<sslAllowAll>true</sslAllowAll>-->
@@ -1475,6 +1491,40 @@
                         </plugin>
                     </plugins>
                 </pluginManagement>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>default-deploy</id>
+                                <phase>deploy</phase>
+                                <goals><goal>deploy</goal></goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <!--<extensions>true</extensions>-->
+                        <executions>
+                            <execution>
+                                <id>default-deploy</id>
+                                <phase>deploy</phase>
+                                <goals><goal>deploy</goal></goals>
+                            </execution>
+                            <!--
+                            <execution>
+                                <id>deploy-staged-repository</id>
+                                <phase>deploy</phase>
+                                <goals><goal>deploy-staged-repository</goal></goals>
+                                <configuration>
+                                    <repositoryDirectory>${wagonRepository}</repositoryDirectory>
+                                </configuration>
+                            </execution>
+                            -->
+                        </executions>
+                    </plugin>
+                </plugins>
             </build>
             <properties>
                 <nexus.staging.serverId>${infrastructure}-staging</nexus.staging.serverId>
@@ -1493,10 +1543,7 @@
                         <executions>
                             <execution>
                                 <id>maven-profiler-report-clean</id>
-                                <!--
-                                If bind to a phase (e.g. clean) and run without topinfra-maven-extension,
-                                it will run at that phase on every modules and clean multiple times.
-                                -->
+                                <inherited>false</inherited>
                                 <!--
                                 phase none run 'mvn org.apache.maven.plugins:maven-antrun-plugin:run@maven-profiler-report-clean'
                                 -->
@@ -1518,7 +1565,7 @@
 
         <profile>
             <!-- multi_module_root_only is a keyword for topinfra-maven-extension to activate this profile on root project only -->
-            <id>mvn-deploy-publish-segregation-wagon-repository-clean-run-on-multi_module_root_only</id>
+            <id>mvn-deploy_publish_segregation-wagon_repository-clean-run-on-multi_module_root_only</id>
             <activation><property><name>mvn.deploy.publish.segregation</name><value>true</value></property></activation>
             <build>
                 <plugins>
@@ -1528,20 +1575,20 @@
                         <artifactId>build-helper-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>artifactDir-on-pre_clean</id>
-                                <phase>pre-clean</phase>
+                                <id>wagonRepository-on-initialize</id>
+                                <phase>initialize</phase>
                                 <goals><goal>bsh-property</goal></goals>
                                 <configuration>
                                     <source>
-                                        artifactDir = project.getGroupId().replace('.', '/') + "/" + project.getArtifactId();
-                                        System.setProperty("wagon.merge-maven-repos.artifactDir", artifactDir);
+                                        multiModuleProjectDirectory = System.getProperty("maven.multiModuleProjectDirectory", "");
+                                        wagonRepository = multiModuleProjectDirectory + File.separator + ".mvn" + File.separator + "wagonRepository";
                                     </source>
-                                    <properties><property>artifactDir</property></properties>
+                                    <properties><property>wagonRepository</property></properties>
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>artifactDir-on-initialize</id>
-                                <phase>initialize</phase>
+                                <id>artifactDir-on-pre_clean</id>
+                                <phase>pre-clean</phase>
                                 <goals><goal>bsh-property</goal></goals>
                                 <configuration>
                                     <source>
@@ -1553,65 +1600,31 @@
                                     <properties><property>artifactDir</property></properties>
                                 </configuration>
                             </execution>
-                            <!--
-                            <execution>
-                                <id>sourceDir-on-pre_clean</id>
-                                <phase>pre-clean</phase>
-                                <goals><goal>bsh-property</goal></goals>
-                                <configuration>
-                                    <source>
-                                        commitId = project.getProperties().getProperty("git.commit.id", session.getUserProperties().getProperty("git.commit.id"));
-                                        commitId = commitId == null || commitId.equals("") ? "unknown-commit" : commitId.substring(0, 8);
-
-                                        multiModuleProjectDirectory = System.getProperty("maven.multiModuleProjectDirectory", "");
-
-                                        prefix = multiModuleProjectDirectory + File.separator + ".mvn" + File.separator + "wagonRepository";
-                                        sourceDir = prefix + File.separator + commitId;
-
-                                        System.setProperty("wagon.merge-maven-repos.source", sourceDir);
-                                    </source>
-                                    <properties><property>sourceDir</property></properties>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>sourceDir-on-initialize</id>
-                                <phase>initialize</phase>
-                                <goals><goal>bsh-property</goal></goals>
-                                <configuration>
-                                    <source>
-                                        commitId = project.getProperties().getProperty("git.commit.id", session.getUserProperties().getProperty("git.commit.id"));
-                                        commitId = commitId == null || commitId.equals("") ? "unknown-commit" : commitId.substring(0, 8);
-
-                                        multiModuleProjectDirectory = System.getProperty("maven.multiModuleProjectDirectory", "");
-
-                                        prefix = multiModuleProjectDirectory + File.separator + ".mvn" + File.separator + "wagonRepository";
-                                        sourceDir = prefix + File.separator + commitId;
-
-                                        System.setProperty("wagon.merge-maven-repos.source", sourceDir);
-                                        session.getUserProperties().setProperty("wagon.merge-maven-repos.source", sourceDir);
-
-                                        altDeploymentRepository = "repo::default::file://" + sourceDir;
-                                        System.setProperty("altDeploymentRepository", altDeploymentRepository);
-                                        session.getUserProperties().setProperty("altDeploymentRepository", altDeploymentRepository);
-                                    </source>
-                                    <properties><property>sourceDir</property></properties>
-                                </configuration>
-                            </execution>
-                            -->
                             <execution>
                                 <id>targetId-on-initialize</id>
                                 <phase>initialize</phase>
                                 <goals><goal>bsh-property</goal></goals>
                                 <configuration>
                                     <source>
-                                        ref = project.getProperties().getProperty("git.ref.name", session.getUserProperties().getProperty("git.ref.name"));
-                                        releaseRef = ref == null || ref.equals("") ? false : ref.startsWith("hotfix/") || ref.startsWith("release/") || ref.startsWith("support/");
-                                        snapshotRef = ref == null || ref.equals("") ? false : ref.equals("develop") || ref.startsWith("feature/");
+                                        gitRef = project.getProperties().getProperty("gitRef");
+                                        releaseRef = gitRef == null || gitRef.equals("") ? false : gitRef.startsWith("hotfix/") || gitRef.startsWith("release/") || gitRef.startsWith("support/");
+                                        snapshotRef = gitRef == null || gitRef.equals("") ? false : gitRef.equals("develop") || gitRef.startsWith("feature/");
                                         channel = releaseRef ? "releases" : snapshotRef ? "snapshots" : "mixed";
 
-                                        infra = project.getProperties().getProperty("infrastructure", session.getUserProperties().getProperty("infrastructure"));
+                                        nexus2 = project.getProperties().getProperty("nexus2", session.getUserProperties().getProperty("nexus2"));
+                                        nexus3 = project.getProperties().getProperty("nexus3", session.getUserProperties().getProperty("nexus3"));
 
-                                        targetId = infra == null || infra.equals("") ? channel : infra + "-" + channel;
+                                        repoType = null;
+                                        if (nexus2 != null @and !nexus2.equals("")) {
+                                            repoType = "nexus2";
+                                        }
+                                        if (nexus3 != null @and !nexus3.equals("")) {
+                                            repoType = "nexus3";
+                                        }
+
+                                        infra = project.getProperties().getProperty("infrastructure", session.getUserProperties().getProperty("infrastructure"));
+                                        repo = repoType == null || repoType.equals("") ? channel : repoType + "-" + channel;
+                                        targetId = infra == null || infra.equals("") ? repo : infra + "-" + repo;
 
                                         System.setProperty("wagon.merge-maven-repos.targetId", targetId);
                                         session.getUserProperties().setProperty("wagon.merge-maven-repos.targetId", targetId);
@@ -1626,15 +1639,16 @@
                                 <goals><goal>bsh-property</goal></goals>
                                 <configuration>
                                     <source>
-                                        ref = project.getProperties().getProperty("git.ref.name", session.getUserProperties().getProperty("git.ref.name"));
-                                        releaseRef = ref == null || ref.equals("") ? false : ref.startsWith("hotfix/") || ref.startsWith("release/") || ref.startsWith("support/");
-                                        snapshotRef = ref == null || ref.equals("") ? false : ref.equals("develop") || ref.startsWith("feature/");
+                                        gitRef = project.getProperties().getProperty("gitRef");
+                                        releaseRef = gitRef == null || gitRef.equals("") ? false : gitRef.startsWith("hotfix/") || gitRef.startsWith("release/") || gitRef.startsWith("support/");
+                                        snapshotRef = gitRef == null || gitRef.equals("") ? false : gitRef.equals("develop") || gitRef.startsWith("feature/");
                                         channel = releaseRef ? "releases" : snapshotRef ? "snapshots" : "mixed";
 
                                         nexus2 = project.getProperties().getProperty("nexus2", session.getUserProperties().getProperty("nexus2"));
                                         nexus2Staging = project.getProperties().getProperty("nexus2.staging", session.getUserProperties().getProperty("nexus2.staging"));
+                                        nexus3 = project.getProperties().getProperty("nexus3", session.getUserProperties().getProperty("nexus3"));
 
-                                        targetRepo = "${nexus3}repository/maven-" + channel;
+                                        targetRepo = null;
                                         if (nexus2 != null @and !nexus2.equals("")) {
                                             if (releaseRef) {
                                                 if (nexus2Staging == null || nexus2Staging.equals("") || !Boolean.parseBoolean(nexus2Staging)) {
@@ -1645,6 +1659,9 @@
                                             } else {
                                                 targetRepo = "${nexus2}content/repositories/snapshots/";
                                             }
+                                        }
+                                        if (nexus3 != null @and !nexus3.equals("")) {
+                                            targetRepo = "${nexus3}repository/maven-" + channel;
                                         }
 
                                         System.setProperty("wagon.merge-maven-repos.target", targetRepo);
@@ -1663,7 +1680,7 @@
                         <executions>
                             <execution>
                                 <goals><goal>execute</goal></goals>
-                                <phase>initialize</phase>
+                                <phase>pre-clean</phase>
                                 <configuration><source>System.setProperty("wagon.merge-maven-repos.artifactDir", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
                             </execution>
                         </executions>
@@ -1680,7 +1697,7 @@
                         <executions>
                             <execution>
                                 <goals><goal>execute</goal></goals>
-                                <phase>initialize</phase>
+                                <phase>pre-clean</phase>
                                 <configuration><source>System.setProperty("wagon.merge-maven-repos.artifactDir", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
                             </execution>
                         </executions>
@@ -1691,10 +1708,7 @@
                         <executions>
                             <execution>
                                 <id>wagon-repository-clean</id>
-                                <!--
-                                If bind to a phase (e.g. clean) and run without topinfra-maven-extension,
-                                it will run at that phase on every modules and clean multiple times.
-                                -->
+                                <inherited>false</inherited>
                                 <!--
                                 phase none run 'mvn org.apache.maven.plugins:maven-antrun-plugin:run@wagon-repository-clean'
                                 -->
@@ -1720,10 +1734,33 @@
                                         <echo message="mvn.deploy.publish.segregation.goal.deploy: ${mvn.deploy.publish.segregation.goal.deploy}"/>
                                         <echo message="mvn.deploy.publish.segregation.goal.install: ${mvn.deploy.publish.segregation.goal.install}"/>
                                         <echo message="mvn.deploy.publish.segregation.goal.package: ${mvn.deploy.publish.segregation.goal.package}"/>
+                                        <echo message="gitRef: ${gitRef}"/>
                                         <echo message="wagon.merge-maven-repos.source: ${wagon.merge-maven-repos.source}"/>
-                                        <echo message="wagon.merge-maven-repos.artifactDir: ${wagon.merge-maven-repos.artifactDir}"/>
                                         <echo message="wagon.merge-maven-repos.target: ${wagon.merge-maven-repos.target}"/>
                                         <echo message="wagon.merge-maven-repos.targetId: ${wagon.merge-maven-repos.targetId}"/>
+                                    </target>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>rename-maven_metadata_nexus_xml-to-maven_metadata_xml</id>
+                                <inherited>false</inherited>
+                                <phase>initialize</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration>
+                                    <target>
+                                        <echo message="rename ${wagon.merge-maven-repos.source}/**/maven-metadata-nexus.xml"/>
+                                        <mkdir dir="${wagon.merge-maven-repos.source}"/>
+                                        <move includeemptydirs="false"
+                                              overwrite="true"
+                                              todir="${wagon.merge-maven-repos.source}"
+                                              verbose="true">
+                                            <fileset dir="${wagon.merge-maven-repos.source}">
+                                                <include name="**/maven-metadata-nexus.*"/>
+                                            </fileset>
+                                            <filtermapper>
+                                                <replacestring from="maven-metadata-nexus" to="maven-metadata"/>
+                                            </filtermapper>
+                                        </move>
                                     </target>
                                 </configuration>
                             </execution>
@@ -1733,12 +1770,74 @@
             </build>
         </profile>
 
+        <!-- disable packages for wagon-maven-plugin -->
+        <profile>
+            <id>maven_packages_skip</id>
+            <activation>
+                <!--<file><exists>${wagon.merge-maven-repos.source}</exists></file>-->
+                <property><name>maven.packages.skip</name><value>true</value></property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <!-- -Dassembly.skipAssembly=true -->
+                        <plugin>
+                            <artifactId>maven-assembly-plugin</artifactId>
+                            <configuration><skipAssembly>true</skipAssembly></configuration>
+                        </plugin>
+                        <plugin>
+                            <artifactId>maven-jar-plugin</artifactId>
+                            <executions><execution><id>default-jar</id><phase>none</phase></execution></executions>
+                        </plugin>
+                        <plugin>
+                            <artifactId>maven-deploy-plugin</artifactId>
+                            <configuration><skip>true</skip></configuration>
+                        </plugin>
+                        <plugin>
+                            <artifactId>maven-install-plugin</artifactId>
+                            <configuration><skip>true</skip></configuration>
+                            <executions>
+                                <execution>
+                                    <id>default-install</id>
+                                    <phase>none</phase>
+                                    <goals><goal>install</goal></goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>dockerfile-maven-plugin</artifactId>
+                            <configuration>
+                                <!--<skip>true</skip>-->
+                                <skipBuild>true</skipBuild>
+                                <skipDockerInfo>true</skipDockerInfo>
+                                <!--<skipPush>true</skipPush>-->
+                                <skipTag>true</skipTag>
+                            </configuration>
+                        </plugin>
+                        <!--
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>docker-maven-plugin</artifactId>
+                            <configuration>
+                                <skipDocker>true</skipDocker>
+                                <skipDockerBuild>true</skipDockerBuild>
+                                <skipDockerPush>true</skipDockerPush>
+                                <skipDockerTag>true</skipDockerTag>
+                            </configuration>
+                        </plugin>
+                        -->
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
         <profile>
             <!-- multi_module_root_only is a keyword for topinfra-maven-extension to activate this profile on root project only -->
-            <id>mvn-deploy-publish-segregation-merge-maven-repos-deploy-run-on-multi_module_root_only</id>
+            <id>mvn-deploy_publish_segregation-merge_maven_repos-deploy-run-on-multi_module_root_only</id>
             <activation>
-                <property><name>mvn.deploy.publish.segregation.goal.deploy</name><value>true</value></property>
                 <file><exists>${wagon.merge-maven-repos.source}</exists></file>
+                <property><name>mvn.deploy.publish.segregation.goal.deploy</name><value>true</value></property>
             </activation>
             <build>
                 <plugins>
@@ -1749,10 +1848,7 @@
                         <executions>
                             <execution>
                                 <id>merge-maven-repos-deploy</id>
-                                <!--
-                                If bind to a phase (e.g. deploy) and run without topinfra-maven-extension,
-                                it will run at that phase on every modules and upload whole repository multiple times.
-                                -->
+                                <inherited>false</inherited>
                                 <!--
                                 phase none run 'mvn org.codehaus.mojo:wagon-maven-plugin:merge-maven-repos@merge-maven-repos-deploy'
                                 -->
@@ -1826,7 +1922,7 @@
             </distributionManagement>
             <properties>
                 <!-- for site on github, id (github.global.server) must match the config in your settings.xml -->
-                <github.global.server>github</github.global.server>
+                <github.global.server>github-site</github.global.server>
 
                 <maven.site.deploy.skip>true</maven.site.deploy.skip>
             </properties>
@@ -2680,12 +2776,14 @@
             <build>
                 <pluginManagement>
                     <plugins>
+                        <!--
                         <plugin>
                             <groupId>com.spotify</groupId><artifactId>docker-maven-plugin</artifactId>
                             <dependencies>
                                 <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${version.javax.activation}</version></dependency>
                             </dependencies>
                         </plugin>
+                        -->
                         <plugin>
                             <artifactId>maven-enforcer-plugin</artifactId>
                             <configuration>
@@ -2760,12 +2858,14 @@
             <build>
                 <pluginManagement>
                     <plugins>
+                        <!--
                         <plugin>
                             <groupId>com.spotify</groupId><artifactId>docker-maven-plugin</artifactId>
                             <dependencies>
                                 <dependency><groupId>javax.activation</groupId><artifactId>activation</artifactId><version>${version.javax.activation}</version></dependency>
                             </dependencies>
                         </plugin>
+                        -->
                         <plugin>
                             <artifactId>maven-enforcer-plugin</artifactId>
                             <configuration>
@@ -3146,7 +3246,7 @@
         <!-- @formatter:on -->
         <!-- @formatter:off -->
         <profile>
-            <id>dockerfile-maven-plugin-lifecycle-binding-on-publish_deploy_segregation-deploy</id>
+            <id>dockerfile-maven-plugin-lifecycle-binding-on-deploy_publish_segregation-deploy</id>
             <activation>
                 <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
                 <property><name>mvn.deploy.publish.segregation.goal.deploy</name><value>true</value></property>
@@ -3185,7 +3285,7 @@
         <!-- @formatter:on -->
         <!-- @formatter:off -->
         <profile>
-            <id>dockerfile_maven_plugin-lifecycle_binding-on-publish_deploy_segregation-package</id>
+            <id>dockerfile_maven_plugin-lifecycle_binding-on-deploy_publish_segregation-package</id>
             <activation>
                 <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
                 <property><name>mvn.deploy.publish.segregation.goal.package</name><value>true</value></property>
@@ -3204,6 +3304,7 @@
                                 </execution>
                             </executions>
                         </plugin>
+                        <!--
                         <plugin>
                             <groupId>com.spotify</groupId>
                             <artifactId>docker-maven-plugin</artifactId>
@@ -3215,6 +3316,7 @@
                                 </execution>
                             </executions>
                         </plugin>
+                        -->
                     </plugins>
                 </pluginManagement>
             </build>
@@ -3222,7 +3324,7 @@
         <!-- @formatter:on -->
         <!-- @formatter:off -->
         <profile>
-            <id>dockerfile_maven_plugin-lifecycle_binding-when-not-publish_deploy_segregation</id>
+            <id>dockerfile_maven_plugin-lifecycle_binding-when-not-deploy_publish_segregation</id>
             <activation>
                 <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
                 <property><name>!mvn.deploy.publish.segregation</name></property>
@@ -3425,32 +3527,105 @@
             </build>
         </profile>
 
+        <profile>
+            <id>infrastructure_custom</id>
+            <activation><property><name>infrastructure</name><value>custom</value></property></activation>
+            <distributionManagement>
+                <repository><id>custom-nexus3-releases</id><url>${custom.nexus3}repository/maven-releases/</url></repository>
+                <snapshotRepository><id>custom-nexus3-snapshots</id><url>${custom.nexus3}repository/maven-snapshots/</url></snapshotRepository>
+            </distributionManagement>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>custom-nexus3-releases</id>
+                    <name>custom nexus3 releases</name>
+                    <url>${custom.nexus3}repository/maven-releases/</url>
+                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>custom-nexus3-snapshots</id>
+                    <name>custom nexus3 snapshots</name>
+                    <url>${custom.nexus3}repository/maven-snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>custom-nexus3-thirdparty</id>
+                    <name>custom nexus3 thirdparty</name>
+                    <url>${custom.nexus3}repository/maven-thirdparty/</url>
+                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+            <properties>
+                <checkstyle.config.location>${custom.checkstyle.config.location}</checkstyle.config.location>
+                <docker.registry.url>${custom.docker.registry.url}</docker.registry.url>
+                <frontend.nodeDownloadRoot>${custom.frontend.nodeDownloadRoot}</frontend.nodeDownloadRoot>
+                <frontend.npmDownloadRoot>${custom.frontend.npmDownloadRoot}</frontend.npmDownloadRoot>
+                <nexus.staging.serverId>${infrastructure}-staging</nexus.staging.serverId>
+                <!--<nexus2>${custom.nexus2}</nexus2>-->
+                <nexus3>${custom.nexus3}</nexus3>
+                <pmd.ruleset.location>${custom.pmd.ruleset.location}</pmd.ruleset.location>
+                <sonar.host.url>${custom.sonar.host.url}</sonar.host.url>
+            </properties>
+            <repositories>
+                <repository>
+                    <id>custom-nexus3-releases</id>
+                    <name>custom nexus3 releases</name>
+                    <url>${custom.nexus3}repository/maven-releases/</url>
+                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </repository>
+                <repository>
+                    <id>custom-nexus3-snapshots</id>
+                    <name>custom nexus3 snapshots</name>
+                    <url>${custom.nexus3}repository/maven-snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                </repository>
+                <repository>
+                    <id>custom-nexus3-thirdparty</id>
+                    <name>custom nexus3 thirdparty</name>
+                    <url>${custom.nexus3}repository/maven-thirdparty/</url>
+                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                </repository>
+            </repositories>
+        </profile>
+
+        <profile>
+            <id>infrastructure_custom-dav-site</id>
+            <activation><property><name>github.site.publish</name><value>false</value></property></activation>
+            <distributionManagement>
+                <site><id>custom-nexus3-mvnsite</id><url>dav:${custom.nexus3}repository/mvnsite/${site.path}/</url></site>
+            </distributionManagement>
+        </profile>
 
         <profile>
             <id>infrastructure_ossrh</id>
             <activation><property><name>infrastructure</name><value>ossrh</value></property></activation>
             <distributionManagement>
-                <repository><id>ossrh-staging</id><url>${ossrh.nexus2}service/local/staging/deploy/maven2/</url></repository>
-                <snapshotRepository><id>ossrh-snapshots</id><url>${ossrh.nexus2}content/repositories/snapshots/</url></snapshotRepository>
+                <repository><id>ossrh-nexus2-staging</id><url>${ossrh.nexus2}service/local/staging/deploy/maven2/</url></repository>
+                <snapshotRepository><id>ossrh-nexus2-snapshots</id><url>${ossrh.nexus2}content/repositories/snapshots/</url></snapshotRepository>
             </distributionManagement>
             <pluginRepositories>
                 <pluginRepository>
-                    <id>ossrh-releases</id>
-                    <name>ossrh releases</name>
+                    <id>ossrh-nexus2-releases</id>
+                    <name>ossrh nexus2 releases</name>
                     <url>${ossrh.nexus2}content/repositories/releases/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </pluginRepository>
                 <pluginRepository>
-                    <id>ossrh-snapshots</id>
-                    <name>ossrh snapshots</name>
+                    <id>ossrh-nexus2-snapshots</id>
+                    <name>ossrh nexus2 snapshots</name>
                     <url>${ossrh.nexus2}content/repositories/snapshots/</url>
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </pluginRepository>
                 <pluginRepository>
-                    <id>ossrh-thirdparty</id>
-                    <name>ossrh thirdparty</name>
+                    <id>ossrh-nexus2-thirdparty</id>
+                    <name>ossrh nexus2 thirdparty</name>
                     <url>${ossrh.nexus2}content/repositories/third-party-releases/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
@@ -3461,7 +3636,7 @@
                 <docker.registry.url>${ossrh.docker.registry.url}</docker.registry.url>
                 <frontend.nodeDownloadRoot>${ossrh.frontend.nodeDownloadRoot}</frontend.nodeDownloadRoot>
                 <frontend.npmDownloadRoot>${ossrh.frontend.npmDownloadRoot}</frontend.npmDownloadRoot>
-                <nexus.staging.serverId>${infrastructure}-staging</nexus.staging.serverId>
+                <nexus.staging.serverId>${infrastructure}-nexus2-staging</nexus.staging.serverId>
                 <nexus2>${ossrh.nexus2}</nexus2>
                 <nexus3>${ossrh.nexus3}</nexus3>
                 <pmd.ruleset.location>${ossrh.pmd.ruleset.location}</pmd.ruleset.location>
@@ -3469,22 +3644,22 @@
             </properties>
             <repositories>
                 <repository>
-                    <id>ossrh-releases</id>
-                    <name>ossrh releases</name>
+                    <id>ossrh-nexus2-releases</id>
+                    <name>ossrh nexus2 releases</name>
                     <url>${ossrh.nexus2}content/repositories/releases/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </repository>
                 <repository>
-                    <id>ossrh-snapshots</id>
-                    <name>ossrh snapshots</name>
+                    <id>ossrh-nexus2-snapshots</id>
+                    <name>ossrh nexus2 snapshots</name>
                     <url>${ossrh.nexus2}content/repositories/snapshots/</url>
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </repository>
                 <repository>
-                    <id>ossrh-thirdparty</id>
-                    <name>ossrh thirdparty</name>
+                    <id>ossrh-nexus2-thirdparty</id>
+                    <name>ossrh nexus2 thirdparty</name>
                     <url>${ossrh.nexus2}content/repositories/third-party-releases/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
@@ -3496,7 +3671,7 @@
             <id>infrastructure_ossrh-dav-site</id>
             <activation><property><name>github.site.publish</name><value>false</value></property></activation>
             <distributionManagement>
-                <site><id>ossrh-mvnsite</id><url>dav:${ossrh.nexus3}repository/mvnsite/${site.path}/</url></site>
+                <site><id>ossrh-nexus3-mvnsite</id><url>dav:${ossrh.nexus3}repository/mvnsite/${site.path}/</url></site>
             </distributionManagement>
         </profile>
 
@@ -3504,34 +3679,34 @@
             <id>infrastructure_local</id>
             <activation><property><name>infrastructure</name><value>local</value></property></activation>
             <distributionManagement>
-                <repository><id>local-releases</id><url>${local.nexus3}repository/maven-releases/</url></repository>
-                <snapshotRepository><id>local-snapshots</id><url>${local.nexus3}repository/maven-snapshots/</url></snapshotRepository>
+                <repository><id>local-nexus3-releases</id><url>${local.nexus3}repository/maven-releases/</url></repository>
+                <snapshotRepository><id>local-nexus3-snapshots</id><url>${local.nexus3}repository/maven-snapshots/</url></snapshotRepository>
             </distributionManagement>
             <pluginRepositories>
                 <pluginRepository>
-                    <id>local-releases</id>
-                    <name>local releases</name>
+                    <id>local-nexus3-releases</id>
+                    <name>local nexus3 releases</name>
                     <url>${local.nexus3}repository/maven-releases/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </pluginRepository>
                 <pluginRepository>
-                    <id>local-snapshots</id>
-                    <name>local snapshots</name>
+                    <id>local-nexus3-snapshots</id>
+                    <name>local nexus3 snapshots</name>
                     <url>${local.nexus3}repository/maven-snapshots/</url>
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </pluginRepository>
                 <pluginRepository>
-                    <id>local-thirdparty</id>
-                    <name>local thirdparty</name>
+                    <id>local-nexus3-thirdparty</id>
+                    <name>local nexus3 thirdparty</name>
                     <url>${local.nexus3}repository/maven-thirdparty/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </pluginRepository>
             </pluginRepositories>
             <properties>
-                <checkstyle.config.location>${docker.checkstyle.config.location}</checkstyle.config.location>
+                <checkstyle.config.location>${local.checkstyle.config.location}</checkstyle.config.location>
                 <docker.registry.url>${local.docker.registry.url}</docker.registry.url>
                 <frontend.nodeDownloadRoot>${local.frontend.nodeDownloadRoot}</frontend.nodeDownloadRoot>
                 <frontend.npmDownloadRoot>${local.frontend.npmDownloadRoot}</frontend.npmDownloadRoot>
@@ -3544,22 +3719,22 @@
             </properties>
             <repositories>
                 <repository>
-                    <id>local-releases</id>
-                    <name>local releases</name>
+                    <id>local-nexus3-releases</id>
+                    <name>local nexus3 releases</name>
                     <url>${local.nexus3}repository/maven-releases/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </repository>
                 <repository>
-                    <id>local-snapshots</id>
-                    <name>local snapshots</name>
+                    <id>local-nexus3-snapshots</id>
+                    <name>local nexus3 snapshots</name>
                     <url>${local.nexus3}repository/maven-snapshots/</url>
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </repository>
                 <repository>
-                    <id>local-thirdparty</id>
-                    <name>local thirdparty</name>
+                    <id>local-nexus3-thirdparty</id>
+                    <name>local nexus3 thirdparty</name>
                     <url>${local.nexus3}repository/maven-thirdparty/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
@@ -3573,7 +3748,7 @@
             <distributionManagement>
                 <!-- scpexe uses privateKey, scp uses password -->
                 <!-- scpexe://${domain_or_ip}:22/path/to/sites -->
-                <site><id>local-mvnsite</id><url>dav:${local.nexus3}repository/mvnsite/${site.path}/</url></site>
+                <site><id>local-nexus3-mvnsite</id><url>dav:${local.nexus3}repository/mvnsite/${site.path}/</url></site>
             </distributionManagement>
         </profile>
         <!-- @formatter:on -->

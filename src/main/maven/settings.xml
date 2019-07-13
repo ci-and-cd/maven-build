@@ -40,32 +40,83 @@
     <profiles>
         <!-- @formatter:off -->
         <profile>
+            <id>infrastructure_custom-allow-using-snapshots-parents-and-plugins</id>
+            <activation><property><name>custom.nexus3</name></property></activation>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>custom-nexus3-snapshots</id>
+                    <name>custom nexus3 snapshots</name>
+                    <url>${custom.nexus3}repository/maven-snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+            <repositories>
+                <repository>
+                    <id>custom-nexus3-snapshots</id>
+                    <name>custom nexus3 snapshots</name>
+                    <url>${custom.nexus3}repository/maven-snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                </repository>
+            </repositories>
+        </profile>
+        <profile>
+            <id>infrastructure_local-allow-using-snapshots-parents-and-plugins</id>
+            <activation><property><name>local.nexus3</name></property></activation>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>local-nexus3-snapshots</id>
+                    <name>local nexus3 snapshots</name>
+                    <url>${local.nexus3}repository/maven-snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+            <repositories>
+                <repository>
+                    <id>local-nexus3-snapshots</id>
+                    <name>local nexus3 snapshots</name>
+                    <url>${local.nexus3}repository/maven-snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                </repository>
+            </repositories>
+        </profile>
+        <profile>
             <id>default-public-repositories</id>
             <activation><activeByDefault>true</activeByDefault></activation>
             <repositories>
                 <!-- Make artifacts in OSSRH repositories available -->
                 <repository>
-                    <id>ossrh-releases</id>
-                    <name>central releases</name>
+                    <id>ossrh-nexus2-releases</id>
+                    <name>ossrh nexus2 releases</name>
                     <url>https://oss.sonatype.org/content/repositories/releases/</url>
-                    <releases><enabled>true</enabled></releases>
+                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </repository>
                 <repository>
-                    <id>ossrh-snapshots</id>
-                    <name>central snapshots</name>
+                    <id>ossrh-nexus2-snapshots</id>
+                    <name>ossrh nexus2 snapshots</name>
                     <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
                     <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </repository>
             </repositories>
             <pluginRepositories>
                 <pluginRepository>
                     <id>central</id>
                     <name>central</name>
-                    <url>https://repo1.maven.org/maven2</url>
-                    <releases><enabled>true</enabled></releases>
+                    <url>https://repo1.maven.org/maven2/</url>
+                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>ossrh-nexus2-snapshots</id>
+                    <name>ossrh nexus2 snapshots</name>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </pluginRepository>
             </pluginRepositories>
         </profile>
@@ -79,17 +130,49 @@
 
     <servers>
         <!-- @formatter:off -->
+        <server><id>custom-nexus3-mvnsite</id><username>${env.CI_OPT_CUSTOM_NEXUS3_USER}</username><password>${env.CI_OPT_CUSTOM_NEXUS3_PASS}</password></server>
+        <server><id>custom-nexus3-releases</id><username>${env.CI_OPT_CUSTOM_NEXUS3_USER}</username><password>${env.CI_OPT_CUSTOM_NEXUS3_PASS}</password></server>
+        <server><id>custom-nexus3-snapshots</id><username>${env.CI_OPT_CUSTOM_NEXUS3_USER}</username><password>${env.CI_OPT_CUSTOM_NEXUS3_PASS}</password></server>
+        <server><id>custom-nexus3-thirdparty</id><username>${env.CI_OPT_CUSTOM_NEXUS3_USER}</username><password>${env.CI_OPT_CUSTOM_NEXUS3_PASS}</password></server>
+
+        <server><id>nexus3:5000</id><username>${env.CI_OPT_LOCAL_NEXUS3_USER}</username><password>${env.CI_OPT_LOCAL_NEXUS3_PASS}</password></server>
+        <!-- see: http://maven.apache.org/guides/mini/guide-encryption.html -->
+        <!-- mvn &#x002d;&#x002d;encrypt-password ${password} -->
+        <!-- accept RSA key fingerprint -->
+        <!-- ssh -o UserKnownHostsFile=~/.ssh/known_hosts root@mvnsite -p 10022 -->
+        <server>
+            <id>local-nexus3-mvnsite</id>
+            <username>${env.CI_OPT_LOCAL_NEXUS3_USER}</username><password>${env.CI_OPT_LOCAL_NEXUS3_PASS}</password>
+            <!--<username>root</username><passphrase>if required</passphrase><privateKey>${user.home}/.ssh/mvnsite.local</privateKey>-->
+            <configuration>
+                <!-- see: https://maven.apache.org/wagon/apidocs/index.html -->
+                <!-- java.lang.ClassNotFoundException: org.apache.maven.wagon.providers.ssh.knownhost.NullKnownHostProvider -->
+                <!--knownHostsProvider implementation="org.apache.maven.wagon.providers.ssh.knownhost.NullKnownHostProvider">
+                    <hostKeyChecking>no</hostKeyChecking>
+                </knownHostsProvider-->
+            </configuration>
+        </server>
+        <server><id>local-nexus3-releases</id><username>${env.CI_OPT_LOCAL_NEXUS3_USER}</username><password>${env.CI_OPT_LOCAL_NEXUS3_PASS}</password></server>
+        <server><id>local-nexus3-snapshots</id><username>${env.CI_OPT_LOCAL_NEXUS3_USER}</username><password>${env.CI_OPT_LOCAL_NEXUS3_PASS}</password></server>
+        <server><id>local-nexus3-thirdparty</id><username>${env.CI_OPT_LOCAL_NEXUS3_USER}</username><password>${env.CI_OPT_LOCAL_NEXUS3_PASS}</password></server>
+        <!--<server>
+            <id>mirror</id><username>${env.CI_OPT_LOCAL_NEXUS3_USER}</username><password>${env.CI_OPT_LOCAL_NEXUS3_PASS}</password>
+            <configuration><httpConfiguration><all><connectionTimeout>120000</connectionTimeout><readTimeout>120000</readTimeout></all></httpConfiguration></configuration>
+        </server>-->
+
+        <!-- for docker-maven-plugin
         <server>
             <id>docker-hub</id>
-            <username>${env.CI_OPT_DOCKER_REGISTRY_USER}</username><password>${env.CI_OPT_DOCKER_REGISTRY_PASS}</password>
+            <username>${env.CI_OPT_OSSRH_DOCKER_REGISTRY_USER}</username><password>${env.CI_OPT_OSSRH_DOCKER_REGISTRY_PASS}</password>
             <configuration><email>${env.CI_OPT_DOCKER_DOCKERHUB_MAIL}</email></configuration>
         </server>
+        -->
         <!-- for dockerfile-maven-plugin, see: https://github.com/spotify/dockerfile-maven/blob/master/docs/authentication.md -->
         <server>
             <id>docker.io</id>
-            <username>${env.CI_OPT_DOCKER_REGISTRY_USER}</username><password>${env.CI_OPT_DOCKER_REGISTRY_PASS}</password>
+            <username>${env.CI_OPT_OSSRH_DOCKER_REGISTRY_USER}</username><password>${env.CI_OPT_OSSRH_DOCKER_REGISTRY_PASS}</password>
         </server>
-        <server><id>github</id><password>${env.CI_OPT_OSSRH_GIT_AUTH_TOKEN}</password></server>
+        <server><id>github-site</id><password>${env.CI_OPT_OSSRH_GIT_AUTH_TOKEN}</password></server>
         <!--
         To fix issue: gpg: signing failed: Inappropriate ioctl for device
         1.
@@ -103,9 +186,9 @@
         echo RELOADAGENT | gpg-connect-agent
         -->
         <server><id>gpg.passphrase</id><passphrase>${env.CI_OPT_GPG_PASSPHRASE}</passphrase></server>
-        <server><id>ossrh-mvnsite</id><username>${env.CI_OPT_OSSRH_MVNSITE_USERNAME}</username><password>${env.CI_OPT_OSSRH_MVNSITE_PASSWORD}</password></server>
-        <server><id>ossrh-snapshots</id><username>${env.CI_OPT_OSSRH_NEXUS2_USER}</username><password>${env.CI_OPT_OSSRH_NEXUS2_PASS}</password></server>
-        <server><id>ossrh-staging</id><username>${env.CI_OPT_OSSRH_NEXUS2_USER}</username><password>${env.CI_OPT_OSSRH_NEXUS2_PASS}</password></server>
+        <server><id>ossrh-nexus3-mvnsite</id><username>${env.CI_OPT_OSSRH_MVNSITE_USERNAME}</username><password>${env.CI_OPT_OSSRH_MVNSITE_PASSWORD}</password></server>
+        <server><id>ossrh-nexus2-snapshots</id><username>${env.CI_OPT_OSSRH_NEXUS2_USER}</username><password>${env.CI_OPT_OSSRH_NEXUS2_PASS}</password></server>
+        <server><id>ossrh-nexus2-staging</id><username>${env.CI_OPT_OSSRH_NEXUS2_USER}</username><password>${env.CI_OPT_OSSRH_NEXUS2_PASS}</password></server>
         <!-- @formatter:on -->
     </servers>
 
