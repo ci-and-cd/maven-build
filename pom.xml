@@ -381,8 +381,8 @@
 
         <custom.checkstyle.config.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/checkstyle/google_checks_8.10.xml</custom.checkstyle.config.location>
         <custom.docker.registry.url>https://docker.io/v2/</custom.docker.registry.url>
-        <custom.frontend.nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</custom.frontend.nodeDownloadRoot>
-        <custom.frontend.npmDownloadRoot>http://registry.npm.taobao.org/npm/-/</custom.frontend.npmDownloadRoot>
+        <custom.frontend.nodeDownloadRoot>https://nodejs.org/dist/</custom.frontend.nodeDownloadRoot>
+        <custom.frontend.npmDownloadRoot>https://registry.npmjs.org/npm/-/</custom.frontend.npmDownloadRoot>
         <!--<custom.nexus2>https://oss.sonatype.org/</custom.nexus2>-->
         <custom.nexus3>https://nexus3.infra.top/nexus/</custom.nexus3>
         <custom.pmd.ruleset.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/pmd/pmd-ruleset-6.8.0.xml</custom.pmd.ruleset.location>
@@ -390,8 +390,8 @@
 
         <ossrh.checkstyle.config.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/checkstyle/google_checks_8.10.xml</ossrh.checkstyle.config.location>
         <ossrh.docker.registry.url>https://docker.io/v2/</ossrh.docker.registry.url>
-        <ossrh.frontend.nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</ossrh.frontend.nodeDownloadRoot>
-        <ossrh.frontend.npmDownloadRoot>http://registry.npm.taobao.org/npm/-/</ossrh.frontend.npmDownloadRoot>
+        <ossrh.frontend.nodeDownloadRoot>https://nodejs.org/dist/</ossrh.frontend.nodeDownloadRoot>
+        <ossrh.frontend.npmDownloadRoot>https://registry.npmjs.org/npm/-/</ossrh.frontend.npmDownloadRoot>
         <ossrh.nexus2>https://oss.sonatype.org/</ossrh.nexus2>
         <ossrh.nexus3>https://nexus3.infra.top/nexus/</ossrh.nexus3>
         <ossrh.pmd.ruleset.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/pmd/pmd-ruleset-6.8.0.xml</ossrh.pmd.ruleset.location>
@@ -399,8 +399,8 @@
 
         <local.checkstyle.config.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/checkstyle/google_checks_8.10.xml</local.checkstyle.config.location>
         <local.docker.registry.url>http://nexus3:5000/v2/</local.docker.registry.url>
-        <local.frontend.nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</local.frontend.nodeDownloadRoot>
-        <local.frontend.npmDownloadRoot>http://registry.npm.taobao.org/npm/-/</local.frontend.npmDownloadRoot>
+        <local.frontend.nodeDownloadRoot>https://nodejs.org/dist/</local.frontend.nodeDownloadRoot>
+        <local.frontend.npmDownloadRoot>https://registry.npmjs.org/npm/-/</local.frontend.npmDownloadRoot>
         <!--<local.nexus2>http://nexus2:28081/nexus/</local.nexus2>-->
         <local.nexus3>http://nexus3:38081/nexus/</local.nexus3>
         <local.sonar.host.url>http://sonarqube:9000</local.sonar.host.url>
