@@ -173,6 +173,8 @@
         <!-- Valid values are "error", "warning" and "info" -->
         <checkstyle.violationSeverity>warning</checkstyle.violationSeverity>
 
+        <docker.image.prefix></docker.image.prefix>
+
         <downloadSources>true</downloadSources>
 
         <!-- findbugs.effort: Min, Default, Max -->
@@ -3262,17 +3264,6 @@
         <!-- @formatter:on -->
         <!-- @formatter:off -->
         <profile>
-            <!-- value of ${docker.image.prefix} should ends with a '/' -->
-            <id>docker-default-docker_image_prefix</id>
-            <activation>
-                <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
-                <property><name>!docker.image.prefix</name></property>
-            </activation>
-            <properties><docker.image.prefix></docker.image.prefix></properties>
-        </profile>
-        <!-- @formatter:on -->
-        <!-- @formatter:off -->
-        <profile>
             <id>dockerfile-maven-plugin-lifecycle-binding-on-deploy_publish_segregation-deploy</id>
             <activation>
                 <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
@@ -3351,7 +3342,7 @@
         <!-- @formatter:on -->
         <!-- @formatter:off -->
         <profile>
-            <id>dockerfile_maven_plugin-lifecycle_binding-when-not-deploy_publish_segregation</id>
+            <id>dockerfile_maven_plugin-lifecycle_binding-when-deploy_publish_segregation-absent</id>
             <activation>
                 <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
                 <property><name>!mvn.deploy.publish.segregation</name></property>
@@ -3399,6 +3390,41 @@
                             </executions>
                         </plugin>
                         -->
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <id>dockerfile_maven_plugin-lifecycle_binding-when-not-deploy_publish_segregation</id>
+            <activation>
+                <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
+                <property><name>mvn.deploy.publish.segregation</name><value>false</value></property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>dockerfile-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>default</id>
+                                    <goals>
+                                        <goal>build</goal>
+                                        <!--
+                                        I found docker-info was built, installed and deployed twice.
+                                        This made build failed when re-deploy is not allowed on artifact repository.
+
+                                        see: [docker-info.jar will be uploaded twice](https://github.com/spotify/dockerfile-maven/issues/11)
+
+                                        If you don't run the tag "goal", you must specify the property "dockerfile.repository".
+                                        -->
+                                        <!--<goal>tag</goal>-->
+                                        <goal>push</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
                     </plugins>
                 </pluginManagement>
             </build>
