@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
 
     <developers>
         <developer>
@@ -172,6 +172,8 @@
         <checkstyle.violation.ignore>foo,bar</checkstyle.violation.ignore>
         <!-- Valid values are "error", "warning" and "info" -->
         <checkstyle.violationSeverity>warning</checkstyle.violationSeverity>
+
+        <docker.image.prefix></docker.image.prefix>
 
         <downloadSources>true</downloadSources>
 
@@ -381,8 +383,8 @@
 
         <custom.checkstyle.config.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/checkstyle/google_checks_8.10.xml</custom.checkstyle.config.location>
         <custom.docker.registry.url>https://docker.io/v2/</custom.docker.registry.url>
-        <custom.frontend.nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</custom.frontend.nodeDownloadRoot>
-        <custom.frontend.npmDownloadRoot>http://registry.npm.taobao.org/npm/-/</custom.frontend.npmDownloadRoot>
+        <custom.frontend.nodeDownloadRoot>https://nodejs.org/dist/</custom.frontend.nodeDownloadRoot>
+        <custom.frontend.npmDownloadRoot>https://registry.npmjs.org/npm/-/</custom.frontend.npmDownloadRoot>
         <!--<custom.nexus2>https://oss.sonatype.org/</custom.nexus2>-->
         <custom.nexus3>https://nexus3.infra.top/nexus/</custom.nexus3>
         <custom.pmd.ruleset.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/pmd/pmd-ruleset-6.8.0.xml</custom.pmd.ruleset.location>
@@ -390,8 +392,8 @@
 
         <ossrh.checkstyle.config.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/checkstyle/google_checks_8.10.xml</ossrh.checkstyle.config.location>
         <ossrh.docker.registry.url>https://docker.io/v2/</ossrh.docker.registry.url>
-        <ossrh.frontend.nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</ossrh.frontend.nodeDownloadRoot>
-        <ossrh.frontend.npmDownloadRoot>http://registry.npm.taobao.org/npm/-/</ossrh.frontend.npmDownloadRoot>
+        <ossrh.frontend.nodeDownloadRoot>https://nodejs.org/dist/</ossrh.frontend.nodeDownloadRoot>
+        <ossrh.frontend.npmDownloadRoot>https://registry.npmjs.org/npm/-/</ossrh.frontend.npmDownloadRoot>
         <ossrh.nexus2>https://oss.sonatype.org/</ossrh.nexus2>
         <ossrh.nexus3>https://nexus3.infra.top/nexus/</ossrh.nexus3>
         <ossrh.pmd.ruleset.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/pmd/pmd-ruleset-6.8.0.xml</ossrh.pmd.ruleset.location>
@@ -399,8 +401,8 @@
 
         <local.checkstyle.config.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/checkstyle/google_checks_8.10.xml</local.checkstyle.config.location>
         <local.docker.registry.url>http://nexus3:5000/v2/</local.docker.registry.url>
-        <local.frontend.nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</local.frontend.nodeDownloadRoot>
-        <local.frontend.npmDownloadRoot>http://registry.npm.taobao.org/npm/-/</local.frontend.npmDownloadRoot>
+        <local.frontend.nodeDownloadRoot>https://nodejs.org/dist/</local.frontend.nodeDownloadRoot>
+        <local.frontend.npmDownloadRoot>https://registry.npmjs.org/npm/-/</local.frontend.npmDownloadRoot>
         <!--<local.nexus2>http://nexus2:28081/nexus/</local.nexus2>-->
         <local.nexus3>http://nexus3:38081/nexus/</local.nexus3>
         <local.sonar.host.url>http://sonarqube:9000</local.sonar.host.url>
@@ -3262,17 +3264,6 @@
         <!-- @formatter:on -->
         <!-- @formatter:off -->
         <profile>
-            <!-- value of ${docker.image.prefix} should ends with a '/' -->
-            <id>docker-default-docker_image_prefix</id>
-            <activation>
-                <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
-                <property><name>!docker.image.prefix</name></property>
-            </activation>
-            <properties><docker.image.prefix></docker.image.prefix></properties>
-        </profile>
-        <!-- @formatter:on -->
-        <!-- @formatter:off -->
-        <profile>
             <id>dockerfile-maven-plugin-lifecycle-binding-on-deploy_publish_segregation-deploy</id>
             <activation>
                 <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
@@ -3351,7 +3342,7 @@
         <!-- @formatter:on -->
         <!-- @formatter:off -->
         <profile>
-            <id>dockerfile_maven_plugin-lifecycle_binding-when-not-deploy_publish_segregation</id>
+            <id>dockerfile_maven_plugin-lifecycle_binding-when-deploy_publish_segregation-absent</id>
             <activation>
                 <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
                 <property><name>!mvn.deploy.publish.segregation</name></property>
@@ -3399,6 +3390,41 @@
                             </executions>
                         </plugin>
                         -->
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <id>dockerfile_maven_plugin-lifecycle_binding-when-not-deploy_publish_segregation</id>
+            <activation>
+                <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
+                <property><name>mvn.deploy.publish.segregation</name><value>false</value></property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>dockerfile-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>default</id>
+                                    <goals>
+                                        <goal>build</goal>
+                                        <!--
+                                        I found docker-info was built, installed and deployed twice.
+                                        This made build failed when re-deploy is not allowed on artifact repository.
+
+                                        see: [docker-info.jar will be uploaded twice](https://github.com/spotify/dockerfile-maven/issues/11)
+
+                                        If you don't run the tag "goal", you must specify the property "dockerfile.repository".
+                                        -->
+                                        <!--<goal>tag</goal>-->
+                                        <goal>push</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
                     </plugins>
                 </pluginManagement>
             </build>
