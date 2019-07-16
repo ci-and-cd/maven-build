@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>3.0.3</version>
+    <version>3.0.4-SNAPSHOT</version>
 
     <developers>
         <developer>
