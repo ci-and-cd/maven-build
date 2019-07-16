@@ -4,7 +4,7 @@ export CI_OPT_ORIGIN_REPO_SLUG="${CI_OPT_ORIGIN_REPO_SLUG:-ci-and-cd/maven-build
 export CI_OPT_OSSRH_SONAR_ORGANIZATION="${CI_OPT_OSSRH_SONAR_ORGANIZATION:-home1-oss-github}";
 
 export CI_OPT_INFRASTRUCTURE="${CI_OPT_INFRASTRUCTURE:-ossrh}";
-export GIT_HOST="${GIT_HOST:-gitlab.com}";
+export GIT_HOST="${GIT_HOST:-github.com}";
 if [[ -z "${GIT_PREFIX}" ]]; then export GIT_PREFIX="https://${GIT_HOST}"; fi;
 export CI_OPT_GPG_KEYNAME="${CI_OPT_GPG_KEYNAME:-59DBF10E}";
 export CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION:-false}";
