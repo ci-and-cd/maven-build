@@ -173,6 +173,7 @@
         <!-- Valid values are "error", "warning" and "info" -->
         <checkstyle.violationSeverity>warning</checkstyle.violationSeverity>
 
+        <dockerfile.skip>false</dockerfile.skip>
         <docker.image.prefix></docker.image.prefix>
 
         <downloadSources>true</downloadSources>
@@ -723,6 +724,7 @@
                             <PROJECT_VERSION>${project.version}</PROJECT_VERSION>
                         </buildArgs>
                         <googleContainerRegistryEnabled>false</googleContainerRegistryEnabled>
+                        <skip>${dockerfile.skip}</skip>
                         <tag>${project.version}</tag>
                         <useMavenSettingsForAuth>${dockerfile.useMavenSettingsForAuth}</useMavenSettingsForAuth>
                     </configuration>
