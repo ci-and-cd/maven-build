@@ -195,6 +195,8 @@
         <maven.source.skip>false</maven.source.skip>
         <maven.test.skip>false</maven.test.skip>
 
+        <mvnExecutable>mvn</mvnExecutable>
+
         <pmd.failOnViolation>false</pmd.failOnViolation>
         <!-- Minimum Priority = 5 Maximum Priority = 0 Default value is: 5. -->
         <pmd.failurePriority>4</pmd.failurePriority>
@@ -720,6 +722,7 @@
                             <PROJECT_GROUPID>${project.groupId}</PROJECT_GROUPID>
                             <PROJECT_VERSION>${project.version}</PROJECT_VERSION>
                         </buildArgs>
+                        <googleContainerRegistryEnabled>false</googleContainerRegistryEnabled>
                         <tag>${project.version}</tag>
                         <useMavenSettingsForAuth>${dockerfile.useMavenSettingsForAuth}</useMavenSettingsForAuth>
                     </configuration>
@@ -877,10 +880,8 @@
                 <groupId>com.amashchenko.maven.plugin</groupId>
                 <artifactId>gitflow-maven-plugin</artifactId>
                 <configuration>
-                    <tychoBuild>false</tychoBuild>
-
                     <installProject>false</installProject>
-                    <verbose>false</verbose>
+                    <mvnExecutable>${mvnExecutable}</mvnExecutable>
 
                     <gitFlowConfig>
                         <productionBranch>master</productionBranch>
@@ -905,6 +906,9 @@
                         <tagHotfixMessage>tagging hotfix</tagHotfixMessage>
                         <tagReleaseMessage>tagging release</tagReleaseMessage>
                     </commitMessages>
+
+                    <tychoBuild>false</tychoBuild>
+                    <verbose>false</verbose>
                 </configuration>
             </plugin>
             <!-- @formatter:off -->
