@@ -25,7 +25,7 @@
   script:
     - |
       if [[ -z "${CI_OPT_MAVEN_EFFECTIVE_POM}" ]]; then export CI_OPT_MAVEN_EFFECTIVE_POM="true"; fi;
-      time ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -U clean deploy verify;
+      time CI_OPT_NEXUS2_STAGING="false" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -U clean deploy verify;
       if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
 
       echo archive $(git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.tar.gz' | grep -v 'profiler-report' | wc -l) files into archive;
