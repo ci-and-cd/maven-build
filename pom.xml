@@ -1743,7 +1743,7 @@
             <!-- multi_module_root_only is a keyword for topinfra-maven-extension to activate this profile on root project only -->
             <id>mvn-deploy_publish_segregation-merge_maven_repos-deploy-run-on-multi_module_root_only</id>
             <activation>
-                <!--<file><exists>${wagon.merge-maven-repos.source}</exists></file>-->
+                <file><exists>${wagon.merge-maven-repos.source}</exists></file>
                 <property><name>mvn.deploy.publish.segregation.goal.deploy</name><value>true</value></property>
             </activation>
             <build>
