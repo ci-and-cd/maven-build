@@ -46,8 +46,8 @@ if [[ -z "${CI_OPT_MAVEN_BUILD_OPTS_REPO_REF}" ]]; then
   if [[ "${GITLAB_CI}" == "true" ]]; then export CI_OPT_MAVEN_BUILD_OPTS_REPO_REF="${CI_COMMIT_REF_NAME:-develop}"; fi;
   if [[ "${TRAVIS_ENABLED}" == "true" ]]; then export CI_OPT_MAVEN_BUILD_OPTS_REPO_REF="${TRAVIS_BRANCH:-develop}"; fi;
 fi;
-#if [[ "${APPVEYOR_ENABLED}" == "true" ]]; then export SETTINGS_GLOBAL_XML="${SETTINGS_GLOBAL_XML:-/home/appveyor/.m2/wrapper/dists/topinfra-maven-dist-1.0.7/6dv6lgbl0mm4742pq28idhmlc9/apache-maven-3.6.1/conf/settings.xml}"; fi;
-##if [[ "${GITLAB_CI}" == "true" ]]; then export SETTINGS_GLOBAL_XML="${SETTINGS_GLOBAL_XML:-/var/lib/gitlab-runner/.m2/wrapper/dists/topinfra-maven-dist-1.0.7/6dv6lgbl0mm4742pq28idhmlc9/apache-maven-3.6.1/conf/settings.xml}"; fi;
+#if [[ "${APPVEYOR_ENABLED}" == "true" ]]; then export SETTINGS_GLOBAL_XML="${SETTINGS_GLOBAL_XML:-/home/appveyor/.m2/wrapper/dists/topinfra-maven-dist-1.0.8/5oa0ssfvmf3lemn3gu713bbnln/apache-maven-3.6.1/conf/settings.xml}"; fi;
+##if [[ "${GITLAB_CI}" == "true" ]]; then export SETTINGS_GLOBAL_XML="${SETTINGS_GLOBAL_XML:-/var/lib/gitlab-runner/.m2/wrapper/dists/topinfra-maven-dist-1.0.8/5oa0ssfvmf3lemn3gu713bbnln/apache-maven-3.6.1/conf/settings.xml}"; fi;
 #if [[ "${GITLAB_CI}" == "true" ]]; then export SETTINGS_GLOBAL_XML="${SETTINGS_GLOBAL_XML:-/tmp/settings-global-${CI_COMMIT_SHA}.xml}"; fi;
-#if [[ "${TRAVIS_ENABLED}" == "true" ]]; then export SETTINGS_GLOBAL_XML="${SETTINGS_GLOBAL_XML:-/home/travis/.m2/wrapper/dists/topinfra-maven-dist-1.0.7/6dv6lgbl0mm4742pq28idhmlc9/apache-maven-3.6.1/conf/settings.xml}"; fi;
+#if [[ "${TRAVIS_ENABLED}" == "true" ]]; then export SETTINGS_GLOBAL_XML="${SETTINGS_GLOBAL_XML:-/home/travis/.m2/wrapper/dists/topinfra-maven-dist-1.0.8/5oa0ssfvmf3lemn3gu713bbnln/apache-maven-3.6.1/conf/settings.xml}"; fi;
 #export SETTINGS_GLOBAL_XML_URL="${CI_OPT_MAVEN_BUILD_OPTS_REPO}/raw/${CI_OPT_MAVEN_BUILD_OPTS_REPO_REF}/src/main/maven/settings-global.xml";
