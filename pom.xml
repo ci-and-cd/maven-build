@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>3.0.3</version>
+    <version>3.0.4</version>
 
     <developers>
         <developer>
@@ -194,6 +194,8 @@
         <maven.javadoc.skip>false</maven.javadoc.skip>
         <maven.source.skip>false</maven.source.skip>
         <maven.test.skip>false</maven.test.skip>
+
+        <mvnExecutable>mvn</mvnExecutable>
 
         <pmd.failOnViolation>false</pmd.failOnViolation>
         <!-- Minimum Priority = 5 Maximum Priority = 0 Default value is: 5. -->
@@ -720,6 +722,7 @@
                             <PROJECT_GROUPID>${project.groupId}</PROJECT_GROUPID>
                             <PROJECT_VERSION>${project.version}</PROJECT_VERSION>
                         </buildArgs>
+                        <googleContainerRegistryEnabled>false</googleContainerRegistryEnabled>
                         <tag>${project.version}</tag>
                         <useMavenSettingsForAuth>${dockerfile.useMavenSettingsForAuth}</useMavenSettingsForAuth>
                     </configuration>
@@ -877,10 +880,8 @@
                 <groupId>com.amashchenko.maven.plugin</groupId>
                 <artifactId>gitflow-maven-plugin</artifactId>
                 <configuration>
-                    <tychoBuild>false</tychoBuild>
-
                     <installProject>false</installProject>
-                    <verbose>false</verbose>
+                    <mvnExecutable>${mvnExecutable}</mvnExecutable>
 
                     <gitFlowConfig>
                         <productionBranch>master</productionBranch>
@@ -905,6 +906,9 @@
                         <tagHotfixMessage>tagging hotfix</tagHotfixMessage>
                         <tagReleaseMessage>tagging release</tagReleaseMessage>
                     </commitMessages>
+
+                    <tychoBuild>false</tychoBuild>
+                    <verbose>false</verbose>
                 </configuration>
             </plugin>
             <!-- @formatter:off -->
@@ -1739,7 +1743,7 @@
             <!-- multi_module_root_only is a keyword for topinfra-maven-extension to activate this profile on root project only -->
             <id>mvn-deploy_publish_segregation-merge_maven_repos-deploy-run-on-multi_module_root_only</id>
             <activation>
-                <!--<file><exists>${wagon.merge-maven-repos.source}</exists></file>-->
+                <file><exists>${wagon.merge-maven-repos.source}</exists></file>
                 <property><name>mvn.deploy.publish.segregation.goal.deploy</name><value>true</value></property>
             </activation>
             <build>
