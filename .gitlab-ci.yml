@@ -1,6 +1,13 @@
 # GIT_STRATEGY: none Clone manually as a resolution of https clone is not available, and runner can't do ssh clone automatically
 # Issue 3378 Uploading untracked artifacts includes ignored files, see: https://gitlab.com/gitlab-org/gitlab-runner/issues/3378
 # Issue 4072 artifacts ignore paths                              , see: https://gitlab.com/gitlab-org/gitlab-ce/issues/4072
+#image: openjdk:8
+
+cache:
+  key: ${CI_PROJECT_ID}
+  paths:
+    - .m2/repository
+    - .m2/wrapper
 
 .git_refs_develop_only: &git_refs_develop_only
   only:
@@ -25,13 +32,13 @@
   script:
     - |
       if [[ -z "${CI_OPT_MAVEN_EFFECTIVE_POM}" ]]; then export CI_OPT_MAVEN_EFFECTIVE_POM="true"; fi;
-      time CI_OPT_NEXUS2_STAGING="false" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -U -Ddockerfile.skip=true -Dmaven.javadoc.skip=true -Dmaven.source.skip=true clean deploy;
+      time CI_OPT_NEXUS2_STAGING="false" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -U -Dmaven.javadoc.skip=true -Dmaven.source.skip=true clean verify;
       if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
 
-      echo archive $(git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.tar.gz' | grep -v 'profiler-report' | wc -l) files into archive;
-      git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.zip' | grep -v 'profiler-report' | zip -P ${ARCHIVE_PASS:-pass} untracked.zip -@;
-      #git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.tar.gz' | grep -v 'profiler-report' | tar -czf untracked.tar.gz -T -;
-      #git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.tar.gz' | grep -v 'profiler-report' | xargs rm -f;
+      echo archive $(git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.zip' | grep -v 'profiler-report' | grep -v '.m2' | wc -l) files into archive;
+      git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.zip' | grep -v 'profiler-report' | grep -v '.m2' | zip -P ${ARCHIVE_PASS:-pass} untracked.zip -@;
+      #git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.tar.gz' | grep -v 'profiler-report' | grep -v '.m2' | tar -czf untracked.tar.gz -T -;
+      #git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.tar.gz' | grep -v 'profiler-report' | grep -v '.m2' | xargs rm -f;
 
 .script_publish: &script_publish
   script:
@@ -41,15 +48,15 @@
       if [ -f untracked.zip ]; then unzip -P ${ARCHIVE_PASS:-pass} untracked.zip; fi; ls -ahl;
       #if [ -f untracked.tar.gz ]; then tar -xzf untracked.tar.gz; fi; ls -ahl;
 
-      time CI_OPT_FAST="true" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -U -Dmaven.clean.skip=true -Dmaven.javadoc.skip=false -Dmaven.source.skip=false deploy;
+      time CI_OPT_FAST="true" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -U deploy;
       if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
 
-      time CI_OPT_FAST="true" CI_OPT_INFRASTRUCTURE="custom" CI_OPT_MAVEN_PACKAGES_SKIP="true" CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="true" CI_OPT_NEXUS2_STAGING="false" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -Dmaven.clean.skip=true -Dmaven.install.skip=true deploy;
+      time CI_OPT_FAST="true" CI_OPT_INFRASTRUCTURE="custom" CI_OPT_NEXUS2_STAGING="false" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp deploy;
       if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
 
-      echo archive $(git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.tar.gz' | grep -v 'profiler-report' | wc -l) files into archive;
-      git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.zip' | grep -v 'profiler-report' | zip -P ${ARCHIVE_PASS:-pass} untracked.zip -@;
-      #git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.tar.gz' | grep -v 'profiler-report' | tar -czf untracked.tar.gz -T -;
+      echo archive $(git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.tar.gz' | grep -v 'profiler-report' | grep -v '.m2' | wc -l) files into archive;
+      git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.zip' | grep -v 'profiler-report' | grep -v '.m2' | zip -P ${ARCHIVE_PASS:-pass} untracked.zip -@;
+      #git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.tar.gz' | grep -v 'profiler-report' | grep -v '.m2' | tar -czf untracked.tar.gz -T -;
 
 .script_site: &script_site
   script:
@@ -57,7 +64,7 @@
       if [ -f untracked.zip ]; then unzip -P ${ARCHIVE_PASS:-pass} untracked.zip; fi; ls -ahl;
       #if [ -f untracked.tar.gz ]; then tar -xzf untracked.tar.gz; fi; ls -ahl;
 
-      time ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -Dmaven.clean.skip=true -DskipITs=true -DskipTests=true site-deploy;
+      time ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp site-deploy;
       if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
 
 .upload_files_for_latter_stages: &upload_files_for_latter_stages
@@ -88,38 +95,41 @@ before_script:
   # CI_OPT_OSSRH_NEXUS2_USER
   # CI_OPT_OSSRH_SONAR_LOGIN
   - |
+    if [[ "$(whoami)" == "root" ]] && [[ -d /usr/local/openjdk-8 ]] && [[ ! -d /usr/lib/jvm/java-8-openjdk ]]; then mkdir -p /usr/lib/jvm; ln -s /usr/local/openjdk-8 /usr/lib/jvm/java-8-openjdk; fi;
+    if [[ "$(whoami)" == "root" ]] && [[ -d /usr/local/openjdk-11 ]] && [[ ! -d /usr/lib/jvm/java-11-openjdk ]]; then mkdir -p /usr/lib/jvm; ln -s /usr/local/openjdk-11 /usr/lib/jvm/java-11-openjdk; fi;
+  - |
     export CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="true";
     source circ.sh;
-#  - export CI_OPT_CI_SCRIPT="${CI_OPT_GIT_PREFIX}/${CI_PROJECT_PATH:-ci-and-cd/maven-build}/raw/${CI_COMMIT_REF_NAME:-develop}/src/main/ci-script/lib_ci.sh";
-#  - |
-#    echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
-#    mkdir -p $(dirname ${SETTINGS_GLOBAL_XML});
-#    curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | tee ${SETTINGS_GLOBAL_XML};
-#    export MAVEN_GLOBAL_SETTINGS="--global-settings ${SETTINGS_GLOBAL_XML}";
+  #- export CI_OPT_CI_SCRIPT="${CI_OPT_GIT_PREFIX}/${CI_PROJECT_PATH:-ci-and-cd/maven-build}/raw/${CI_COMMIT_REF_NAME:-develop}/src/main/ci-script/lib_ci.sh";
+  #- |
+  #  echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
+  #  mkdir -p $(dirname ${SETTINGS_GLOBAL_XML});
+  #  curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | tee ${SETTINGS_GLOBAL_XML};
+  #  export MAVEN_GLOBAL_SETTINGS="--global-settings ${SETTINGS_GLOBAL_XML}";
   - |
-    rm -rf ~/.m2/repository/top/infra/maven;
-    if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:+UseParallelGC -Dprofile=title -DprofileFormat=JSON,HTML"; fi;
-    ls -ahl ~/.m2;
+    if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:+UseParallelGC -Dmaven.repo.local=.m2/repository -Dprofile=title -DprofileFormat=JSON,HTML"; fi;
+    if [[ -d ${HOME}/.m2 ]]; then rm -rf ${HOME}/.m2/repository/top/infra/maven; ls -ahl ${HOME}/.m2; fi;
+    export MAVEN_USER_HOME="${PWD}/.m2";
     ./mvnw ${MAVEN_GLOBAL_SETTINGS} -version;
 
-#  # manual_git
-#  - export GIT_REMOTE="git@${CI_OPT_GIT_HOST}:${CI_PROJECT_NAMESPACE}/${CI_OPT_BUILD_PREFIX}${CI_PROJECT_NAME}.git";
-#    if [ -d .git ]; then git remote set-url origin ${GIT_REMOTE} && git fetch --all; fi;
-#    if [ ! -d .git ]; then echo "clone into non-empty directory"; git init && git remote add origin ${GIT_REMOTE} && git fetch --all && git reset origin/${CI_COMMIT_REF_NAME} > /dev/null 2>&1; fi;
-#    if git show-ref --verify refs/tags/${CI_COMMIT_REF_NAME} > /dev/null 2>&1; then
-#      echo 'build on tag is not supported'; exit 1;
-#    elif git show-ref --verify refs/remotes/origin/${CI_COMMIT_REF_NAME} > /dev/null 2>&1; then
-#      echo 'build on branch is supported';
-#      git checkout -f origin/${CI_COMMIT_REF_NAME};
-#      if [ "$(git rev-parse origin/${CI_COMMIT_REF_NAME})" != "${CI_COMMIT_SHA}" ]; then
-#        echo Prevents build of an older commit;
-#        PRIVATE_TOKEN_COLON='PRIVATE-TOKEN:';
-#        set +x; curl -H "${PRIVATE_TOKEN_COLON} ${CI_OPT_GITLAB_GIT_AUTH_TOKEN}" -X POST ${CI_OPT_GIT_PREFIX}/api/v4/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}/cancel; set -x;
-#        exit 0;
-#      fi;
-#      git checkout -f ${CI_COMMIT_SHA};
-#      echo "remove untracked files and directories"; git clean -fdx :/ -e untracked.tar.gz;
-#    fi;
+  ## manual_git
+  #- export GIT_REMOTE="git@${CI_OPT_GIT_HOST}:${CI_PROJECT_NAMESPACE}/${CI_OPT_BUILD_PREFIX}${CI_PROJECT_NAME}.git";
+  #  if [ -d .git ]; then git remote set-url origin ${GIT_REMOTE} && git fetch --all; fi;
+  #  if [ ! -d .git ]; then echo "clone into non-empty directory"; git init && git remote add origin ${GIT_REMOTE} && git fetch --all && git reset origin/${CI_COMMIT_REF_NAME} > /dev/null 2>&1; fi;
+  #  if git show-ref --verify refs/tags/${CI_COMMIT_REF_NAME} > /dev/null 2>&1; then
+  #    echo 'build on tag is not supported'; exit 1;
+  #  elif git show-ref --verify refs/remotes/origin/${CI_COMMIT_REF_NAME} > /dev/null 2>&1; then
+  #    echo 'build on branch is supported';
+  #    git checkout -f origin/${CI_COMMIT_REF_NAME};
+  #    if [ "$(git rev-parse origin/${CI_COMMIT_REF_NAME})" != "${CI_COMMIT_SHA}" ]; then
+  #      echo Prevents build of an older commit;
+  #      PRIVATE_TOKEN_COLON='PRIVATE-TOKEN:';
+  #      set +x; curl -H "${PRIVATE_TOKEN_COLON} ${CI_OPT_GITLAB_GIT_AUTH_TOKEN}" -X POST ${CI_OPT_GIT_PREFIX}/api/v4/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}/cancel; set -x;
+  #      exit 0;
+  #    fi;
+  #    git checkout -f ${CI_COMMIT_SHA};
+  #    echo "remove untracked files and directories"; git clean -fdx :/ -e untracked.tar.gz;
+  #  fi;
 
 build_snapshots:
   <<: *git_refs_of_snapshots
@@ -136,8 +146,9 @@ analysis:
   stage: analysis
   script:
     - |
-      if [ -f untracked.tar.gz ]; then tar -xzf untracked.tar.gz; fi; ls -ahl;
-      time CI_OPT_SONAR="true" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -Dmaven.clean.skip=true sonar:sonar;
+      if [ -f untracked.zip ]; then unzip -P ${ARCHIVE_PASS:-pass} untracked.zip; fi; ls -ahl;
+
+      time CI_OPT_SONAR="true" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp sonar:sonar;
       if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
   variables:
     GIT_STRATEGY: fetch

@@ -313,7 +313,7 @@
         <version.jdepend-maven-plugin>2.0</version.jdepend-maven-plugin>
         <version.jetbrains-annotations>16.0.3</version.jetbrains-annotations>
         <version.jsch>0.1.54</version.jsch>
-        <version.lombok>1.18.6</version.lombok>
+        <version.lombok>1.18.8</version.lombok>
 
         <version.maven-antrun-plugin>1.8</version.maven-antrun-plugin>
         <version.maven-changes-plugin>2.12.1</version.maven-changes-plugin>
@@ -486,12 +486,14 @@
                         <skip>${skipITs}</skip>
                         <includes>
                             <include>**/*IT.java</include>
+                            <include>**/*Verify.java</include>
                         </includes>
                         <excludes>
                             <exclude>**/Abstract*.java</exclude>
                             <exclude>**/Base*.java</exclude>
                             <exclude>**/deprecated/*.java</exclude>
                             <exclude>**/Deprecated*.java</exclude>
+                            <include>**/*Suite.class</include>
                             <exclude>**/*Test.java</exclude>
                             <exclude>**/*Tests.java</exclude>
                             <exclude>**/Test*.java</exclude>
@@ -536,7 +538,9 @@
                         <argLine>${jacoco.agent.ut.arg} ${argLine}</argLine>
                         <forkCount>${surefire.fork.count}</forkCount>
                         <reuseForks>${surefire.fork.reuse}</reuseForks>
+                        <runOrder>alphabetical</runOrder>
                         <includes>
+                            <include>**/*Suite.class</include>
                             <include>**/*Test.java</include>
                             <include>**/*Tests.java</include>
                             <include>**/Test*.java</include>
@@ -549,6 +553,7 @@
                             <exclude>**/deprecated/*.java</exclude>
                             <exclude>**/Deprecated*.java</exclude>
                             <exclude>**/*IT.java</exclude>
+                            <include>**/*Verify.java</include>
                         </excludes>
                         <useSystemClassLoader>false</useSystemClassLoader>
                     </configuration>
@@ -1589,89 +1594,6 @@
             </build>
         </profile>
 
-        <profile>
-            <!-- multi_module_root_only is a keyword for topinfra-maven-extension to activate this profile on root project only -->
-            <id>mvn-deploy_publish_segregation-wagon_repository-clean-run-on-multi_module_root_only</id>
-            <activation><property><name>mvn.deploy.publish.segregation</name><value>true</value></property></activation>
-            <build>
-                <plugins>
-                    <!-- @formatter:off -->
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>build-helper-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>artifactDir-on-pre_clean</id>
-                                <phase>pre-clean</phase>
-                                <goals><goal>bsh-property</goal></goals>
-                                <configuration>
-                                    <source>
-                                        artifactDir = project.getGroupId().replace('.', '/') + "/" + project.getArtifactId();
-                                        System.setProperty("wagon.merge-maven-repos.artifactDir", artifactDir);
-                                        session.getUserProperties().setProperty("wagon.merge-maven-repos.artifactDir", artifactDir);
-                                        project.getProperties().setProperty("wagon.merge-maven-repos.artifactDir", artifactDir);
-                                    </source>
-                                    <properties><property>artifactDir</property></properties>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- @formatter:on -->
-                    <!--<plugin>
-                        <groupId>org.codehaus.groovy.maven</groupId>
-                        <artifactId>gmaven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals><goal>execute</goal></goals>
-                                <phase>pre-clean</phase>
-                                <configuration><source>System.setProperty("wagon.merge-maven-repos.artifactDir", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
-                            </execution>
-                        </executions>
-                    </plugin>-->
-                    <!--
-                    groovy-maven-plugin error on java11:
-                    [ERROR] WARNING: Please consider reporting this to the maintainers of org.codehaus.groovy.vmplugin.v7.Java7$1
-                    [ERROR] WARNING: Use -\-illegal-access=warn to enable warnings of further illegal reflective access operations
-                    [ERROR] WARNING: All illegal access operations will be denied in a future release
-                    -->
-                    <!--<plugin>
-                        <groupId>org.codehaus.gmaven</groupId>
-                        <artifactId>groovy-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals><goal>execute</goal></goals>
-                                <phase>pre-clean</phase>
-                                <configuration><source>System.setProperty("wagon.merge-maven-repos.artifactDir", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
-                            </execution>
-                        </executions>
-                    </plugin>-->
-                    <!-- clean files deployed to local directory -->
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>wagon-repository-clean</id>
-                                <!--<inherited>false</inherited>-->
-                                <!--
-                                phase none run 'mvn org.apache.maven.plugins:maven-antrun-plugin:run@wagon-repository-clean'
-                                -->
-                                <!--<phase>none</phase>-->
-                                <phase>clean</phase>
-                                <goals><goal>run</goal></goals>
-                                <configuration>
-                                    <target>
-                                        <echo message="wagon.merge-maven-repos.source: ${wagon.merge-maven-repos.source}"/>
-                                        <echo message="wagon.merge-maven-repos.artifactDir: ${wagon.merge-maven-repos.artifactDir}"/>
-                                        <delete failonerror="false" includeemptydirs="true" verbose="true"><fileset dir="${wagon.merge-maven-repos.source}/${wagon.merge-maven-repos.artifactDir}" includes="**/*"/></delete>
-                                    </target>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
         <!-- disable packages for wagon-maven-plugin -->
         <profile>
             <id>maven_packages_skip</id>
@@ -1743,7 +1665,94 @@
 
         <profile>
             <!-- multi_module_root_only is a keyword for topinfra-maven-extension to activate this profile on root project only -->
-            <id>mvn-deploy_publish_segregation-merge_maven_repos-deploy-run-on-multi_module_root_only</id>
+            <id>mvn_multi_stage-wagon_repository-clean-run-on-multi_module_root_only</id>
+            <activation>
+                <file><exists>${wagon.merge-maven-repos.source}</exists></file>
+                <property><name>mvn.deploy.publish.segregation</name><value>true</value></property>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- @formatter:off -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>artifactDir-on-pre_clean</id>
+                                <phase>pre-clean</phase>
+                                <goals><goal>bsh-property</goal></goals>
+                                <configuration>
+                                    <source>
+                                        artifactDir = project.getGroupId().replace('.', '/') + "/" + project.getArtifactId();
+                                        System.setProperty("wagon.merge-maven-repos.artifactDir", artifactDir);
+                                        session.getUserProperties().setProperty("wagon.merge-maven-repos.artifactDir", artifactDir);
+                                        project.getProperties().setProperty("wagon.merge-maven-repos.artifactDir", artifactDir);
+                                    </source>
+                                    <properties><property>artifactDir</property></properties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- @formatter:on -->
+                    <!--<plugin>
+                        <groupId>org.codehaus.groovy.maven</groupId>
+                        <artifactId>gmaven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals><goal>execute</goal></goals>
+                                <phase>pre-clean</phase>
+                                <configuration><source>System.setProperty("wagon.merge-maven-repos.artifactDir", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
+                            </execution>
+                        </executions>
+                    </plugin>-->
+                    <!--
+                    groovy-maven-plugin error on java11:
+                    [ERROR] WARNING: Please consider reporting this to the maintainers of org.codehaus.groovy.vmplugin.v7.Java7$1
+                    [ERROR] WARNING: Use -\-illegal-access=warn to enable warnings of further illegal reflective access operations
+                    [ERROR] WARNING: All illegal access operations will be denied in a future release
+                    -->
+                    <!--<plugin>
+                        <groupId>org.codehaus.gmaven</groupId>
+                        <artifactId>groovy-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals><goal>execute</goal></goals>
+                                <phase>pre-clean</phase>
+                                <configuration><source>System.setProperty("wagon.merge-maven-repos.artifactDir", "${project.groupId}".replace('.', '/') + "/${project.artifactId}")</source></configuration>
+                            </execution>
+                        </executions>
+                    </plugin>-->
+                    <!-- clean files deployed to local directory -->
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>wagon-repository-clean</id>
+                                <!--<inherited>false</inherited>-->
+                                <!--
+                                phase none run 'mvn org.apache.maven.plugins:maven-antrun-plugin:run@wagon-repository-clean'
+                                -->
+                                <!--<phase>none</phase>-->
+                                <phase>clean</phase>
+                                <goals><goal>run</goal></goals>
+                                <configuration>
+                                    <target>
+                                        <echo message="wagon.merge-maven-repos.source: ${wagon.merge-maven-repos.source}"/>
+                                        <echo message="wagon.merge-maven-repos.artifactDir: ${wagon.merge-maven-repos.artifactDir}"/>
+                                        <delete failonerror="false" includeemptydirs="true" verbose="true"><fileset dir="${wagon.merge-maven-repos.source}/${wagon.merge-maven-repos.artifactDir}" includes="**/*"/></delete>
+                                        <delete failonerror="false" includeemptydirs="true" verbose="true"><fileset dir="${wagon.merge-maven-repos.source}" includes="**/*"/></delete>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <!-- multi_module_root_only is a keyword for topinfra-maven-extension to activate this profile on root project only -->
+            <id>mvn_multi_stage-merge_maven_repos-deploy-run-on-multi_module_root_only</id>
             <activation>
                 <file><exists>${wagon.merge-maven-repos.source}</exists></file>
                 <property><name>mvn.deploy.publish.segregation.goal.deploy</name><value>true</value></property>
@@ -2847,7 +2856,7 @@
                         <plugin>
                             <artifactId>maven-failsafe-plugin</artifactId>
                             <configuration>
-                                <argLine>${jacoco.agent.ut.arg} --add-modules java.xml.bind,java.xml.ws,java.xml.ws.annotation ${argLine}</argLine>
+                                <argLine>${jacoco.agent.it.arg} --add-modules java.xml.bind,java.xml.ws,java.xml.ws.annotation ${argLine}</argLine>
                             </configuration>
                         </plugin>
                     </plugins>
@@ -2929,7 +2938,7 @@
                         <plugin>
                             <artifactId>maven-failsafe-plugin</artifactId>
                             <configuration>
-                                <argLine>${jacoco.agent.ut.arg} --illegal-access=permit --add-exports java.base/jdk.internal.loader=ALL-UNNAMED --add-exports java.base/sun.security.ssl=ALL-UNNAMED --add-opens java.base/jdk.internal.loader=ALL-UNNAMED --add-opens java.base/sun.security.ssl=ALL-UNNAMED ${argLine}</argLine>
+                                <argLine>${jacoco.agent.it.arg} --illegal-access=permit --add-exports java.base/jdk.internal.loader=ALL-UNNAMED --add-exports java.base/sun.security.ssl=ALL-UNNAMED --add-opens java.base/jdk.internal.loader=ALL-UNNAMED --add-opens java.base/sun.security.ssl=ALL-UNNAMED ${argLine}</argLine>
                             </configuration>
                         </plugin>
                     </plugins>
@@ -3270,7 +3279,7 @@
         <!-- @formatter:on -->
         <!-- @formatter:off -->
         <profile>
-            <id>dockerfile-maven-plugin-lifecycle-binding-on-deploy_publish_segregation-deploy</id>
+            <id>dockerfile-maven-plugin-lifecycle-binding-on-mvn_multi_stage-deploy</id>
             <activation>
                 <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
                 <property><name>mvn.deploy.publish.segregation.goal.deploy</name><value>true</value></property>
@@ -3309,7 +3318,7 @@
         <!-- @formatter:on -->
         <!-- @formatter:off -->
         <profile>
-            <id>dockerfile_maven_plugin-lifecycle_binding-on-deploy_publish_segregation-package</id>
+            <id>dockerfile_maven_plugin-lifecycle_binding-on-mvn_multi_stage-package</id>
             <activation>
                 <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
                 <property><name>mvn.deploy.publish.segregation.goal.package</name><value>true</value></property>
@@ -3348,7 +3357,7 @@
         <!-- @formatter:on -->
         <!-- @formatter:off -->
         <profile>
-            <id>dockerfile_maven_plugin-lifecycle_binding-when-deploy_publish_segregation-absent</id>
+            <id>dockerfile_maven_plugin-lifecycle_binding-when-mvn_multi_stage-absent</id>
             <activation>
                 <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
                 <property><name>!mvn.deploy.publish.segregation</name></property>
@@ -3401,7 +3410,7 @@
             </build>
         </profile>
         <profile>
-            <id>dockerfile_maven_plugin-lifecycle_binding-when-not-deploy_publish_segregation</id>
+            <id>dockerfile_maven_plugin-lifecycle_binding-when-not-mvn_multi_stage</id>
             <activation>
                 <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
                 <property><name>mvn.deploy.publish.segregation</name><value>false</value></property>
