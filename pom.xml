@@ -391,7 +391,7 @@
         <!--<custom.nexus2>https://oss.sonatype.org/</custom.nexus2>-->
         <custom.nexus3>https://nexus3.infra.top/nexus/</custom.nexus3>
         <custom.pmd.ruleset.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/pmd/pmd-ruleset-6.8.0.xml</custom.pmd.ruleset.location>
-        <custom.sonar.host.url>https://sonarqube.com</custom.sonar.host.url>
+        <custom.sonar.host.url>https://sonarcloud.io</custom.sonar.host.url>
 
         <ossrh.checkstyle.config.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/checkstyle/google_checks_8.10.xml</ossrh.checkstyle.config.location>
         <ossrh.docker.registry.url>https://docker.io/v2/</ossrh.docker.registry.url>
@@ -400,7 +400,7 @@
         <ossrh.nexus2>https://oss.sonatype.org/</ossrh.nexus2>
         <ossrh.nexus3>https://nexus3.infra.top/nexus/</ossrh.nexus3>
         <ossrh.pmd.ruleset.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/pmd/pmd-ruleset-6.8.0.xml</ossrh.pmd.ruleset.location>
-        <ossrh.sonar.host.url>https://sonarqube.com</ossrh.sonar.host.url>
+        <ossrh.sonar.host.url>https://sonarcloud.io</ossrh.sonar.host.url>
 
         <local.checkstyle.config.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/checkstyle/google_checks_8.10.xml</local.checkstyle.config.location>
         <local.docker.registry.url>http://nexus3:5000/v2/</local.docker.registry.url>
