@@ -32,21 +32,27 @@ cache:
   script:
     - |
       if [[ -z "${CI_OPT_MAVEN_EFFECTIVE_POM}" ]]; then export CI_OPT_MAVEN_EFFECTIVE_POM="true"; fi;
-      time CI_OPT_NEXUS2_STAGING="false" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -U -Dmaven.javadoc.skip=true -Dmaven.source.skip=true clean verify;
+      time ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -U -Dmaven.javadoc.skip=true -Dmaven.source.skip=true clean verify;
       if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
 
-      echo archive $(git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.zip' | grep -v 'profiler-report' | grep -v '.m2' | wc -l) files into archive;
-      git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.zip' | grep -v 'profiler-report' | grep -v '.m2' | zip -P ${ARCHIVE_PASS:-pass} untracked.zip -@;
-      #git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.tar.gz' | grep -v 'profiler-report' | grep -v '.m2' | tar -czf untracked.tar.gz -T -;
-      #git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.tar.gz' | grep -v 'profiler-report' | grep -v '.m2' | xargs rm -f;
+      echo archive $(git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'profiler-report' | grep -v '.m2' | grep -v 'untracked.tar.gz' | grep -v 'untracked.zip' | wc -l) files into archive;
+      if type -p zip > /dev/null && type -p unzip > /dev/null; then
+        git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'profiler-report' | grep -v '.m2' | grep -v 'untracked.tar.gz' | grep -v 'untracked.zip' | zip -P ${ARCHIVE_PASS:-pass} untracked.zip -@;
+      else
+        git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'profiler-report' | grep -v '.m2' | grep -v 'untracked.tar.gz' | grep -v 'untracked.zip' | tar -czf untracked.tar.gz -T -;
+      fi;
+      #git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'profiler-report' | grep -v '.m2' | grep -v 'untracked.tar.gz' | grep -v 'untracked.zip' | xargs rm -f;
 
 .script_publish: &script_publish
   script:
     # force publish on temp branch push
     #- export CI_OPT_PUBLISH_TO_REPO="true";
     - |
-      if [ -f untracked.zip ]; then unzip -P ${ARCHIVE_PASS:-pass} untracked.zip; fi; ls -ahl;
-      #if [ -f untracked.tar.gz ]; then tar -xzf untracked.tar.gz; fi; ls -ahl;
+      if type -p zip > /dev/null && type -p unzip > /dev/null; then
+        if [ -f untracked.zip ]; then unzip -P ${ARCHIVE_PASS:-pass} untracked.zip; fi; ls -ahl;
+      else
+        if [ -f untracked.tar.gz ]; then tar -xzf untracked.tar.gz; fi; ls -ahl;
+      fi;
 
       time CI_OPT_FAST="true" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -U deploy;
       if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
@@ -54,15 +60,20 @@ cache:
       time CI_OPT_FAST="true" CI_OPT_INFRASTRUCTURE="custom" CI_OPT_NEXUS2_STAGING="false" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp deploy;
       if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
 
-      echo archive $(git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.tar.gz' | grep -v 'profiler-report' | grep -v '.m2' | wc -l) files into archive;
-      git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.zip' | grep -v 'profiler-report' | grep -v '.m2' | zip -P ${ARCHIVE_PASS:-pass} untracked.zip -@;
-      #git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'untracked.tar.gz' | grep -v 'profiler-report' | grep -v '.m2' | tar -czf untracked.tar.gz -T -;
+      if type -p zip > /dev/null && type -p unzip > /dev/null; then
+        git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'profiler-report' | grep -v '.m2' | grep -v 'untracked.tar.gz' | grep -v 'untracked.zip' | zip -P ${ARCHIVE_PASS:-pass} untracked.zip -@;
+      else
+        git ls-files -o | grep -Ev '.+-exec\.jar' | grep -v 'profiler-report' | grep -v '.m2' | grep -v 'untracked.tar.gz' | grep -v 'untracked.zip' | tar -czf untracked.tar.gz -T -;
+      fi;
 
 .script_site: &script_site
   script:
     - |
-      if [ -f untracked.zip ]; then unzip -P ${ARCHIVE_PASS:-pass} untracked.zip; fi; ls -ahl;
-      #if [ -f untracked.tar.gz ]; then tar -xzf untracked.tar.gz; fi; ls -ahl;
+      if type -p zip > /dev/null && type -p unzip > /dev/null; then
+        if [ -f untracked.zip ]; then unzip -P ${ARCHIVE_PASS:-pass} untracked.zip; fi; ls -ahl;
+      else
+        if [ -f untracked.tar.gz ]; then tar -xzf untracked.tar.gz; fi; ls -ahl;
+      fi;
 
       time ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp site-deploy;
       if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
@@ -72,7 +83,7 @@ cache:
     expire_in: 1 day
     paths:
       - untracked.zip
-#      - untracked.tar.gz
+      - untracked.tar.gz
 
 before_script:
   - if [ -f ~/env ]; then source ~/env; fi;
@@ -95,10 +106,11 @@ before_script:
   # CI_OPT_OSSRH_NEXUS2_USER
   # CI_OPT_OSSRH_SONAR_LOGIN
   - |
-    if [[ "$(whoami)" == "root" ]] && [[ -d /usr/local/openjdk-8 ]] && [[ ! -d /usr/lib/jvm/java-8-openjdk ]]; then mkdir -p /usr/lib/jvm; ln -s /usr/local/openjdk-8 /usr/lib/jvm/java-8-openjdk; fi;
-    if [[ "$(whoami)" == "root" ]] && [[ -d /usr/local/openjdk-11 ]] && [[ ! -d /usr/lib/jvm/java-11-openjdk ]]; then mkdir -p /usr/lib/jvm; ln -s /usr/local/openjdk-11 /usr/lib/jvm/java-11-openjdk; fi;
+    if [[ "$(whoami)" == "root" ]] && [[ ! -d /usr/lib/jvm/java-8-openjdk ]] && [[ -d /usr/local/openjdk-8 ]]; then mkdir -p /usr/lib/jvm; ln -s /usr/local/openjdk-8 /usr/lib/jvm/java-8-openjdk; fi;
+    if [[ "$(whoami)" == "root" ]] && [[ ! -d /usr/lib/jvm/java-11-openjdk ]] && [[ -d /usr/local/openjdk-11 ]]; then mkdir -p /usr/lib/jvm; ln -s /usr/local/openjdk-11 /usr/lib/jvm/java-11-openjdk; fi;
+    if [[ "$(whoami)" == "root" ]] && [[ ! -d /usr/lib/jvm/java-11-openjdk ]] && [[ -d /docker-java-home ]]; then mkdir -p /usr/lib/jvm; ln -s /docker-java-home /usr/lib/jvm/java-11-openjdk; fi;
   - |
-    export CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="true";
+    export CI_OPT_MVN_MULTI_STAGE_BUILD="true";
     source circ.sh;
   #- export CI_OPT_CI_SCRIPT="${CI_OPT_GIT_PREFIX}/${CI_PROJECT_PATH:-ci-and-cd/maven-build}/raw/${CI_COMMIT_REF_NAME:-develop}/src/main/ci-script/lib_ci.sh";
   #- |
@@ -146,9 +158,13 @@ analysis:
   stage: analysis
   script:
     - |
-      if [ -f untracked.zip ]; then unzip -P ${ARCHIVE_PASS:-pass} untracked.zip; fi; ls -ahl;
+      if type -p zip > /dev/null && type -p unzip > /dev/null; then
+        if [ -f untracked.zip ]; then unzip -P ${ARCHIVE_PASS:-pass} untracked.zip; fi; ls -ahl;
+      else
+        if [ -f untracked.tar.gz ]; then tar -xzf untracked.tar.gz; fi; ls -ahl;
+      fi;
 
-      time CI_OPT_SONAR="true" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp sonar:sonar;
+      time ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp sonar:sonar;
       if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
   variables:
     GIT_STRATEGY: fetch

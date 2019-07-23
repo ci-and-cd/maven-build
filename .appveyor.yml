@@ -25,10 +25,10 @@ environment:
 
   CI_OPT_GPG_PASSPHRASE:
     secure: 9W3TKuaDpCwfEF8yNbbbNCaelmjnZqHdxUqfITdKTWM=
-#  CI_OPT_OSSRH_DOCKER_REGISTRY_PASS:
-#    secure:
-#  CI_OPT_OSSRH_DOCKER_REGISTRY_USER:
-#    secure:
+  #CI_OPT_OSSRH_DOCKER_REGISTRY_PASS:
+  #  secure:
+  #CI_OPT_OSSRH_DOCKER_REGISTRY_USER:
+  #  secure:
   CI_OPT_OSSRH_GIT_AUTH_TOKEN:
     secure: b8+kCKw7dSSIWSmdlsRzDKz9m5xU3BO1uBzd4voLqDmbGn+pVQxOQzpEzqNqw0xq
   CI_OPT_OSSRH_MVNSITE_PASSWORD:
@@ -60,14 +60,14 @@ install:
   # Settings -> Environment -> Environment variables -> Add variable
   # CI_OPT_ORIGIN_REPO_SLUG
   - sh: |
-      export CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="false";
-      source circ.sh;
-  - sh: |
       # make AppVeyor's JDK path (/usr/lib/jvm/java-11-openjdk-amd64) compatible with travis-ci's style (/usr/lib/jvm/java-11-openjdk) to make toolchains.xml valid
       if [[ -d /usr/lib/jvm/java-8-openjdk-amd64 ]]; then sudo ln -s /usr/lib/jvm/java-8-openjdk-amd64 /usr/lib/jvm/java-8-openjdk; fi;
       if [[ -d /usr/lib/jvm/java-11-openjdk-amd64 ]]; then sudo ln -s /usr/lib/jvm/java-11-openjdk-amd64 /usr/lib/jvm/java-11-openjdk; fi;
       export JAVA_HOME="/usr/lib/jvm/java-8-openjdk";
       export PATH="$JAVA_HOME:$PATH";
+  - sh: |
+      export CI_OPT_MVN_MULTI_STAGE_BUILD="false";
+      source circ.sh;
   #  A host on cloud
   #sudo adduser --home /restricted/rsync_user rsync_user;
   #
@@ -90,15 +90,15 @@ install:
       sshpass -p "${RSYNC_PASSWORD}" rsync -r -a -v -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" rsync_user@infra.top:/restricted/rsync_user/m2_repository/ /home/appveyor/.m2/repository > /dev/null;
       du -sh /home/appveyor/.m2/repository;
       ls -ahl /home/appveyor/.m2/repository/;
-#  - sh: |
-#      echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
-#      mkdir -p $(dirname ${SETTINGS_GLOBAL_XML});
-#      curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | dd of=${SETTINGS_GLOBAL_XML}; cat ${SETTINGS_GLOBAL_XML};
-#      export MAVEN_GLOBAL_SETTINGS="--global-settings ${SETTINGS_GLOBAL_XML}";
+  #- sh: |
+  #    echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
+  #    mkdir -p $(dirname ${SETTINGS_GLOBAL_XML});
+  #    curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | dd of=${SETTINGS_GLOBAL_XML}; cat ${SETTINGS_GLOBAL_XML};
+  #    export MAVEN_GLOBAL_SETTINGS="--global-settings ${SETTINGS_GLOBAL_XML}";
   - sh: |
-      rm -rf ~/.m2/repository/top/infra/maven;
-      if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:+UseParallelGC -Dprofile=title -DprofileFormat=JSON,HTML"; fi;
-      ls -ahl ~/.m2;
+      if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:+UseParallelGC -Dmaven.repo.local=.m2/repository -Dprofile=title -DprofileFormat=JSON,HTML"; fi;
+      if [[ -d ${HOME}/.m2 ]]; then rm -rf ${HOME}/.m2/repository/top/infra/maven; ls -ahl ${HOME}/.m2; fi;
+      export MAVEN_USER_HOME="${PWD}/.m2";
       ./mvnw ${MAVEN_GLOBAL_SETTINGS} -version;
 #  - sh: |
 #      unset M2_HOME;
@@ -135,7 +135,7 @@ test_script:
         time CI_OPT_SONAR="true" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -U clean deploy;
         if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
 
-        time CI_OPT_FAST="true" CI_OPT_INFRASTRUCTURE="custom" CI_OPT_MAVEN_PACKAGES_SKIP="true" CI_OPT_NEXUS2_STAGING="false" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -Dmaven.install.skip=true deploy;
+        time CI_OPT_FAST="true" CI_OPT_INFRASTRUCTURE="custom" CI_OPT_MVN_MULTI_STAGE_BUILD="true" CI_OPT_NEXUS2_STAGING="false" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp deploy;
         if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
 
         time ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp site-deploy;

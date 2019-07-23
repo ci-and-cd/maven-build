@@ -26,35 +26,35 @@ before_install:
   # CI_OPT_OSSRH_NEXUS2_PASS
   # CI_OPT_OSSRH_NEXUS2_USER
   # CI_OPT_OSSRH_SONAR_LOGIN
-  - export CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="false";
-    source circ.sh;
-#  - export CI_OPT_CI_SCRIPT="${CI_OPT_GIT_PREFIX}/${TRAVIS_REPO_SLUG:-ci-and-cd/maven-build}/raw/${TRAVIS_BRANCH:-develop}/src/main/ci-script/lib_ci.sh";
-#  - ls -ahl /usr/lib/jvm/;
-#  - if [[ -d /usr/lib/jvm/java-8-oracle ]]; then sudo ln -s /usr/lib/jvm/java-8-oracle /usr/lib/jvm/java-8-openjdk; fi;
   - if [[ -d /usr/lib/jvm/java-8-openjdk-amd64 ]]; then sudo ln -s /usr/lib/jvm/java-8-openjdk-amd64 /usr/lib/jvm/java-8-openjdk; fi;
-  - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh;
-    bash install-jdk.sh -F 11 --target $HOME/openjdk11 --workspace $HOME/.cache/install-jdk;
+    if [[ -d /usr/lib/jvm/java-11-openjdk-amd64 ]]; then sudo ln -s /usr/lib/jvm/java-11-openjdk-amd64 /usr/lib/jvm/java-11-openjdk; fi;
+  #- if [[ -d /usr/lib/jvm/java-8-oracle ]]; then sudo ln -s /usr/lib/jvm/java-8-oracle /usr/lib/jvm/java-8-openjdk; fi;
+  #- ls -ahl /usr/lib/jvm/;
+  - curl -sSL https://github.com/sormuras/bach/raw/master/install-jdk.sh | bash -s -- -F 11 --target $HOME/openjdk11 --workspace $HOME/.cache/install-jdk;
     if [[ -d $HOME/openjdk11 ]]; then sudo ln -s $HOME/openjdk11 /usr/lib/jvm/java-11-openjdk; fi;
   - export JAVA_HOME="/usr/lib/jvm/java-8-openjdk";
-#  - echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
-#    mkdir -p $(dirname ${SETTINGS_GLOBAL_XML});
-#    curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | tee ${SETTINGS_GLOBAL_XML};
-#    export MAVEN_GLOBAL_SETTINGS="--global-settings ${SETTINGS_GLOBAL_XML}";
-  - rm -rf ~/.m2/repository/top/infra/maven;
-    if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:+UseParallelGC -Dprofile=title -DprofileFormat=JSON,HTML"; fi;
-    ls -ahl ~/.m2;
+  - export CI_OPT_MVN_MULTI_STAGE_BUILD="false";
+    source circ.sh;
+  #- export CI_OPT_CI_SCRIPT="${CI_OPT_GIT_PREFIX}/${TRAVIS_REPO_SLUG:-ci-and-cd/maven-build}/raw/${TRAVIS_BRANCH:-develop}/src/main/ci-script/lib_ci.sh";
+  #- echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
+  #  mkdir -p $(dirname ${SETTINGS_GLOBAL_XML});
+  #  curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | tee ${SETTINGS_GLOBAL_XML};
+  #  export MAVEN_GLOBAL_SETTINGS="--global-settings ${SETTINGS_GLOBAL_XML}";
+  - if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:+UseParallelGC -Dmaven.repo.local=.m2/repository -Dprofile=title -DprofileFormat=JSON,HTML"; fi;
+    if [[ -d ${HOME}/.m2 ]]; then rm -rf ${HOME}/.m2/repository/top/infra/maven; ls -ahl ${HOME}/.m2; fi;
+    export MAVEN_USER_HOME="${PWD}/.m2";
     ./mvnw ${MAVEN_GLOBAL_SETTINGS} -version;
-#  - aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -o apache-maven-3.6.1-bin.zip https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.zip && unzip -qq apache-maven-3.6.1-bin.zip;
-#    export M2_HOME="$PWD/apache-maven-3.6.1";
-#    export PATH="$M2_HOME/bin:$PATH";
-#  # see: https://github.com/travis-ci/travis.rb
-#  - if [[ "${CLEAN_TRAVIS_LOGS}" == "true" ]]; then
-#      ruby -v; gem install travis -v 1.8.10 --no-rdoc --no-ri; travis version;
-#      travis login --github-token ${CI_OPT_OSSRH_GIT_AUTH_TOKEN} --org;
-#      LAST_BUILD_NUMBER=$(print '\n' | travis history --limit 10 --org | head -n1 | cut -d" " -f1 | cut -c2-);
-#      echo "LAST_BUILD_NUMBER [${LAST_BUILD_NUMBER}]";
-#      for bn in $(seq 1 ${LAST_BUILD_NUMBER} ); do print '\n' | travis logs ${bn} --delete --force --org; done;
-#    fi;
+  #- aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -o apache-maven-3.6.1-bin.zip https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.zip && unzip -qq apache-maven-3.6.1-bin.zip;
+  #  export M2_HOME="$PWD/apache-maven-3.6.1";
+  #  export PATH="$M2_HOME/bin:$PATH";
+  ## see: https://github.com/travis-ci/travis.rb
+  #- if [[ "${CLEAN_TRAVIS_LOGS}" == "true" ]]; then
+  #    ruby -v; gem install travis -v 1.8.10 --no-rdoc --no-ri; travis version;
+  #    travis login --github-token ${CI_OPT_OSSRH_GIT_AUTH_TOKEN} --org;
+  #    LAST_BUILD_NUMBER=$(print '\n' | travis history --limit 10 --org | head -n1 | cut -d" " -f1 | cut -c2-);
+  #    echo "LAST_BUILD_NUMBER [${LAST_BUILD_NUMBER}]";
+  #    for bn in $(seq 1 ${LAST_BUILD_NUMBER} ); do print '\n' | travis logs ${bn} --delete --force --org; done;
+  #  fi;
 branches:
   only:
     #- master # do nothing on master branch
@@ -80,7 +80,8 @@ group: edge
 install: true
 jdk:
   - openjdk8
-#  - oraclejdk9
+  #- openjdk11
+  #- oraclejdk9
 #language: java
 language: ruby
 rvm:
@@ -93,7 +94,7 @@ script:
       time CI_OPT_SONAR="true" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -U clean deploy;
       if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
 
-      time CI_OPT_FAST="true" CI_OPT_INFRASTRUCTURE="custom" CI_OPT_MAVEN_PACKAGES_SKIP="true" CI_OPT_NEXUS2_STAGING="false" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -Dmaven.install.skip=true deploy;
+      time CI_OPT_FAST="true" CI_OPT_INFRASTRUCTURE="custom" CI_OPT_MVN_MULTI_STAGE_BUILD="true" CI_OPT_NEXUS2_STAGING="false" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp deploy;
       if type -p column > /dev/null; then find .mvn/profiler-report -name "*.json" | xargs cat | jq -r '.projects[]|"module:", .project, "plugins", (.mojos[]|[.mojo,.time]|@tsv)' | column -t; fi; rm -rf .mvn/profiler-report;
 
       time ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp site-deploy;

@@ -1668,7 +1668,7 @@
             <id>mvn_multi_stage-wagon_repository-clean-run-on-multi_module_root_only</id>
             <activation>
                 <file><exists>${wagon.merge-maven-repos.source}</exists></file>
-                <property><name>mvn.deploy.publish.segregation</name><value>true</value></property>
+                <property><name>mvn.multi.stage.build</name><value>true</value></property>
             </activation>
             <build>
                 <plugins>
@@ -1755,7 +1755,7 @@
             <id>mvn_multi_stage-merge_maven_repos-deploy-run-on-multi_module_root_only</id>
             <activation>
                 <file><exists>${wagon.merge-maven-repos.source}</exists></file>
-                <property><name>mvn.deploy.publish.segregation.goal.deploy</name><value>true</value></property>
+                <property><name>mvn.multi.stage.build.goal.deploy</name><value>true</value></property>
             </activation>
             <build>
                 <plugins>
@@ -1846,10 +1846,10 @@
                                 <configuration>
                                     <target>
                                         <echo message="altDeploymentRepository: ${altDeploymentRepository}"/>
-                                        <echo message="mvn.deploy.publish.segregation.goal: ${mvn.deploy.publish.segregation.goal}"/>
-                                        <echo message="mvn.deploy.publish.segregation.goal.deploy: ${mvn.deploy.publish.segregation.goal.deploy}"/>
-                                        <echo message="mvn.deploy.publish.segregation.goal.install: ${mvn.deploy.publish.segregation.goal.install}"/>
-                                        <echo message="mvn.deploy.publish.segregation.goal.package: ${mvn.deploy.publish.segregation.goal.package}"/>
+                                        <echo message="mvn.multi.stage.build.goal: ${mvn.multi.stage.build.goal}"/>
+                                        <echo message="mvn.multi.stage.build.goal.deploy: ${mvn.multi.stage.build.goal.deploy}"/>
+                                        <echo message="mvn.multi.stage.build.goal.install: ${mvn.multi.stage.build.goal.install}"/>
+                                        <echo message="mvn.multi.stage.build.goal.package: ${mvn.multi.stage.build.goal.package}"/>
                                         <echo message="gitRef: ${gitRef}"/>
                                         <echo message="wagon.merge-maven-repos.source: ${wagon.merge-maven-repos.source}"/>
                                         <echo message="wagon.merge-maven-repos.target: ${wagon.merge-maven-repos.target}"/>
@@ -3282,7 +3282,7 @@
             <id>dockerfile-maven-plugin-lifecycle-binding-on-mvn_multi_stage-deploy</id>
             <activation>
                 <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
-                <property><name>mvn.deploy.publish.segregation.goal.deploy</name><value>true</value></property>
+                <property><name>mvn.multi.stage.build.goal.deploy</name><value>true</value></property>
             </activation>
             <build>
                 <pluginManagement>
@@ -3321,7 +3321,7 @@
             <id>dockerfile_maven_plugin-lifecycle_binding-on-mvn_multi_stage-package</id>
             <activation>
                 <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
-                <property><name>mvn.deploy.publish.segregation.goal.package</name><value>true</value></property>
+                <property><name>mvn.multi.stage.build.goal.package</name><value>true</value></property>
             </activation>
             <build>
                 <pluginManagement>
@@ -3360,7 +3360,7 @@
             <id>dockerfile_maven_plugin-lifecycle_binding-when-mvn_multi_stage-absent</id>
             <activation>
                 <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
-                <property><name>!mvn.deploy.publish.segregation</name></property>
+                <property><name>!mvn.multi.stage.build</name></property>
             </activation>
             <build>
                 <pluginManagement>
@@ -3413,7 +3413,7 @@
             <id>dockerfile_maven_plugin-lifecycle_binding-when-not-mvn_multi_stage</id>
             <activation>
                 <file><exists>${basedir}/src/main/resources/docker/Dockerfile</exists></file>
-                <property><name>mvn.deploy.publish.segregation</name><value>false</value></property>
+                <property><name>mvn.multi.stage.build</name><value>false</value></property>
             </activation>
             <build>
                 <pluginManagement>
