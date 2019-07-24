@@ -29,14 +29,14 @@ assert_log "alter_mvn result: mvn -Dxxx=yyy clean compile package" "alter_mvn re
 
 rm -f ${TEST_LOG}
 exec 3> >(tee ${TEST_LOG})
-CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="true" \
+CI_OPT_MVN_MULTI_STAGE_BUILD="true" \
 ./src/main/ci-script/lib_ci.sh mvn clean install >&3
 assert_log "alter_mvn result: mvn clean org.apache.maven.plugins:maven-antrun-plugin:run@wagon-repository-clean deploy" "alter_mvn result: "
 
 
 rm -f ${TEST_LOG}
 exec 3> >(tee ${TEST_LOG})
-CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="true" \
+CI_OPT_MVN_MULTI_STAGE_BUILD="true" \
 CI_OPT_MAVEN_CLEAN_SKIP="true" \
 CI_OPT_SKIPITS="true" \
 CI_OPT_MAVEN_TEST_SKIP="true" \
@@ -49,7 +49,7 @@ assert_log "CI_OPT_MAVEN_TEST_SKIP=true" "^CI_OPT_MAVEN_TEST_SKIP="
 
 rm -f ${TEST_LOG}
 exec 3> >(tee ${TEST_LOG})
-CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="true" \
+CI_OPT_MVN_MULTI_STAGE_BUILD="true" \
 CI_OPT_DOCKER="true" \
 ./src/main/ci-script/lib_ci.sh mvn deploy >&3
 assert_log "alter_mvn result: mvn org.codehaus.mojo:wagon-maven-plugin:merge-maven-repos@merge-maven-repos-deploy docker:build docker:push" "alter_mvn result: "

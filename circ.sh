@@ -7,7 +7,7 @@ export CI_OPT_INFRASTRUCTURE="${CI_OPT_INFRASTRUCTURE:-ossrh}";
 export GIT_HOST="${GIT_HOST:-github.com}";
 if [[ -z "${GIT_PREFIX}" ]]; then export GIT_PREFIX="https://${GIT_HOST}"; fi;
 export CI_OPT_GPG_KEYNAME="${CI_OPT_GPG_KEYNAME:-59DBF10E}";
-export CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION="${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION:-false}";
+export CI_OPT_MVN_MULTI_STAGE_BUILD="${CI_OPT_MVN_MULTI_STAGE_BUILD:-false}";
 export CI_OPT_NEXUS2_STAGING="${CI_OPT_NEXUS2_STAGING:-true}";
 
 if [[ -n "${APPVEYOR_REPO_BRANCH}" ]]; then export APPVEYOR_ENABLED="${APPVEYOR_ENABLED:-true}"; fi;
@@ -46,8 +46,8 @@ if [[ -z "${CI_OPT_MAVEN_BUILD_OPTS_REPO_REF}" ]]; then
   if [[ "${GITLAB_CI}" == "true" ]]; then export CI_OPT_MAVEN_BUILD_OPTS_REPO_REF="${CI_COMMIT_REF_NAME:-develop}"; fi;
   if [[ "${TRAVIS_ENABLED}" == "true" ]]; then export CI_OPT_MAVEN_BUILD_OPTS_REPO_REF="${TRAVIS_BRANCH:-develop}"; fi;
 fi;
-#if [[ "${APPVEYOR_ENABLED}" == "true" ]]; then export SETTINGS_GLOBAL_XML="${SETTINGS_GLOBAL_XML:-/home/appveyor/.m2/wrapper/dists/topinfra-maven-dist-1.0.7/6dv6lgbl0mm4742pq28idhmlc9/apache-maven-3.6.1/conf/settings.xml}"; fi;
-##if [[ "${GITLAB_CI}" == "true" ]]; then export SETTINGS_GLOBAL_XML="${SETTINGS_GLOBAL_XML:-/var/lib/gitlab-runner/.m2/wrapper/dists/topinfra-maven-dist-1.0.7/6dv6lgbl0mm4742pq28idhmlc9/apache-maven-3.6.1/conf/settings.xml}"; fi;
+#if [[ "${APPVEYOR_ENABLED}" == "true" ]]; then export SETTINGS_GLOBAL_XML="${SETTINGS_GLOBAL_XML:-/home/appveyor/.m2/wrapper/dists/topinfra-maven-dist-1.1.0/7jnr0a9ojtoufj0nkcpl5pcdo1/apache-maven-3.6.1/conf/settings.xml}"; fi;
+##if [[ "${GITLAB_CI}" == "true" ]]; then export SETTINGS_GLOBAL_XML="${SETTINGS_GLOBAL_XML:-/var/lib/gitlab-runner/.m2/wrapper/dists/topinfra-maven-dist-1.1.0/7jnr0a9ojtoufj0nkcpl5pcdo1/apache-maven-3.6.1/conf/settings.xml}"; fi;
 #if [[ "${GITLAB_CI}" == "true" ]]; then export SETTINGS_GLOBAL_XML="${SETTINGS_GLOBAL_XML:-/tmp/settings-global-${CI_COMMIT_SHA}.xml}"; fi;
-#if [[ "${TRAVIS_ENABLED}" == "true" ]]; then export SETTINGS_GLOBAL_XML="${SETTINGS_GLOBAL_XML:-/home/travis/.m2/wrapper/dists/topinfra-maven-dist-1.0.7/6dv6lgbl0mm4742pq28idhmlc9/apache-maven-3.6.1/conf/settings.xml}"; fi;
+#if [[ "${TRAVIS_ENABLED}" == "true" ]]; then export SETTINGS_GLOBAL_XML="${SETTINGS_GLOBAL_XML:-/home/travis/.m2/wrapper/dists/topinfra-maven-dist-1.1.0/7jnr0a9ojtoufj0nkcpl5pcdo1/apache-maven-3.6.1/conf/settings.xml}"; fi;
 #export SETTINGS_GLOBAL_XML_URL="${CI_OPT_MAVEN_BUILD_OPTS_REPO}/raw/${CI_OPT_MAVEN_BUILD_OPTS_REPO_REF}/src/main/maven/settings-global.xml";

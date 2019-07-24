@@ -18,7 +18,7 @@
 
 Parent pom for maven based jar, war and docker projects
 
-maven-build support code environment segregation and build deploy segregation.  
+maven-build support multi-infrastructure and multi-stage (package deploy/publish segregation) build or deploy.  
 
 
 ## I. Usage
@@ -52,9 +52,9 @@ mvn coreext:check
 mvn coreext:install
 ```
 
-if src/main/resources/Dockerfile absent or CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION=true (use script),
+if src/main/resources/Dockerfile absent or CI_OPT_MVN_MULTI_STAGE_BUILD=true (use script),
 no docker image is built at package phase.
-see profile 'dockerfile_maven_plugin-lifecycle_binding-when-not-publish_deploy_segregation' in pom.xml.
+see profile 'dockerfile_maven_plugin-lifecycle_binding-when-not-mvn_multi_stage' in pom.xml.
 
 You need to provide few properties and environment variables, see next chapter.
 
@@ -259,8 +259,8 @@ git-commit-id
 > Generate src/main/resources/git.properties.
 activate automatically if '${maven.multiModuleProjectDirectory}/.git/HEAD' exists
 
-mvn-deploy-publish-segregation-by-wagon
-> activate by set 'mvn.deploy.publish.segregation' to 'true'
+mvn_multi_stage-merge_maven_repos-deploy-run-on-multi_module_root_only
+> activate by set 'mvn.multi.stage.build.goal.deploy' to 'true'
 
 jacoco-build
 > Test coverage report.
@@ -316,8 +316,8 @@ env.CI_OPT_GITHUB_GLOBAL_REPOSITORYOWNER
 
 ### 4. docker
 
-dockerfile_maven_plugin-lifecycle_binding-when-not-publish_deploy_segregation
-> activate by property 'mvn.deploy.publish.segregation' absent
+dockerfile_maven_plugin-lifecycle_binding-when-not-mvn_multi_stage
+> activate by property 'mvn.multi.stage.build' absent
 build and push docker image automatically
 
 ## V. Repositories

@@ -140,7 +140,7 @@ if [[ -z ${CI_OPT_JIRA_PASSWORD+x} ]]; then CI_OPT_JIRA_PASSWORD=""; fi
 if [[ -z ${CI_OPT_JIRA_PROJECTKEY+x} ]]; then CI_OPT_JIRA_PROJECTKEY=""; fi
 if [[ -z ${CI_OPT_JIRA_USER+x} ]]; then CI_OPT_JIRA_USER=""; fi
 if [[ -z ${CI_OPT_MAVEN_OPTS+x} ]]; then CI_OPT_MAVEN_OPTS=""; fi
-if [[ -z ${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION+x} ]]; then CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION=""; fi
+if [[ -z ${CI_OPT_MVN_MULTI_STAGE_BUILD+x} ]]; then CI_OPT_MVN_MULTI_STAGE_BUILD=""; fi
 if [[ -z ${CI_OPT_PMD_RULESET_LOCATION+x} ]]; then CI_OPT_PMD_RULESET_LOCATION=""; fi
 if [[ -z ${CI_OPT_SITE+x} ]]; then CI_OPT_SITE="true"; fi
 if [[ -z ${CI_OPT_SITE_PATH_PREFIX+x} ]]; then CI_OPT_SITE_PATH_PREFIX=""; fi
@@ -638,7 +638,7 @@ function ci_opt_maven_opts() {
         if [[ "${CI_OPT_JACOCO}" == "true" ]]; then opts="${opts} -Djacoco=true"; elif [[ "${CI_OPT_JACOCO}" == "false" ]]; then opts="${opts} -Djacoco=false"; fi
         if [[ "${CI_OPT_MAVEN_TEST_FAILURE_IGNORE}" == "true" ]]; then opts="${opts} -Dmaven.test.failure.ignore=true"; fi
         if [[ "${CI_OPT_MAVEN_TEST_SKIP}" == "true" ]]; then opts="${opts} -Dmaven.test.skip=true"; else opts="${opts} -Dmaven.test.skip=false"; fi
-        if [[ "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]]; then opts="${opts} -Dmvn.deploy.publish.segregation=true"; fi
+        if [[ "${CI_OPT_MVN_MULTI_STAGE_BUILD}" == "true" ]]; then opts="${opts} -Dmvn.multi.stage.build=true"; fi
         if [[ -n "${CI_OPT_PMD_RULESET_LOCATION}" ]]; then opts="${opts} -Dpmd.ruleset.location=${CI_OPT_PMD_RULESET_LOCATION}"; fi
         opts="${opts} -Dsite=$(ci_opt_site)"
         opts="${opts} -Dsite.path=$(ci_opt_site_path_prefix)/$(ci_opt_publish_channel)"
@@ -767,8 +767,8 @@ function alter_mvn() {
             if [[ "${element}" == *deploy ]] && [[ "${element}" != *site* ]]; then
             # deploy, site-deploy, push (docker)
                 if [[ "$(ci_opt_publish_to_repo)" == "true" ]]; then
-                    if [[ "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]]; then
-                    # maven deploy and publish segregation
+                    if [[ "${CI_OPT_MVN_MULTI_STAGE_BUILD}" == "true" ]]; then
+                    # maven multi stage build
                         goals+=("org.codehaus.mojo:wagon-maven-plugin:merge-maven-repos@merge-maven-repos-deploy")
                         if [[ "$(ci_opt_use_docker)" == "true" ]]; then goals+=("dockerfile:push"); fi
                     else
@@ -786,8 +786,8 @@ function alter_mvn() {
                 fi
             elif ([[ "${element}" == *clean ]] || [[ "${element}" == *install ]]); then
             # goals need to alter
-                if [[ "${CI_OPT_MVN_DEPLOY_PUBLISH_SEGREGATION}" == "true" ]]; then
-                # maven deploy and publish segregation
+                if [[ "${CI_OPT_MVN_MULTI_STAGE_BUILD}" == "true" ]]; then
+                # maven multi stage build
                     if [[ "${element}" == *clean ]]; then
                         goals+=("clean")
                         goals+=("org.apache.maven.plugins:maven-antrun-plugin:run@wagon-repository-clean")
