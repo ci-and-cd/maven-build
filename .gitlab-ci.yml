@@ -4,7 +4,7 @@
 
 # Tag image and services are for executor "docker". Executor "bash" does not awared of these tags.
 #docker run --rm -it -v /path/to/config:/etc/gitlab-runner --name gitlab-runner gitlab/gitlab-runner:alpine-v12.1.0 register --executor "docker" --docker-image alpine:3 --url "https://gitlab.com/" --registration-token "PROJECT_REGISTRATION_TOKEN" --description "docker-runner" --tag-list "dev" --run-untagged --locked="true"
-image: openjdk:11.0.2
+image: cirepo/gitlab-runner:12.1.0-en_US.UTF-8_Etc.UTC-bionic
 services:
   - docker:dind
 
