@@ -73,6 +73,7 @@
             <releases><enabled>false</enabled></releases>
             <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
         </repository>
+        <!-- 404 - Repository "Third Party Releases" [id=third-party-releases] exists but is not exposed.
         <repository>
             <id>ossrh-nexus2-thirdparty</id>
             <name>central thirdparty</name>
@@ -80,6 +81,7 @@
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </repository>
+        -->
         <!-- Repo jvnet is for java.xml.bind (org.glassfish.jaxb:jaxb-runtime:2.4.0-b180608.0325) that removed in JDK 11 by JEP-320 -->
         <repository>
             <id>jvnet-nexus-staging</id>
@@ -130,13 +132,6 @@
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
             <releases><enabled>false</enabled></releases>
             <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>ossrh-nexus2-thirdparty</id>
-            <name>central thirdparty</name>
-            <url>https://oss.sonatype.org/content/repositories/third-party-releases/</url>
-            <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
-            <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
         <pluginRepository>
             <id>github-mvn-repo-github-maven-plugins</id>
@@ -392,6 +387,12 @@
         <custom.nexus3>https://nexus3.infra.top/nexus/</custom.nexus3>
         <custom.pmd.ruleset.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/pmd/pmd-ruleset-6.8.0.xml</custom.pmd.ruleset.location>
         <custom.sonar.host.url>https://sonarcloud.io</custom.sonar.host.url>
+        <custom.repository.url>${custom.nexus3}repository/maven-releases/</custom.repository.url>
+        <custom.snapshotRepository.url>${custom.nexus3}repository/maven-snapshots/</custom.snapshotRepository.url>
+        <custom.mvnsite.url>dav:${custom.nexus3}repository/mvnsite/${site.path}/</custom.mvnsite.url>
+        <custom.repository.releases.url>${custom.nexus3}repository/maven-releases/</custom.repository.releases.url>
+        <custom.repository.snapshots.url>${custom.nexus3}repository/maven-snapshots/</custom.repository.snapshots.url>
+        <custom.repository.third-party.url>${custom.nexus3}repository/maven-thirdparty/</custom.repository.third-party.url>
 
         <ossrh.checkstyle.config.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/checkstyle/google_checks_8.10.xml</ossrh.checkstyle.config.location>
         <ossrh.docker.registry.url>https://docker.io/v2/</ossrh.docker.registry.url>
@@ -401,6 +402,12 @@
         <ossrh.nexus3>https://nexus3.infra.top/nexus/</ossrh.nexus3>
         <ossrh.pmd.ruleset.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/pmd/pmd-ruleset-6.8.0.xml</ossrh.pmd.ruleset.location>
         <ossrh.sonar.host.url>https://sonarcloud.io</ossrh.sonar.host.url>
+        <ossrh.repository.url>${ossrh.nexus2}service/local/staging/deploy/maven2/</ossrh.repository.url>
+        <ossrh.snapshotRepository.url>${ossrh.nexus2}content/repositories/snapshots/</ossrh.snapshotRepository.url>
+        <ossrh.mvnsite.url>dav:${ossrh.nexus3}repository/mvnsite/${site.path}/</ossrh.mvnsite.url>
+        <ossrh.repository.releases.url>${ossrh.nexus2}content/repositories/releases/</ossrh.repository.releases.url>
+        <ossrh.repository.snapshots.url>${ossrh.nexus2}content/repositories/snapshots/</ossrh.repository.snapshots.url>
+        <!--<ossrh.repository.third-party.url></ossrh.repository.third-party.url>-->
 
         <local.checkstyle.config.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/checkstyle/google_checks_8.10.xml</local.checkstyle.config.location>
         <local.docker.registry.url>http://nexus3:5000/v2/</local.docker.registry.url>
@@ -410,6 +417,12 @@
         <local.nexus3>http://nexus3:38081/nexus/</local.nexus3>
         <local.sonar.host.url>http://sonarqube:9000</local.sonar.host.url>
         <local.pmd.ruleset.location>https://github.com/ci-and-cd/maven-build/raw/master/src/main/pmd/pmd-ruleset-6.8.0.xml</local.pmd.ruleset.location>
+        <local.repository.url>${local.nexus3}repository/maven-releases/</local.repository.url>
+        <local.snapshotRepository.url>${local.nexus3}repository/maven-snapshots/</local.snapshotRepository.url>
+        <local.mvnsite.url>dav:${local.nexus3}repository/mvnsite/${site.path}/</local.mvnsite.url>
+        <local.repository.releases.url>${local.nexus3}repository/maven-releases/</local.repository.releases.url>
+        <local.repository.snapshots.url>${local.nexus3}repository/maven-snapshots/</local.repository.snapshots.url>
+        <local.repository.third-party.url>${local.nexus3}repository/maven-thirdparty/</local.repository.third-party.url>
     </properties>
 
     <build>
@@ -3599,28 +3612,28 @@
             <id>infrastructure_custom</id>
             <activation><property><name>infrastructure</name><value>custom</value></property></activation>
             <distributionManagement>
-                <repository><id>custom-nexus3-releases</id><url>${custom.nexus3}repository/maven-releases/</url></repository>
-                <snapshotRepository><id>custom-nexus3-snapshots</id><url>${custom.nexus3}repository/maven-snapshots/</url></snapshotRepository>
+                <repository><id>custom-nexus3-releases</id><url>${custom.repository.url}</url></repository>
+                <snapshotRepository><id>custom-nexus3-snapshots</id><url>${custom.snapshotRepository.url}</url></snapshotRepository>
             </distributionManagement>
             <pluginRepositories>
                 <pluginRepository>
                     <id>custom-nexus3-releases</id>
                     <name>custom nexus3 releases</name>
-                    <url>${custom.nexus3}repository/maven-releases/</url>
+                    <url>${custom.repository.releases.url}</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </pluginRepository>
                 <pluginRepository>
                     <id>custom-nexus3-snapshots</id>
                     <name>custom nexus3 snapshots</name>
-                    <url>${custom.nexus3}repository/maven-snapshots/</url>
+                    <url>${custom.repository.snapshots.url}</url>
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </pluginRepository>
                 <pluginRepository>
                     <id>custom-nexus3-thirdparty</id>
                     <name>custom nexus3 thirdparty</name>
-                    <url>${custom.nexus3}repository/maven-thirdparty/</url>
+                    <url>${custom.repository.third-party.url}</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </pluginRepository>
@@ -3640,21 +3653,21 @@
                 <repository>
                     <id>custom-nexus3-releases</id>
                     <name>custom nexus3 releases</name>
-                    <url>${custom.nexus3}repository/maven-releases/</url>
+                    <url>${custom.repository.releases.url}</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </repository>
                 <repository>
                     <id>custom-nexus3-snapshots</id>
                     <name>custom nexus3 snapshots</name>
-                    <url>${custom.nexus3}repository/maven-snapshots/</url>
+                    <url>${custom.repository.snapshots.url}</url>
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </repository>
                 <repository>
                     <id>custom-nexus3-thirdparty</id>
                     <name>custom nexus3 thirdparty</name>
-                    <url>${custom.nexus3}repository/maven-thirdparty/</url>
+                    <url>${custom.repository.third-party.url}</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </repository>
@@ -3665,7 +3678,7 @@
             <id>infrastructure_custom-dav-site</id>
             <activation><property><name>github.site.publish</name><value>false</value></property></activation>
             <distributionManagement>
-                <site><id>custom-nexus3-mvnsite</id><url>dav:${custom.nexus3}repository/mvnsite/${site.path}/</url></site>
+                <site><id>custom-mvnsite</id><url>${custom.mvnsite.url}</url></site>
             </distributionManagement>
         </profile>
 
@@ -3673,29 +3686,22 @@
             <id>infrastructure_ossrh</id>
             <activation><property><name>infrastructure</name><value>ossrh</value></property></activation>
             <distributionManagement>
-                <repository><id>ossrh-nexus2-staging</id><url>${ossrh.nexus2}service/local/staging/deploy/maven2/</url></repository>
-                <snapshotRepository><id>ossrh-nexus2-snapshots</id><url>${ossrh.nexus2}content/repositories/snapshots/</url></snapshotRepository>
+                <repository><id>ossrh-nexus2-staging</id><url>${ossrh.repository.url}</url></repository>
+                <snapshotRepository><id>ossrh-nexus2-snapshots</id><url>${ossrh.snapshotRepository.url}</url></snapshotRepository>
             </distributionManagement>
             <pluginRepositories>
                 <pluginRepository>
                     <id>ossrh-nexus2-releases</id>
                     <name>ossrh nexus2 releases</name>
-                    <url>${ossrh.nexus2}content/repositories/releases/</url>
+                    <url>${ossrh.repository.releases.url}</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </pluginRepository>
                 <pluginRepository>
                     <id>ossrh-nexus2-snapshots</id>
                     <name>ossrh nexus2 snapshots</name>
-                    <url>${ossrh.nexus2}content/repositories/snapshots/</url>
+                    <url>${ossrh.repository.snapshots.url}</url>
                     <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
-                </pluginRepository>
-                <pluginRepository>
-                    <id>ossrh-nexus2-thirdparty</id>
-                    <name>ossrh nexus2 thirdparty</name>
-                    <url>${ossrh.nexus2}content/repositories/third-party-releases/</url>
-                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </pluginRepository>
             </pluginRepositories>
@@ -3714,22 +3720,15 @@
                 <repository>
                     <id>ossrh-nexus2-releases</id>
                     <name>ossrh nexus2 releases</name>
-                    <url>${ossrh.nexus2}content/repositories/releases/</url>
+                    <url>${ossrh.repository.releases.url}</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </repository>
                 <repository>
                     <id>ossrh-nexus2-snapshots</id>
                     <name>ossrh nexus2 snapshots</name>
-                    <url>${ossrh.nexus2}content/repositories/snapshots/</url>
+                    <url>${ossrh.repository.snapshots.url}</url>
                     <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
-                </repository>
-                <repository>
-                    <id>ossrh-nexus2-thirdparty</id>
-                    <name>ossrh nexus2 thirdparty</name>
-                    <url>${ossrh.nexus2}content/repositories/third-party-releases/</url>
-                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </repository>
             </repositories>
@@ -3739,7 +3738,7 @@
             <id>infrastructure_ossrh-dav-site</id>
             <activation><property><name>github.site.publish</name><value>false</value></property></activation>
             <distributionManagement>
-                <site><id>ossrh-nexus3-mvnsite</id><url>dav:${ossrh.nexus3}repository/mvnsite/${site.path}/</url></site>
+                <site><id>ossrh-mvnsite</id><url>${ossrh.mvnsite.url}</url></site>
             </distributionManagement>
         </profile>
 
@@ -3747,28 +3746,28 @@
             <id>infrastructure_local</id>
             <activation><property><name>infrastructure</name><value>local</value></property></activation>
             <distributionManagement>
-                <repository><id>local-nexus3-releases</id><url>${local.nexus3}repository/maven-releases/</url></repository>
-                <snapshotRepository><id>local-nexus3-snapshots</id><url>${local.nexus3}repository/maven-snapshots/</url></snapshotRepository>
+                <repository><id>local-nexus3-releases</id><url>${local.repository.url}</url></repository>
+                <snapshotRepository><id>local-nexus3-snapshots</id><url>${local.snapshotRepository.url}</url></snapshotRepository>
             </distributionManagement>
             <pluginRepositories>
                 <pluginRepository>
                     <id>local-nexus3-releases</id>
                     <name>local nexus3 releases</name>
-                    <url>${local.nexus3}repository/maven-releases/</url>
+                    <url>${local.repository.releases.url}</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </pluginRepository>
                 <pluginRepository>
                     <id>local-nexus3-snapshots</id>
                     <name>local nexus3 snapshots</name>
-                    <url>${local.nexus3}repository/maven-snapshots/</url>
+                    <url>${local.repository.snapshots.url}</url>
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </pluginRepository>
                 <pluginRepository>
                     <id>local-nexus3-thirdparty</id>
                     <name>local nexus3 thirdparty</name>
-                    <url>${local.nexus3}repository/maven-thirdparty/</url>
+                    <url>${local.repository.third-party.url}</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </pluginRepository>
@@ -3789,21 +3788,21 @@
                 <repository>
                     <id>local-nexus3-releases</id>
                     <name>local nexus3 releases</name>
-                    <url>${local.nexus3}repository/maven-releases/</url>
+                    <url>${local.repository.releases.url}</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </repository>
                 <repository>
                     <id>local-nexus3-snapshots</id>
                     <name>local nexus3 snapshots</name>
-                    <url>${local.nexus3}repository/maven-snapshots/</url>
+                    <url>${local.repository.snapshots.url}</url>
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </repository>
                 <repository>
                     <id>local-nexus3-thirdparty</id>
                     <name>local nexus3 thirdparty</name>
-                    <url>${local.nexus3}repository/maven-thirdparty/</url>
+                    <url>${local.repository.third-party.url}</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </repository>
@@ -3816,7 +3815,7 @@
             <distributionManagement>
                 <!-- scpexe uses privateKey, scp uses password -->
                 <!-- scpexe://${domain_or_ip}:22/path/to/sites -->
-                <site><id>local-nexus3-mvnsite</id><url>dav:${local.nexus3}repository/mvnsite/${site.path}/</url></site>
+                <site><id>local-mvnsite</id><url>${local.mvnsite.url}</url></site>
             </distributionManagement>
         </profile>
         <!-- @formatter:on -->
