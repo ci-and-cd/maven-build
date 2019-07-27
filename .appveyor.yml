@@ -47,15 +47,16 @@ environment:
   RSYNC_PASSWORD:
     secure: u1zNgVE8L//j/YW6mzcKbIgIegoqSYKPAfYAiMWEHds=
 
-image: Ubuntu1804
+image: ubuntu
+#image: Ubuntu1804
 
 #init:
 
 install:
   - ls -ahl;
   - sh: |
-      sudo apt-get update > /dev/null;
-      sudo apt-get install -yq --no-install-suggests --no-install-recommends aria2 gnupg2 graphviz openssl rsync sshpass whois > /dev/null;
+      sudo apt -y update > /dev/null;
+      sudo DEBIAN_FRONTEND=noninteractive apt -qq -y install aria2 gnupg2 graphviz openssl rsync sshpass whois --no-install-suggests --no-install-recommends;
   - whois $(curl ipinfo.io/ip);
   # Settings -> Environment -> Environment variables -> Add variable
   # CI_OPT_ORIGIN_REPO_SLUG
@@ -85,11 +86,11 @@ install:
   #sshpass -p "${RSYNC_PASSWORD}" rsync -r -a -v -e ssh --delete $(pwd)/.mvn/localRepository/ rsync_user@infra.top:/restricted/rsync_user/m2_repository;
   #rm -rf  $(pwd)/.mvn/localRepository/*;
   #sshpass -p "${RSYNC_PASSWORD}" rsync -r -a -v -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" rsync_user@infra.top:/restricted/rsync_user/m2_repository/ $(pwd)/.mvn/localRepository;
-  - sh: |
-      mkdir -p /home/appveyor/.m2/repository;
-      sshpass -p "${RSYNC_PASSWORD}" rsync -r -a -v -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" rsync_user@infra.top:/restricted/rsync_user/m2_repository/ /home/appveyor/.m2/repository > /dev/null;
-      du -sh /home/appveyor/.m2/repository;
-      ls -ahl /home/appveyor/.m2/repository/;
+  #- sh: |
+  #    mkdir -p /home/appveyor/.m2/repository;
+  #    sshpass -p "${RSYNC_PASSWORD}" rsync -r -a -v -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" rsync_user@infra.top:/restricted/rsync_user/m2_repository/ /home/appveyor/.m2/repository > /dev/null;
+  #    du -sh /home/appveyor/.m2/repository;
+  #    ls -ahl /home/appveyor/.m2/repository/;
   #- sh: |
   #    echo "download ${SETTINGS_GLOBAL_XML_URL} to ${SETTINGS_GLOBAL_XML}";
   #    mkdir -p $(dirname ${SETTINGS_GLOBAL_XML});
@@ -100,23 +101,23 @@ install:
       if [[ -d ${HOME}/.m2 ]]; then rm -rf ${HOME}/.m2/repository/top/infra/maven; ls -ahl ${HOME}/.m2; fi;
       export MAVEN_USER_HOME="${PWD}/.m2";
       ./mvnw ${MAVEN_GLOBAL_SETTINGS} -version;
-#  - sh: |
-#      unset M2_HOME;
-#      sudo mkdir -p /opt/maven;
-#      sudo aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -d /opt/maven -o apache-maven-3.6.1-bin.zip https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.zip && sudo unzip /opt/maven/apache-maven-3.6.1-bin.zip -d /opt/maven > /dev/null;
-#      sudo ln -sfn apache-maven-3.6.1 /opt/maven/latest;
-#      export M3_HOME="/opt/maven/latest";
-#      export PATH="$M3_HOME/bin:$PATH";
-#      echo "M3_HOME=$M3_HOME, PATH=$PATH";
-#  - sh: |
-#      sudo mkdir -p /opt/gradle;
-#      sudo aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -d /opt/gradle -o gradle-5.2.1-all.zip https://services.gradle.org/distributions/gradle-5.2.1-all.zip && sudo unzip /opt/gradle/gradle-5.2.1-all.zip -d /opt/gradle > /dev/null;
-#      sudo ln -sfn gradle-5.2.1 /opt/gradle/latest;
-#      ls -la /opt/gradle;
-#      ls -la /opt/gradle/latest/;
-#      export GRADLE_HOME="/opt/gradle/latest";
-#      export PATH="$GRADLE_HOME/bin:$PATH";
-#      echo "GRADLE_HOME=$GRADLE_HOME, PATH=$PATH";
+  #- sh: |
+  #    unset M2_HOME;
+  #    sudo mkdir -p /opt/maven;
+  #    sudo aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -d /opt/maven -o apache-maven-3.6.1-bin.zip https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.zip && sudo unzip /opt/maven/apache-maven-3.6.1-bin.zip -d /opt/maven > /dev/null;
+  #    sudo ln -sfn apache-maven-3.6.1 /opt/maven/latest;
+  #    export M3_HOME="/opt/maven/latest";
+  #    export PATH="$M3_HOME/bin:$PATH";
+  #    echo "M3_HOME=$M3_HOME, PATH=$PATH";
+  #- sh: |
+  #    sudo mkdir -p /opt/gradle;
+  #    sudo aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -d /opt/gradle -o gradle-5.2.1-all.zip https://services.gradle.org/distributions/gradle-5.2.1-all.zip && sudo unzip /opt/gradle/gradle-5.2.1-all.zip -d /opt/gradle > /dev/null;
+  #    sudo ln -sfn gradle-5.2.1 /opt/gradle/latest;
+  #    ls -la /opt/gradle;
+  #    ls -la /opt/gradle/latest/;
+  #    export GRADLE_HOME="/opt/gradle/latest";
+  #    export PATH="$GRADLE_HOME/bin:$PATH";
+  #    echo "GRADLE_HOME=$GRADLE_HOME, PATH=$PATH";
 
 services:
   - docker
@@ -126,10 +127,10 @@ services:
 stack: jdk 8
 
 test_script:
-# publish site onto github
-#  - sh: ./mvnw -e -ntp -U clean install sonar:sonar site deploy site-deploy;
-# publish site onto nexus3 raw repository by WebDAV
-#  - sh: ./mvnw -e -ntp -U clean install sonar:sonar site deploy site:stage site:stage-deploy;
+  # publish site onto github
+  #- sh: ./mvnw -e -ntp -U clean install sonar:sonar site deploy site-deploy;
+  # publish site onto nexus3 raw repository by WebDAV
+  #- sh: ./mvnw -e -ntp -U clean install sonar:sonar site deploy site:stage site:stage-deploy;
   - sh: |
       if [[ "${APPVEYOR_ENABLED}" == "true" ]]; then
         time CI_OPT_SONAR="true" ./mvnw ${MAVEN_GLOBAL_SETTINGS} -e -ntp -U clean deploy;
