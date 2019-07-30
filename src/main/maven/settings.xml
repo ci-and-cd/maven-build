@@ -130,7 +130,7 @@
 
     <servers>
         <!-- @formatter:off -->
-        <server><id>custom-nexus3-mvnsite</id><username>${env.CI_OPT_CUSTOM_NEXUS3_USER}</username><password>${env.CI_OPT_CUSTOM_NEXUS3_PASS}</password></server>
+        <server><id>custom-mvnsite</id><username>${env.CI_OPT_CUSTOM_NEXUS3_USER}</username><password>${env.CI_OPT_CUSTOM_NEXUS3_PASS}</password></server>
         <server><id>custom-nexus3-releases</id><username>${env.CI_OPT_CUSTOM_NEXUS3_USER}</username><password>${env.CI_OPT_CUSTOM_NEXUS3_PASS}</password></server>
         <server><id>custom-nexus3-snapshots</id><username>${env.CI_OPT_CUSTOM_NEXUS3_USER}</username><password>${env.CI_OPT_CUSTOM_NEXUS3_PASS}</password></server>
         <server><id>custom-nexus3-thirdparty</id><username>${env.CI_OPT_CUSTOM_NEXUS3_USER}</username><password>${env.CI_OPT_CUSTOM_NEXUS3_PASS}</password></server>
@@ -141,7 +141,7 @@
         <!-- accept RSA key fingerprint -->
         <!-- ssh -o UserKnownHostsFile=~/.ssh/known_hosts root@mvnsite -p 10022 -->
         <server>
-            <id>local-nexus3-mvnsite</id>
+            <id>local-mvnsite</id>
             <username>${env.CI_OPT_LOCAL_NEXUS3_USER}</username><password>${env.CI_OPT_LOCAL_NEXUS3_PASS}</password>
             <!--<username>root</username><passphrase>if required</passphrase><privateKey>${user.home}/.ssh/mvnsite.local</privateKey>-->
             <configuration>
@@ -186,7 +186,7 @@
         echo RELOADAGENT | gpg-connect-agent
         -->
         <server><id>gpg.passphrase</id><passphrase>${env.CI_OPT_GPG_PASSPHRASE}</passphrase></server>
-        <server><id>ossrh-nexus3-mvnsite</id><username>${env.CI_OPT_OSSRH_MVNSITE_USERNAME}</username><password>${env.CI_OPT_OSSRH_MVNSITE_PASSWORD}</password></server>
+        <server><id>ossrh-mvnsite</id><username>${env.CI_OPT_OSSRH_MVNSITE_USERNAME}</username><password>${env.CI_OPT_OSSRH_MVNSITE_PASSWORD}</password></server>
         <server><id>ossrh-nexus2-snapshots</id><username>${env.CI_OPT_OSSRH_NEXUS2_USER}</username><password>${env.CI_OPT_OSSRH_NEXUS2_PASS}</password></server>
         <server><id>ossrh-nexus2-staging</id><username>${env.CI_OPT_OSSRH_NEXUS2_USER}</username><password>${env.CI_OPT_OSSRH_NEXUS2_PASS}</password></server>
         <!-- @formatter:on -->
