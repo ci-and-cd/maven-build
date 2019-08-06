@@ -82,7 +82,7 @@ install:
   #  Developer's host
   #brew install https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb;
   #sshpass -p "${RSYNC_PASSWORD}" ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no rsync_user@nexus3.infra.top;
-  #./mvnw -e -ntp -U -Dsettings.localRepository=$(pwd)/.mvn/localRepository clean install sonar:sonar site deploy site-deploy;
+  #./mvnw -e -ntp -U -Dmaven.repo.local=$(pwd)/.mvn/localRepository clean install sonar:sonar site deploy site-deploy;
   #sshpass -p "${RSYNC_PASSWORD}" rsync -r -a -v -e ssh --delete $(pwd)/.mvn/localRepository/ rsync_user@infra.top:/restricted/rsync_user/m2_repository;
   #rm -rf  $(pwd)/.mvn/localRepository/*;
   #sshpass -p "${RSYNC_PASSWORD}" rsync -r -a -v -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" rsync_user@infra.top:/restricted/rsync_user/m2_repository/ $(pwd)/.mvn/localRepository;
