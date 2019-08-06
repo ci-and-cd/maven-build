@@ -82,7 +82,7 @@ install:
   #  Developer's host
   #brew install https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb;
   #sshpass -p "${RSYNC_PASSWORD}" ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no rsync_user@nexus3.infra.top;
-  #./mvnw -e -ntp -U -Dmaven.repo.local=$(pwd)/.mvn/localRepository clean install sonar:sonar site deploy site-deploy;
+  #./mvnw -e -ntp -U clean install sonar:sonar site deploy site-deploy;
   #sshpass -p "${RSYNC_PASSWORD}" rsync -r -a -v -e ssh --delete $(pwd)/.mvn/localRepository/ rsync_user@infra.top:/restricted/rsync_user/m2_repository;
   #rm -rf  $(pwd)/.mvn/localRepository/*;
   #sshpass -p "${RSYNC_PASSWORD}" rsync -r -a -v -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" rsync_user@infra.top:/restricted/rsync_user/m2_repository/ $(pwd)/.mvn/localRepository;
@@ -97,7 +97,7 @@ install:
   #    curl -L "${SETTINGS_GLOBAL_XML_URL}" 2>/dev/null | dd of=${SETTINGS_GLOBAL_XML}; cat ${SETTINGS_GLOBAL_XML};
   #    export MAVEN_GLOBAL_SETTINGS="--global-settings ${SETTINGS_GLOBAL_XML}";
   - sh: |
-      if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:+UseParallelGC -Dmaven.repo.local=.m2/repository -Dprofile=title -DprofileFormat=JSON,HTML"; fi;
+      if [[ -z "${MAVEN_OPTS}" ]]; then export MAVEN_OPTS="-XX:+UseParallelGC -Dprofile=title -DprofileFormat=JSON,HTML"; fi;
       if [[ -d ${HOME}/.m2 ]]; then rm -rf ${HOME}/.m2/repository/top/infra/maven; ls -ahl ${HOME}/.m2; fi;
       export MAVEN_USER_HOME="${PWD}/.m2";
       ./mvnw ${MAVEN_GLOBAL_SETTINGS} -version;
