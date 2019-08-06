@@ -57,7 +57,7 @@ install:
   - sh: |
       sudo apt -y update > /dev/null;
       sudo DEBIAN_FRONTEND=noninteractive apt -qq -y install aria2 gnupg2 graphviz openssl rsync sshpass whois --no-install-suggests --no-install-recommends;
-  - whois $(curl ipinfo.io/ip);
+  #- whois $(curl ipinfo.io/ip);
   # Settings -> Environment -> Environment variables -> Add variable
   # CI_OPT_ORIGIN_REPO_SLUG
   - sh: |

@@ -1,20 +1,12 @@
 
-addons:
-  apt:
-    packages:
-      - aria2
-      # trusty: gpg (GnuPG) 2.0.22, OpenSSL 1.0.1f 6 Jan 2014
-      # xenial: gpg (GnuPG) 2.1.11, OpenSSL 1.0.2g  1 Mar 2016
-      #- gnupg
-      - gnupg2
-      - graphviz
-      - openssl
-      - rsync
-      - sshpass
-      - whois
 before_install:
   - set -ex;
-  - whois $(curl ipinfo.io/ip);
+  # trusty: gpg (GnuPG) 2.0.22, OpenSSL 1.0.1f 6 Jan 2014
+  # xenial: gpg (GnuPG) 2.1.11, OpenSSL 1.0.2g  1 Mar 2016
+  #- sudo apt -q -y install gnupg;
+  - sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) main universe restricted multiverse";
+    sudo apt -q -y install aria2 gnupg2 graphviz openjdk-8-jdk openssl rsync sshpass whois;
+  #- whois $(curl ipinfo.io/ip);
   # More options -> Settings -> Environment variables -> Add
   # CI_OPT_GPG_PASSPHRASE
   # CI_OPT_ORIGIN_REPO_SLUG
@@ -28,11 +20,10 @@ before_install:
   # CI_OPT_OSSRH_SONAR_LOGIN
   - if [[ -d /usr/lib/jvm/java-8-openjdk-amd64 ]]; then sudo ln -s /usr/lib/jvm/java-8-openjdk-amd64 /usr/lib/jvm/java-8-openjdk; fi;
     if [[ -d /usr/lib/jvm/java-11-openjdk-amd64 ]]; then sudo ln -s /usr/lib/jvm/java-11-openjdk-amd64 /usr/lib/jvm/java-11-openjdk; fi;
-  #- if [[ -d /usr/lib/jvm/java-8-oracle ]]; then sudo ln -s /usr/lib/jvm/java-8-oracle /usr/lib/jvm/java-8-openjdk; fi;
-  #- ls -ahl /usr/lib/jvm/;
+    ls -ahl /usr/lib/jvm/;
   - curl -sSL https://github.com/sormuras/bach/raw/master/install-jdk.sh | bash -s -- -F 11 --target $HOME/openjdk11 --workspace $HOME/.cache/install-jdk;
     if [[ -d $HOME/openjdk11 ]]; then sudo ln -s $HOME/openjdk11 /usr/lib/jvm/java-11-openjdk; fi;
-  - export JAVA_HOME="/usr/lib/jvm/java-8-openjdk";
+  - if [[ -d /usr/lib/jvm/java-8-openjdk ]]; then export JAVA_HOME="/usr/lib/jvm/java-8-openjdk"; fi;
   - export CI_OPT_MVN_MULTI_STAGE_BUILD="false";
     source circ.sh;
   #- export CI_OPT_CI_SCRIPT="${CI_OPT_GIT_PREFIX}/${TRAVIS_REPO_SLUG:-ci-and-cd/maven-build}/raw/${TRAVIS_BRANCH:-develop}/src/main/ci-script/lib_ci.sh";
@@ -72,20 +63,20 @@ cache:
     - "$HOME/.m2/wrapper"
     - "$HOME/.sonar/cache"
 
-dist: xenial
+dist: bionic
 env:
   global:
     - MAVEN_SKIP_RC=true
-group: edge
+#group: edge
 install: true
-jdk:
-  - openjdk8
-  #- openjdk11
-  #- oraclejdk9
-#language: java
-language: ruby
-rvm:
-  - 2.0
+#jdk:
+#  - openjdk8
+#  - openjdk11
+#  - oraclejdk9
+language: java
+#language: ruby
+#rvm:
+#  - 2.0
 script:
   # When prefixed with `travis_wait 30`, no log output until it is done.
   # see: https://github.com/travis-ci/travis-ci/issues/4190 or https://github.com/HaxeFoundation/hxcpp/issues/709
