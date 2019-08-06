@@ -9,7 +9,7 @@
     <name>maven-build</name>
     <packaging>pom</packaging>
     <url>https://github.com/ci-and-cd/maven-build</url>
-    <version>3.2.0</version>
+    <version>3.3.0</version>
 
     <developers>
         <developer>
@@ -37,9 +37,25 @@
     <repositories>
         <!-- @formatter:off -->
         <repository>
-            <id>central</id><url>https://repo1.maven.org/maven2/</url>
+            <id>central</id><name>Maven Central</name><url>https://repo1.maven.org/maven2/</url>
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+        <!--
+        <repository>
+            <id>ossrh-nexus2-releases</id>
+            <name>ossrh nexus2 releases</name>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+            <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
+            <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+        -->
+        <repository>
+            <id>ossrh-nexus2-snapshots</id>
+            <name>ossrh nexus2 snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
         </repository>
         <repository>
             <id>spring-libs-release</id>
@@ -56,20 +72,6 @@
         <repository>
             <id>spring-libs-snapshot</id>
             <url>http://repo.spring.io/libs-snapshot/</url>
-            <releases><enabled>false</enabled></releases>
-            <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
-        </repository>
-        <repository>
-            <id>ossrh-nexus2-releases</id>
-            <name>ossrh nexus2 releases</name>
-            <url>https://oss.sonatype.org/content/repositories/releases/</url>
-            <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
-            <snapshots><enabled>false</enabled></snapshots>
-        </repository>
-        <repository>
-            <id>ossrh-nexus2-snapshots</id>
-            <name>ossrh nexus2 snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
             <releases><enabled>false</enabled></releases>
             <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
         </repository>
@@ -96,29 +98,11 @@
     <pluginRepositories>
         <!-- @formatter:off -->
         <pluginRepository>
-            <id>central</id>
-            <url>https://repo1.maven.org/maven2/</url>
+            <id>central</id><name>Maven Central</name><url>https://repo1.maven.org/maven2/</url>
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
-        <pluginRepository>
-            <id>spring-libs-release</id>
-            <url>http://repo.spring.io/libs-release/</url>
-            <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
-            <snapshots><enabled>false</enabled></snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>spring-milestone</id>
-            <url>http://repo.spring.io/milestone/</url>
-            <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
-            <snapshots><enabled>false</enabled></snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>spring-libs-snapshot</id>
-            <url>http://repo.spring.io/libs-snapshot/</url>
-            <releases><enabled>false</enabled></releases>
-            <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
-        </pluginRepository>
+        <!--
         <pluginRepository>
             <id>ossrh-nexus2-releases</id>
             <name>ossrh nexus2 releases</name>
@@ -126,28 +110,26 @@
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
             <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
+        -->
         <pluginRepository>
-            <id>ossrh-nexus2-snapshots</id>
-            <name>ossrh nexus2 snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <id>ossrh-nexus2-snapshots</id><name>ossrh nexus2 snapshots</name><url>https://oss.sonatype.org/content/repositories/snapshots/</url>
             <releases><enabled>false</enabled></releases>
             <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
         </pluginRepository>
         <pluginRepository>
-            <id>github-mvn-repo-github-maven-plugins</id>
-            <url>https://raw.github.com/ci-and-cd/maven-plugins/mvn-repo/</url>
-            <name>Forked github-maven-plugins that upload faster</name>
-            <layout>default</layout>
-            <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+            <id>spring-libs-release</id><url>http://repo.spring.io/libs-release/</url>
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
+            <snapshots><enabled>false</enabled></snapshots>
         </pluginRepository>
         <pluginRepository>
-            <id>github-mvn-repo-wagon-maven-plugin</id>
-            <url>https://raw.github.com/ci-and-cd/wagon-maven-plugin/mvn-repo/</url>
-            <name>Forked wagon-maven-plugin that can merge snapshots metadata correctly</name>
-            <layout>default</layout>
-            <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+            <id>spring-milestone</id><url>http://repo.spring.io/milestone/</url>
             <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
+            <snapshots><enabled>false</enabled></snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>spring-libs-snapshot</id><url>http://repo.spring.io/libs-snapshot/</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
         </pluginRepository>
         <!-- @formatter:on -->
     </pluginRepositories>
@@ -291,7 +273,6 @@
 
         <version.frontend-maven-plugin>1.7.5</version.frontend-maven-plugin>
 
-        <version.git-commit-id-plugin>2.2.6</version.git-commit-id-plugin>
         <version.gitflow-maven-plugin>1.11.0</version.gitflow-maven-plugin>
 
         <!--<version.gmaven-plugin>1.0</version.gmaven-plugin>-->
@@ -354,8 +335,6 @@
         <version.properties-maven-plugin>1.0.0</version.properties-maven-plugin>
         <version.qualinsight-mojo-cobertura-core>2.0.0</version.qualinsight-mojo-cobertura-core>
 
-
-        <version.site-maven-plugin>0.13.0.OSS-M1</version.site-maven-plugin>
         <version.scala-maven-plugin>4.0.1</version.scala-maven-plugin>
 
         <!--<version.sonar-maven-plugin>3.4.1.1168</version.sonar-maven-plugin>-->
@@ -700,27 +679,6 @@
                 <plugin><artifactId>maven-surefire-report-plugin</artifactId><version>${version.maven-surefire-report-plugin}</version></plugin>
 
                 <plugin><groupId>org.sonatype.plugins</groupId><artifactId>nexus-staging-maven-plugin</artifactId><version>${version.nexus-staging-maven-plugin}</version></plugin>
-                <plugin>
-                    <groupId>pl.project13.maven</groupId>
-                    <artifactId>git-commit-id-plugin</artifactId>
-                    <version>${version.git-commit-id-plugin}</version>
-                    <configuration>
-                        <commitIdGenerationMode>flat</commitIdGenerationMode>
-                        <dotGitDirectory>${maven.multiModuleProjectDirectory}/.git</dotGitDirectory>
-                        <failOnNoGitDirectory>false</failOnNoGitDirectory>
-                        <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
-                        <generateGitPropertiesFile>true</generateGitPropertiesFile>
-                        <!--generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename-->
-                        <generateGitPropertiesFilename>src/main/resources/git.properties</generateGitPropertiesFilename>
-                        <injectAllReactorProjects>true</injectAllReactorProjects>
-                        <prefix>git</prefix>
-                        <skip>${git.commit.id.skip}</skip>
-                        <skipPoms>false</skipPoms>
-                        <verbose>false</verbose>
-                    </configuration>
-                </plugin>
-
-                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>wagon-maven-plugin</artifactId><version>${version.wagon-maven-plugin}</version></plugin>
 
                 <plugin>
                     <groupId>com.spotify</groupId>
@@ -1210,6 +1168,29 @@
             <!-- works on both git submodule and normal local repository -->
             <activation><file><exists>${maven.multiModuleProjectDirectory}/.git</exists></file></activation>
             <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>pl.project13.maven</groupId>
+                            <artifactId>git-commit-id-plugin</artifactId>
+                            <version>${version.git-commit-id-plugin}</version>
+                            <configuration>
+                                <commitIdGenerationMode>flat</commitIdGenerationMode>
+                                <dotGitDirectory>${maven.multiModuleProjectDirectory}/.git</dotGitDirectory>
+                                <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                                <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
+                                <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                                <!--generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename-->
+                                <generateGitPropertiesFilename>src/main/resources/git.properties</generateGitPropertiesFilename>
+                                <injectAllReactorProjects>true</injectAllReactorProjects>
+                                <prefix>git</prefix>
+                                <skip>${git.commit.id.skip}</skip>
+                                <skipPoms>false</skipPoms>
+                                <verbose>false</verbose>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
                 <plugins>
                     <plugin>
                         <groupId>pl.project13.maven</groupId><artifactId>git-commit-id-plugin</artifactId>
@@ -1223,6 +1204,9 @@
                     </plugin>
                 </plugins>
             </build>
+            <properties>
+                <version.git-commit-id-plugin>2.2.6</version.git-commit-id-plugin>
+            </properties>
         </profile>
 
         <profile>
@@ -1671,9 +1655,30 @@
                             </configuration>
                         </plugin>
                         -->
+                        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>wagon-maven-plugin</artifactId><version>${version.wagon-maven-plugin}</version></plugin>
                     </plugins>
                 </pluginManagement>
             </build>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>central</id><name>Maven Central</name><url>https://repo1.maven.org/maven2/</url>
+                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>ossrh-nexus2-snapshots</id><name>ossrh nexus2 snapshots</name><url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>github-mvn-repo-wagon-maven-plugin</id>
+                    <url>https://raw.github.com/ci-and-cd/wagon-maven-plugin/mvn-repo/</url>
+                    <name>Forked wagon-maven-plugin that can merge snapshots metadata correctly</name>
+                    <layout>default</layout>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
+                </pluginRepository>
+            </pluginRepositories>
         </profile>
 
         <profile>
@@ -1974,11 +1979,33 @@
                     <url>${github.site.path}</url>
                 </site>
             </distributionManagement>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>central</id><name>Maven Central</name><url>https://repo1.maven.org/maven2/</url>
+                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>ossrh-nexus2-snapshots</id><name>ossrh nexus2 snapshots</name><url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>github-mvn-repo-github-maven-plugins</id>
+                    <url>https://raw.github.com/ci-and-cd/maven-plugins/mvn-repo/</url>
+                    <name>Forked github-maven-plugins that upload faster</name>
+                    <layout>default</layout>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
+                </pluginRepository>
+            </pluginRepositories>
             <properties>
                 <!-- for site on github, id (github.global.server) must match the config in your settings.xml -->
                 <github.global.server>github-site</github.global.server>
 
                 <maven.site.deploy.skip>true</maven.site.deploy.skip>
+
+                <version.site-maven-plugin>0.13.0.OSS-M1</version.site-maven-plugin>
             </properties>
         </profile>
 
@@ -3075,6 +3102,16 @@
             </dependencyManagement>
             <pluginRepositories>
                 <pluginRepository>
+                    <id>central</id><name>Maven Central</name><url>https://repo1.maven.org/maven2/</url>
+                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>ossrh-nexus2-snapshots</id><name>ossrh nexus2 snapshots</name><url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                </pluginRepository>
+                <pluginRepository>
                     <!-- Needed for latest Groovy Eclipse version -->
                     <id>groovy-bintray</id><name>Groovy Bintray</name><url>https://dl.bintray.com/groovy/maven/</url>
                     <releases><updatePolicy>never</updatePolicy></releases>
@@ -3617,23 +3654,27 @@
             </distributionManagement>
             <pluginRepositories>
                 <pluginRepository>
-                    <id>custom-nexus3-releases</id>
-                    <name>custom nexus3 releases</name>
-                    <url>${custom.repository.releases.url}</url>
+                    <id>central</id><name>Maven Central</name><url>https://repo1.maven.org/maven2/</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </pluginRepository>
                 <pluginRepository>
-                    <id>custom-nexus3-snapshots</id>
-                    <name>custom nexus3 snapshots</name>
-                    <url>${custom.repository.snapshots.url}</url>
+                    <id>ossrh-nexus2-snapshots</id><name>ossrh nexus2 snapshots</name><url>https://oss.sonatype.org/content/repositories/snapshots/</url>
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </pluginRepository>
                 <pluginRepository>
-                    <id>custom-nexus3-thirdparty</id>
-                    <name>custom nexus3 thirdparty</name>
-                    <url>${custom.repository.third-party.url}</url>
+                    <id>custom-nexus3-releases</id><name>custom nexus3 releases</name><url>${custom.repository.releases.url}</url>
+                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>custom-nexus3-snapshots</id><name>custom nexus3 snapshots</name><url>${custom.repository.snapshots.url}</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>custom-nexus3-thirdparty</id><name>custom nexus3 thirdparty</name><url>${custom.repository.third-party.url}</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
                 </pluginRepository>
@@ -3650,6 +3691,18 @@
                 <sonar.host.url>${custom.sonar.host.url}</sonar.host.url>
             </properties>
             <repositories>
+                <repository>
+                    <id>central</id><name>Maven Central</name><url>https://repo1.maven.org/maven2/</url>
+                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </repository>
+                <repository>
+                    <id>ossrh-nexus2-snapshots</id>
+                    <name>ossrh nexus2 snapshots</name>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled><updatePolicy>daily</updatePolicy></snapshots>
+                </repository>
                 <repository>
                     <id>custom-nexus3-releases</id>
                     <name>custom nexus3 releases</name>
@@ -3690,6 +3743,7 @@
                 <snapshotRepository><id>ossrh-nexus2-snapshots</id><url>${ossrh.snapshotRepository.url}</url></snapshotRepository>
             </distributionManagement>
             <pluginRepositories>
+                <!--
                 <pluginRepository>
                     <id>ossrh-nexus2-releases</id>
                     <name>ossrh nexus2 releases</name>
@@ -3697,6 +3751,7 @@
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </pluginRepository>
+                -->
                 <pluginRepository>
                     <id>ossrh-nexus2-snapshots</id>
                     <name>ossrh nexus2 snapshots</name>
@@ -3718,12 +3773,19 @@
             </properties>
             <repositories>
                 <repository>
+                    <id>central</id><name>Maven Central</name><url>https://repo1.maven.org/maven2/</url>
+                    <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                </repository>
+                <!--
+                <repository>
                     <id>ossrh-nexus2-releases</id>
                     <name>ossrh nexus2 releases</name>
                     <url>${ossrh.repository.releases.url}</url>
                     <releases><enabled>true</enabled><updatePolicy>never</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                 </repository>
+                -->
                 <repository>
                     <id>ossrh-nexus2-snapshots</id>
                     <name>ossrh nexus2 snapshots</name>
