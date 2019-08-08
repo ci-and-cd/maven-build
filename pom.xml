@@ -3076,10 +3076,12 @@
                                 <useIncrementalCompilation>false</useIncrementalCompilation>
                                 <compilerId>groovy-eclipse-compiler</compilerId><!-- Use Groovy Eclipse Compiler -->
                                 <compilerArguments>
-                                    <!--<indy/>-->
+                                    <!--<configScript>config.groovy</configScript> optional; supported by batch 2.4.13-02+ -->
+                                    <indy/><!-- optional; supported by batch 2.4.12-04+ -->
                                     <javaAgentClass>lombok.launch.Agent</javaAgentClass>
                                 </compilerArguments>
                                 <fork>true</fork>
+                                <verbose>true</verbose>
                             </configuration>
                             <dependencies>
                                 <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-eclipse-compiler</artifactId><version>${version.groovy-eclipse-compiler}</version></dependency>
@@ -3091,12 +3093,13 @@
                 </pluginManagement>
             </build>
             <dependencies>
-                <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId></dependency>
-                <!--<dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId><classifier>indy</classifier></dependency>-->
+                <!--<dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId><type>pom</type></dependency>-->
+                <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId><classifier>indy</classifier></dependency>
+                <dependency><groupId>org.projectlombok</groupId><artifactId>lombok</artifactId><version>${version.lombok}</version><optional>true</optional></dependency>
             </dependencies>
             <dependencyManagement>
                 <dependencies>
-                    <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy</artifactId><classifier>indy</classifier><version>${groovy.version}</version></dependency>
+                    <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId><classifier>indy</classifier><version>${groovy.version}</version></dependency>
                     <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-all</artifactId><version>${groovy.version}</version><type>pom</type></dependency>
                 </dependencies>
             </dependencyManagement>
