@@ -40,7 +40,7 @@
     <profiles>
         <!-- @formatter:off -->
         <profile>
-            <id>infrastructure_custom-allow-using-snapshots-parents-and-plugins</id>
+            <id>infra_custom-allow-using-snapshots-parents-and-plugins</id>
             <activation><property><name>custom.nexus3</name></property></activation>
             <pluginRepositories>
                 <pluginRepository>
@@ -62,7 +62,7 @@
             </repositories>
         </profile>
         <profile>
-            <id>infrastructure_local-allow-using-snapshots-parents-and-plugins</id>
+            <id>infra_local-allow-using-snapshots-parents-and-plugins</id>
             <activation><property><name>local.nexus3</name></property></activation>
             <pluginRepositories>
                 <pluginRepository>
