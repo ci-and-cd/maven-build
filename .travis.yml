@@ -35,6 +35,11 @@ before_install:
     if [[ -d ${HOME}/.m2 ]]; then rm -rf ${HOME}/.m2/repository/top/infra/maven; ls -ahl ${HOME}/.m2; fi;
     export MAVEN_USER_HOME="${PWD}/.m2";
     ./mvnw ${MAVEN_GLOBAL_SETTINGS} -version;
+  - if [[ -n "${MAVEN_USER_HOME}" ]] && [[ ! -d ${HOME}/.m2/repository ]]; then
+      mkdir -p ${MAVEN_USER_HOME}/repository ${HOME}/.m2;
+      ln -s ${MAVEN_USER_HOME}/repository ${HOME}/.m2/repository;
+      ls -ahl ${HOME}/.m2/;
+    fi;
   #- aria2c --file-allocation=none -c -x 10 -s 10 -m 0 --console-log-level=notice --log-level=notice --summary-interval=0 -o apache-maven-3.6.1-bin.zip https://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.zip && unzip -qq apache-maven-3.6.1-bin.zip;
   #  export M2_HOME="$PWD/apache-maven-3.6.1";
   #  export PATH="$M2_HOME/bin:$PATH";
@@ -59,8 +64,8 @@ cache:
   directories:
     - "$HOME/.cache"
     - "$HOME/.gradle"
-    - "$HOME/.m2/repository"
-    - "$HOME/.m2/wrapper"
+    - ".m2/repository"
+    - ".m2/wrapper"
     - "$HOME/.sonar/cache"
 
 dist: bionic

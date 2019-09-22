@@ -16,8 +16,8 @@ build: off
 cache:
   - "$HOME/.cache"
   - "$HOME/.gradle"
-  - "$HOME/.m2/repository"
-  - "$HOME/.m2/wrapper"
+  - ".m2/repository"
+  - ".m2/wrapper"
   - "$HOME/.sonar/cache"
 
 environment:
@@ -101,6 +101,12 @@ install:
       if [[ -d ${HOME}/.m2 ]]; then rm -rf ${HOME}/.m2/repository/top/infra/maven; ls -ahl ${HOME}/.m2; fi;
       export MAVEN_USER_HOME="${PWD}/.m2";
       ./mvnw ${MAVEN_GLOBAL_SETTINGS} -version;
+  - sh: |
+      if [[ -n "${MAVEN_USER_HOME}" ]] && [[ ! -d ${HOME}/.m2/repository ]]; then
+        mkdir -p ${MAVEN_USER_HOME}/repository ${HOME}/.m2;
+        ln -s ${MAVEN_USER_HOME}/repository ${HOME}/.m2/repository;
+        ls -ahl ${HOME}/.m2/;
+      fi;
   #- sh: |
   #    unset M2_HOME;
   #    sudo mkdir -p /opt/maven;

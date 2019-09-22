@@ -128,7 +128,13 @@ before_script:
     if [[ -d ${HOME}/.m2 ]]; then rm -rf ${HOME}/.m2/repository/top/infra/maven; ls -ahl ${HOME}/.m2; fi;
     export MAVEN_USER_HOME="${PWD}/.m2";
     ./mvnw ${MAVEN_GLOBAL_SETTINGS} -version;
-
+  # spring-cloud-contract-maven-plugin may not aware of maven.repo.local
+  - |
+    if [[ -n "${MAVEN_USER_HOME}" ]] && [[ ! -d ${HOME}/.m2/repository ]]; then
+      mkdir -p ${MAVEN_USER_HOME}/repository ${HOME}/.m2;
+      ln -s ${MAVEN_USER_HOME}/repository ${HOME}/.m2/repository;
+      ls -ahl ${HOME}/.m2/;
+    fi;
   ## manual_git
   #- export GIT_REMOTE="git@${CI_OPT_GIT_HOST}:${CI_PROJECT_NAMESPACE}/${CI_OPT_BUILD_PREFIX}${CI_PROJECT_NAME}.git";
   #  if [ -d .git ]; then git remote set-url origin ${GIT_REMOTE} && git fetch --all; fi;
