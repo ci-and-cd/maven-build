@@ -11,7 +11,7 @@
         <configuration>
             <!-- OSX style: /Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home -->
             <!-- OSX style: /Library/Java/JavaVirtualMachines/openjdk-11.0.2.jdk/Contents/Home -->
-            <jdkHome>/Library/Java/JavaVirtualMachines/jdk1.8.0_211.jdk/Contents/Home</jdkHome>
+            <jdkHome>/Library/Java/JavaVirtualMachines/jdk1.8.0_221.jdk/Contents/Home</jdkHome>
         </configuration>
     </toolchain>
     <toolchain>
@@ -20,7 +20,7 @@
             <version>1.8</version>
         </provides>
         <configuration>
-            <jdkHome>/Library/Java/JavaVirtualMachines/jdk1.8.0_211.jdk/Contents/Home</jdkHome>
+            <jdkHome>/Library/Java/JavaVirtualMachines/jdk1.8.0_221.jdk/Contents/Home</jdkHome>
         </configuration>
     </toolchain>
     <toolchain>
@@ -29,7 +29,7 @@
             <version>8</version>
         </provides>
         <configuration>
-            <jdkHome>/Library/Java/JavaVirtualMachines/jdk1.8.0_211.jdk/Contents/Home</jdkHome>
+            <jdkHome>/Library/Java/JavaVirtualMachines/jdk1.8.0_221.jdk/Contents/Home</jdkHome>
         </configuration>
     </toolchain>
     <toolchain>
@@ -39,7 +39,7 @@
             <version>11</version>
         </provides>
         <configuration>
-            <jdkHome>/Library/Java/JavaVirtualMachines/jdk-11.0.2.jdk/Contents/Home</jdkHome>
+            <jdkHome>/Library/Java/JavaVirtualMachines/jdk-11.0.4.jdk/Contents/Home</jdkHome>
         </configuration>
     </toolchain>
 </toolchains>

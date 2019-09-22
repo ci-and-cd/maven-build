@@ -9,9 +9,9 @@
             <!--<vendor>openjdk</vendor>-->
         </provides>
         <configuration>
-            <!-- Windows style: C:\Program Files\Java\jdk1.8.0_211 -->
-            <!-- sdkman style: ${user.home}/.sdkman/candidates/java/11.0.2-open -->
-            <jdkHome>C:\Program Files\Java\jdk1.8.0_211</jdkHome>
+            <!-- Windows style: C:\Program Files\Java\jdk1.8.0_221 -->
+            <!-- sdkman style: ${user.home}/.sdkman/candidates/java/11.0.4-open -->
+            <jdkHome>C:\Program Files\Java\jdk1.8.0_221</jdkHome>
         </configuration>
     </toolchain>
     <toolchain>
@@ -20,7 +20,7 @@
             <version>1.8</version>
         </provides>
         <configuration>
-            <jdkHome>C:\Program Files\Java\jdk1.8.0_211</jdkHome>
+            <jdkHome>C:\Program Files\Java\jdk1.8.0_221</jdkHome>
         </configuration>
     </toolchain>
     <toolchain>
@@ -29,7 +29,7 @@
             <version>8</version>
         </provides>
         <configuration>
-            <jdkHome>C:\Program Files\Java\jdk1.8.0_211</jdkHome>
+            <jdkHome>C:\Program Files\Java\jdk1.8.0_221</jdkHome>
         </configuration>
     </toolchain>
     <toolchain>
@@ -39,7 +39,7 @@
             <id>jdk11</id>
         </provides>
         <configuration>
-            <jdkHome>C:\Program Files\Java\jdk-11.0.2</jdkHome>
+            <jdkHome>C:\Program Files\Java\jdk-11.0.4</jdkHome>
         </configuration>
     </toolchain>
 </toolchains>
