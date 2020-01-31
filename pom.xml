@@ -249,7 +249,7 @@
         <version.build-helper-maven-plugin>3.0.0</version.build-helper-maven-plugin>
 
         <!--<version.checkstyle>6.19</version.checkstyle>-->
-        <version.checkstyle>8.14</version.checkstyle>
+        <version.checkstyle>8.29</version.checkstyle>
         <version.clirr-maven-plugin>2.8</version.clirr-maven-plugin>
         <!--<version.cobertura-maven-plugin>2.7</version.cobertura-maven-plugin>-->
         <version.com.google.errorprone_error_prone_core>2.3.1</version.com.google.errorprone_error_prone_core>
